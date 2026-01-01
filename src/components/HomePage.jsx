@@ -1,7 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Brain, Database, Smartphone, Code, Building, Star } from 'lucide-react';
+import { ArrowRight, Brain, Database, Smartphone, Code, Building } from 'lucide-react';
 import { Button } from './ui/button';
+import TestimonialCarousel from './TestimonialCarousel';
+import TechnologyStack from './TechnologyStack';
+import ProcessTimeline from './ProcessTimeline';
 
 const HomePage = () => {
   const vantaRef = useRef(null);
@@ -9,7 +12,7 @@ const HomePage = () => {
   useEffect(() => {
     // Initialize Vanta.js globe effect
     let vantaEffect = null;
-    
+
     const initVanta = () => {
       if (window.VANTA && window.THREE) {
         vantaEffect = window.VANTA.GLOBE({
@@ -91,12 +94,12 @@ const HomePage = () => {
   return (
     <div className="relative min-h-screen bg-slate-900 text-white overflow-hidden">
       {/* Vanta.js Background */}
-      <div 
-        ref={vantaRef} 
+      <div
+        ref={vantaRef}
         className="absolute inset-0 z-0"
         style={{ width: '100%', height: '100%' }}
       />
-      
+
       {/* Content */}
       <div className="relative z-10">
         {/* Hero Section */}
@@ -106,7 +109,7 @@ const HomePage = () => {
             <div className="inline-block mb-6 px-4 py-1 rounded-full border border-indigo-500 text-xs uppercase tracking-wider">
               Engineering Innovation Studio
             </div>
-            
+
             {/* Main Heading */}
             <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
               We build{' '}
@@ -115,18 +118,18 @@ const HomePage = () => {
               </span>{' '}
               that inspire
             </h1>
-            
+
             {/* Subheading */}
             <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-10">
-              Pioneering digital experiences that fuse cutting-edge technology with business strategy 
+              Pioneering digital experiences that fuse cutting-edge technology with business strategy
               to transform organizations and create meaningful connections.
             </p>
-            
+
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button 
-                asChild 
-                size="lg" 
+              <Button
+                asChild
+                size="lg"
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full"
               >
                 <Link to="/contact">
@@ -134,9 +137,9 @@ const HomePage = () => {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button 
-                asChild 
-                variant="outline" 
+              <Button
+                asChild
+                variant="outline"
                 size="lg"
                 className="border-gray-600 text-white hover:bg-gray-800 px-8 py-3 rounded-full"
               >
@@ -164,6 +167,90 @@ const HomePage = () => {
           </div>
         </section>
 
+        {/* AI Agents Section */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-800/30">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <div className="inline-block mb-6 px-4 py-2 rounded-full bg-purple-600/20 border border-purple-500 text-purple-300 text-sm font-semibold">
+                Featured AI Agents
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                Our{' '}
+                <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                  AI Agent
+                </span>{' '}
+                Suite
+              </h2>
+              <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                Pre-built, enterprise-ready AI agents that integrate seamlessly with your existing tools and workflows.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+              <Link to="/agents/copywriter" className="group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-8 hover:border-blue-500 transition-all duration-300">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-3xl">✍️</span>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
+                  Copywriter Agent
+                </h3>
+                <p className="text-gray-400 mb-6">
+                  AI-powered content creation with stunning infographics
+                </p>
+                <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                  10x
+                </div>
+                <div className="text-sm text-gray-400">Faster Content Creation</div>
+              </Link>
+
+              <Link to="/agents/crm" className="group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-8 hover:border-blue-500 transition-all duration-300">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-3xl">👥</span>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
+                  CRM Agent
+                </h3>
+                <p className="text-gray-400 mb-6">
+                  Intelligent customer engagement, 24/7
+                </p>
+                <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                  95%
+                </div>
+                <div className="text-sm text-gray-400">Customer Satisfaction</div>
+              </Link>
+
+              <Link to="/agents/sales" className="group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-8 hover:border-blue-500 transition-all duration-300">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-3xl">📈</span>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
+                  Sales Agent
+                </h3>
+                <p className="text-gray-400 mb-6">
+                  Qualify leads and accelerate your pipeline
+                </p>
+                <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                  3x
+                </div>
+                <div className="text-sm text-gray-400">More Qualified Leads</div>
+              </Link>
+            </div>
+
+            <div className="text-center">
+              <Button
+                asChild
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full"
+              >
+                <Link to="/agents">
+                  Explore All Agents
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+
         {/* Services Section */}
         <section className="py-20 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
@@ -178,10 +265,10 @@ const HomePage = () => {
                 We specialize in cutting-edge technologies that drive innovation and business transformation.
               </p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {services.map((service, index) => (
-                <div 
+                <div
                   key={index}
                   className="group p-6 rounded-2xl bg-slate-800/50 backdrop-blur-sm border border-slate-700 hover:border-blue-500 transition-all duration-300 hover:transform hover:scale-105"
                 >
@@ -200,6 +287,38 @@ const HomePage = () => {
           </div>
         </section>
 
+        {/* Technology Stack Section */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-800/30">
+          <div className="max-w-7xl mx-auto">
+            <TechnologyStack />
+          </div>
+        </section>
+
+        {/* Process Timeline Section */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <ProcessTimeline />
+          </div>
+        </section>
+
+        {/* Testimonials Section */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-800/30">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                What Our{' '}
+                <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                  Clients Say
+                </span>
+              </h2>
+              <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                Don't just take our word for it. Here's what our clients have to say about working with us.
+              </p>
+            </div>
+            <TestimonialCarousel />
+          </div>
+        </section>
+
         {/* CTA Section */}
         <section className="py-20 px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
@@ -211,13 +330,13 @@ const HomePage = () => {
               your business?
             </h2>
             <p className="text-gray-400 text-lg mb-10 max-w-2xl mx-auto">
-              Let's discuss how our expertise in AI, data platforms, and modern development 
+              Let's discuss how our expertise in AI, data platforms, and modern development
               can accelerate your digital transformation journey.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                asChild 
-                size="lg" 
+              <Button
+                asChild
+                size="lg"
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full"
               >
                 <Link to="/contact">
@@ -225,9 +344,9 @@ const HomePage = () => {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button 
-                asChild 
-                variant="outline" 
+              <Button
+                asChild
+                variant="outline"
                 size="lg"
                 className="border-gray-600 text-white hover:bg-gray-800 px-8 py-3 rounded-full"
               >

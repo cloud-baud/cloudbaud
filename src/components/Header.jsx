@@ -6,6 +6,7 @@ import { Button } from './ui/button';
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const [isAgentsOpen, setIsAgentsOpen] = useState(false);
 
   const services = [
     { name: 'Architecture', href: '/services' },
@@ -32,10 +33,55 @@ const Header = () => {
             <Link to="/" className="text-gray-300 hover:text-blue-400 transition-colors">
               Home
             </Link>
-            
+
+            {/* AI Agents Dropdown */}
+            <div className="relative group">
+              <button
+                className="flex items-center text-gray-300 hover:text-blue-400 transition-colors"
+                onMouseEnter={() => setIsAgentsOpen(true)}
+                onMouseLeave={() => setIsAgentsOpen(false)}
+              >
+                AI Agents
+                <ChevronDown className="ml-1 h-4 w-4" />
+              </button>
+
+              {isAgentsOpen && (
+                <div
+                  className="absolute top-full left-0 mt-2 w-56 bg-slate-800 rounded-lg shadow-lg border border-slate-700 py-2"
+                  onMouseEnter={() => setIsAgentsOpen(true)}
+                  onMouseLeave={() => setIsAgentsOpen(false)}
+                >
+                  <Link
+                    to="/agents"
+                    className="block px-4 py-2 text-gray-300 hover:bg-slate-700 hover:text-blue-400 transition-colors"
+                  >
+                    All Agents
+                  </Link>
+                  <Link
+                    to="/agents/copywriter"
+                    className="block px-4 py-2 text-gray-300 hover:bg-slate-700 hover:text-blue-400 transition-colors"
+                  >
+                    Copywriter Agent
+                  </Link>
+                  <Link
+                    to="/agents/crm"
+                    className="block px-4 py-2 text-gray-300 hover:bg-slate-700 hover:text-blue-400 transition-colors"
+                  >
+                    CRM Agent
+                  </Link>
+                  <Link
+                    to="/agents/sales"
+                    className="block px-4 py-2 text-gray-300 hover:bg-slate-700 hover:text-blue-400 transition-colors"
+                  >
+                    Sales Agent
+                  </Link>
+                </div>
+              )}
+            </div>
+
             {/* Services Dropdown */}
             <div className="relative group">
-              <button 
+              <button
                 className="flex items-center text-gray-300 hover:text-blue-400 transition-colors"
                 onMouseEnter={() => setIsServicesOpen(true)}
                 onMouseLeave={() => setIsServicesOpen(false)}
@@ -43,9 +89,9 @@ const Header = () => {
                 Services
                 <ChevronDown className="ml-1 h-4 w-4" />
               </button>
-              
+
               {isServicesOpen && (
-                <div 
+                <div
                   className="absolute top-full left-0 mt-2 w-56 bg-slate-800 rounded-lg shadow-lg border border-slate-700 py-2"
                   onMouseEnter={() => setIsServicesOpen(true)}
                   onMouseLeave={() => setIsServicesOpen(false)}
@@ -63,6 +109,12 @@ const Header = () => {
               )}
             </div>
 
+            <Link to="/portfolio" className="text-gray-300 hover:text-blue-400 transition-colors">
+              Portfolio
+            </Link>
+            <Link to="/blog" className="text-gray-300 hover:text-blue-400 transition-colors">
+              Blog
+            </Link>
             <Link to="/about" className="text-gray-300 hover:text-blue-400 transition-colors">
               About
             </Link>
@@ -91,14 +143,14 @@ const Header = () => {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-slate-700">
             <div className="flex flex-col space-y-4">
-              <Link 
-                to="/" 
+              <Link
+                to="/"
                 className="text-gray-300 hover:text-blue-400 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Home
               </Link>
-              
+
               {/* Mobile Services */}
               <div className="space-y-2">
                 <span className="text-white font-medium">Services</span>
@@ -114,21 +166,35 @@ const Header = () => {
                 ))}
               </div>
 
-              <Link 
-                to="/about" 
+              <Link
+                to="/portfolio"
+                className="text-gray-300 hover:text-blue-400 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Portfolio
+              </Link>
+              <Link
+                to="/blog"
+                className="text-gray-300 hover:text-blue-400 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Blog
+              </Link>
+              <Link
+                to="/about"
                 className="text-gray-300 hover:text-blue-400 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 About
               </Link>
-              <Link 
-                to="/contact" 
+              <Link
+                to="/contact"
                 className="text-gray-300 hover:text-blue-400 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contact
               </Link>
-              
+
               <Button asChild className="w-fit bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
                 <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
                   Get Started
