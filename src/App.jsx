@@ -13,6 +13,7 @@ import BlogPost from './components/BlogPost';
 import CareersPage from './components/CareersPage';
 import AgentsPage from './components/AgentsPage';
 import AgentDetail from './components/AgentDetail';
+import CapabilitiesPage from './components/CapabilitiesPage';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/agents" element={<AgentsPage />} />
             <Route path="/agents/:slug" element={<AgentDetail />} />
+            <Route path="/capabilities" element={<CapabilitiesPage />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/portfolio" element={<PortfolioPage />} />
             <Route path="/about" element={<AboutPage />} />
