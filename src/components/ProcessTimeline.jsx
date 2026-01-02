@@ -68,11 +68,11 @@ const ProcessTimeline = () => {
     return (
         <div className="space-y-12">
             <div className="text-center mb-16">
-                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 font-serif">
-                    Our <span className="text-blue-600">Methodology</span>
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white font-serif">
+                    Our <span className="text-blue-500">Methodology</span>
                 </h2>
                 <div className="w-20 h-1 bg-blue-600 mx-auto mb-8"></div>
-                <p className="text-gray-600 text-xl max-w-3xl mx-auto">
+                <p className="text-slate-400 text-xl max-w-3xl mx-auto">
                     A proven, engineering-first approach that delivers results through
                     collaboration, transparency, and technical excellence.
                 </p>
@@ -81,7 +81,7 @@ const ProcessTimeline = () => {
             {/* Timeline */}
             <div className="relative">
                 {/* Vertical Line - Desktop */}
-                <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-gray-200 transform -translate-x-1/2" />
+                <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-slate-800 transform -translate-x-1/2" />
 
                 {/* Steps */}
                 <div className="space-y-20">
@@ -93,27 +93,27 @@ const ProcessTimeline = () => {
                         >
                             {/* Content */}
                             <div className={`${index % 2 === 0 ? 'md:text-right' : 'md:col-start-2'}`}>
-                                <div className="bg-white border border-gray-100 rounded-2xl p-8 hover:shadow-2xl hover:border-blue-100 transition-all duration-300 shadow-sm">
+                                <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-8 hover:bg-slate-900/60 hover:border-blue-500/30 transition-all duration-300 shadow-xl">
                                     <div className={`flex items-center gap-4 mb-6 ${index % 2 === 0 ? 'md:justify-end' : ''}`}>
-                                        <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                                            <step.icon className="h-6 w-6 text-blue-600" />
+                                        <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                                            <step.icon className="h-6 w-6 text-blue-500" />
                                         </div>
                                         <div>
-                                            <div className="text-blue-600 text-xs font-bold uppercase tracking-widest">Phase 0{step.id}</div>
-                                            <h3 className="text-2xl font-bold text-gray-900">{step.title}</h3>
+                                            <div className="text-blue-500 text-xs font-bold uppercase tracking-widest">Phase 0{step.id}</div>
+                                            <h3 className="text-2xl font-bold text-white">{step.title}</h3>
                                         </div>
                                     </div>
 
-                                    <p className="text-gray-600 text-lg mb-6">{step.description}</p>
+                                    <p className="text-slate-400 text-lg mb-6">{step.description}</p>
 
                                     <ul className={`space-y-3 ${index % 2 === 0 ? 'md:text-right' : ''}`}>
                                         {step.details.map((detail, detailIndex) => (
                                             <li
                                                 key={detailIndex}
-                                                className="text-gray-500 text-sm font-medium flex items-center gap-3"
+                                                className="text-slate-500 text-sm font-medium flex items-center gap-3"
                                                 style={{ flexDirection: index % 2 === 0 ? 'row-reverse' : 'row' }}
                                             >
-                                                <div className="w-1.5 h-1.5 bg-blue-600 rounded-full flex-shrink-0" />
+                                                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0" />
                                                 <span>{detail}</span>
                                             </li>
                                         ))}
@@ -122,8 +122,8 @@ const ProcessTimeline = () => {
                             </div>
 
                             {/* Timeline Node - Desktop */}
-                            <div className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white border-2 border-gray-100 rounded-full items-center justify-center z-10 shadow-lg">
-                                <div className="w-4 h-4 bg-blue-600 rounded-full shadow-lg shadow-blue-200" />
+                            <div className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-[#010816] border-2 border-slate-800 rounded-full items-center justify-center z-10 shadow-lg">
+                                <div className="w-4 h-4 bg-blue-600 rounded-full shadow-lg shadow-blue-500/20" />
                             </div>
                         </div>
                     ))}
@@ -131,7 +131,7 @@ const ProcessTimeline = () => {
             </div>
 
             {/* Mobile Timeline Indicator */}
-            <div className="md:hidden absolute left-8 top-0 bottom-0 w-px bg-gray-200" />
+            <div className="md:hidden absolute left-8 top-0 bottom-0 w-px bg-slate-800" />
         </div>
     );
 };

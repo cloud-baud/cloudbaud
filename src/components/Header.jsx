@@ -17,7 +17,7 @@ const Header = () => {
   ];
 
   return (
-    <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
+    <header className="bg-slate-950/80 backdrop-blur-md border-b border-slate-900 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
@@ -26,21 +26,21 @@ const Header = () => {
               <span className="text-white font-black text-xl">C</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-bold text-gray-900 leading-tight">CloudBaud</span>
-              <span className="text-[10px] uppercase tracking-widest text-blue-600 font-bold">Innovation Engineering</span>
+              <span className="text-xl font-bold text-white leading-tight">CloudBaud</span>
+              <span className="text-[10px] uppercase tracking-widest text-blue-500 font-bold">Innovation Engineering</span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+            <Link to="/" className="text-slate-300 hover:text-white font-medium transition-colors">
               Home
             </Link>
 
             {/* Capabilities Dropdown */}
             <div className="relative group">
               <button
-                className="flex items-center text-gray-600 hover:text-blue-600 font-medium transition-colors py-2"
+                className="flex items-center text-slate-300 hover:text-white font-medium transition-colors py-2"
                 onMouseEnter={() => setIsServicesOpen(true)}
                 onMouseLeave={() => setIsServicesOpen(false)}
               >
@@ -50,7 +50,7 @@ const Header = () => {
 
               {isServicesOpen && (
                 <div
-                  className="absolute top-full left-0 mt-0 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-3 animate-in fade-in slide-in-from-top-2 duration-200"
+                  className="absolute top-full left-0 mt-0 w-64 bg-slate-900 rounded-xl shadow-2xl border border-slate-800 py-3 animate-in fade-in slide-in-from-top-2 duration-200"
                   onMouseEnter={() => setIsServicesOpen(true)}
                   onMouseLeave={() => setIsServicesOpen(false)}
                 >
@@ -58,7 +58,7 @@ const Header = () => {
                     <Link
                       key={service.name}
                       to={service.href}
-                      className="block px-6 py-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                      className="block px-6 py-3 text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
                     >
                       {service.name}
                     </Link>
@@ -67,13 +67,13 @@ const Header = () => {
               )}
             </div>
 
-            <Link to="/industries" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+            <Link to="/industries" className="text-slate-300 hover:text-white font-medium transition-colors">
               Industries
             </Link>
-            <Link to="/portfolio" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+            <Link to="/portfolio" className="text-slate-300 hover:text-white font-medium transition-colors">
               Portfolio
             </Link>
-            <Link to="/about" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+            <Link to="/about" className="text-slate-300 hover:text-white font-medium transition-colors">
               About
             </Link>
           </nav>
@@ -96,11 +96,11 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-6 border-t border-gray-100 bg-white">
+          <div className="md:hidden py-6 border-t border-slate-900 bg-slate-950">
             <div className="flex flex-col space-y-4">
               <Link
                 to="/"
-                className="text-lg font-medium text-gray-900 border-l-4 border-transparent pl-2 hover:border-blue-600 hover:text-blue-600 transition-all"
+                className="text-lg font-medium text-white border-l-4 border-transparent pl-2 hover:border-blue-600 hover:text-blue-500 transition-all"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Home
@@ -108,13 +108,13 @@ const Header = () => {
 
               {/* Capabilities Section */}
               <div className="pt-2">
-                <div className="text-gray-400 text-xs uppercase tracking-wider mb-4 px-2 font-bold">Capabilities</div>
+                <div className="text-slate-500 text-xs uppercase tracking-wider mb-4 px-2 font-bold">Capabilities</div>
                 <div className="grid grid-cols-1 gap-2">
                   {services.map((service) => (
                     <Link
                       key={service.name}
                       to={service.href}
-                      className="block pl-4 py-2 text-gray-600 hover:text-blue-600 transition-colors"
+                      className="block pl-4 py-2 text-slate-400 hover:text-white transition-colors"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {service.name}
@@ -125,7 +125,7 @@ const Header = () => {
 
               <Link
                 to="/industries"
-                className="text-lg font-medium text-gray-900 border-l-4 border-transparent pl-2 hover:border-blue-600 hover:text-blue-600 transition-all"
+                className="text-lg font-medium text-white border-l-4 border-transparent pl-2 hover:border-blue-600 hover:text-blue-500 transition-all"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Industries
@@ -133,21 +133,21 @@ const Header = () => {
 
               <Link
                 to="/portfolio"
-                className="text-lg font-medium text-gray-900 border-l-4 border-transparent pl-2 hover:border-blue-600 hover:text-blue-600 transition-all"
+                className="text-lg font-medium text-white border-l-4 border-transparent pl-2 hover:border-blue-600 hover:text-blue-500 transition-all"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Portfolio
               </Link>
               <Link
                 to="/about"
-                className="text-lg font-medium text-gray-900 border-l-4 border-transparent pl-2 hover:border-blue-600 hover:text-blue-600 transition-all"
+                className="text-lg font-medium text-white border-l-4 border-transparent pl-2 hover:border-blue-600 hover:text-blue-500 transition-all"
                 onClick={() => setIsMenuOpen(false)}
               >
                 About
               </Link>
               <Link
                 to="/contact"
-                className="text-lg font-medium text-gray-900 border-l-4 border-transparent pl-2 hover:border-blue-600 hover:text-blue-600 transition-all"
+                className="text-lg font-medium text-white border-l-4 border-transparent pl-2 hover:border-blue-600 hover:text-blue-500 transition-all"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contact

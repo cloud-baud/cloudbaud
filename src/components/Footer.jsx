@@ -4,7 +4,7 @@ import { Linkedin, Twitter, Github, Globe } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-slate-50 text-gray-600 border-t border-gray-100">
+    <footer className="bg-[#010816] text-slate-400 border-t border-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Company Info */}
@@ -13,7 +13,7 @@ const Footer = () => {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">C</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">CloudBaud</span>
+              <span className="text-xl font-bold text-white">CloudBaud</span>
             </Link>
             <p className="text-gray-500 leading-relaxed">
               Engineering high-performance, intelligent systems for the modern enterprise. Specialized in architecture, AI engineering, and cloud platforms.
