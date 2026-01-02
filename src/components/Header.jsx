@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { Button } from './ui/button';
+import ThemeToggle from './ThemeToggle';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,30 +18,30 @@ const Header = () => {
   ];
 
   return (
-    <header className="bg-slate-950/80 backdrop-blur-md border-b border-slate-900 sticky top-0 z-50">
+    <header className="bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-900 sticky top-0 z-50 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105">
+            <div className="w-10 h-10 bg-brand-blue rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 shadow-lg shadow-brand-blue/20">
               <span className="text-white font-black text-xl">C</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-bold text-white leading-tight">CloudBaud</span>
-              <span className="text-[10px] uppercase tracking-widest text-blue-500 font-bold">Innovation Engineering</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-white leading-tight">CloudBaud</span>
+              <span className="text-[10px] uppercase tracking-widest text-brand-blue font-bold">Innovation Engineering</span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-slate-300 hover:text-white font-medium transition-colors">
+            <Link to="/" className="text-slate-600 dark:text-slate-300 hover:text-brand-blue dark:hover:text-white font-medium transition-colors">
               Home
             </Link>
 
             {/* Capabilities Dropdown */}
             <div className="relative group">
               <button
-                className="flex items-center text-slate-300 hover:text-white font-medium transition-colors py-2"
+                className="flex items-center text-slate-600 dark:text-slate-300 hover:text-brand-blue dark:hover:text-white font-medium transition-colors py-2"
                 onMouseEnter={() => setIsServicesOpen(true)}
                 onMouseLeave={() => setIsServicesOpen(false)}
               >
@@ -67,20 +68,18 @@ const Header = () => {
               )}
             </div>
 
-            <Link to="/industries" className="text-slate-300 hover:text-white font-medium transition-colors">
+            <Link to="/industries" className="text-slate-600 dark:text-slate-300 hover:text-brand-blue dark:hover:text-white font-medium transition-colors">
               Industries
             </Link>
-            <Link to="/portfolio" className="text-slate-300 hover:text-white font-medium transition-colors">
+            <Link to="/portfolio" className="text-slate-600 dark:text-slate-300 hover:text-brand-blue dark:hover:text-white font-medium transition-colors">
               Portfolio
-            </Link>
-            <Link to="/about" className="text-slate-300 hover:text-white font-medium transition-colors">
-              About
             </Link>
           </nav>
 
-          {/* CTA Button */}
+          {/* Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-6 font-bold shadow-lg shadow-blue-100">
+            <ThemeToggle />
+            <Button asChild className="bg-brand-blue hover:bg-brand-blue/90 text-white rounded-lg px-6 font-bold shadow-lg shadow-brand-blue/20">
               <Link to="/contact">Get Started</Link>
             </Button>
           </div>
@@ -96,11 +95,11 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-6 border-t border-slate-900 bg-slate-950">
+          <div className="md:hidden py-6 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950">
             <div className="flex flex-col space-y-4">
               <Link
                 to="/"
-                className="text-lg font-medium text-white border-l-4 border-transparent pl-2 hover:border-blue-600 hover:text-blue-500 transition-all"
+                className="text-lg font-medium text-gray-900 dark:text-white border-l-4 border-transparent pl-2 hover:border-blue-600 hover:text-blue-600 dark:hover:text-blue-500 transition-all"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Home
@@ -114,7 +113,7 @@ const Header = () => {
                     <Link
                       key={service.name}
                       to={service.href}
-                      className="block pl-4 py-2 text-slate-400 hover:text-white transition-colors"
+                      className="block pl-4 py-2 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {service.name}
@@ -125,7 +124,7 @@ const Header = () => {
 
               <Link
                 to="/industries"
-                className="text-lg font-medium text-white border-l-4 border-transparent pl-2 hover:border-blue-600 hover:text-blue-500 transition-all"
+                className="text-lg font-medium text-gray-900 dark:text-white border-l-4 border-transparent pl-2 hover:border-brand-blue hover:text-brand-blue dark:hover:text-brand-aqua transition-all"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Industries
@@ -133,28 +132,26 @@ const Header = () => {
 
               <Link
                 to="/portfolio"
-                className="text-lg font-medium text-white border-l-4 border-transparent pl-2 hover:border-blue-600 hover:text-blue-500 transition-all"
+                className="text-lg font-medium text-gray-900 dark:text-white border-l-4 border-transparent pl-2 hover:border-brand-blue hover:text-brand-blue dark:hover:text-brand-aqua transition-all"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Portfolio
               </Link>
               <Link
-                to="/about"
-                className="text-lg font-medium text-white border-l-4 border-transparent pl-2 hover:border-blue-600 hover:text-blue-500 transition-all"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                About
-              </Link>
-              <Link
                 to="/contact"
-                className="text-lg font-medium text-white border-l-4 border-transparent pl-2 hover:border-blue-600 hover:text-blue-500 transition-all"
+                className="text-lg font-medium text-gray-900 dark:text-white border-l-4 border-transparent pl-2 hover:border-brand-blue hover:text-brand-blue dark:hover:text-brand-aqua transition-all"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contact
               </Link>
 
-              <div className="pt-4">
-                <Button asChild className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold py-6">
+              <div className="pt-4 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
+                <span className="text-sm font-medium text-slate-500 uppercase tracking-widest pl-2">Appearance</span>
+                <ThemeToggle />
+              </div>
+
+              <div className="pt-2">
+                <Button asChild className="w-full bg-brand-blue hover:bg-brand-blue/90 text-white rounded-lg font-bold py-6">
                   <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
                     Get Started
                   </Link>

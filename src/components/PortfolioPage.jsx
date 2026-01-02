@@ -19,7 +19,7 @@ const PortfolioPage = () => {
                 <div className="max-w-7xl mx-auto text-center">
                     <h1 className="text-5xl md:text-6xl font-bold mb-6">
                         Our{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                             Portfolio
                         </span>
                     </h1>
@@ -44,8 +44,8 @@ const PortfolioPage = () => {
                                 key={category}
                                 onClick={() => setSelectedCategory(category)}
                                 className={`px-4 py-2 rounded-full font-medium transition-all duration-300 ${selectedCategory === category
-                                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                                        : 'bg-slate-800 text-gray-300 hover:bg-slate-700'
+                                    ? 'bg-gradient-to-r from-blue-600 to-blue-800 text-white'
+                                    : 'bg-slate-800 text-gray-300 hover:bg-slate-700'
                                     }`}
                             >
                                 {category}
@@ -90,7 +90,7 @@ const PortfolioPage = () => {
                     <div className="text-center mb-16">
                         <h2 className="text-4xl font-bold mb-4">
                             Detailed{' '}
-                            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                            <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                                 Case Studies
                             </span>
                         </h2>
@@ -188,7 +188,7 @@ const PortfolioPage = () => {
                 <div className="max-w-4xl mx-auto text-center">
                     <h2 className="text-4xl md:text-5xl font-bold mb-6">
                         Ready to{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                             start your project
                         </span>
                         ?
@@ -199,7 +199,7 @@ const PortfolioPage = () => {
                     <Button
                         asChild
                         size="lg"
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full"
+                        className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-8 py-3 rounded-full"
                     >
                         <Link to="/contact">
                             Schedule a Consultation

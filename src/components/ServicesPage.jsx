@@ -79,12 +79,12 @@ const ServicesPage = () => {
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
             Our{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
               Services
             </span>
           </h1>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            We provide comprehensive technology solutions that drive innovation and business transformation 
+            We provide comprehensive technology solutions that drive innovation and business transformation
             across architecture, AI, data platforms, full stack, and mobile development.
           </p>
         </div>
@@ -94,22 +94,21 @@ const ServicesPage = () => {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto space-y-20">
           {services.map((service, index) => (
-            <div 
+            <div
               key={index}
-              className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${
-                index % 2 === 1 ? 'lg:grid-flow-col-dense' : ''
-              }`}
+              className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${index % 2 === 1 ? 'lg:grid-flow-col-dense' : ''
+                }`}
             >
               {/* Content */}
               <div className={index % 2 === 1 ? 'lg:col-start-2' : ''}>
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mb-6">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center mb-6">
                   <service.icon className="h-8 w-8 text-white" />
                 </div>
-                
+
                 <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">
                   {service.title}
                 </h2>
-                
+
                 <p className="text-gray-400 text-lg mb-8 leading-relaxed">
                   {service.description}
                 </p>
@@ -132,7 +131,7 @@ const ServicesPage = () => {
                   <h3 className="text-xl font-semibold mb-4 text-white">Technologies</h3>
                   <div className="flex flex-wrap gap-2">
                     {service.technologies.map((tech, techIndex) => (
-                      <span 
+                      <span
                         key={techIndex}
                         className="px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-sm text-gray-300"
                       >
@@ -142,9 +141,9 @@ const ServicesPage = () => {
                   </div>
                 </div>
 
-                <Button 
-                  asChild 
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                <Button
+                  asChild
+                  className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white"
                 >
                   <Link to="/contact">
                     Get Started
@@ -155,7 +154,7 @@ const ServicesPage = () => {
 
               {/* Visual */}
               <div className={`${index % 2 === 1 ? 'lg:col-start-1' : ''} relative`}>
-                <div className="aspect-square bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-3xl border border-slate-700 flex items-center justify-center">
+                <div className="aspect-square bg-gradient-to-br from-blue-600/20 to-blue-800/20 rounded-3xl border border-slate-700 flex items-center justify-center">
                   <service.icon className="h-32 w-32 text-blue-400 opacity-50" />
                 </div>
               </div>
@@ -169,7 +168,7 @@ const ServicesPage = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Ready to{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
               get started
             </span>
             ?
@@ -177,10 +176,10 @@ const ServicesPage = () => {
           <p className="text-gray-400 text-lg mb-10 max-w-2xl mx-auto">
             Let's discuss your project requirements and how our expertise can help you achieve your goals.
           </p>
-          <Button 
-            asChild 
-            size="lg" 
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full"
+          <Button
+            asChild
+            size="lg"
+            className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-8 py-3 rounded-full"
           >
             <Link to="/contact">
               Schedule a Consultation

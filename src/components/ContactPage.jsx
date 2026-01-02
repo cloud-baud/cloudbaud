@@ -27,7 +27,7 @@ const ContactPage = () => {
     // Here you would typically send the form data to your backend
     console.log('Form submitted:', formData);
     setIsSubmitted(true);
-    
+
     // Reset form after 3 seconds
     setTimeout(() => {
       setIsSubmitted(false);
@@ -75,13 +75,13 @@ const ContactPage = () => {
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
             Let's Build Something{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
               Amazing
             </span>{' '}
             Together
           </h1>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Ready to transform your business with intelligent technology solutions? 
+            Ready to transform your business with intelligent technology solutions?
             We'd love to hear about your project and discuss how we can help you achieve your goals.
           </p>
         </div>
@@ -94,10 +94,10 @@ const ContactPage = () => {
             {/* Contact Information */}
             <div>
               <h2 className="text-3xl font-bold mb-8 text-white">Get in Touch</h2>
-              
+
               <div className="space-y-6 mb-12">
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
                     <Mail className="h-6 w-6 text-white" />
                   </div>
                   <div>
@@ -105,7 +105,7 @@ const ContactPage = () => {
                     <p className="text-gray-400">hello@cloudbaud.com</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                     <Phone className="h-6 w-6 text-white" />
@@ -115,7 +115,7 @@ const ContactPage = () => {
                     <p className="text-gray-400">+1 (555) 123-4567</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                     <MapPin className="h-6 w-6 text-white" />
@@ -130,7 +130,7 @@ const ContactPage = () => {
               <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
                 <h3 className="text-xl font-semibold mb-4 text-white">Response Time</h3>
                 <p className="text-gray-400 mb-4">
-                  We typically respond to inquiries within 24 hours during business days. 
+                  We typically respond to inquiries within 24 hours during business days.
                   For urgent matters, please call us directly.
                 </p>
                 <div className="flex items-center space-x-2">
@@ -169,7 +169,7 @@ const ContactPage = () => {
                           placeholder="Your name"
                         />
                       </div>
-                      
+
                       <div>
                         <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
                           Email *
@@ -202,7 +202,7 @@ const ContactPage = () => {
                           placeholder="Your company"
                         />
                       </div>
-                      
+
                       <div>
                         <label htmlFor="phone" className="block text-sm font-medium text-white mb-2">
                           Phone
@@ -255,7 +255,7 @@ const ContactPage = () => {
                           ))}
                         </select>
                       </div>
-                      
+
                       <div>
                         <label htmlFor="budget" className="block text-sm font-medium text-white mb-2">
                           Budget Range
@@ -291,10 +291,10 @@ const ContactPage = () => {
                       />
                     </div>
 
-                    <Button 
+                    <Button
                       type="submit"
                       size="lg"
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3"
+                      className="w-full bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white py-3"
                     >
                       Send Message
                       <Send className="ml-2 h-4 w-4" />
@@ -312,38 +312,38 @@ const ContactPage = () => {
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-12">
             Frequently Asked{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
               Questions
             </span>
           </h2>
-          
+
           <div className="space-y-6">
             <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
               <h3 className="text-xl font-semibold text-white mb-3">
                 How long does a typical project take?
               </h3>
               <p className="text-gray-400">
-                Project timelines vary depending on scope and complexity. Simple applications may take 2-3 months, 
+                Project timelines vary depending on scope and complexity. Simple applications may take 2-3 months,
                 while enterprise-scale solutions can take 6-12 months. We'll provide a detailed timeline during our initial consultation.
               </p>
             </div>
-            
+
             <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
               <h3 className="text-xl font-semibold text-white mb-3">
                 Do you provide ongoing support after project completion?
               </h3>
               <p className="text-gray-400">
-                Yes, we offer comprehensive support and maintenance packages to ensure your systems continue 
+                Yes, we offer comprehensive support and maintenance packages to ensure your systems continue
                 to perform optimally. This includes monitoring, updates, and technical support.
               </p>
             </div>
-            
+
             <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
               <h3 className="text-xl font-semibold text-white mb-3">
                 Can you work with our existing technology stack?
               </h3>
               <p className="text-gray-400">
-                Absolutely. We're experienced in integrating with existing systems and can work with a wide variety 
+                Absolutely. We're experienced in integrating with existing systems and can work with a wide variety
                 of technologies. We'll assess your current infrastructure and recommend the best approach.
               </p>
             </div>

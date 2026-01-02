@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
+import { ThemeProvider } from 'next-themes';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './components/HomePage';
@@ -19,29 +20,31 @@ import IndustryDetail from './components/IndustryDetail';
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-background text-foreground">
-        <Header />
-        <main>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/agents" element={<AgentsPage />} />
-            <Route path="/agents/:slug" element={<AgentDetail />} />
-            <Route path="/capabilities" element={<CapabilitiesPage />} />
-            <Route path="/industries" element={<IndustriesPage />} />
-            <Route path="/industries/:slug" element={<IndustryDetail />} />
-            <Route path="/services" element={<ServicesPage />} />
-            <Route path="/portfolio" element={<PortfolioPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/blog/:slug" element={<BlogPost />} />
-            <Route path="/careers" element={<CareersPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </Router>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+      <Router>
+        <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+          <Header />
+          <main>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/agents" element={<AgentsPage />} />
+              <Route path="/agents/:slug" element={<AgentDetail />} />
+              <Route path="/capabilities" element={<CapabilitiesPage />} />
+              <Route path="/industries" element={<IndustriesPage />} />
+              <Route path="/industries/:slug" element={<IndustryDetail />} />
+              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/portfolio" element={<PortfolioPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/blog" element={<BlogPage />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/careers" element={<CareersPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
+      </Router>
+    </ThemeProvider>
   );
 }
 

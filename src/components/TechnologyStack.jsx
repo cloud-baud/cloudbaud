@@ -49,7 +49,7 @@ const TechnologyStack = () => {
     return (
         <div className="space-y-12">
             <div className="text-center mb-16">
-                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
                     Our Specialized <span className="text-blue-500">Technology Stack</span>
                 </h2>
                 <div className="w-20 h-1 bg-blue-600 mx-auto mb-8"></div>
@@ -63,14 +63,14 @@ const TechnologyStack = () => {
                 {Object.entries(technologies).map(([category, { icon: Icon, items }]) => (
                     <div
                         key={category}
-                        className="bg-slate-900/40 border border-slate-800 p-8 rounded-2xl hover:bg-slate-900/60 hover:border-blue-500/30 transition-all duration-300"
+                        className="bg-white/50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 p-8 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-900/60 hover:border-blue-500/30 transition-all duration-300 shadow-sm dark:shadow-none"
                     >
                         {/* Icon & Title */}
                         <div className="flex items-center gap-4 mb-6">
                             <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
                                 <Icon className="h-6 w-6 text-blue-500" />
                             </div>
-                            <h3 className="text-xl font-bold text-white">{category}</h3>
+                            <h3 className="text-xl font-bold text-foreground">{category}</h3>
                         </div>
 
                         {/* Technologies List */}

@@ -30,7 +30,7 @@ const IndustriesPage = () => {
                 <div className="max-w-7xl mx-auto text-center">
                     <h1 className="text-5xl md:text-6xl font-bold mb-6">
                         Industries{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                             We Serve
                         </span>
                     </h1>
@@ -41,25 +41,25 @@ const IndustriesPage = () => {
                     {/* Stats */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
                         <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
-                            <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                            <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent mb-2">
                                 {industryStats.clientsServed}
                             </div>
                             <div className="text-sm text-gray-400">Clients Served</div>
                         </div>
                         <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
-                            <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                            <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent mb-2">
                                 {industryStats.industriesCovered}
                             </div>
                             <div className="text-sm text-gray-400">Industries</div>
                         </div>
                         <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
-                            <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                            <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent mb-2">
                                 {industryStats.avgROI}
                             </div>
                             <div className="text-sm text-gray-400">Avg ROI</div>
                         </div>
                         <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
-                            <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                            <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent mb-2">
                                 {industryStats.projectSuccessRate}
                             </div>
                             <div className="text-sm text-gray-400">Success Rate</div>
@@ -80,7 +80,7 @@ const IndustriesPage = () => {
                                     to={`/industries/${industry.slug}`}
                                     className="group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-8 hover:border-blue-500 transition-all duration-300"
                                 >
-                                    <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                                    <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                                         <Icon className="h-8 w-8 text-white" />
                                     </div>
                                     <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
@@ -104,7 +104,7 @@ const IndustriesPage = () => {
                     <div className="text-center mb-16">
                         <h2 className="text-4xl font-bold mb-6">
                             Why{' '}
-                            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                            <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                                 Industry Expertise
                             </span>{' '}
                             Matters
@@ -163,7 +163,7 @@ const IndustriesPage = () => {
                 <div className="max-w-4xl mx-auto text-center">
                     <h2 className="text-4xl md:text-5xl font-bold mb-6">
                         Ready to{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                             transform your industry
                         </span>
                         ?
@@ -175,7 +175,7 @@ const IndustriesPage = () => {
                         <Button
                             asChild
                             size="lg"
-                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full"
+                            className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-8 py-3 rounded-full"
                         >
                             <Link to="/contact">
                                 Schedule Consultation

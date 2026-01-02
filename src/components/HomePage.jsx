@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Code, Cloud, Server, Smartphone, Database, Award, Users, CheckCircle, TrendingUp, Brain, Building } from 'lucide-react';
 import { Button } from './ui/button';
+import { useTheme } from 'next-themes';
 import SEO from './SEO';
 import TechnologyStack from './TechnologyStack';
 import ProcessTimeline from './ProcessTimeline';
@@ -9,6 +10,7 @@ import TrustedBy from './TrustedBy';
 
 const HomePage = () => {
   const vantaRef = useRef(null);
+  const { theme } = useTheme();
 
   useEffect(() => {
     let vantaEffect = null;
@@ -28,7 +30,7 @@ const HomePage = () => {
             color: 0x3b82f6,
             color2: 0x1d4ed8,
             size: 1.1,
-            backgroundColor: 0x010816,
+            backgroundColor: theme === 'dark' ? 0x010816 : 0xffffff,
             points: 12.00,
             maxDistance: 20.00,
             spacing: 16.00
@@ -83,7 +85,7 @@ const HomePage = () => {
         }
       }
     };
-  }, []);
+  }, [theme]);
   const services = [
     {
       icon: Building,
@@ -120,7 +122,7 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="relative min-h-screen bg-[#010816] text-white">
+    <div className="relative min-h-screen bg-background text-foreground transition-colors duration-300">
       <SEO
         title="Engineering Intelligent Systems"
         description="CloudBaud delivers enterprise solutions architecture, AI engineering, cloud migration, and DevOps automation. Experts in TOGAF, AWS Well-Architected, Microsoft Dynamics 365, Salesforce, and Terraform."
@@ -140,7 +142,7 @@ const HomePage = () => {
               Engineering Innovation Studio
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-white">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-foreground">
               We build <span className="text-blue-500">intelligent systems</span> that work for you
             </h1>
 
@@ -163,7 +165,7 @@ const HomePage = () => {
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-slate-700 text-white hover:bg-white/5 px-8 py-6 text-lg rounded-lg transition-all"
+                className="border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 px-8 py-6 text-lg rounded-lg transition-all"
               >
                 <Link to="/capabilities">View Our Capabilities</Link>
               </Button>
@@ -173,7 +175,7 @@ const HomePage = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[#010816] border-y border-slate-800">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-background border-y border-slate-100 dark:border-slate-800 transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
@@ -191,17 +193,17 @@ const HomePage = () => {
       </section>
 
       {/* Trusted By Section */}
-      <section className="py-16 bg-slate-900/50">
+      <section className="py-16 bg-slate-50 dark:bg-slate-900/50 transition-colors">
         <div className="max-w-7xl mx-auto px-4">
           <TrustedBy />
         </div>
       </section>
 
       {/* Expertise Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-[#010816]">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-background transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 font-serif">
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6 font-serif">
               Our Core Expertise
             </h2>
             <div className="w-20 h-1 bg-blue-600 mx-auto mb-8"></div>
@@ -214,12 +216,12 @@ const HomePage = () => {
             {services.map((service, index) => (
               <div
                 key={index}
-                className="p-8 rounded-xl border border-slate-800 bg-slate-900/30 hover:bg-slate-900/50 border-white/5 hover:shadow-2xl hover:border-blue-500/30 transition-all duration-300"
+                className="p-8 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/30 hover:bg-slate-50 dark:hover:bg-slate-900/50 hover:shadow-2xl dark:hover:border-blue-500/30 transition-all duration-300 shadow-sm dark:shadow-none"
               >
                 <div className="w-14 h-14 bg-blue-500/10 rounded-xl flex items-center justify-center mb-6">
                   <service.icon className="h-7 w-7 text-blue-500" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">
+                <h3 className="text-2xl font-bold text-foreground mb-4">
                   {service.title}
                 </h3>
                 <p className="text-slate-400 leading-relaxed text-lg">
@@ -232,14 +234,14 @@ const HomePage = () => {
       </section>
 
       {/* Technology Stack Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-slate-900/30">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-900/30 transition-colors">
         <div className="max-w-7xl mx-auto">
           <TechnologyStack />
         </div>
       </section>
 
       {/* Process Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-[#010816]">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-background transition-colors">
         <div className="max-w-7xl mx-auto">
           <ProcessTimeline />
         </div>
@@ -248,10 +250,10 @@ const HomePage = () => {
 
 
       {/* CTA Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-slate-950 overflow-hidden relative border-t border-slate-900">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-950 overflow-hidden relative border-t border-slate-100 dark:border-slate-900 transition-colors">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 leading-tight">
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-8 leading-tight">
             Ready to build the future of <br /><span className="text-blue-500 underline decoration-blue-900 underline-offset-8">your business?</span>
           </h2>
           <p className="text-xl text-slate-300 mb-12 max-w-2xl mx-auto">
@@ -272,7 +274,7 @@ const HomePage = () => {
               asChild
               variant="outline"
               size="lg"
-              className="border-slate-700 text-white hover:bg-white/5 px-10 py-7 text-xl rounded-lg font-bold"
+              className="border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 px-10 py-7 text-xl rounded-lg font-bold transition-all"
             >
               <Link to="/about">Our Company</Link>
             </Button>

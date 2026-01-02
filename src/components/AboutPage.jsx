@@ -78,7 +78,7 @@ const AboutPage = () => {
             <div className="relative">
               <div className="aspect-square bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-3xl border border-slate-700 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="text-6xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4">
+                  <div className="text-6xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent mb-4">
                     50+
                   </div>
                   <div className="text-gray-400">Projects Delivered</div>
@@ -94,7 +94,7 @@ const AboutPage = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-8">
             Our{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
               Mission
             </span>
           </h2>
@@ -112,7 +112,7 @@ const AboutPage = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Our{' '}
-              <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                 Values
               </span>
             </h2>
@@ -127,7 +127,7 @@ const AboutPage = () => {
                 key={index}
                 className="p-6 rounded-2xl bg-slate-800/50 backdrop-blur-sm border border-slate-700 text-center hover:border-blue-500 transition-all duration-300"
               >
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <value.icon className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-white">
@@ -148,7 +148,7 @@ const AboutPage = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Meet Our{' '}
-              <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                 Team
               </span>
             </h2>
@@ -165,7 +165,7 @@ const AboutPage = () => {
                 className="group text-center"
               >
                 <div className="relative mb-6">
-                  <div className="w-48 h-48 mx-auto bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-2xl border border-slate-700 flex items-center justify-center group-hover:border-blue-500 transition-all duration-300">
+                  <div className="w-48 h-48 mx-auto bg-gradient-to-br from-blue-600/20 to-blue-800/20 rounded-2xl border border-slate-700 flex items-center justify-center group-hover:border-blue-500 transition-all duration-300">
                     <Users className="h-16 w-16 text-blue-400 opacity-50" />
                   </div>
                 </div>
@@ -191,7 +191,7 @@ const AboutPage = () => {
             <div>
               <h2 className="text-4xl md:text-5xl font-bold mb-8">
                 Why Choose{' '}
-                <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                   Cloudbaud
                 </span>
                 ?
@@ -224,25 +224,25 @@ const AboutPage = () => {
               <div className="aspect-square bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-3xl border border-slate-700 flex items-center justify-center">
                 <div className="grid grid-cols-2 gap-8 text-center">
                   <div>
-                    <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                    <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent mb-2">
                       100%
                     </div>
                     <div className="text-gray-400 text-sm">Client Satisfaction</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                    <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent mb-2">
                       24/7
                     </div>
                     <div className="text-gray-400 text-sm">Support</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                    <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent mb-2">
                       5+
                     </div>
                     <div className="text-gray-400 text-sm">Years Experience</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                    <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent mb-2">
                       50+
                     </div>
                     <div className="text-gray-400 text-sm">Projects</div>
@@ -259,7 +259,7 @@ const AboutPage = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Ready to{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
               work together
             </span>
             ?
@@ -270,7 +270,7 @@ const AboutPage = () => {
           <Button
             asChild
             size="lg"
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full"
+            className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-8 py-3 rounded-full"
           >
             <Link to="/contact">
               Get in Touch

@@ -4,7 +4,7 @@ import { Linkedin, Twitter, Github, Globe } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-[#010816] text-slate-400 border-t border-slate-900">
+    <footer className="bg-slate-50 dark:bg-[#010816] text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-900 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Company Info */}
@@ -13,7 +13,7 @@ const Footer = () => {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">C</span>
               </div>
-              <span className="text-xl font-bold text-white">CloudBaud</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-white">CloudBaud</span>
             </Link>
             <p className="text-gray-500 leading-relaxed">
               Engineering high-performance, intelligent systems for the modern enterprise. Specialized in architecture, AI engineering, and cloud platforms.
@@ -36,10 +36,10 @@ const Footer = () => {
 
           {/* Capabilities Column */}
           <div>
-            <h3 className="text-gray-900 font-bold uppercase tracking-widest text-xs mb-6">Capabilities</h3>
+            <h3 className="text-gray-900 dark:text-white font-bold uppercase tracking-widest text-xs mb-6">Capabilities</h3>
             <ul className="space-y-4 text-sm font-medium">
               <li>
-                <Link to="/capabilities" className="hover:text-blue-600 transition-colors">
+                <Link to="/capabilities" className="hover:text-blue-600 dark:hover:text-white transition-colors">
                   Solutions Architecture
                 </Link>
               </li>
@@ -68,10 +68,10 @@ const Footer = () => {
 
           {/* Company Column */}
           <div>
-            <h3 className="text-gray-900 font-bold uppercase tracking-widest text-xs mb-6">Company</h3>
+            <h3 className="text-gray-900 dark:text-white font-bold uppercase tracking-widest text-xs mb-6">Company</h3>
             <ul className="space-y-4 text-sm font-medium">
               <li>
-                <Link to="/about" className="hover:text-blue-600 transition-colors">
+                <Link to="/about" className="hover:text-blue-600 dark:hover:text-white transition-colors">
                   About Us
                 </Link>
               </li>
@@ -100,13 +100,13 @@ const Footer = () => {
 
           {/* Newsletter / Contact Hint */}
           <div>
-            <h3 className="text-gray-900 font-bold uppercase tracking-widest text-xs mb-6">Inquiries</h3>
+            <h3 className="text-gray-900 dark:text-white font-bold uppercase tracking-widest text-xs mb-6">Inquiries</h3>
             <p className="text-sm text-gray-500 mb-6 font-medium">
               Ready to accelerate your digital transformation?
             </p>
             <Link
               to="/contact"
-              className="inline-flex items-center justify-center px-6 py-3 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-900 hover:border-blue-600 hover:text-blue-600 transition-all shadow-sm"
+              className="inline-flex items-center justify-center px-6 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-lg text-sm font-bold text-gray-900 dark:text-white hover:border-blue-600 hover:text-blue-600 transition-all shadow-sm"
             >
               Consult with an Expert
             </Link>
@@ -114,7 +114,7 @@ const Footer = () => {
         </div>
 
         {/* Legal & Copyright */}
-        <div className="border-t border-gray-100 pt-10 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="border-t border-slate-200 dark:border-slate-800 pt-10 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-2 text-xs font-bold text-gray-400 uppercase tracking-widest">
             <Link to="/privacy-policy" className="hover:text-gray-600 transition-colors">
               Privacy
