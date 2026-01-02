@@ -8,83 +8,79 @@ import {
     Layers,
     Workflow,
     GitBranch,
-    Container,
-    Brain
 } from 'lucide-react';
 
 const TechnologyStack = () => {
     const technologies = {
         'Databases': {
             icon: Database,
-            items: ['PostgreSQL', 'MongoDB', 'MySQL', 'Redis', 'Snowflake', 'DynamoDB']
+            items: ['PostgreSQL', 'MongoDB', 'Redis', 'Snowflake', 'DynamoDB', 'Neo4j']
         },
         'Cloud Platforms': {
             icon: Cloud,
-            items: ['AWS', 'Azure', 'Google Cloud', 'Heroku', 'DigitalOcean']
+            items: ['AWS', 'Azure', 'Google Cloud (GCP)', 'DigitalOcean']
         },
-        'AI & ML': {
-            icon: Brain,
-            items: ['TensorFlow', 'PyTorch', 'OpenAI', 'Hugging Face', 'scikit-learn']
+        'AI & Engineering': {
+            icon: Cpu,
+            items: ['OpenAI', 'LangChain', 'Vector DBs', 'Graph Databases', 'Azure OpenAI']
         },
-        'Backend': {
+        'Enterprise Stack': {
             icon: Server,
-            items: ['Node.js', 'Python', 'Go', 'Java', '.NET', 'Ruby']
+            items: ['Microsoft Dynamics 365', 'Salesforce', 'SAP', 'ServiceNow', 'SharePoint']
         },
-        'Frontend': {
+        'Modern Backend': {
             icon: Code2,
-            items: ['React', 'Next.js', 'Vue', 'Angular', 'Tailwind CSS']
+            items: ['Node.js', 'Python', 'Go', '.NET Core', 'Spring Boot']
         },
-        'DevOps': {
+        'Infastructure': {
             icon: GitBranch,
-            items: ['Docker', 'Kubernetes', 'Terraform', 'GitHub Actions', 'Jenkins']
+            items: ['Terraform', 'Kubernetes', 'Docker', 'Ansible', 'GitHub Actions']
         },
-        'Data Platforms': {
+        'Data Engineering': {
             icon: Layers,
-            items: ['Apache Kafka', 'Spark', 'Airflow', 'dbt', 'Flink']
+            items: ['Apache Kafka', 'Spark', 'Airflow', 'dbt', 'Datadog']
         },
         'Architecture': {
             icon: Workflow,
-            items: ['Microservices', 'Event-Driven', 'Serverless', 'API Gateway']
+            items: ['TOGAF', 'Zachman', 'AWS Well-Architected', 'SAFe Agile']
         }
     };
 
     return (
-        <div className="space-y-8">
-            <div className="text-center mb-12">
-                <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                    Our Technology{' '}
-                    <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                        Stack
-                    </span>
+        <div className="space-y-12">
+            <div className="text-center mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
+                    Our Specialized <span className="text-blue-600">Technology Stack</span>
                 </h2>
-                <p className="text-gray-400 text-lg max-w-3xl mx-auto">
-                    We work with industry-leading technologies and frameworks to deliver
-                    cutting-edge solutions tailored to your needs.
+                <div className="w-20 h-1 bg-blue-600 mx-auto mb-8"></div>
+                <p className="text-gray-600 text-xl max-w-3xl mx-auto">
+                    We leverage best-in-class technologies and frameworks to architect
+                    high-performance, intelligent systems for the modern enterprise.
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {Object.entries(technologies).map(([category, { icon: Icon, items }]) => (
                     <div
                         key={category}
-                        className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6 hover:border-blue-500 transition-all duration-300"
+                        className="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-300"
                     >
                         {/* Icon & Title */}
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                                <Icon className="h-6 w-6 text-white" />
+                        <div className="flex items-center gap-4 mb-6">
+                            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                                <Icon className="h-6 w-6 text-blue-600" />
                             </div>
-                            <h3 className="text-lg font-semibold text-white">{category}</h3>
+                            <h3 className="text-xl font-bold text-gray-900">{category}</h3>
                         </div>
 
                         {/* Technologies List */}
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                             {items.map((item, index) => (
                                 <div
                                     key={index}
-                                    className="flex items-center gap-2 text-gray-400 text-sm"
+                                    className="flex items-center gap-3 text-gray-600 text-sm font-medium"
                                 >
-                                    <div className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
+                                    <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
                                     <span>{item}</span>
                                 </div>
                             ))}
@@ -94,11 +90,11 @@ const TechnologyStack = () => {
             </div>
 
             {/* CTA */}
-            <div className="text-center pt-8">
-                <p className="text-gray-400 text-lg">
-                    Don't see your technology?{' '}
-                    <a href="/contact" className="text-blue-400 hover:text-blue-300 transition-colors font-medium">
-                        Let's discuss your stack →
+            <div className="text-center pt-12">
+                <p className="text-gray-500 text-lg">
+                    Have a specific technology in mind?{' '}
+                    <a href="/contact" className="text-blue-600 hover:text-blue-700 transition-colors font-bold underline decoration-blue-100 underline-offset-4">
+                        Consult with our architects →
                     </a>
                 </p>
             </div>

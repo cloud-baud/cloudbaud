@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Users, Target, Award, Lightbulb } from 'lucide-react';
+import { ArrowRight, Users, Target, Award, Lightbulb, Shield, CheckCircle } from 'lucide-react';
+import TrustedBy from './TrustedBy';
 import { Button } from './ui/button';
 
 const AboutPage = () => {
@@ -69,8 +70,8 @@ const AboutPage = () => {
                 of Technology
               </h1>
               <p className="text-xl text-gray-400 leading-relaxed">
-                Cloudbaud was founded with a vision to bridge the gap between cutting-edge technology 
-                and real-world business challenges. Our team of experienced engineers, architects, 
+                Cloudbaud was founded with a vision to bridge the gap between cutting-edge technology
+                and real-world business challenges. Our team of experienced engineers, architects,
                 and data scientists brings together decades of collective expertise.
               </p>
             </div>
@@ -98,8 +99,8 @@ const AboutPage = () => {
             </span>
           </h2>
           <p className="text-xl text-gray-400 leading-relaxed">
-            To empower organizations with intelligent systems that drive innovation, efficiency, 
-            and growth while maintaining the highest standards of quality, security, and reliability. 
+            To empower organizations with intelligent systems that drive innovation, efficiency,
+            and growth while maintaining the highest standards of quality, security, and reliability.
             We believe that technology should be an enabler, not a barrier.
           </p>
         </div>
@@ -119,10 +120,10 @@ const AboutPage = () => {
               These core principles guide everything we do and shape how we work with our clients and each other.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {values.map((value, index) => (
-              <div 
+              <div
                 key={index}
                 className="p-6 rounded-2xl bg-slate-800/50 backdrop-blur-sm border border-slate-700 text-center hover:border-blue-500 transition-all duration-300"
               >
@@ -152,14 +153,14 @@ const AboutPage = () => {
               </span>
             </h2>
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Our diverse team of experts brings together deep technical knowledge and real-world experience 
+              Our diverse team of experts brings together deep technical knowledge and real-world experience
               to deliver exceptional results for our clients.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {team.map((member, index) => (
-              <div 
+              <div
                 key={index}
                 className="group text-center"
               >
@@ -199,21 +200,21 @@ const AboutPage = () => {
                 <div>
                   <h3 className="text-xl font-semibold mb-2 text-white">Innovation-Driven</h3>
                   <p className="text-gray-400">
-                    We stay at the forefront of technology trends, ensuring your solutions leverage 
+                    We stay at the forefront of technology trends, ensuring your solutions leverage
                     the latest advancements in AI, cloud computing, and software development.
                   </p>
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold mb-2 text-white">End-to-End Expertise</h3>
                   <p className="text-gray-400">
-                    From initial architecture design to final deployment and ongoing support, 
+                    From initial architecture design to final deployment and ongoing support,
                     we provide comprehensive services that cover every aspect of your technology needs.
                   </p>
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold mb-2 text-white">Proven Results</h3>
                   <p className="text-gray-400">
-                    Our track record speaks for itself. We've helped organizations across industries 
+                    Our track record speaks for itself. We've helped organizations across industries
                     achieve their digital transformation goals and realize measurable business value.
                   </p>
                 </div>
@@ -266,9 +267,9 @@ const AboutPage = () => {
           <p className="text-gray-400 text-lg mb-10 max-w-2xl mx-auto">
             Let's discuss how our team can help you achieve your technology goals and drive your business forward.
           </p>
-          <Button 
-            asChild 
-            size="lg" 
+          <Button
+            asChild
+            size="lg"
             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full"
           >
             <Link to="/contact">
@@ -278,9 +279,11 @@ const AboutPage = () => {
           </Button>
         </div>
       </section>
+
+      {/* Trusted By Section */}
+      <TrustedBy title="Trusted by Leading Organizations" showCategories={true} />
     </div>
   );
 };
 
 export default AboutPage;
-
