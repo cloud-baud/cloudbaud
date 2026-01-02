@@ -9,7 +9,7 @@ const Header = () => {
 
   const services = [
     { name: 'Database Development', href: '/capabilities' },
-    { name: 'AI Engineering', href: '/capabilities' },
+    { name: 'Intelligent Systems Engineering', href: '/capabilities' },
     { name: 'Cloud Solutions', href: '/capabilities' },
     { name: 'Microsoft Platform', href: '/capabilities' },
     { name: 'DevOps & Infrastructure', href: '/capabilities' },

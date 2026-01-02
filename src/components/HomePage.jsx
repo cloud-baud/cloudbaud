@@ -141,8 +141,7 @@ const HomePage = () => {
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-white">
-              We build AI that{' '}
-              <span className="text-blue-500">works for you</span>
+              We build <span className="text-blue-500">intelligent systems</span> that work for you
             </h1>
 
             <p className="text-xl md:text-2xl text-slate-300 mb-10 leading-relaxed max-w-2xl">
