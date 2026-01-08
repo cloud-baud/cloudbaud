@@ -4,6 +4,8 @@ import { Menu, X, ChevronDown } from 'lucide-react';
 import { Button } from './ui/button';
 import ThemeToggle from './ThemeToggle';
 
+import logo from '../assets/cloudbaud_logo.png';
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
@@ -22,9 +24,13 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group">
-            <div className="w-10 h-10 bg-brand-blue rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 shadow-lg shadow-brand-blue/20">
-              <span className="text-white font-black text-xl">C</span>
+          <Link to="/" className="flex items-center space-x-4 group">
+            <div className="w-16 h-16 flex items-center justify-center transition-transform group-hover:scale-110 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+              <img
+                src={logo}
+                alt="CloudBaud Logo"
+                className="w-full h-full object-contain"
+              />
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-bold text-gray-900 dark:text-white leading-tight">CloudBaud</span>

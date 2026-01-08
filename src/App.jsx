@@ -17,6 +17,9 @@ import AgentDetail from './components/AgentDetail';
 import CapabilitiesPage from './components/CapabilitiesPage';
 import IndustriesPage from './components/IndustriesPage';
 import IndustryDetail from './components/IndustryDetail';
+import PrivacyPolicyPage from './components/PrivacyPolicyPage';
+import TermsPage from './components/TermsPage';
+import SignupPage from './components/SignupPage';
 
 function App() {
   return (
@@ -39,6 +42,9 @@ function App() {
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/careers" element={<CareersPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/signup" element={<SignupPage />} />
             </Routes>
           </main>
           <Footer />

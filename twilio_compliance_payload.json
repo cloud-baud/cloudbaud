@@ -1,0 +1,39 @@
+{
+    "compliance_info": {
+        "description": "Crucial: This JSON object contains the exact text fields you need to copy/paste into your Twilio A2P 10DLC Brand/Campaign registration. The 'message_flow' and 'sample_messages' are specifically written to pass the manual vetting process.",
+        "notes": "Ensure you have deployed the latest code to cloudbaud.com before submitting, as the reviewer will visit the Signup URL."
+    },
+    "campaign_submission": {
+        "campaign_description": "This campaign sends project status updates, meeting reminders, two-factor authentication codes, and service notifications to CloudBaud clients who have explicitly opted in via our website signup form. Messages are only sent to users who have registered an account or requested engagement regarding software development services.",
+        "sample_message_1": "CloudBaud Update: Your project 'Alpha' has moved to the QA phase. Review the latest build here: https://cloudbaud.com/portal/alpha",
+        "sample_message_2": "CloudBaud Reminder: You have a scheduled architecture review with our team tomorrow at 2:00 PM EST.",
+        "sample_message_3": "CloudBaud Security: Your verification code is 849201. This code will expire in 10 minutes.",
+        "sample_message_4": "CloudBaud: Thank you for your inquiry. A solution architect will contact you shortly to discuss your requirements.",
+        "sample_message_5": "CloudBaud: Your monthly service report for January is now available for download in your client console.",
+        "message_flow": "End users opt-in by visiting https://cloudbaud.com/signup. Users fill out the registration form and must manually check a box labeled 'I agree to the terms and privacy policy.' This checkbox is accompanied by strict disclosure text stating: 'By checking this box, I consent to receive SMS/MMS texts from CloudBaud regarding my account and services...'. The form cannot be submitted without this explicit consent. A detailed Privacy Policy is linked directly next to the checkbox.",
+        "help_message": "CloudBaud Alerts: For assistance, reply HELP or contact us at privacy@cloudbaud.com or +1 (555) 123-4567. Msg frequency varies. Msg&Data rates may apply.",
+        "opt_out_message": "Unsubscribe Success: You have been unsubscribed from CloudBaud messages and will strictly receive no further messages. Reply START to resubscribe.",
+        "opt_in_keywords": [
+            "START",
+            "SUBSCRIBE",
+            "YES"
+        ],
+        "opt_out_keywords": [
+            "STOP",
+            "UNSUBSCRIBE",
+            "CANCEL",
+            "END",
+            "QUIT"
+        ],
+        "help_keywords": [
+            "HELP",
+            "INFO"
+        ],
+        "embedded_links": true,
+        "embedded_phone": true
+    },
+    "urls": {
+        "privacy_policy_url": "https://cloudbaud.com/privacy-policy",
+        "terms_of_service_url": "https://cloudbaud.com/terms"
+    }
+}

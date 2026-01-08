@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
 import { Button } from './ui/button';
 
+import PrivacyConsent from './PrivacyConsent';
+
 const ContactPage = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -13,6 +15,7 @@ const ContactPage = () => {
     budget: '',
     message: ''
   });
+  const [consentChecked, setConsentChecked] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleChange = (e) => {
@@ -290,6 +293,8 @@ const ContactPage = () => {
                         placeholder="Tell us about your project..."
                       />
                     </div>
+
+                    <PrivacyConsent checked={consentChecked} onChange={setConsentChecked} />
 
                     <Button
                       type="submit"

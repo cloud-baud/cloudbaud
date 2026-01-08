@@ -1,137 +1,149 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Linkedin, Twitter, Github, Globe } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { Globe, ChevronDown, Smartphone } from 'lucide-react';
 
 const Footer = () => {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const footerSections = [
+    {
+      title: 'Platforms',
+      links: [
+        { label: 'Cloud Infrastructure', to: '/platforms/cloud' },
+        { label: 'Edge Computing', to: '/platforms/edge' },
+        { label: 'Hybrid Mesh', to: '/platforms/hybrid' },
+        { label: 'Serverless SDK', to: '/platforms/serverless' },
+        { label: 'Data Fabric', to: '/platforms/data' },
+      ],
+    },
+    {
+      title: 'Topics & Engineering',
+      links: [
+        { label: 'Generative AI', to: '/engineering/ai' },
+        { label: 'System Architecture', to: '/engineering/architecture' },
+        { label: 'DevOps & CI/CD', to: '/engineering/devops' },
+        { label: 'Cybersecurity', to: '/engineering/security' },
+        { label: 'Performance', to: '/engineering/performance' },
+        { label: 'Scalability', to: '/engineering/scalability' },
+        { label: 'Microservices', to: '/engineering/microservices' },
+      ],
+    },
+    {
+      title: 'Resources',
+      links: [
+        { label: 'Documentation', to: '/docs' },
+        { label: 'Whitepapers', to: '/whitepapers' },
+        { label: 'Case Studies', to: '/case-studies' },
+        { label: 'API Reference', to: '/api' },
+        { label: 'Community', to: '/community' },
+        { label: 'Events', to: '/events' },
+      ],
+    },
+    {
+      title: 'Support',
+      links: [
+        { label: 'Help Center', to: '/support' },
+        { label: 'Contact Us', to: '/contact' },
+        { label: 'System Status', to: '/status' },
+        { label: 'Professional Services', to: '/services' },
+      ],
+    },
+    {
+      title: 'Account',
+      links: [
+        { label: 'CloudBaud Console', to: '/console' },
+        { label: 'Billing', to: '/billing' },
+        { label: 'Developer ID', to: '/dev-id' },
+      ],
+    },
+    {
+      title: 'Company',
+      links: [
+        { label: 'About Us', to: '/about' },
+        { label: 'Portfolio', to: '/portfolio' },
+        { label: 'Careers', to: '/careers' },
+        { label: 'Newsroom', to: '/news' },
+        { label: 'Ethics', to: '/ethics' },
+      ],
+    },
+  ];
+
+  if (!mounted) return null;
+
   return (
-    <footer className="bg-slate-50 dark:bg-[#010816] text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-900 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-          {/* Company Info */}
-          <div className="space-y-6">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">C</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">CloudBaud</span>
-            </Link>
-            <p className="text-gray-500 leading-relaxed">
-              Engineering high-performance, intelligent systems for the modern enterprise. Specialized in architecture, AI engineering, and cloud platforms.
-            </p>
-            <div className="flex space-x-5">
-              <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors" aria-label="LinkedIn">
-                <Linkedin className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors" aria-label="Twitter">
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors" aria-label="GitHub">
-                <Github className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors" aria-label="Website">
-                <Globe className="h-5 w-5" />
-              </a>
+    <footer className="bg-[#f5f5f7] dark:bg-[#010816] text-[#1d1d1f] dark:text-[#f5f5f7] border-t border-slate-200 dark:border-slate-800 transition-colors pt-12 pb-8 px-4 font-sans tracking-tight">
+      <div className="max-w-[1024px] mx-auto">
+        {/* Navigation Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-12">
+          {footerSections.map((section) => (
+            <div key={section.title} className="flex flex-col space-y-3">
+              <h3 className="text-[12px] font-semibold text-[#6e6e73] dark:text-[#86868b] leading-[1.3] mb-1">
+                {section.title}
+              </h3>
+              <ul className="space-y-2">
+                {section.links.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      to={link.to}
+                      className="text-[12px] text-[#424245] dark:text-[#d2d2d7] hover:underline leading-[1.33]"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
+          ))}
+        </div>
+
+        {/* Call to action & Theme row */}
+        <div className="border-b border-slate-200 dark:border-slate-800 pb-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex items-center space-x-2 text-[12px] text-[#6e6e73] dark:text-[#86868b]">
+            <Smartphone className="w-4 h-4" />
+            <span>Get the <Link to="/app" className="text-blue-600 hover:underline">CloudBaud Console app</Link>.</span>
           </div>
 
-          {/* Capabilities Column */}
-          <div>
-            <h3 className="text-gray-900 dark:text-white font-bold uppercase tracking-widest text-xs mb-6">Capabilities</h3>
-            <ul className="space-y-4 text-sm font-medium">
-              <li>
-                <Link to="/capabilities" className="hover:text-blue-600 dark:hover:text-white transition-colors">
-                  Solutions Architecture
-                </Link>
-              </li>
-              <li>
-                <Link to="/capabilities" className="hover:text-blue-600 transition-colors">
-                  AI Engineering
-                </Link>
-              </li>
-              <li>
-                <Link to="/capabilities" className="hover:text-blue-600 transition-colors">
-                  Cloud Platforms
-                </Link>
-              </li>
-              <li>
-                <Link to="/capabilities" className="hover:text-blue-600 transition-colors">
-                  DevOps Automation
-                </Link>
-              </li>
-              <li>
-                <Link to="/capabilities" className="hover:text-blue-600 transition-colors">
-                  Enterprise Integration
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Company Column */}
-          <div>
-            <h3 className="text-gray-900 dark:text-white font-bold uppercase tracking-widest text-xs mb-6">Company</h3>
-            <ul className="space-y-4 text-sm font-medium">
-              <li>
-                <Link to="/about" className="hover:text-blue-600 dark:hover:text-white transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link to="/portfolio" className="hover:text-blue-600 transition-colors">
-                  Portfolio
-                </Link>
-              </li>
-              <li>
-                <Link to="/industries" className="hover:text-blue-600 transition-colors">
-                  Industries
-                </Link>
-              </li>
-              <li>
-                <Link to="/careers" className="hover:text-blue-600 transition-colors">
-                  Careers
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="hover:text-blue-600 transition-colors">
-                  Contact
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Newsletter / Contact Hint */}
-          <div>
-            <h3 className="text-gray-900 dark:text-white font-bold uppercase tracking-widest text-xs mb-6">Inquiries</h3>
-            <p className="text-sm text-gray-500 mb-6 font-medium">
-              Ready to accelerate your digital transformation?
-            </p>
-            <Link
-              to="/contact"
-              className="inline-flex items-center justify-center px-6 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-lg text-sm font-bold text-gray-900 dark:text-white hover:border-blue-600 hover:text-blue-600 transition-all shadow-sm"
-            >
-              Consult with an Expert
-            </Link>
+          {/* Theme Segmented Control */}
+          <div className="flex bg-[#e8e8ed] dark:bg-[#1d1d1f] rounded-full p-[2px] w-fit shadow-inner">
+            {['light', 'dark', 'system'].map((t) => (
+              <button
+                key={t}
+                onClick={() => setTheme(t)}
+                className={`px-4 py-1 text-[11px] font-medium rounded-full transition-all ${(t === 'system' ? theme === 'system' : theme === t)
+                  ? 'bg-white dark:bg-slate-700 text-[#1d1d1f] dark:text-white shadow-sm'
+                  : 'text-[#6e6e73] dark:text-[#86868b] hover:text-[#1d1d1f] dark:hover:text-white'
+                  }`}
+              >
+                {t.charAt(0).toUpperCase() + t.slice(1)}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Legal & Copyright */}
-        <div className="border-t border-slate-200 dark:border-slate-800 pt-10 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-2 text-xs font-bold text-gray-400 uppercase tracking-widest">
-            <Link to="/privacy-policy" className="hover:text-gray-600 transition-colors">
-              Privacy
-            </Link>
-            <Link to="/terms-of-use" className="hover:text-gray-600 transition-colors">
-              Terms
-            </Link>
-            <Link to="/accessibility" className="hover:text-gray-600 transition-colors">
-              Accessibility
-            </Link>
-            <Link to="/cookie-preferences" className="hover:text-gray-600 transition-colors">
-              Cookies
-            </Link>
+        {/* Legal & Local Footer */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pt-1">
+          <div className="flex flex-wrap items-center gap-y-2 text-[12px] text-[#6e6e73] dark:text-[#86868b]">
+            <span className="mr-4">Copyright © 2026 CloudBaud Inc. All rights reserved.</span>
+            <div className="flex divide-x divide-slate-300 dark:divide-slate-700">
+              <Link to="/privacy-policy" className="px-2 first:pl-0 hover:underline">Privacy Policy</Link>
+              <Link to="/terms" className="px-2 hover:underline">Terms of Use</Link>
+              <Link to="/sales" className="px-2 hover:underline">Sales and Refunds</Link>
+              <Link to="/legal" className="px-3 hover:underline">Legal</Link>
+              <Link to="/site-map" className="px-3 hover:underline">Site Map</Link>
+            </div>
           </div>
-          <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">
-            &copy; 2017-2026 CloudBaud LLC. All rights reserved.
-          </p>
+
+          <div className="flex items-center space-x-1 text-[12px] text-[#424245] dark:text-[#d2d2d7] hover:underline cursor-pointer group">
+            <span className="font-medium">United States</span>
+            <Globe className="w-3 h-3 text-[#6e6e73]" />
+            <ChevronDown className="w-3 h-3 text-[#6e6e73] group-hover:block hidden" />
+          </div>
         </div>
       </div>
     </footer>
@@ -139,3 +151,4 @@ const Footer = () => {
 };
 
 export default Footer;
+
