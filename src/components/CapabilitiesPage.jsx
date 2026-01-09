@@ -198,7 +198,7 @@ const CapabilitiesPage = () => {
                                     {/* Content */}
                                     <div className="p-6">
                                         <div className="w-12 h-12 bg-blue-600 rounded flex items-center justify-center mb-4">
-                                            <Icon className="h-6 w-6 text-white" />
+                                            {Icon && <Icon className="h-6 w-6 text-white" />}
                                         </div>
                                         <h3 className="text-xl font-semibold text-gray-900 mb-2">
                                             {capability.title}
@@ -243,7 +243,7 @@ const CapabilitiesPage = () => {
                                     className="bg-white border border-gray-200 rounded-lg p-8"
                                 >
                                     <div className="w-12 h-12 bg-blue-600 rounded flex items-center justify-center mb-6">
-                                        <Icon className="h-6 w-6 text-white" />
+                                        {Icon && <Icon className="h-6 w-6 text-white" />}
                                     </div>
                                     <h3 className="text-2xl font-semibold text-gray-900 mb-3">
                                         {model.title}

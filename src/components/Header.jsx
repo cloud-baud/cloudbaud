@@ -45,21 +45,22 @@ const Header = () => {
             </Link>
 
             {/* Capabilities Dropdown */}
-            <div className="relative group">
-              <button
+            <div
+              className="relative group"
+              onMouseEnter={() => setIsServicesOpen(true)}
+              onMouseLeave={() => setIsServicesOpen(false)}
+            >
+              <Link
+                to="/capabilities"
                 className="flex items-center text-slate-600 dark:text-slate-300 hover:text-brand-blue dark:hover:text-white font-medium transition-colors py-2"
-                onMouseEnter={() => setIsServicesOpen(true)}
-                onMouseLeave={() => setIsServicesOpen(false)}
               >
                 Capabilities
                 <ChevronDown className="ml-1 h-4 w-4 transition-transform group-hover:rotate-180" />
-              </button>
+              </Link>
 
               {isServicesOpen && (
                 <div
                   className="absolute top-full left-0 mt-0 w-64 bg-slate-900 rounded-xl shadow-2xl border border-slate-800 py-3 animate-in fade-in slide-in-from-top-2 duration-200"
-                  onMouseEnter={() => setIsServicesOpen(true)}
-                  onMouseLeave={() => setIsServicesOpen(false)}
                 >
                   {services.map((service) => (
                     <Link
@@ -113,7 +114,13 @@ const Header = () => {
 
               {/* Capabilities Section */}
               <div className="pt-2">
-                <div className="text-slate-500 text-xs uppercase tracking-wider mb-4 px-2 font-bold">Capabilities</div>
+                <Link
+                  to="/capabilities"
+                  className="block text-slate-500 text-xs uppercase tracking-wider mb-4 px-2 font-bold hover:text-blue-600 dark:hover:text-blue-500 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Capabilities
+                </Link>
                 <div className="grid grid-cols-1 gap-2">
                   {services.map((service) => (
                     <Link
