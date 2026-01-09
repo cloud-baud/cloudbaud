@@ -186,34 +186,23 @@ const CapabilitiesPage = () => {
                                     key={index}
                                     className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200"
                                 >
+                                    {/* Content Header */}
+                                    <div className="p-4 border-b border-gray-100 flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-blue-600 rounded flex items-center justify-center shrink-0">
+                                            {Icon && <Icon className="h-5 w-5 text-white" />}
+                                        </div>
+                                        <h3 className="text-lg font-bold text-gray-900 leading-tight">
+                                            {capability.title}
+                                        </h3>
+                                    </div>
+
                                     {/* Infographic Image */}
-                                    <div className="relative h-48 bg-gray-100 border-b border-gray-200">
+                                    <div className="relative aspect-[4/3] bg-gray-50">
                                         <img
                                             src={capability.infographic}
                                             alt={`${capability.title} infographic`}
-                                            className="w-full h-full object-cover"
+                                            className="w-full h-full object-contain p-2"
                                         />
-                                    </div>
-
-                                    {/* Content */}
-                                    <div className="p-6">
-                                        <div className="w-12 h-12 bg-blue-600 rounded flex items-center justify-center mb-4">
-                                            {Icon && <Icon className="h-6 w-6 text-white" />}
-                                        </div>
-                                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                                            {capability.title}
-                                        </h3>
-                                        <p className="text-gray-600 mb-4 text-sm leading-relaxed">
-                                            {capability.description}
-                                        </p>
-                                        <ul className="space-y-2">
-                                            {capability.capabilities.map((item, idx) => (
-                                                <li key={idx} className="text-gray-700 text-sm flex items-start gap-2">
-                                                    <span className="text-blue-600 font-medium">•</span>
-                                                    <span>{item}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
                                     </div>
                                 </div>
                             );
