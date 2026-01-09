@@ -14,161 +14,25 @@ import {
 import { Button } from './ui/button';
 import SEO from './SEO';
 
+import { technicalCapabilities, deliveryModels } from '../data/capabilities';
+
 const CapabilitiesPage = () => {
-    const technicalCapabilities = [
-        {
-            icon: Database,
-            title: 'Database Development',
-            description: 'PostgreSQL, MongoDB, SQL Server, Oracle, and cloud-native databases',
-            infographic: '/infographic-database.png',
-            capabilities: [
-                'Database design & architecture',
-                'Performance optimization',
-                'Migration & modernization',
-                'Data modeling'
-            ]
-        },
-        {
-            icon: Cpu,
-            title: 'AI Engineering',
-            description: 'LLM integration, machine learning, and intelligent systems',
-            infographic: '/infographic-ai.png',
-            capabilities: [
-                'Custom AI model development',
-                'LLM integration & fine-tuning',
-                'ML pipeline development',
-                'AI strategy consulting'
-            ]
-        },
-        {
-            icon: Code,
-            title: 'Custom Applications',
-            description: 'Full-stack web and enterprise application development',
-            infographic: '/infographic-custom-apps.png',
-            capabilities: [
-                'Modern web applications',
-                'Microservices architecture',
-                'API development',
-                'Legacy modernization'
-            ]
-        },
-        {
-            icon: Cloud,
-            title: 'Cloud Solutions',
-            description: 'AWS, Azure, and Google Cloud Platform expertise',
-            infographic: '/infographic-cloud.png',
-            capabilities: [
-                'Cloud migration',
-                'Infrastructure as Code',
-                'Serverless architecture',
-                'Multi-cloud strategy'
-            ]
-        },
-        {
-            icon: Target,
-            title: 'Microsoft Platform',
-            description: 'SharePoint, Power Platform, and Dynamics 365 ecosystem',
-            infographic: '/infographic-microsoft.png',
-            capabilities: [
-                'SharePoint Framework (SPFx)',
-                'Microsoft Teams Development',
-                'Microsoft Graph API',
-                'Power Automate workflows',
-                'Dynamics 365 suite',
-                'Power Apps & Power BI'
-            ]
-        },
-        {
-            icon: Code,
-            title: 'DevOps & Infrastructure',
-            description: 'Automated infrastructure provisioning and configuration management',
-            infographic: '/infographic-devops.png',
-            capabilities: [
-                'Terraform for IaC',
-                'Ansible automation',
-                'CI/CD pipelines',
-                'Kubernetes orchestration'
-            ]
-        },
-        {
-            icon: Smartphone,
-            title: 'Mobile Development',
-            description: 'Native iOS, Android, and cross-platform solutions',
-            infographic: '/infographic-mobile.png',
-            capabilities: [
-                'iOS (Swift) development',
-                'Android (Kotlin) development',
-                'React Native & Flutter',
-                'Mobile CI/CD'
-            ]
-        },
-        {
-            icon: Target,
-            title: 'Enterprise Integration',
-            description: 'Connect and automate across enterprise platforms',
-            infographic: '/infographic-integration.png',
-            capabilities: [
-                'Salesforce & SAP integration',
-                'Oracle & ServiceNow',
-                'Datadog & Wiz monitoring',
-                'Korber HighJump WMS',
-                'REST & GraphQL APIs',
-                'Enterprise service bus'
-            ]
-        },
-        {
-            icon: Target,
-            title: 'Solutions Architecture',
-            description: 'Enterprise architecture frameworks and strategic guidance',
-            infographic: '/infographic-solutions.png',
-            capabilities: [
-                'TOGAF architecture',
-                'Zachman Framework',
-                'AWS Well-Architected',
-                'SAFe Agile methodology',
-                'Enterprise governance',
-                'Architecture consulting'
-            ]
-        }
-    ];
-
-    const deliveryModels = [
-        {
-            icon: Zap,
-            title: 'Pre-Built AI Agents',
-            description: 'Deploy ready-made AI solutions in days with proven ROI',
-            benefits: ['Fastest time to value', 'Predictable pricing', 'Proven results']
-        },
-        {
-            icon: Code,
-            title: 'Custom Development',
-            description: 'Tailored solutions built to your exact specifications',
-            benefits: ['Complete flexibility', 'Expert team', 'Scalable architecture']
-        },
-        {
-            icon: Shield,
-            title: 'Consulting & Advisory',
-            description: 'Strategic guidance for your technology initiatives',
-            benefits: ['Technology strategy', 'Architecture review', 'Best practices']
-        }
-    ];
-
     return (
         <div className="min-h-screen bg-white text-gray-900">
             <SEO
                 title="Our Capabilities"
-                description="Comprehensive technology capabilities including database development, AI engineering, cloud solutions, Microsoft platform, DevOps, mobile development, enterprise integration, and solutions architecture using TOGAF and AWS Well-Architected frameworks."
-                keywords="database development, PostgreSQL, MongoDB, vector databases, graph databases, Neo4j, AI engineering, cloud migration, AWS, Azure, Google Cloud Platform, GCP, Microsoft Dynamics 365, Microsoft Teams development, SharePoint development, DevOps automation, Terraform, Ansible, Kubernetes, mobile development, Salesforce integration, SAP, Oracle, ServiceNow, TOGAF architecture, Zachman framework, AWS Well-Architected, SAFe Agile"
+                description="Comprehensive technology capabilities including data engineering, AI engineering, cloud solutions, Microsoft platform, DevOps, mobile development, enterprise integration, and solutions architecture."
+                keywords="data engineering, database development, PostgreSQL, MongoDB, AI engineering, cloud migration, AWS, Azure, DevOps, mobile development"
                 canonical="/capabilities"
             />
             {/* Hero Section */}
-            <section className="py-24 px-4 sm:px-6 lg:px-8 bg-slate-50 border-b border-gray-200">
+            <section className="py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 border-b border-gray-200">
                 <div className="max-w-7xl mx-auto">
                     <div className="max-w-3xl">
-                        <h1 className="text-5xl md:text-6xl font-bold mb-6 text-gray-900 tracking-tight">
+                        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 tracking-tight">
                             Our Capabilities
                         </h1>
-                        <p className="text-xl text-gray-600 leading-relaxed">
+                        <p className="text-lg text-gray-600 leading-relaxed">
                             From pre-built solutions to custom enterprise applications, we deliver technology that drives measurable business value.
                         </p>
                     </div>
@@ -176,35 +40,39 @@ const CapabilitiesPage = () => {
             </section>
 
             {/* Technical Capabilities */}
-            <section className="py-20 px-4 sm:px-6 lg:px-8">
+            <section className="py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {technicalCapabilities.map((capability, index) => {
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {technicalCapabilities.map((capability) => {
                             const Icon = capability.icon;
                             return (
-                                <div
-                                    key={index}
-                                    className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200"
+                                <Link
+                                    key={capability.id}
+                                    to={`/capabilities/${capability.slug}`}
+                                    className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 group block transform hover:-translate-y-1"
                                 >
                                     {/* Content Header */}
-                                    <div className="p-4 border-b border-gray-100 flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-blue-600 rounded flex items-center justify-center shrink-0">
-                                            {Icon && <Icon className="h-5 w-5 text-white" />}
+                                    <div className="p-4 border-b border-neutral-800 flex items-center gap-3 bg-neutral-900 bg-[linear-gradient(45deg,transparent_25%,rgba(68,68,68,.2)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] hover:bg-[position:100%_0] transition-all duration-1000">
+                                        <div className="w-10 h-10 bg-blue-600/20 border border-blue-500/30 rounded-lg flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(37,99,235,0.1)] group-hover:shadow-[0_0_20px_rgba(37,99,235,0.3)] group-hover:scale-105 transition-all">
+                                            {Icon && <Icon className="h-5 w-5 text-blue-400" />}
                                         </div>
-                                        <h3 className="text-lg font-bold text-gray-900 leading-tight">
+                                        <h3 className="text-lg font-bold text-gray-100 leading-tight group-hover:text-blue-400 transition-colors">
                                             {capability.title}
                                         </h3>
+                                        <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">
+                                            <ArrowRight className="text-blue-400 w-5 h-5" />
+                                        </div>
                                     </div>
 
                                     {/* Infographic Image */}
-                                    <div className="relative aspect-[4/3] bg-gray-50">
+                                    <div className="relative aspect-[4/3] bg-white group-hover:bg-gray-50 transition-colors">
                                         <img
                                             src={capability.infographic}
                                             alt={`${capability.title} infographic`}
                                             className="w-full h-full object-contain p-2"
                                         />
                                     </div>
-                                </div>
+                                </Link>
                             );
                         })}
                     </div>

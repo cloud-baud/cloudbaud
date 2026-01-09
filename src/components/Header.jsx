@@ -11,12 +11,12 @@ const Header = () => {
   const [isServicesOpen, setIsServicesOpen] = useState(false);
 
   const services = [
-    { name: 'Database Development', href: '/capabilities' },
-    { name: 'Intelligent Systems Engineering', href: '/capabilities' },
-    { name: 'Cloud Solutions', href: '/capabilities' },
-    { name: 'Microsoft Platform', href: '/capabilities' },
-    { name: 'DevOps & Infrastructure', href: '/capabilities' },
-    { name: 'Solutions Architecture', href: '/capabilities' },
+    { name: 'Data Engineering', href: '/capabilities/data-engineering' },
+    { name: 'AI Engineering', href: '/capabilities/ai-engineering' },
+    { name: 'Cloud Solutions', href: '/capabilities/cloud-solutions' },
+    { name: 'Custom Applications', href: '/capabilities/custom-applications' },
+    { name: 'Microsoft Platform', href: '/capabilities/microsoft-platform' },
+    { name: 'DevOps & Infrastructure', href: '/capabilities/devops-infrastructure' },
   ];
 
   return (
