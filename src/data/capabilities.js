@@ -15,13 +15,81 @@ export const technicalCapabilities = [
         slug: 'data-engineering',
         icon: Database,
         title: 'Data Engineering',
-        description: 'PostgreSQL, MongoDB, SQL Server, Oracle, and cloud-native databases',
+        description: 'Databricks, Snowflake, PostgreSQL, MongoDB, SQL Server, Oracle, and cloud-native databases',
         infographic: '/infographic-database.png',
         capabilities: [
-            'Database design & architecture',
-            'Performance optimization',
-            'Migration & modernization',
-            'Data modeling'
+            {
+                slug: 'cluster-troubleshooting',
+                text: 'Cluster troubleshooting',
+                title: 'Data Cluster Troubleshooting',
+                description: 'Expert diagnosis and resolution of distributed computing cluster issues for Databricks and Spark environments.',
+                image: '/infographic-database.png',
+                features: [
+                    { title: 'Root Cause Analysis', description: 'Deep dive into driver/executor logs to identify memory leaks and skew.' },
+                    { title: 'Configuration Tuning', description: 'Optimization of instance types and auto-scaling policies to prevent failures.' },
+                    { title: 'Recovery Strategies', description: 'Implementation of robust retry logic and checkpointing.' }
+                ]
+            },
+            {
+                slug: 'unity-catalog-governance',
+                text: 'Unity Catalog governance',
+                title: 'Unity Catalog Governance',
+                description: 'Unified data governance for data and AI assets on the Lakehouse, ensuring security and compliance.',
+                image: '/infographic-database.png',
+                features: [
+                    { title: 'Access Control', description: 'Fine-grained row and column level permissions across workspaces.' },
+                    { title: 'Data Lineage', description: 'Automated lineage tracking to understand data flow and impact.' },
+                    { title: 'Data Sharing', description: 'Secure sharing of live data sets without copying via Delta Sharing.' }
+                ]
+            },
+            {
+                slug: 'sql-delta-migration',
+                text: 'SQL → Delta migration',
+                title: 'SQL to Delta Lake Migration',
+                description: 'Modernizing legacy SQL warehouses to the high-performance, open Delta Lake format.',
+                image: '/infographic-database.png',
+                features: [
+                    { title: 'Schema Evolution', description: 'Adaptive schema management to handle changing data structures.' },
+                    { title: 'ACID Transactions', description: 'Bringing reliability and data integrity to your data lake.' },
+                    { title: 'Performance', description: 'Up to 10x faster query performance with optimization techniques like Z-Ordering.' }
+                ]
+            },
+            {
+                slug: 'foundry-coexistence',
+                text: 'Foundry coexistence',
+                title: 'Palantir Foundry Coexistence',
+                description: 'Seamless integration strategies for running Databricks and Palantir Foundry in parallel.',
+                image: '/infographic-database.png',
+                features: [
+                    { title: 'Bi-Directional Sync', description: 'Automated pipelines to keep data synchronized between platforms.' },
+                    { title: 'Unified Governance', description: 'Strategy to maintain compliance across both ecosystems.' },
+                    { title: 'Cost Optimization', description: 'Leveraging the right compute engine for the right workload.' }
+                ]
+            },
+            {
+                slug: 'cost-optimization',
+                text: 'Cost optimization',
+                title: 'Cloud Data Cost Optimization',
+                description: 'Strategic analysis and implementation of cost-saving measures for big data workloads.',
+                image: '/infographic-database.png',
+                features: [
+                    { title: 'Spot Instance Usage', description: 'Leveraging spot instances for non-critical batch workloads.' },
+                    { title: 'Auto-Termination', description: 'Aggressive policies to shut down idle resources.' },
+                    { title: 'Workload Right-Sizing', description: 'Matching compute resources precisely to job requirements.' }
+                ]
+            },
+            {
+                slug: 'spark-performance-tuning',
+                text: 'Spark performance tuning',
+                title: 'Spark Performance Tuning',
+                description: 'Deep optimization of Apache Spark jobs to reduce runtime and resource consumption.',
+                image: '/infographic-database.png',
+                features: [
+                    { title: 'Shuffle Optimization', description: 'Reducing expensive network I/O through broadcast joins and partitioning.' },
+                    { title: 'Memory Management', description: 'Tuning GC and memory fractions to eliminate OOM errors.' },
+                    { title: 'Skew Handling', description: 'Salting and repartitioning strategies to handle uneven data distribution.' }
+                ]
+            }
         ]
     },
     {
@@ -90,10 +158,54 @@ export const technicalCapabilities = [
         description: 'Automated infrastructure provisioning and configuration management',
         infographic: '/infographic-devops.png',
         capabilities: [
-            'Terraform for IaC',
-            'Ansible automation',
-            'CI/CD pipelines',
-            'Kubernetes orchestration'
+            {
+                slug: 'terraform',
+                text: 'Terraform for IaC',
+                title: 'Terraform Infrastructure as Code',
+                description: 'We use Terraform to define cloud and on-premise resources in human-readable configuration files that you can version, reuse, and share.',
+                image: '/infographic-devops.png',
+                features: [
+                    { title: 'Multi-Cloud Provisioning', description: 'Deploy infrastructure to AWS, Azure, Google Cloud, and Kubernetes from a single workflow.' },
+                    { title: 'State Management', description: 'Track resource changes throughout your deployment lifecycle with robust state handling.' },
+                    { title: 'Module Reusability', description: 'Create reusable components for standard infrastructure patterns to speed up development.' }
+                ]
+            },
+            {
+                slug: 'ansible',
+                text: 'Ansible automation',
+                title: 'Ansible Automation',
+                description: 'Ansible is our tool of choice for configuration management, application deployment, and task automation. It is agentless and powerful.',
+                image: '/infographic-devops.png',
+                features: [
+                    { title: 'Agentless Architecture', description: 'No software needed on remote nodes; uses standard SSH/WinRM.' },
+                    { title: 'Playbook Automation', description: 'Define automation tasks in simple YAML, making it easy to read and version control.' },
+                    { title: 'Configuration Drift', description: 'Ensure all servers remain in the desired state automatically.' }
+                ]
+            },
+            {
+                slug: 'terraform-cicd-automation',
+                text: 'Terraform + CI/CD automation',
+                title: 'Terraform & CI/CD Automation',
+                description: 'End-to-end automation of infrastructure provisioning coupled with continuous integration and delivery.',
+                image: '/infographic-devops.png',
+                features: [
+                    { title: 'GitOps Workflow', description: 'Infrastructure changes trigger automatic plan and apply in pipelines.' },
+                    { title: 'Policy as Code', description: 'Automated compliance checks (Sentinel/OPA) before deployment.' },
+                    { title: 'Drift Detection', description: 'Scheduled pipelines to detect and remediate manual changes.' }
+                ]
+            },
+            {
+                slug: 'kubernetes',
+                text: 'Kubernetes orchestration',
+                title: 'Kubernetes (K8s) Orchestration',
+                description: 'We design and manage production-grade Kubernetes clusters for containerized application scaling and management.',
+                image: '/infographic-devops.png',
+                features: [
+                    { title: 'Auto-Scaling', description: 'Automatically adjust the number of running pods based on CPU or memory usage.' },
+                    { title: 'Self-Healing', description: 'Restart containers that fail, replace and reschedule containers when nodes die.' },
+                    { title: 'Service Discovery', description: 'Automatically load balance traffic across your application containers.' }
+                ]
+            }
         ]
     },
     {

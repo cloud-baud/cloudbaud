@@ -56,12 +56,26 @@ const CapabilityDetailPage = () => {
                                 <h3 className="text-sm font-bold uppercase tracking-widest text-blue-600 mb-4">
                                     Key Competencies
                                 </h3>
-                                {capability.capabilities.map((item, idx) => (
-                                    <div key={idx} className="flex items-start">
-                                        <CheckCircle className="w-6 h-6 text-green-500 mr-3 shrink-0" />
-                                        <span className="text-lg text-gray-700 font-medium">{item}</span>
-                                    </div>
-                                ))}
+                                {capability.capabilities.map((item, idx) => {
+                                    const isLink = typeof item === 'object' && item.slug;
+                                    const text = isLink ? item.text : item;
+
+                                    return (
+                                        <div key={idx} className="flex items-start">
+                                            <CheckCircle className="w-6 h-6 text-green-500 mr-3 shrink-0" />
+                                            {isLink ? (
+                                                <Link
+                                                    to={`/capabilities/${slug}/${item.slug}`}
+                                                    className="text-lg text-blue-600 font-medium hover:underline hover:text-blue-700"
+                                                >
+                                                    {text}
+                                                </Link>
+                                            ) : (
+                                                <span className="text-lg text-gray-700 font-medium">{text}</span>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
 
                             <div className="flex flex-col sm:flex-row gap-4">

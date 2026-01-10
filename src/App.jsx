@@ -16,6 +16,7 @@ import AgentsPage from './components/AgentsPage';
 import AgentDetail from './components/AgentDetail';
 import CapabilitiesPage from './components/CapabilitiesPage';
 import CapabilityDetailPage from './components/CapabilityDetailPage';
+import TechnologyDetailPage from './components/TechnologyDetailPage';
 import IndustriesPage from './components/IndustriesPage';
 import IndustryDetail from './components/IndustryDetail';
 import PrivacyPolicyPage from './components/PrivacyPolicyPage';
@@ -35,6 +36,7 @@ function App() {
               <Route path="/agents/:slug" element={<AgentDetail />} />
               <Route path="/capabilities" element={<CapabilitiesPage />} />
               <Route path="/capabilities/:slug" element={<CapabilityDetailPage />} />
+              <Route path="/capabilities/:slug/:techSlug" element={<TechnologyDetailPage />} />
               <Route path="/industries" element={<IndustriesPage />} />
               <Route path="/industries/:slug" element={<IndustryDetail />} />
               <Route path="/services" element={<ServicesPage />} />
