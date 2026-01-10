@@ -115,7 +115,7 @@ const ContactPage = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-white">Phone</h3>
-                    <p className="text-gray-400">+1 (555) 123-4567</p>
+                    <p className="text-gray-400">425.749.2101</p>
                   </div>
                 </div>
 
@@ -125,7 +125,7 @@ const ContactPage = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-white">Location</h3>
-                    <p className="text-gray-400">San Francisco, CA</p>
+                    <p className="text-gray-400">Bellevue, WA</p>
                   </div>
                 </div>
               </div>

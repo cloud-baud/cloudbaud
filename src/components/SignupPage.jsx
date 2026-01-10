@@ -123,7 +123,7 @@ const SignupPage = () => {
                                         value={formData.phone}
                                         onChange={handleChange}
                                         className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-white py-2"
-                                        placeholder="+1 (555) 123-4567"
+                                        placeholder="425.749.2101"
                                     />
                                 </div>
                             </div>

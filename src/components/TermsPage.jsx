@@ -11,7 +11,7 @@ const TermsPage = () => {
             <SEO
                 title="Terms and Conditions - CloudBaud"
                 description="Review the Terms and Conditions for using CloudBaud services, including our SMS/Mobile communication policies."
-                canonical="/terms"
+                canonical="/terms-and-conditions"
             />
 
             {/* Header Section */}
@@ -65,7 +65,7 @@ const TermsPage = () => {
                                     <strong>Opt-Out:</strong> You can cancel the SMS service at any time. Just text <strong>STOP</strong> to the short code or number provided. After you send the SMS message "STOP" to us, we will send you an SMS message to confirm that you have been unsubscribed. After this, you will no longer receive SMS messages from us. If you want to join again, just sign up as you did the first time and we will start sending SMS messages to you again.
                                 </p>
                                 <p>
-                                    <strong>Help:</strong> If you are experiencing issues with the messaging program you can reply with the keyword <strong>HELP</strong> for more assistance, or you can get help directly at privacy@cloudbaud.com or +1 (555) 123-4567.
+                                    <strong>Help:</strong> If you are experiencing issues with the messaging program you can reply with the keyword <strong>HELP</strong> for more assistance, or you can get help directly at privacy@cloudbaud.com or 425.749.2101.
                                 </p>
                                 <p>
                                     <strong>Carriers:</strong> Carriers are not liable for delayed or undelivered messages.

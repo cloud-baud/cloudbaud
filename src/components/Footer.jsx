@@ -132,7 +132,7 @@ const Footer = () => {
             <span className="mr-4">Copyright © 2026 CloudBaud Inc. All rights reserved.</span>
             <div className="flex divide-x divide-slate-300 dark:divide-slate-700">
               <Link to="/privacy-policy" className="px-2 first:pl-0 hover:underline">Privacy Policy</Link>
-              <Link to="/terms" className="px-2 hover:underline">Terms of Use</Link>
+              <Link to="/terms-and-conditions" className="px-2 hover:underline">Terms of Use</Link>
               <Link to="/sales" className="px-2 hover:underline">Sales and Refunds</Link>
               <Link to="/legal" className="px-3 hover:underline">Legal</Link>
               <Link to="/site-map" className="px-3 hover:underline">Site Map</Link>

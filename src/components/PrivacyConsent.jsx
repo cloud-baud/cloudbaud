@@ -18,13 +18,13 @@ const PrivacyConsent = ({ checked, onChange }) => {
                 </div>
                 <div className="text-sm">
                     <label htmlFor="privacy-consent" className="font-medium text-slate-300">
-                        I agree to the terms and privacy policy.
+                        I agree to the <Link to="/terms-and-conditions" className="text-blue-400 hover:text-blue-300 underline" target="_blank">Terms</Link> and <Link to="/privacy-policy" className="text-blue-400 hover:text-blue-300 underline" target="_blank">Privacy Policy</Link>.
                     </label>
                     <p className="text-slate-400 mt-1 leading-relaxed text-xs">
-                        By checking this box, I consent to receive SMS/MMS texts from CloudBaud regarding my account
-                        and services at the phone number provided. Message frequency varies.
-                        Message & data rates may apply. Reply STOP to opt-out.
-                        View our <Link to="/privacy-policy" className="text-blue-400 hover:text-blue-300 underline" target="_blank">Privacy Policy</Link>.
+                        By checking this box, I consent to receive SMS/MMS texts from CloudBaud regarding my account,
+                        service updates, and notifications at the phone number provided. Message frequency varies.
+                        Message & data rates may apply. Reply STOP to unsubscribe.
+                        View our <Link to="/terms-and-conditions" className="text-blue-400 hover:text-blue-300 underline" target="_blank">Terms</Link> and <Link to="/privacy-policy" className="text-blue-400 hover:text-blue-300 underline" target="_blank">Privacy Policy</Link>.
                     </p>
                 </div>
             </div>
