@@ -86,6 +86,9 @@ const Header = () => {
           {/* Actions */}
           <div className="hidden md:flex items-center space-x-4">
             <ThemeToggle />
+            <Link to="/login" className="text-slate-600 dark:text-slate-300 hover:text-brand-blue dark:hover:text-white font-medium transition-colors">
+              Sign In
+            </Link>
             <Button asChild className="bg-brand-blue hover:bg-brand-blue/90 text-white rounded-lg px-6 font-bold shadow-lg shadow-brand-blue/20">
               <Link to="/contact">Get Started</Link>
             </Button>

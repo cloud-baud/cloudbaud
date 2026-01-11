@@ -22,6 +22,8 @@ import IndustryDetail from './components/IndustryDetail';
 import PrivacyPolicyPage from './components/PrivacyPolicyPage';
 import TermsPage from './components/TermsPage';
 import SignupPage from './components/SignupPage';
+import LoginPage from './components/LoginPage';
+import RedirectHandler from './components/RedirectHandler';
 
 function App() {
   return (
@@ -49,6 +51,8 @@ function App() {
               <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
               <Route path="/terms-and-conditions" element={<TermsPage />} />
               <Route path="/signup" element={<SignupPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/logout" element={<RedirectHandler to="/" />} />
             </Routes>
           </main>
           <Footer />
