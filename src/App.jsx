@@ -2,8 +2,9 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import { ThemeProvider } from 'next-themes';
-import Header from './components/Header';
-import Footer from './components/Footer';
+import MarketingLayout from './components/MarketingLayout';
+import WorkspaceLayout from './components/portal/WorkspaceLayout';
+import PortalDashboard from './components/portal/PortalDashboard';
 import HomePage from './components/HomePage';
 import ServicesPage from './components/ServicesPage';
 import AboutPage from './components/AboutPage';
@@ -25,14 +26,26 @@ import SignupPage from './components/SignupPage';
 import LoginPage from './components/LoginPage';
 import RedirectHandler from './components/RedirectHandler';
 
+import { AuthProvider } from './context/AuthContext';
+
+import ProtectedRoute from './components/ProtectedRoute';
+
 function App() {
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-      <Router>
-        <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
-          <Header />
-          <main>
-            <Routes>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            {/* Protected Portal Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/portal" element={<WorkspaceLayout />}>
+                <Route index element={<PortalDashboard />} />
+                <Route path="*" element={<PortalDashboard />} />
+              </Route>
+            </Route>
+
+            {/* Marketing Website */}
+            <Route element={<MarketingLayout />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/agents" element={<AgentsPage />} />
               <Route path="/agents/:slug" element={<AgentDetail />} />
@@ -53,11 +66,10 @@ function App() {
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/logout" element={<RedirectHandler to="/" />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
-      </Router>
+            </Route>
+          </Routes>
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

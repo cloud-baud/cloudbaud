@@ -46,33 +46,41 @@ const CapabilitiesPage = () => {
                         {technicalCapabilities.map((capability) => {
                             const Icon = capability.icon;
                             return (
-                                <Link
+                                <div
                                     key={capability.id}
-                                    to={`/capabilities/${capability.slug}`}
-                                    className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 group block transform hover:-translate-y-1"
+                                    className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 group block transform hover:-translate-y-1 relative flex flex-col"
                                 >
-                                    {/* Content Header */}
-                                    <div className="p-4 border-b border-neutral-800 flex items-center gap-3 bg-neutral-900 bg-[linear-gradient(45deg,transparent_25%,rgba(68,68,68,.2)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] hover:bg-[position:100%_0] transition-all duration-1000">
-                                        <div className="w-10 h-10 bg-blue-600/20 border border-blue-500/30 rounded-lg flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(37,99,235,0.1)] group-hover:shadow-[0_0_20px_rgba(37,99,235,0.3)] group-hover:scale-105 transition-all">
-                                            {Icon && <Icon className="h-5 w-5 text-blue-400" />}
+                                    <Link to={`/capabilities/${capability.slug}`} className="flex-1">
+                                        {/* Content Header */}
+                                        <div className="p-4 border-b border-neutral-800 flex items-center gap-3 bg-neutral-900 bg-[linear-gradient(45deg,transparent_25%,rgba(68,68,68,.2)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] hover:bg-[position:100%_0] transition-all duration-1000">
+                                            <div className="w-10 h-10 bg-blue-600/20 border border-blue-500/30 rounded-lg flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(37,99,235,0.1)] group-hover:shadow-[0_0_20px_rgba(37,99,235,0.3)] group-hover:scale-105 transition-all">
+                                                {Icon && <Icon className="h-5 w-5 text-blue-400" />}
+                                            </div>
+                                            <h3 className="text-lg font-bold text-gray-100 leading-tight group-hover:text-blue-400 transition-colors">
+                                                {capability.title}
+                                            </h3>
+                                            <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">
+                                                <ArrowRight className="text-blue-400 w-5 h-5" />
+                                            </div>
                                         </div>
-                                        <h3 className="text-lg font-bold text-gray-100 leading-tight group-hover:text-blue-400 transition-colors">
-                                            {capability.title}
-                                        </h3>
-                                        <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">
-                                            <ArrowRight className="text-blue-400 w-5 h-5" />
-                                        </div>
-                                    </div>
 
-                                    {/* Infographic Image */}
-                                    <div className="relative aspect-[4/3] bg-white group-hover:bg-gray-50 transition-colors">
-                                        <img
-                                            src={capability.infographic}
-                                            alt={`${capability.title} infographic`}
-                                            className="w-full h-full object-contain p-2"
-                                        />
+                                        {/* Infographic Image */}
+                                        <div className="relative aspect-[4/3] bg-white group-hover:bg-gray-50 transition-colors">
+                                            <img
+                                                src={capability.infographic}
+                                                alt={`${capability.title} infographic`}
+                                                className="w-full h-full object-contain p-2"
+                                            />
+                                        </div>
+                                    </Link>
+
+                                    {/* Action Footer */}
+                                    <div className="p-4 bg-gray-50 border-t border-gray-100">
+                                        <Button asChild className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-md">
+                                            <Link to="/contact">Get Started</Link>
+                                        </Button>
                                     </div>
-                                </Link>
+                                </div>
                             );
                         })}
                     </div>

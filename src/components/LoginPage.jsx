@@ -3,18 +3,31 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Mail, Lock, Loader2 } from 'lucide-react';
 
+import { useAuth } from '../context/AuthContext';
+import { toast } from 'sonner';
+
+import SocialAuthButtons from './SocialAuthButtons';
+
 const LoginPage = () => {
     const [loading, setLoading] = useState(false);
+    const { signInWithEmail } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        // Simulate network request
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setLoading(false);
-        // For now, just go to home or dashboard
-        navigate('/');
+        const email = e.target[0].value;
+        const password = e.target[1].value;
+
+        try {
+            await signInWithEmail(email, password);
+            toast.success('Successfully logged in!');
+            navigate('/portal');
+        } catch (error) {
+            console.error(error);
+            toast.error(error.message || 'Failed to login');
+            setLoading(false);
+        }
     };
 
     return (
@@ -56,6 +69,10 @@ const LoginPage = () => {
                         {loading ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : 'Sign In'}
                     </Button>
                 </form>
+
+                <div className="mt-6">
+                    <SocialAuthButtons />
+                </div>
 
                 <div className="mt-6 text-center text-sm text-slate-600 dark:text-slate-400">
                     Don't have an account? <Link to="/signup" className="text-blue-600 hover:text-blue-500 font-medium">Sign up</Link>

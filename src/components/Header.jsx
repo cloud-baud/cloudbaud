@@ -86,11 +86,8 @@ const Header = () => {
           {/* Actions */}
           <div className="hidden md:flex items-center space-x-4">
             <ThemeToggle />
-            <Link to="/login" className="text-slate-600 dark:text-slate-300 hover:text-brand-blue dark:hover:text-white font-medium transition-colors">
-              Sign In
-            </Link>
             <Button asChild className="bg-brand-blue hover:bg-brand-blue/90 text-white rounded-lg px-6 font-bold shadow-lg shadow-brand-blue/20">
-              <Link to="/contact">Get Started</Link>
+              <Link to="/login">Login</Link>
             </Button>
           </div>
 
@@ -168,8 +165,8 @@ const Header = () => {
 
               <div className="pt-2">
                 <Button asChild className="w-full bg-brand-blue hover:bg-brand-blue/90 text-white rounded-lg font-bold py-6">
-                  <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
-                    Get Started
+                  <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                    Login
                   </Link>
                 </Button>
               </div>
@@ -177,7 +174,7 @@ const Header = () => {
           </div>
         )}
       </div>
-    </header>
+    </header >
   );
 };
 

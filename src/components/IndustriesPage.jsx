@@ -75,23 +75,36 @@ const IndustriesPage = () => {
                         {industries.map((industry) => {
                             const Icon = iconMap[industry.icon];
                             return (
-                                <Link
+                                <div
                                     key={industry.id}
-                                    to={`/industries/${industry.slug}`}
-                                    className="group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-8 hover:border-blue-500 transition-all duration-300"
+                                    className="group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-8 hover:border-blue-500 transition-all duration-300 flex flex-col h-full"
                                 >
-                                    <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                                        <Icon className="h-8 w-8 text-white" />
+                                    <div className="flex-1">
+                                        <Link to={`/industries/${industry.slug}`} className="block">
+                                            <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                                                <Icon className="h-8 w-8 text-white" />
+                                            </div>
+                                            <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
+                                                {industry.name}
+                                            </h3>
+                                            <p className="text-gray-400 mb-6">{industry.description}</p>
+                                        </Link>
                                     </div>
-                                    <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
-                                        {industry.name}
-                                    </h3>
-                                    <p className="text-gray-400 mb-6">{industry.description}</p>
-                                    <div className="flex items-center text-blue-400 text-sm font-medium">
-                                        Learn more
-                                        <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+
+                                    <div className="mt-auto space-y-4">
+                                        <Link
+                                            to={`/industries/${industry.slug}`}
+                                            className="flex items-center text-blue-400 text-sm font-medium hover:text-blue-300 mb-4"
+                                        >
+                                            Learn more
+                                            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                                        </Link>
+
+                                        <Button asChild className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+                                            <Link to="/contact">Get Started</Link>
+                                        </Button>
                                     </div>
-                                </Link>
+                                </div>
                             );
                         })}
                     </div>

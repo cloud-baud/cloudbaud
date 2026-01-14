@@ -4,8 +4,13 @@ import { Mail, Lock, User, Phone, CheckCircle, ArrowRight } from 'lucide-react';
 import { Button } from './ui/button';
 import PrivacyConsent from './PrivacyConsent';
 import SEO from './SEO';
+import SocialAuthButtons from './SocialAuthButtons';
+
+import { useAuth } from '../context/AuthContext';
+import { toast } from 'sonner';
 
 const SignupPage = () => {
+    const { signUpWithEmail } = useAuth();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -22,10 +27,25 @@ const SignupPage = () => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Signup submitted:', formData);
-        setIsSubmitted(true);
+
+        if (!consentChecked) {
+            toast.error('You must agree to the privacy policy');
+            return;
+        }
+
+        try {
+            await signUpWithEmail(formData.email, formData.password, {
+                full_name: formData.name,
+                phone: formData.phone
+            });
+            setIsSubmitted(true);
+            toast.success('Account created! Please check your email.');
+        } catch (error) {
+            console.error(error);
+            toast.error(error.message || 'Failed to sign up');
+        }
     };
 
     return (
@@ -159,6 +179,10 @@ const SignupPage = () => {
                                     Create Account
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
+                            </div>
+
+                            <div className="mt-6">
+                                <SocialAuthButtons />
                             </div>
                         </form>
                     )}
