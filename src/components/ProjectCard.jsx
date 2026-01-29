@@ -10,7 +10,7 @@ const ProjectCard = ({ project, featured = false }) => {
                 }`}
         >
             {/* ImagePlaceholder with Gradient */}
-            <div className={`relative ${featured ? 'h-64' : 'h-48'} bg-gradient-to-br from-brand-blue/10 to-brand-aqua/10 overflow-hidden`}>
+            <div className={`relative ${featured ? 'h-36' : 'h-28'} bg-gradient-to-br from-brand-blue/10 to-brand-aqua/10 overflow-hidden`}>
                 <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/40 dark:from-slate-900 dark:via-slate-900/60 to-transparent" />
 
                 {/* Tags */}
