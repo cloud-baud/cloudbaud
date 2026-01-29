@@ -13,17 +13,17 @@ const PortfolioPage = () => {
         : portfolioProjects.filter(project => project.category === selectedCategory);
 
     return (
-        <div className="min-h-screen bg-slate-900 text-white">
+        <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
             {/* Hero Section */}
-            <section className="py-20 px-4 sm:px-6 lg:px-8">
+            <section className="py-16 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto text-center">
-                    <h1 className="text-5xl md:text-6xl font-bold mb-6">
+                    <h1 className="text-5xl md:text-6xl font-bold mb-6 text-gray-900 dark:text-white">
                         Our{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                             Portfolio
                         </span>
                     </h1>
-                    <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+                    <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
                         Explore our successful client projects across database modernization, AI engineering,
                         custom application development, and cloud architecture.
                     </p>
@@ -31,11 +31,11 @@ const PortfolioPage = () => {
             </section>
 
             {/* Filter Section */}
-            <section className="py-8 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
+            <section className="py-8 px-4 sm:px-6 lg:px-8 border-b border-gray-200 dark:border-slate-800">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex items-center gap-4 mb-6">
-                        <Filter className="h-5 w-5 text-gray-400" />
-                        <span className="text-gray-400 font-medium">Filter by Category:</span>
+                        <Filter className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                        <span className="text-gray-700 dark:text-gray-300 font-medium">Filter by Category:</span>
                     </div>
 
                     <div className="flex flex-wrap gap-3">
@@ -44,8 +44,8 @@ const PortfolioPage = () => {
                                 key={category}
                                 onClick={() => setSelectedCategory(category)}
                                 className={`px-4 py-2 rounded-full font-medium transition-all duration-300 ${selectedCategory === category
-                                    ? 'bg-gradient-to-r from-blue-600 to-blue-800 text-white'
-                                    : 'bg-slate-800 text-gray-300 hover:bg-slate-700'
+                                    ? 'bg-brand-blue text-black shadow-lg shadow-brand-blue/20'
+                                    : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700'
                                     }`}
                             >
                                 {category}
@@ -56,11 +56,11 @@ const PortfolioPage = () => {
             </section>
 
             {/* Projects Grid */}
-            <section className="py-20 px-4 sm:px-6 lg:px-8">
+            <section className="py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
                     <div className="mb-8">
-                        <p className="text-gray-400">
-                            Showing <span className="text-white font-semibold">{filteredProjects.length}</span> {filteredProjects.length === 1 ? 'project' : 'projects'}
+                        <p className="text-gray-600 dark:text-gray-400">
+                            Showing <span className="text-gray-900 dark:text-white font-semibold">{filteredProjects.length}</span> {filteredProjects.length === 1 ? 'project' : 'projects'}
                         </p>
                     </div>
 
@@ -76,7 +76,7 @@ const PortfolioPage = () => {
 
                     {filteredProjects.length === 0 && (
                         <div className="text-center py-20">
-                            <p className="text-gray-400 text-lg">
+                            <p className="text-gray-600 dark:text-gray-400 text-lg">
                                 No projects found in this category.
                             </p>
                         </div>
@@ -85,16 +85,16 @@ const PortfolioPage = () => {
             </section>
 
             {/* Case Study Details */}
-            <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-800/30">
+            <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-800/30">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold mb-4">
+                        <h2 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
                             Detailed{' '}
-                            <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+                            <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                                 Case Studies
                             </span>
                         </h2>
-                        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                        <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
                             Dive deep into how we solved complex challenges for our clients
                         </p>
                     </div>
@@ -106,19 +106,19 @@ const PortfolioPage = () => {
                                 id={project.id}
                                 className="scroll-mt-20"
                             >
-                                <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-3xl p-8 md:p-12">
+                                <div className="bg-white dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700 rounded-3xl p-8 md:p-12 shadow-sm dark:shadow-none">
                                     {/* Header */}
                                     <div className="mb-8">
                                         <div className="flex items-center gap-3 mb-4">
-                                            <span className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-full">
+                                            <span className="px-4 py-2 bg-brand-blue/10 text-brand-blue text-sm font-semibold rounded-full border border-brand-blue/20">
                                                 {project.category}
                                             </span>
-                                            <span className="text-gray-400">{project.year}</span>
+                                            <span className="text-gray-500 dark:text-gray-400">{project.year}</span>
                                         </div>
-                                        <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                                        <h3 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                                             {project.title}
                                         </h3>
-                                        <p className="text-blue-400 text-lg font-medium">
+                                        <p className="text-brand-blue text-lg font-medium">
                                             Client: {project.client}
                                         </p>
                                     </div>
@@ -128,39 +128,39 @@ const PortfolioPage = () => {
                                         {/* Challenge & Solution */}
                                         <div className="space-y-8">
                                             <div>
-                                                <h4 className="text-xl font-semibold text-white mb-4">The Challenge</h4>
-                                                <p className="text-gray-400 leading-relaxed">{project.challenge}</p>
+                                                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">The Challenge</h4>
+                                                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{project.challenge}</p>
                                             </div>
 
                                             <div>
-                                                <h4 className="text-xl font-semibold text-white mb-4">Our Solution</h4>
-                                                <p className="text-gray-400 leading-relaxed">{project.solution}</p>
+                                                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Our Solution</h4>
+                                                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{project.solution}</p>
                                             </div>
                                         </div>
 
                                         {/* Results & Tech */}
                                         <div className="space-y-8">
                                             <div>
-                                                <h4 className="text-xl font-semibold text-white mb-4">Results Achieved</h4>
+                                                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Results Achieved</h4>
                                                 <div className="space-y-3">
                                                     {project.results.map((result, index) => (
                                                         <div key={index} className="flex items-start gap-3">
-                                                            <div className="w-6 h-6 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                                                <div className="w-2 h-2 bg-green-400 rounded-full" />
+                                                            <div className="w-6 h-6 bg-brand-aqua/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                                <div className="w-2 h-2 bg-brand-aqua rounded-full" />
                                                             </div>
-                                                            <span className="text-gray-300">{result}</span>
+                                                            <span className="text-gray-600 dark:text-gray-300">{result}</span>
                                                         </div>
                                                     ))}
                                                 </div>
                                             </div>
 
                                             <div>
-                                                <h4 className="text-xl font-semibold text-white mb-4">Technologies Used</h4>
+                                                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Technologies Used</h4>
                                                 <div className="flex flex-wrap gap-2">
                                                     {project.technologies.map((tech, index) => (
                                                         <span
                                                             key={index}
-                                                            className="px-3 py-1.5 bg-slate-700 text-gray-300 text-sm rounded-lg border border-slate-600"
+                                                            className="px-3 py-1.5 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 text-sm rounded-lg border border-gray-200 dark:border-slate-600"
                                                         >
                                                             {tech}
                                                         </span>
@@ -169,7 +169,7 @@ const PortfolioPage = () => {
                                             </div>
 
                                             <div className="pt-4">
-                                                <div className="flex items-center gap-4 text-sm text-gray-400">
+                                                <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                                                     <span className="font-medium">Duration:</span>
                                                     <span>{project.duration}</span>
                                                 </div>
@@ -184,22 +184,22 @@ const PortfolioPage = () => {
             </section>
 
             {/* CTA Section */}
-            <section className="py-20 px-4 sm:px-6 lg:px-8">
+            <section className="py-16 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-4xl mx-auto text-center">
-                    <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                    <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white">
                         Ready to{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                             start your project
                         </span>
                         ?
                     </h2>
-                    <p className="text-gray-400 text-lg mb-10 max-w-2xl mx-auto">
+                    <p className="text-gray-600 dark:text-gray-400 text-lg mb-10 max-w-2xl mx-auto">
                         Let's discuss how we can help you achieve similar results with your technology initiatives.
                     </p>
                     <Button
                         asChild
                         size="lg"
-                        className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-8 py-3 rounded-full"
+                        className="bg-brand-blue hover:bg-brand-blue/90 text-black font-semibold px-8 py-3 rounded-full shadow-lg shadow-brand-blue/20"
                     >
                         <Link to="/contact">
                             Schedule a Consultation

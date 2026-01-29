@@ -22,9 +22,13 @@ import IndustriesPage from './components/IndustriesPage';
 import IndustryDetail from './components/IndustryDetail';
 import PrivacyPolicyPage from './components/PrivacyPolicyPage';
 import TermsPage from './components/TermsPage';
+import SalesPage from './components/SalesPage';
+import LegalPage from './components/LegalPage';
+import SiteMapPage from './components/SiteMapPage';
 import SignupPage from './components/SignupPage';
 import LoginPage from './components/LoginPage';
 import RedirectHandler from './components/RedirectHandler';
+import AiEngineeringPage from './components/AiEngineeringPage';
 
 import { AuthProvider } from './context/AuthContext';
 
@@ -55,6 +59,7 @@ function App() {
               <Route path="/industries" element={<IndustriesPage />} />
               <Route path="/industries/:slug" element={<IndustryDetail />} />
               <Route path="/services" element={<ServicesPage />} />
+              <Route path="/ai-engineering" element={<AiEngineeringPage />} />
               <Route path="/portfolio" element={<PortfolioPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/blog" element={<BlogPage />} />
@@ -63,6 +68,9 @@ function App() {
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
               <Route path="/terms-and-conditions" element={<TermsPage />} />
+              <Route path="/sales" element={<SalesPage />} />
+              <Route path="/legal" element={<LegalPage />} />
+              <Route path="/site-map" element={<SiteMapPage />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/logout" element={<RedirectHandler to="/" />} />

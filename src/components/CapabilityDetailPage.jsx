@@ -16,7 +16,7 @@ const CapabilityDetailPage = () => {
     const Icon = capability.icon;
 
     return (
-        <div className="min-h-screen bg-white text-gray-900">
+        <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
             <SEO
                 title={`${capability.title} - CloudBaud Capabilities`}
                 description={capability.description}
@@ -24,11 +24,11 @@ const CapabilityDetailPage = () => {
             />
 
             {/* Breadcrumb / Back Navigation */}
-            <div className="bg-slate-50 border-b border-gray-200 py-4 px-4 sm:px-6 lg:px-8">
+            <div className="bg-slate-50 dark:bg-slate-900/30 border-b border-gray-200 dark:border-slate-800 py-4 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
                     <Link
                         to="/capabilities"
-                        className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors"
+                        className="inline-flex items-center text-sm font-medium text-gray-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-brand-blue transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4 mr-2" />
                         Back to Capabilities
@@ -37,23 +37,23 @@ const CapabilityDetailPage = () => {
             </div>
 
             {/* Hero Section */}
-            <section className="py-16 px-4 sm:px-6 lg:px-8">
+            <section className="py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         {/* Text Content */}
                         <div>
-                            <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-blue-600/20">
+                            <div className="w-16 h-16 bg-blue-600 dark:bg-brand-blue rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-blue-600/20 dark:shadow-brand-blue/20">
                                 {Icon && <Icon className="h-8 w-8 text-white" />}
                             </div>
-                            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+                            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
                                 {capability.title}
                             </h1>
-                            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                            <p className="text-xl text-gray-600 dark:text-slate-400 mb-8 leading-relaxed">
                                 {capability.description}
                             </p>
 
                             <div className="space-y-4 mb-10">
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-blue-600 mb-4">
+                                <h3 className="text-sm font-bold uppercase tracking-widest text-blue-600 dark:text-brand-blue mb-4">
                                     Key Competencies
                                 </h3>
                                 {capability.capabilities.map((item, idx) => {
@@ -66,12 +66,12 @@ const CapabilityDetailPage = () => {
                                             {isLink ? (
                                                 <Link
                                                     to={`/capabilities/${slug}/${item.slug}`}
-                                                    className="text-lg text-blue-600 font-medium hover:underline hover:text-blue-700"
+                                                    className="text-lg text-blue-600 dark:text-brand-blue font-medium hover:underline hover:text-blue-700 dark:hover:text-brand-aqua"
                                                 >
                                                     {text}
                                                 </Link>
                                             ) : (
-                                                <span className="text-lg text-gray-700 font-medium">{text}</span>
+                                                <span className="text-lg text-gray-700 dark:text-slate-300 font-medium">{text}</span>
                                             )}
                                         </div>
                                     );
@@ -79,13 +79,13 @@ const CapabilityDetailPage = () => {
                             </div>
 
                             <div className="flex flex-col sm:flex-row gap-4">
-                                <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-6 px-8 rounded-xl shadow-lg shadow-blue-600/20">
+                                <Button asChild size="lg" className="bg-blue-600 dark:bg-brand-blue hover:bg-blue-700 dark:hover:bg-brand-blue/80 text-white font-bold py-6 px-8 rounded-xl shadow-lg shadow-blue-600/20 dark:shadow-brand-blue/20">
                                     <Link to="/contact">
                                         Start a Project
                                         <ArrowRight className="ml-2 w-5 h-5" />
                                     </Link>
                                 </Button>
-                                <Button asChild variant="outline" size="lg" className="border-2 py-6 px-8 rounded-xl font-bold text-gray-700 hover:bg-gray-50">
+                                <Button asChild variant="outline" size="lg" className="border-2 py-6 px-8 rounded-xl font-bold text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 dark:border-slate-700">
                                     <Link to="/portfolio">View Case Studies</Link>
                                 </Button>
                             </div>
@@ -93,7 +93,7 @@ const CapabilityDetailPage = () => {
 
                         {/* Visual Content */}
                         <div className="relative">
-                            <div className="relative bg-slate-50 border border-gray-100 rounded-3xl p-8 shadow-2xl">
+                            <div className="relative bg-slate-50 dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-3xl p-8 shadow-2xl">
                                 <img
                                     src={capability.infographic}
                                     alt={`${capability.title} Visualization`}
@@ -109,18 +109,18 @@ const CapabilityDetailPage = () => {
             </section>
 
             {/* CTA Section */}
-            <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-900 text-white mt-12">
+            <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-white mt-12 border-t border-gray-200 dark:border-slate-800">
                 <div className="max-w-4xl mx-auto text-center">
                     <h2 className="text-3xl md:text-4xl font-bold mb-6">
                         Ready to leverage our {capability.title} expertise?
                     </h2>
-                    <p className="text-xl text-slate-300 mb-10 max-w-2xl mx-auto">
+                    <p className="text-xl text-gray-600 dark:text-slate-300 mb-10 max-w-2xl mx-auto">
                         Let's discuss how our engineering team can help you build scalable, mission-critical solutions.
                     </p>
                     <Button
                         asChild
                         size="lg"
-                        className="bg-white text-slate-900 hover:bg-slate-100 px-10 py-7 text-xl rounded-lg font-bold"
+                        className="bg-brand-blue hover:bg-brand-blue/90 text-black px-10 py-7 text-xl rounded-lg font-bold"
                     >
                         <Link to="/contact">
                             Get in Touch

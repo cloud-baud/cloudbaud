@@ -18,7 +18,7 @@ import { technicalCapabilities, deliveryModels } from '../data/capabilities';
 
 const CapabilitiesPage = () => {
     return (
-        <div className="min-h-screen bg-white text-gray-900">
+        <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
             <SEO
                 title="Our Capabilities"
                 description="Comprehensive technology capabilities including data engineering, AI engineering, cloud solutions, Microsoft platform, DevOps, mobile development, enterprise integration, and solutions architecture."
@@ -26,13 +26,13 @@ const CapabilitiesPage = () => {
                 canonical="/capabilities"
             />
             {/* Hero Section */}
-            <section className="py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 border-b border-gray-200">
+            <section className="py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-900/30 border-b border-gray-200 dark:border-slate-800">
                 <div className="max-w-7xl mx-auto">
                     <div className="max-w-3xl">
-                        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 tracking-tight">
+                        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white tracking-tight">
                             Our Capabilities
                         </h1>
-                        <p className="text-lg text-gray-600 leading-relaxed">
+                        <p className="text-lg text-gray-600 dark:text-slate-400 leading-relaxed">
                             From pre-built solutions to custom enterprise applications, we deliver technology that drives measurable business value.
                         </p>
                     </div>
@@ -48,24 +48,24 @@ const CapabilitiesPage = () => {
                             return (
                                 <div
                                     key={capability.id}
-                                    className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 group block transform hover:-translate-y-1 relative flex flex-col"
+                                    className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 group block transform hover:-translate-y-1 relative flex flex-col"
                                 >
                                     <Link to={`/capabilities/${capability.slug}`} className="flex-1">
                                         {/* Content Header */}
                                         <div className="p-4 border-b border-neutral-800 flex items-center gap-3 bg-neutral-900 bg-[linear-gradient(45deg,transparent_25%,rgba(68,68,68,.2)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] hover:bg-[position:100%_0] transition-all duration-1000">
-                                            <div className="w-10 h-10 bg-blue-600/20 border border-blue-500/30 rounded-lg flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(37,99,235,0.1)] group-hover:shadow-[0_0_20px_rgba(37,99,235,0.3)] group-hover:scale-105 transition-all">
-                                                {Icon && <Icon className="h-5 w-5 text-blue-400" />}
+                                            <div className="w-10 h-10 bg-brand-blue/20 border border-brand-blue/30 rounded-lg flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(0,210,255,0.1)] group-hover:shadow-[0_0_20px_rgba(0,210,255,0.3)] group-hover:scale-105 transition-all">
+                                                {Icon && <Icon className="h-5 w-5 text-brand-blue" />}
                                             </div>
-                                            <h3 className="text-lg font-bold text-gray-100 leading-tight group-hover:text-blue-400 transition-colors">
+                                            <h3 className="text-lg font-bold text-gray-100 leading-tight group-hover:text-brand-blue transition-colors">
                                                 {capability.title}
                                             </h3>
                                             <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">
-                                                <ArrowRight className="text-blue-400 w-5 h-5" />
+                                                <ArrowRight className="text-brand-blue w-5 h-5" />
                                             </div>
                                         </div>
 
                                         {/* Infographic Image */}
-                                        <div className="relative aspect-[4/3] bg-white group-hover:bg-gray-50 transition-colors">
+                                        <div className="relative aspect-[4/3] bg-white dark:bg-slate-950 group-hover:bg-gray-50 dark:group-hover:bg-slate-900/50 transition-colors">
                                             <img
                                                 src={capability.infographic}
                                                 alt={`${capability.title} infographic`}
@@ -75,8 +75,8 @@ const CapabilitiesPage = () => {
                                     </Link>
 
                                     {/* Action Footer */}
-                                    <div className="p-4 bg-gray-50 border-t border-gray-100">
-                                        <Button asChild className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-md">
+                                    <div className="p-4 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-100 dark:border-slate-800">
+                                        <Button asChild className="w-full bg-brand-blue hover:bg-brand-blue/80 text-black font-semibold shadow-md">
                                             <Link to="/contact">Get Started</Link>
                                         </Button>
                                     </div>
@@ -88,13 +88,13 @@ const CapabilitiesPage = () => {
             </section>
 
             {/* Delivery Models */}
-            <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+            <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-slate-900/20">
                 <div className="max-w-7xl mx-auto">
                     <div className="max-w-3xl mb-16">
-                        <h2 className="text-4xl font-bold mb-4 text-gray-900">
+                        <h2 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
                             Flexible Delivery Models
                         </h2>
-                        <p className="text-gray-600 text-lg">
+                        <p className="text-gray-600 dark:text-slate-400 text-lg">
                             Choose the engagement approach that best fits your needs and timeline
                         </p>
                     </div>
@@ -105,21 +105,21 @@ const CapabilitiesPage = () => {
                             return (
                                 <div
                                     key={index}
-                                    className="bg-white border border-gray-200 rounded-lg p-8"
+                                    className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-lg p-8"
                                 >
-                                    <div className="w-12 h-12 bg-blue-600 rounded flex items-center justify-center mb-6">
+                                    <div className="w-12 h-12 bg-brand-blue rounded flex items-center justify-center mb-6">
                                         {Icon && <Icon className="h-6 w-6 text-white" />}
                                     </div>
-                                    <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+                                    <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
                                         {model.title}
                                     </h3>
-                                    <p className="text-gray-600 mb-6">
+                                    <p className="text-gray-600 dark:text-slate-400 mb-6">
                                         {model.description}
                                     </p>
                                     <ul className="space-y-2">
                                         {model.benefits.map((benefit, idx) => (
-                                            <li key={idx} className="text-gray-700 text-sm flex items-center gap-2">
-                                                <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
+                                            <li key={idx} className="text-gray-700 dark:text-slate-300 text-sm flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 bg-brand-blue rounded-full" />
                                                 <span>{benefit}</span>
                                             </li>
                                         ))}
@@ -132,19 +132,19 @@ const CapabilitiesPage = () => {
             </section>
 
             {/* CTA Section */}
-            <section className="py-20 px-4 sm:px-6 lg:px-8 border-t border-gray-200">
+            <section className="py-16 px-4 sm:px-6 lg:px-8 border-t border-gray-200 dark:border-slate-800">
                 <div className="max-w-4xl mx-auto text-center">
-                    <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
+                    <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white">
                         Ready to get started?
                     </h2>
-                    <p className="text-gray-600 text-lg mb-10 max-w-2xl mx-auto">
+                    <p className="text-gray-600 dark:text-slate-400 text-lg mb-10 max-w-2xl mx-auto">
                         Let's discuss which capabilities and delivery model are the best fit for your project.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Button
                             asChild
                             size="lg"
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-base"
+                            className="bg-brand-blue hover:bg-brand-blue/80 text-black font-bold px-8 py-6 text-base"
                         >
                             <Link to="/contact">
                                 Schedule Consultation
@@ -155,7 +155,7 @@ const CapabilitiesPage = () => {
                             asChild
                             variant="outline"
                             size="lg"
-                            className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-6 text-base"
+                            className="border-2 border-gray-300 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 px-8 py-6 text-base"
                         >
                             <Link to="/portfolio">View Portfolio</Link>
                         </Button>

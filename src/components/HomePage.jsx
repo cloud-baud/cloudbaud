@@ -28,8 +28,8 @@ const HomePage = () => {
             minWidth: 200.00,
             scale: 1.00,
             scaleMobile: 1.00,
-            color: 0x3b82f6,
-            color2: 0x1d4ed8,
+            color: 0x00d2ff,
+            color2: 0x29ff7e,
             size: 1.1,
             backgroundColor: theme === 'dark' ? 0x010816 : 0xffffff,
             points: 12.00,
@@ -126,26 +126,24 @@ const HomePage = () => {
   return (
     <div className="relative min-h-screen bg-background text-foreground transition-colors duration-300">
       <SEO
-        title="Senior Platform Engineer - Azure Databricks Specialist"
-        description="Expert in Azure Databricks Platform Engineering, Cost Optimization, Unity Catalog Governance, and Healthcare Data Operations."
-        keywords="Azure Databricks, Platform Engineering, Unity Catalog, Spark Optimization, Terraform, Healthcare Data, Data Engineering"
+        title="CloudBaud - Intelligent Systems Engineering"
+        description="We architect mission-critical data platforms, optimizing cost, governance, and performance on Azure Databricks."
+        keywords="CloudBaud, Data Engineering, Azure Databricks, AI Engineering, Intelligent Systems, Cloud Solutions"
         canonical="/"
       />
 
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex flex-col justify-center px-4 sm:px-6 lg:px-8 pt-20">
+      <section className="relative min-h-[85vh] flex flex-col justify-center px-4 sm:px-6 lg:px-8 pt-16">
         {/* Vanta Background Container */}
         <div ref={vantaRef} className="absolute inset-0 z-0 opacity-40"></div>
 
         <div className="max-w-7xl mx-auto w-full relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="max-w-3xl">
             {/* Badge */}
-            <div className="inline-block mb-6 px-4 py-1 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-400 text-xs uppercase font-bold tracking-wider animate-in fade-in slide-in-from-bottom-4 duration-700">
-              Senior Platform Engineer Profile
-            </div>
+            {/* Badge - Removed */}
 
             <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight text-foreground animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
-              Architecting <span className="text-blue-500">Mission-Critical</span> Data Platforms
+              Architecting <span className="text-brand-blue drop-shadow-[0_0_8px_rgba(0,210,255,0.5)]">Mission-Critical</span> Data Platforms
             </h1>
 
             <p className="text-xl md:text-2xl text-slate-300 mb-10 leading-relaxed max-w-2xl animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
@@ -158,10 +156,10 @@ const HomePage = () => {
               <Button
                 asChild
                 size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg rounded-lg shadow-lg shadow-blue-900/20 transition-all font-bold"
+                className="bg-brand-blue hover:bg-brand-blue/80 text-black px-8 py-6 text-lg rounded-lg shadow-lg shadow-brand-blue/20 transition-all font-bold"
               >
                 <Link to="/contact">
-                  View Full Profile
+                  Start Your Transformation
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
@@ -179,7 +177,7 @@ const HomePage = () => {
           {/* Hero Dashboard Preview - Mobile/Tablet Only hidden on desktop if too crowded, but we want it visible */}
           <div className="hidden lg:block w-full animate-in fade-in slide-in-from-right-8 duration-1000 delay-300">
             <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
+              <div className="absolute -inset-1 bg-gradient-to-r from-brand-blue to-brand-aqua rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
               <div className="relative bg-slate-900 ring-1 ring-slate-800 rounded-xl p-6 shadow-2xl">
                 <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-4">
                   <div className="flex items-center gap-2">
@@ -191,7 +189,7 @@ const HomePage = () => {
                 </div>
                 <div className="space-y-2 font-mono text-sm text-slate-300">
                   <div className="flex justify-between"><span>{'>'} checking_cluster_health...</span><span className="text-emerald-500">OK</span></div>
-                  <div className="flex justify-between"><span>{'>'} optimizing_delta_tables...</span><span className="text-blue-500">COMPLETED (2.4TB)</span></div>
+                  <div className="flex justify-between"><span>{'>'} optimizing_delta_tables...</span><span className="text-brand-blue">COMPLETED (2.4TB)</span></div>
                   <div className="flex justify-between"><span>{'>'} enforcing_unity_catalog...</span><span className="text-emerald-500">SECURE</span></div>
                   <div className="flex justify-between"><span>{'>'} analyzing_cost_metrics...</span><span className="text-amber-500">SAVINGS DETECTED</span></div>
                   <div className="mt-4 pt-4 border-t border-slate-800 flex justify-between items-end">
@@ -200,7 +198,7 @@ const HomePage = () => {
                       <div className="text-xl font-bold text-white">4.2 GB/s</div>
                     </div>
                     <div className="h-8 w-24 bg-gradient-to-t from-blue-500/20 to-transparent relative overflow-hidden">
-                      <div className="absolute bottom-0 left-0 right-0 h-[60%] bg-blue-500/40 animate-pulse" />
+                      <div className="absolute bottom-0 left-0 right-0 h-[60%] bg-brand-blue/40 animate-pulse" />
                     </div>
                   </div>
                 </div>
@@ -211,7 +209,7 @@ const HomePage = () => {
       </section>
 
       {/* Platform Insights Section - THE NANO BANANA INFOGRAPHIC */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-900/40 transition-colors border-y border-slate-200 dark:border-slate-800">
+      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-900/40 transition-colors border-y border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold text-foreground mb-4">Operational Visibility & Insights</h2>
@@ -224,12 +222,12 @@ const HomePage = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-background transition-colors">
+      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-background transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center p-6 rounded-2xl bg-slate-50 dark:bg-slate-900/20 border border-slate-100 dark:border-slate-800">
-                <div className="text-4xl md:text-5xl font-bold text-blue-500 mb-2">
+                <div className="text-4xl md:text-5xl font-bold text-brand-blue mb-2 drop-shadow-[0_0_10px_rgba(0,210,255,0.3)]">
                   {stat.number}
                 </div>
                 <div className="text-slate-500 font-medium uppercase tracking-wider text-sm">
@@ -242,13 +240,13 @@ const HomePage = () => {
       </section>
 
       {/* Expertise Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-background transition-colors">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-background transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6 font-serif">
               Core Responsibilities
             </h2>
-            <div className="w-20 h-1 bg-blue-600 mx-auto mb-8"></div>
+            <div className="w-20 h-1 bg-brand-aqua mx-auto mb-8 shadow-[0_0_10px_rgba(41,255,126,0.5)]"></div>
             <p className="text-slate-300 text-xl max-w-2xl mx-auto">
               Delivering stability and innovation across the entire data platform lifecycle.
             </p>
@@ -258,10 +256,10 @@ const HomePage = () => {
             {services.map((service, index) => (
               <div
                 key={index}
-                className="p-8 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/30 hover:bg-slate-50 dark:hover:bg-slate-900/50 hover:shadow-2xl dark:hover:border-blue-500/30 transition-all duration-300 shadow-sm dark:shadow-none group"
+                className="p-8 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/30 hover:bg-slate-50 dark:hover:bg-slate-900/50 hover:shadow-2xl dark:hover:border-brand-blue/30 transition-all duration-300 shadow-sm dark:shadow-none group"
               >
-                <div className="w-14 h-14 bg-blue-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-500/20 transition-colors">
-                  <service.icon className="h-7 w-7 text-blue-500" />
+                <div className="w-14 h-14 bg-brand-blue/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-blue/20 transition-colors">
+                  <service.icon className="h-7 w-7 text-brand-blue" />
                 </div>
                 <h3 className="text-2xl font-bold text-foreground mb-4">
                   {service.title}
@@ -276,14 +274,14 @@ const HomePage = () => {
       </section>
 
       {/* Technology Stack Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-900/30 transition-colors">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-900/30 transition-colors">
         <div className="max-w-7xl mx-auto">
           <TechnologyStack />
         </div>
       </section>
 
       {/* Process Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-background transition-colors">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-background transition-colors">
         <div className="max-w-7xl mx-auto">
           <ProcessTimeline />
         </div>
@@ -292,11 +290,11 @@ const HomePage = () => {
 
 
       {/* CTA Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-950 overflow-hidden relative border-t border-slate-100 dark:border-slate-900 transition-colors">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-950 overflow-hidden relative border-t border-slate-100 dark:border-slate-900 transition-colors">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-blue to-brand-aqua"></div>
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-8 leading-tight">
-            Ready to build the future of <br /><span className="text-blue-500 underline decoration-blue-900 underline-offset-8">your business?</span>
+            Ready to build the future of <br /><span className="text-brand-aqua underline decoration-brand-blue/50 underline-offset-8">your business?</span>
           </h2>
           <p className="text-xl text-slate-300 mb-12 max-w-2xl mx-auto">
             Contact us today to discuss your vision and learn how our engineering prowess can turn it into reality.
@@ -305,7 +303,7 @@ const HomePage = () => {
             <Button
               asChild
               size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-7 text-xl rounded-lg shadow-xl shadow-blue-500/10 font-bold"
+              className="bg-brand-blue hover:bg-brand-blue/80 text-black px-10 py-7 text-xl rounded-lg shadow-xl shadow-brand-blue/20 font-bold"
             >
               <Link to="/contact">
                 Get in Touch

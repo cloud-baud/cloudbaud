@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft Fabric Demo - Real-Time Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-chart-line text-white"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-800">Microsoft Fabric Demo</h1>
+                </div>
+                <div class="text-sm text-gray-600">
+                    <i class="fas fa-clock mr-2"></i>
+                    <span id="current-time"></span>
+                    <span class="ml-4 font-semibold">Period: <span id="reporting-period">Last 24 Hours</span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="container mx-auto px-6 py-8">
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">
+                    Real-Time GitHub Analytics with Microsoft Fabric
+                </h2>
+                <p class="text-xl text-gray-600 mb-6">
+                    Experience the power of Fabric's medallion architecture with live data
+                </p>
+                <button id="fetch-btn" onclick="fetchData()" 
+                        class="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-all transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-sync-alt mr-2"></i>
+                    Fetch Fresh Data
+                </button>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading" class="hidden text-center py-8">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <p class="mt-4 text-gray-600">Fetching live GitHub data...</p>
+            </div>
+
+            <!-- Success/Error Messages -->
+            <div id="message" class="hidden mb-6 p-4 rounded-lg"></div>
+        </div>
+
+        <!-- Medallion Architecture Tabs -->
+        <div id="medallion-tabs" class="hidden">
+            <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Microsoft Fabric Medallion Architecture</h3>
+                
+                <!-- Tab Navigation -->
+                <div class="flex justify-center mb-8">
+                    <div class="bg-gray-100 rounded-lg p-1 inline-flex">
+                        <button onclick="showTab('bronze')" id="bronze-tab" 
+                                class="px-6 py-3 rounded-md font-semibold transition-all bg-amber-600 text-white">
+                            <i class="fas fa-database mr-2"></i>Bronze Layer
+                        </button>
+                        <button onclick="showTab('silver')" id="silver-tab" 
+                                class="px-6 py-3 rounded-md font-semibold transition-all text-gray-600 hover:text-gray-800">
+                            <i class="fas fa-filter mr-2"></i>Silver Layer
+                        </button>
+                        <button onclick="showTab('gold')" id="gold-tab" 
+                                class="px-6 py-3 rounded-md font-semibold transition-all text-gray-600 hover:text-gray-800">
+                            <i class="fas fa-chart-line mr-2"></i>Gold Layer
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bronze Layer Content -->
+                <div id="bronze-content" class="tab-content">
+                    <div class="bg-amber-50 rounded-xl p-6 mb-6">
+                        <h4 class="text-xl font-semibold text-amber-800 mb-4">
+                            <i class="fas fa-database mr-2"></i>Bronze Layer - Raw Data Ingestion
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h5 class="font-semibold text-gray-800 mb-3">Raw Data Characteristics</h5>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li><i class="fas fa-check text-amber-600 mr-2"></i>Unstructured JSON events</li>
+                                    <li><i class="fas fa-check text-amber-600 mr-2"></i>Original GitHub Archive format</li>
+                                    <li><i class="fas fa-check text-amber-600 mr-2"></i>Full event payload preserved</li>
+                                    <li><i class="fas fa-check text-amber-600 mr-2"></i>Real-time data streaming</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 class="font-semibold text-gray-800 mb-3">Business Value</h5>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li><i class="fas fa-arrow-right text-amber-600 mr-2"></i>Capture everything, filter later</li>
+                                    <li><i class="fas fa-arrow-right text-amber-600 mr-2"></i>Complete data lineage</li>
+                                    <li><i class="fas fa-arrow-right text-amber-600 mr-2"></i>Audit trail compliance</li>
+                                    <li><i class="fas fa-arrow-right text-amber-600 mr-2"></i>Future-proof data storage</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-900 text-green-400 rounded-lg p-4 font-mono text-sm">
+                        <div class="mb-2 text-gray-400">// Raw GitHub Event Sample</div>
+                        <div>{</div>
+                        <div>  "id":          "1234567890",</div>
+                        <div>  "type":        "PushEvent",</div>
+                        <div>  "actor":       {"login": "developer"},</div>
+                        <div>  "repo":        {"name": "company/project"},</div>
+                        <div>  "payload":     {...},</div>
+                        <div>  "created_at":  "2026-01-29T04:00:00Z"</div>
+                        <div>}</div>
+                    </div>
+                </div>
+
+                <!-- Silver Layer Content -->
+                <div id="silver-content" class="tab-content hidden">
+                    <div class="bg-blue-50 rounded-xl p-6 mb-6">
+                        <h4 class="text-xl font-semibold text-blue-800 mb-4">
+                            <i class="fas fa-filter mr-2"></i>Silver Layer - Structured Transformation
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h5 class="font-semibold text-gray-800 mb-3">Data Transformation</h5>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li><i class="fas fa-check text-blue-500 mr-2"></i>Cleaned and validated fields</li>
+                                    <li><i class="fas fa-check text-blue-500 mr-2"></i>Standardized data types</li>
+                                    <li><i class="fas fa-check text-blue-500 mr-2"></i>Deduplicated records</li>
+                                    <li><i class="fas fa-check text-blue-500 mr-2"></i>Business rules applied</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 class="font-semibold text-gray-800 mb-3">Business Value</h5>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li><i class="fas fa-arrow-right text-blue-500 mr-2"></i>Reliable data quality</li>
+                                    <li><i class="fas fa-arrow-right text-blue-500 mr-2"></i>Consistent formatting</li>
+                                    <li><i class="fas fa-arrow-right text-blue-500 mr-2"></i>Performance optimized</li>
+                                    <li><i class="fas fa-arrow-right text-blue-500 mr-2"></i>Ready for analytics</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-900 text-green-400 rounded-lg p-4 font-mono text-sm">
+                        <div class="mb-2 text-gray-400">// Structured DataFrame Schema</div>
+                        <div>event_id   | event_type   | created_at  | repo_name      | actor_login</div>
+                        <div>-----------|--------------|-------------|----------------|-------------</div>
+                        <div>1234567    | PushEvent    | 2026-01-29  | company/proj   | developer</div>
+                        <div>1234568    | IssueEvent   | 2026-01-29  | company/proj   | user123</div>
+                        <div>1234569    | PREvent      | 2026-01-29  | company/proj   | dev456</div>
+                    </div>
+                </div>
+
+                <!-- Gold Layer Content -->
+                <div id="gold-content" class="tab-content hidden">
+                    <div class="bg-yellow-50 rounded-xl p-6 mb-6">
+                        <h4 class="text-xl font-semibold text-yellow-800 mb-4">
+                            <i class="fas fa-chart-line mr-2"></i>Gold Layer - Business Analytics
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h5 class="font-semibold text-gray-800 mb-3">Analytics Aggregates</h5>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li><i class="fas fa-check text-yellow-600 mr-2"></i>KPIs and metrics</li>
+                                    <li><i class="fas fa-check text-yellow-600 mr-2"></i>Business summaries</li>
+                                    <li><i class="fas fa-check text-yellow-600 mr-2"></i>ML feature engineering</li>
+                                    <li><i class="fas fa-check text-yellow-600 mr-2"></i>Performance indicators</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 class="font-semibold text-gray-800 mb-3">Business Value</h5>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li><i class="fas fa-arrow-right text-yellow-600 mr-2"></i>Instant insights</li>
+                                    <li><i class="fas fa-arrow-right text-yellow-600 mr-2"></i>Decision ready</li>
+                                    <li><i class="fas fa-arrow-right text-yellow-600 mr-2"></i>BI dashboard ready</li>
+                                    <li><i class="fas fa-arrow-right text-yellow-600 mr-2"></i>ML model ready</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-900 text-green-400 rounded-lg p-4 font-mono text-sm">
+                        <div class="mb-2 text-gray-400">// Business Aggregates</div>
+                        <div>repo_metrics = {</div>
+                        <div>  "company/project": {</div>
+                        <div>    "total_events":        1250,</div>
+                        <div>    "unique_contributors": 15,</div>
+                        <div>    "collaboration_score": 78.5,</div>
+                        <div>    "activity_trend":      "increasing"</div>
+                        <div>  }</div>
+                        <div>}</div>
+                    </div>
+                </div>
+            </div>
+
+        <!-- Key Metrics Dashboard -->
+        <div id="metrics-dashboard" class="hidden">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">Total Events</p>
+                            <p id="total-events" class="text-3xl font-bold text-blue-600">-</p>
+                        </div>
+                        <i class="fas fa-chart-bar text-3xl text-blue-200"></i>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">Active Repos</p>
+                            <p id="unique-repos" class="text-3xl font-bold text-green-600">-</p>
+                        </div>
+                        <i class="fas fa-code-branch text-3xl text-green-200"></i>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">Developers</p>
+                            <p id="active-devs" class="text-3xl font-bold text-purple-600">-</p>
+                        </div>
+                        <i class="fas fa-users text-3xl text-purple-200"></i>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">Collaboration</p>
+                            <p id="collab-score" class="text-3xl font-bold text-orange-600">-</p>
+                        </div>
+                        <i class="fas fa-handshake text-3xl text-orange-200"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">Top 10 Event Distribution</h3>
+                    <canvas id="event-chart"></canvas>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">Top 10 Most Active Repositories</h3>
+                    <canvas id="repo-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Additional Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">Top 10 Most Active Developers</h3>
+                    <canvas id="developer-chart"></canvas>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">Detected Languages Distribution</h3>
+                    <div id="languages-table" class="overflow-hidden">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b-2 border-gray-200">
+                                    <th class="text-left py-3 px-2 font-semibold text-gray-700">Language</th>
+                                    <th class="text-right py-3 px-2 font-semibold text-gray-700">Events</th>
+                                    <th class="text-right py-3 px-2 font-semibold text-gray-700">Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody id="languages-tbody">
+                                <!-- Languages will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KQL Showcase Section -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-search text-blue-600 mr-3"></i>
+                    KQL Query Showcase - Real-Time Analytics
+                </h3>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-4">Sample KQL Queries</h4>
+                        
+                        <div class="space-y-4">
+                            <div class="bg-gray-900 text-green-400 rounded-lg p-4 font-mono text-sm">
+                                <div class="mb-2 text-blue-400">// Top repositories by activity</div>
+                                <div>github_events</div>
+                                <div>| summarize count() by repo_name</div>
+                                <div>| top 10 by count_</div>
+                                <div>| order by count_ desc</div>
+                            </div>
+                            
+                            <div class="bg-gray-900 text-green-400 rounded-lg p-4 font-mono text-sm">
+                                <div class="mb-2 text-blue-400">// Collaboration patterns over time</div>
+                                <div>github_events</div>
+                                <div>| where event_type in ('PushEvent', 'PullRequestEvent')</div>
+                                <div>| summarize events=count() by bin(created_at, 1h), event_type</div>
+                                <div>| render timechart</div>
+                            </div>
+                            
+                            <div class="bg-gray-900 text-green-400 rounded-lg p-4 font-mono text-sm">
+                                <div class="mb-2 text-blue-400">// Developer activity heatmap</div>
+                                <div>github_events</div>
+                                <div>| summarize count() by actor_login, dayofweek(created_at)</div>
+                                <div>| evaluate pivot(actor_login, dayofweek_created_at, sum(count_))</div>
+                                <div>| render heatmap</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-4">KQL in Fabric Benefits</h4>
+                        
+                        <div class="space-y-4">
+                            <div class="bg-blue-50 rounded-lg p-4">
+                                <div class="flex items-start">
+                                    <i class="fas fa-tachometer-alt text-blue-600 mt-1 mr-3"></i>
+                                    <div>
+                                        <h5 class="font-semibold text-blue-800">Real-Time Analytics</h5>
+                                        <p class="text-gray-600 text-sm mt-1">Query millions of events in seconds with optimized performance</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-green-50 rounded-lg p-4">
+                                <div class="flex items-start">
+                                    <i class="fas fa-chart-line text-green-600 mt-1 mr-3"></i>
+                                    <div>
+                                        <h5 class="font-semibold text-green-800">Rich Visualizations</h5>
+                                        <p class="text-gray-600 text-sm mt-1">Built-in chart types: timechart, heatmap, pie, bar, and more</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-purple-50 rounded-lg p-4">
+                                <div class="flex items-start">
+                                    <i class="fas fa-code text-purple-600 mt-1 mr-3"></i>
+                                    <div>
+                                        <h5 class="font-semibold text-purple-800">Powerful Functions</h5>
+                                        <p class="text-gray-600 text-sm mt-1">Advanced analytics: machine learning, anomaly detection, forecasting</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-orange-50 rounded-lg p-4">
+                                <div class="flex items-start">
+                                    <i class="fas fa-users text-orange-600 mt-1 mr-3"></i>
+                                    <div>
+                                        <h5 class="font-semibold text-orange-800">Collaboration Ready</h5>
+                                        <p class="text-gray-600 text-sm mt-1">Share queries, create dashboards, and collaborate in real-time</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fabric Benefits -->
+            <div class="bg-blue-600 rounded-xl shadow-lg p-8 text-white">
+                <h3 class="text-2xl font-bold mb-6">Microsoft Fabric Business Value</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="benefits-grid">
+                    <!-- Benefits will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let eventChart = null;
+        let repoChart = null;
+        let developerChart = null;
+        let languageChart = null;
+
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleString();
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Show message
+        function showMessage(message, type = 'success') {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = message;
+            messageEl.className = `mb-6 p-4 rounded-lg ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
+            messageEl.classList.remove('hidden');
+            setTimeout(() => messageEl.classList.add('hidden'), 5000);
+        }
+
+        // Fetch data
+        async function fetchData() {
+            const btn = document.getElementById('fetch-btn');
+            const loading = document.getElementById('loading');
+            
+            btn.disabled = true;
+            loading.classList.remove('hidden');
+            
+            try {
+                const response = await fetch('/fetch-data');
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage(data.message, 'success');
+                    updateDashboard(data.analysis);
+                    loadFabricBenefits();
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error fetching data. Please try again.', 'error');
+            } finally {
+                btn.disabled = false;
+                loading.classList.add('hidden');
+            }
+        }
+
+        // Update dashboard
+        function updateDashboard(analysis) {
+            document.getElementById('medallion-tabs').classList.remove('hidden');
+            document.getElementById('metrics-dashboard').classList.remove('hidden');
+            
+            // Update metrics
+            document.getElementById('total-events').textContent = analysis.total_events.toLocaleString();
+            document.getElementById('unique-repos').textContent = analysis.unique_repositories.toLocaleString();
+            document.getElementById('active-devs').textContent = analysis.active_developers.toLocaleString();
+            document.getElementById('collab-score').textContent = analysis.collaboration_score + '%';
+            
+            // Update charts
+            updateEventChart(analysis.event_types);
+            updateRepoChart(analysis.top_repositories);
+            updateDeveloperChart(analysis.top_developers);
+            updateLanguageTable(analysis.languages || getSampleLanguages());
+            loadFabricBenefits();
+        }
+
+        // Tab switching function
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Reset all tab buttons
+            document.querySelectorAll('[id$="-tab"]').forEach(button => {
+                button.classList.remove('bg-orange-500', 'bg-blue-500', 'bg-yellow-500', 'text-white');
+                button.classList.add('text-gray-600', 'hover:text-gray-800');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-content').classList.remove('hidden');
+            
+            // Highlight selected tab button
+            const selectedTab = document.getElementById(tabName + '-tab');
+            selectedTab.classList.remove('text-gray-600', 'hover:text-gray-800');
+            selectedTab.classList.add('text-white');
+            
+            if (tabName === 'bronze') {
+                selectedTab.classList.add('bg-amber-600');
+            } else if (tabName === 'silver') {
+                selectedTab.classList.add('bg-gray-500');
+            } else if (tabName === 'gold') {
+                selectedTab.classList.add('bg-yellow-500');
+            }
+        }
+
+        // Get sample languages data
+        function getSampleLanguages() {
+            return {
+                'Other': 134432,
+                'Go': 7096,
+                'JavaScript': 2978,
+                'Python': 711,
+                'Rust': 452,
+                'Java': 421
+            };
+        }
+
+        // Update developer chart
+        function updateDeveloperChart(topDevelopers) {
+            const ctx = document.getElementById('developer-chart').getContext('2d');
+            
+            if (developerChart) {
+                developerChart.destroy();
+            }
+            
+            developerChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: topDevelopers.map(dev => dev[0].replace(/\[bot\]/g, '')),
+                    datasets: [{
+                        label: 'Events',
+                        data: topDevelopers.map(dev => dev[1]),
+                        backgroundColor: '#10B981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                maxRotation: 90,
+                                minRotation: 90,
+                                autoSkip: false,
+                                font: {
+                                    size: 10
+                                },
+                                padding: 10
+                            }
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update language table
+        function updateLanguageTable(languages) {
+            const tbody = document.getElementById('languages-tbody');
+            tbody.innerHTML = '';
+            
+            // Sort languages by count (descending)
+            const sortedLanguages = Object.entries(languages).sort((a, b) => b[1] - a[1]);
+            const total = sortedLanguages.reduce((sum, [_, count]) => sum + count, 0);
+            
+            sortedLanguages.forEach(([language, count]) => {
+                const percentage = ((count / total) * 100).toFixed(1);
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-100 hover:bg-gray-50';
+                
+                // Add language color indicator
+                let colorClass = 'bg-gray-500';
+                if (language === 'Go') colorClass = 'bg-cyan-500';
+                else if (language === 'JavaScript') colorClass = 'bg-yellow-500';
+                else if (language === 'Python') colorClass = 'bg-blue-500';
+                else if (language === 'Rust') colorClass = 'bg-orange-500';
+                else if (language === 'Java') colorClass = 'bg-red-500';
+                
+                row.innerHTML = `
+                    <td class="py-3 px-2">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full ${colorClass} mr-2"></div>
+                            <span class="font-medium">${language}</span>
+                        </div>
+                    </td>
+                    <td class="py-3 px-2 text-right font-mono">${count.toLocaleString()}</td>
+                    <td class="py-3 px-2 text-right">
+                        <span class="inline-block bg-gray-100 rounded px-2 py-1 text-xs font-semibold">
+                            ${percentage}%
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Update event chart
+        function updateEventChart(eventTypes) {
+            const ctx = document.getElementById('event-chart').getContext('2d');
+            
+            if (eventChart) {
+                eventChart.destroy();
+            }
+            
+            // Sort event types by count (descending) for legend order
+            const sortedEntries = Object.entries(eventTypes).sort((a, b) => b[1] - a[1]);
+            const sortedLabels = sortedEntries.map(([label]) => label);
+            const sortedData = sortedEntries.map(([, count]) => count);
+            
+            eventChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: sortedLabels,
+                    datasets: [{
+                        data: sortedData,
+                        backgroundColor: [
+                            '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+                            '#EC4899', '#14B8A6', '#F97316', '#6366F1', '#84CC16'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                padding: 15,
+                                usePointStyle: true,
+                                font: {
+                                    size: 11
+                                },
+                                // Sort legend items to match data order
+                                sort: (a, b) => {
+                                    const aIndex = sortedLabels.indexOf(a.text);
+                                    const bIndex = sortedLabels.indexOf(b.text);
+                                    return aIndex - bIndex;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update repo chart
+        function updateRepoChart(topRepos) {
+            const ctx = document.getElementById('repo-chart').getContext('2d');
+            
+            if (repoChart) {
+                repoChart.destroy();
+            }
+            
+            repoChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: topRepos.map(repo => repo[0].split('/')[1]),
+                    datasets: [{
+                        label: 'Events',
+                        data: topRepos.map(repo => repo[1]),
+                        backgroundColor: '#3B82F6'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                maxRotation: 90,
+                                minRotation: 90,
+                                autoSkip: false,
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Load Fabric benefits
+        async function loadFabricBenefits() {
+            try {
+                const response = await fetch('/fabric-benefits');
+                const benefits = await response.json();
+                
+                const grid = document.getElementById('benefits-grid');
+                grid.innerHTML = '';
+                
+                Object.values(benefits).forEach(benefit => {
+                    const card = document.createElement('div');
+                    card.className = 'text-center';
+                    
+                    // Choose appropriate icon based on benefit title
+                    let iconClass = 'fas fa-rocket'; // default
+                    if (benefit.title.includes('Real-Time')) {
+                        iconClass = 'fas fa-bolt';
+                    } else if (benefit.title.includes('Scalable')) {
+                        iconClass = 'fas fa-database';
+                    } else if (benefit.title.includes('Unified')) {
+                        iconClass = 'fas fa-chart-pie';
+                    } else if (benefit.title.includes('ML-Ready')) {
+                        iconClass = 'fas fa-brain';
+                    }
+                    
+                    card.innerHTML = `
+                        <div class="bg-white bg-opacity-20 rounded-lg p-4 mb-3">
+                            <i class="${iconClass} text-3xl mb-2"></i>
+                        </div>
+                        <h4 class="font-semibold mb-2">${benefit.title}</h4>
+                        <p class="text-sm opacity-90">${benefit.description}</p>
+                        <p class="text-xs mt-2 opacity-75">${benefit.value}</p>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error loading benefits:', error);
+            }
+        }
+    </script>
+</body>
+</html>

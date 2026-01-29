@@ -41,12 +41,12 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   /* Brand Colors - Updated to match Logo Highlight and Metallic Steel */
-  --color-brand-blue: #3b82f6;
-  /* Electric Blue match */
+  --color-brand-blue: #00d2ff;
+  /* Neon Blue match */
   --color-brand-magenta: #e11d48;
   /* High-contrast crimson highlight */
-  --color-brand-aqua: #06b6d4;
-  /* Silicon Cyan */
+  --color-brand-aqua: #29ff7e;
+  /* Neon Green */
   --color-brand-gray: #94a3b8;
   /* Brushed Steel */
   --color-steel-light: #f8fafc;
@@ -62,31 +62,31 @@
   --card-foreground: #0f172a;
   --popover: #ffffff;
   --popover-foreground: #0f172a;
-  --primary: #2563eb;
-  --primary-foreground: #ffffff;
+  --primary: #00d2ff;
+  --primary-foreground: #000000;
   --secondary: #64748b;
   --secondary-foreground: #ffffff;
   --muted: #f1f5f9;
   --muted-foreground: #475569;
-  --accent: #3b82f6;
-  --accent-foreground: #ffffff;
+  --accent: #00d2ff;
+  --accent-foreground: #000000;
   --destructive: #ef4444;
   --border: #cbd5e1;
   --input: #e2e8f0;
-  --ring: #3b82f6;
-  --chart-1: #3b82f6;
-  --chart-2: #6366f1;
+  --ring: #00d2ff;
+  --chart-1: #00d2ff;
+  --chart-2: #29ff7e;
   --chart-3: #8b5cf6;
   --chart-4: #ec4899;
   --chart-5: #f43f5e;
   --sidebar: #f8fafc;
   --sidebar-foreground: #0f172a;
-  --sidebar-primary: #1e293b;
-  --sidebar-primary-foreground: #ffffff;
+  --sidebar-primary: #00d2ff;
+  --sidebar-primary-foreground: #000000;
   --sidebar-accent: #f1f5f9;
   --sidebar-accent-foreground: #1e293b;
   --sidebar-border: #e2e8f0;
-  --sidebar-ring: #3b82f6;
+  --sidebar-ring: #00d2ff;
 }
 
 .dark {
@@ -97,32 +97,32 @@
   --card-foreground: #f8fafc;
   --popover: #0f172a;
   --popover-foreground: #f8fafc;
-  --primary: #3b82f6;
-  /* Matches Electric CB Highlight */
-  --primary-foreground: #ffffff;
+  --primary: #00d2ff;
+  /* Matches Neon Blue Highlight */
+  --primary-foreground: #000000;
   --secondary: #1e293b;
   --secondary-foreground: #f8fafc;
   --muted: #1e293b;
   --muted-foreground: #94a3b8;
-  --accent: #2563eb;
-  --accent-foreground: #ffffff;
+  --accent: #00d2ff;
+  --accent-foreground: #000000;
   --destructive: #7f1d1d;
   --border: rgba(255, 255, 255, 0.1);
   --input: rgba(255, 255, 255, 0.05);
-  --ring: #3b82f6;
-  --chart-1: #22d3ee;
-  --chart-2: #818cf8;
+  --ring: #00d2ff;
+  --chart-1: #00d2ff;
+  --chart-2: #29ff7e;
   --chart-3: #c084fc;
   --chart-4: #f472b6;
   --chart-5: #fb7185;
   --sidebar: #020617;
   --sidebar-foreground: #f8fafc;
-  --sidebar-primary: #3b82f6;
-  --sidebar-primary-foreground: #ffffff;
+  --sidebar-primary: #00d2ff;
+  --sidebar-primary-foreground: #000000;
   --sidebar-accent: #1e293b;
   --sidebar-accent-foreground: #f8fafc;
   --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: #3b82f6;
+  --sidebar-ring: #00d2ff;
 }
 
 @layer base {

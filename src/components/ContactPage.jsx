@@ -72,18 +72,18 @@ const ContactPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-gray-900 dark:text-white">
             Let's Build Something{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
               Amazing
             </span>{' '}
             Together
           </h1>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             Ready to transform your business with intelligent technology solutions?
             We'd love to hear about your project and discuss how we can help you achieve your goals.
           </p>
@@ -91,66 +91,66 @@ const ContactPage = () => {
       </section>
 
       {/* Contact Content */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             {/* Contact Information */}
             <div>
-              <h2 className="text-3xl font-bold mb-8 text-white">Get in Touch</h2>
+              <h2 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">Get in Touch</h2>
 
               <div className="space-y-6 mb-12">
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
-                    <Mail className="h-6 w-6 text-white" />
+                  <div className="w-12 h-12 bg-gradient-to-r from-brand-blue to-brand-aqua rounded-lg flex items-center justify-center">
+                    <Mail className="h-6 w-6 text-black" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white">Email</h3>
-                    <p className="text-gray-400">hello@cloudbaud.com</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">Email</h3>
+                    <p className="text-gray-600 dark:text-gray-400">hello@cloudbaud.com</p>
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                    <Phone className="h-6 w-6 text-white" />
+                  <div className="w-12 h-12 bg-gradient-to-r from-brand-blue to-brand-magenta rounded-lg flex items-center justify-center">
+                    <Phone className="h-6 w-6 text-black" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white">Phone</h3>
-                    <p className="text-gray-400">425.749.2101</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">Phone</h3>
+                    <p className="text-gray-600 dark:text-gray-400">425.749.2101</p>
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                    <MapPin className="h-6 w-6 text-white" />
+                  <div className="w-12 h-12 bg-gradient-to-r from-brand-blue to-brand-magenta rounded-lg flex items-center justify-center">
+                    <MapPin className="h-6 w-6 text-black" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white">Location</h3>
-                    <p className="text-gray-400">Bellevue, WA</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">Location</h3>
+                    <p className="text-gray-600 dark:text-gray-400">Bellevue, WA</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
-                <h3 className="text-xl font-semibold mb-4 text-white">Response Time</h3>
-                <p className="text-gray-400 mb-4">
+              <div className="bg-white dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700 rounded-2xl p-6 shadow-sm dark:shadow-none">
+                <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Response Time</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
                   We typically respond to inquiries within 24 hours during business days.
                   For urgent matters, please call us directly.
                 </p>
                 <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-5 w-5 text-green-400" />
-                  <span className="text-green-400 font-medium">Usually responds within 24 hours</span>
+                  <CheckCircle className="h-5 w-5 text-brand-aqua" />
+                  <span className="text-brand-aqua font-medium">Usually responds within 24 hours</span>
                 </div>
               </div>
             </div>
 
             {/* Contact Form */}
             <div>
-              <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-8">
+              <div className="bg-white dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700 rounded-2xl p-8 shadow-md dark:shadow-none">
                 {isSubmitted ? (
                   <div className="text-center py-12">
-                    <CheckCircle className="h-16 w-16 text-green-400 mx-auto mb-4" />
-                    <h3 className="text-2xl font-bold text-white mb-2">Thank You!</h3>
-                    <p className="text-gray-400">
+                    <CheckCircle className="h-16 w-16 text-brand-aqua mx-auto mb-4" />
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Thank You!</h3>
+                    <p className="text-gray-600 dark:text-gray-400">
                       We've received your message and will respond within 24 hours.
                     </p>
                   </div>
@@ -158,7 +158,7 @@ const ContactPage = () => {
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-white mb-2">
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Name *
                         </label>
                         <input
@@ -168,13 +168,13 @@ const ContactPage = () => {
                           required
                           value={formData.name}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent"
                           placeholder="Your name"
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Email *
                         </label>
                         <input
@@ -184,7 +184,7 @@ const ContactPage = () => {
                           required
                           value={formData.email}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent"
                           placeholder="your@email.com"
                         />
                       </div>
@@ -192,7 +192,7 @@ const ContactPage = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label htmlFor="company" className="block text-sm font-medium text-white mb-2">
+                        <label htmlFor="company" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Company
                         </label>
                         <input
@@ -201,13 +201,13 @@ const ContactPage = () => {
                           name="company"
                           value={formData.company}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent"
                           placeholder="Your company"
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="phone" className="block text-sm font-medium text-white mb-2">
+                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Phone
                         </label>
                         <input
@@ -216,14 +216,14 @@ const ContactPage = () => {
                           name="phone"
                           value={formData.phone}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent"
                           placeholder="Your phone number"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label htmlFor="projectType" className="block text-sm font-medium text-white mb-2">
+                      <label htmlFor="projectType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Project Type
                       </label>
                       <select
@@ -231,7 +231,7 @@ const ContactPage = () => {
                         name="projectType"
                         value={formData.projectType}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent"
                       >
                         <option value="">Select a service</option>
                         {projectTypes.map((type) => (
@@ -242,7 +242,7 @@ const ContactPage = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label htmlFor="timeline" className="block text-sm font-medium text-white mb-2">
+                        <label htmlFor="timeline" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Timeline
                         </label>
                         <select
@@ -250,7 +250,7 @@ const ContactPage = () => {
                           name="timeline"
                           value={formData.timeline}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent"
                         >
                           <option value="">Select timeline</option>
                           {timelines.map((timeline) => (
@@ -260,7 +260,7 @@ const ContactPage = () => {
                       </div>
 
                       <div>
-                        <label htmlFor="budget" className="block text-sm font-medium text-white mb-2">
+                        <label htmlFor="budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Budget Range
                         </label>
                         <select
@@ -268,7 +268,7 @@ const ContactPage = () => {
                           name="budget"
                           value={formData.budget}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent"
                         >
                           <option value="">Select budget</option>
                           {budgets.map((budget) => (
@@ -279,7 +279,7 @@ const ContactPage = () => {
                     </div>
 
                     <div>
-                      <label htmlFor="message" className="block text-sm font-medium text-white mb-2">
+                      <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Message *
                       </label>
                       <textarea
@@ -289,7 +289,7 @@ const ContactPage = () => {
                         rows={6}
                         value={formData.message}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                        className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent resize-none"
                         placeholder="Tell us about your project..."
                       />
                     </div>
@@ -299,7 +299,7 @@ const ContactPage = () => {
                     <Button
                       type="submit"
                       size="lg"
-                      className="w-full bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white py-3"
+                      className="w-full bg-brand-blue hover:bg-brand-blue/80 text-black font-semibold py-3 shadow-lg"
                     >
                       Send Message
                       <Send className="ml-2 h-4 w-4" />
@@ -313,41 +313,41 @@ const ContactPage = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-800/30">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12">
+          <h2 className="text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">
             Frequently Asked{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
               Questions
             </span>
           </h2>
 
           <div className="space-y-6">
-            <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-3">
+            <div className="bg-white dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700 rounded-2xl p-6 shadow-sm dark:shadow-none">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
                 How long does a typical project take?
               </h3>
-              <p className="text-gray-400">
+              <p className="text-gray-600 dark:text-gray-400">
                 Project timelines vary depending on scope and complexity. Simple applications may take 2-3 months,
                 while enterprise-scale solutions can take 6-12 months. We'll provide a detailed timeline during our initial consultation.
               </p>
             </div>
 
-            <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-3">
+            <div className="bg-white dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700 rounded-2xl p-6 shadow-sm dark:shadow-none">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
                 Do you provide ongoing support after project completion?
               </h3>
-              <p className="text-gray-400">
+              <p className="text-gray-600 dark:text-gray-400">
                 Yes, we offer comprehensive support and maintenance packages to ensure your systems continue
                 to perform optimally. This includes monitoring, updates, and technical support.
               </p>
             </div>
 
-            <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-3">
+            <div className="bg-white dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700 rounded-2xl p-6 shadow-sm dark:shadow-none">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
                 Can you work with our existing technology stack?
               </h3>
-              <p className="text-gray-400">
+              <p className="text-gray-600 dark:text-gray-400">
                 Absolutely. We're experienced in integrating with existing systems and can work with a wide variety
                 of technologies. We'll assess your current infrastructure and recommend the best approach.
               </p>

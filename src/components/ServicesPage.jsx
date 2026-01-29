@@ -29,7 +29,8 @@ const ServicesPage = () => {
         'Predictive Analytics',
         'Process Automation'
       ],
-      technologies: ['TensorFlow', 'PyTorch', 'OpenAI', 'Hugging Face', 'MLflow']
+      technologies: ['TensorFlow', 'PyTorch', 'OpenAI', 'Hugging Face', 'MLflow'],
+      link: '/ai-engineering'
     },
     {
       icon: Database,
@@ -145,8 +146,8 @@ const ServicesPage = () => {
                   asChild
                   className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white"
                 >
-                  <Link to="/contact">
-                    Get Started
+                  <Link to={service.link || "/contact"}>
+                    {service.link ? 'Explore Service' : 'Get Started'}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
