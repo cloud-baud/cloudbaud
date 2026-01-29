@@ -5,8 +5,8 @@ import { Button } from './ui/button';
 import ThemeToggle from './ThemeToggle';
 
 
-import logo from '../assets/cloudbaud_logo.png';
-import logoIcon from '../assets/cloudbaud_icon.png';
+import logo from '../assets/images/cloudbaud_logo.png';
+import logoIcon from '../assets/images/cloudbaud_icon.png';
 // Image import removed
 
 
@@ -38,18 +38,17 @@ const Header = () => {
       <div className="max-w-7xl mx-auto w-full">
         <div className="flex justify-between items-center h-full">
           {/* Logo */}
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="h-12 w-auto flex items-center justify-start shrink-0 transition-transform group-hover:scale-105">
               <img
                 src={logo}
                 alt="CloudBaud"
                 className="h-full w-auto object-contain"
-                style={{ mixBlendMode: 'normal' }}
+                style={{ mixBlendMode: 'screen' }}
               />
             </div>
             <div className="flex flex-col whitespace-nowrap pt-1">
-              <span className="text-xs md:text-sm uppercase tracking-widest text-brand-blue font-bold">Innovative Engineering</span>
+              <span className="text-xl md:text-2xl uppercase tracking-widest text-brand-blue font-bold">Innovative Engineering</span>
             </div>
           </Link>
 

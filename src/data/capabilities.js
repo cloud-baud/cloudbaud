@@ -71,7 +71,7 @@ export const technicalCapabilities = [
                 text: 'Microsoft Fabric',
                 title: 'Microsoft Fabric Implementation',
                 description: 'End-to-end data analytics platform integration unifying Data Engineering, Data Science, and Power BI.',
-                image: '/infographic-database.png',
+                image: '/infographic-fabric-neon.png',
                 features: [
                     { title: 'OneLake Architecture', description: 'Implementing a single, unified logical data lake for the entire organization.' },
                     { title: 'Direct Lake Analysis', description: 'Ultra-fast reporting by loading data directly from storage into Power BI engine.' },

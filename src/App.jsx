@@ -5,6 +5,7 @@ import { ThemeProvider } from 'next-themes';
 import MarketingLayout from './components/MarketingLayout';
 import WorkspaceLayout from './components/portal/WorkspaceLayout';
 import PortalDashboard from './components/portal/PortalDashboard';
+import FabricDemo from './components/portal/FabricDemo';
 import HomePage from './components/HomePage';
 import ServicesPage from './components/ServicesPage';
 import AboutPage from './components/AboutPage';
@@ -28,6 +29,7 @@ import SiteMapPage from './components/SiteMapPage';
 import SignupPage from './components/SignupPage';
 import LoginPage from './components/LoginPage';
 import RedirectHandler from './components/RedirectHandler';
+import AuthRedirector from './components/AuthRedirector';
 import AiEngineeringPage from './components/AiEngineeringPage';
 
 import { AuthProvider } from './context/AuthContext';
@@ -39,11 +41,13 @@ function App() {
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
       <AuthProvider>
         <Router>
+          <AuthRedirector />
           <Routes>
             {/* Protected Portal Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/portal" element={<WorkspaceLayout />}>
                 <Route index element={<PortalDashboard />} />
+                <Route path="fabric-demo" element={<FabricDemo />} />
                 <Route path="*" element={<PortalDashboard />} />
               </Route>
             </Route>

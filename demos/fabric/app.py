@@ -4,6 +4,7 @@ Business Stakeholder Showcase - No pandas dependency
 """
 
 from flask import Flask, render_template, jsonify
+from flask_cors import CORS
 import requests
 import gzip
 import json
@@ -12,6 +13,7 @@ from collections import Counter, defaultdict
 import time
 
 app = Flask(__name__)
+CORS(app)
 
 class FabricDemo:
     def __init__(self):

@@ -58,6 +58,17 @@ export const AuthProvider = ({ children }) => {
         return data;
     };
 
+    const signInWithOtp = async (email) => {
+        const { data, error } = await supabase.auth.signInWithOtp({
+            email,
+            options: {
+                emailRedirectTo: `${window.location.origin}/portal`,
+            },
+        });
+        if (error) throw error;
+        return data;
+    };
+
     const signInWithSSO = async (domain) => {
         const { data, error } = await supabase.auth.signInWithSSO({
             domain: domain,
@@ -88,6 +99,7 @@ export const AuthProvider = ({ children }) => {
         session,
         loading,
         signInWithEmail,
+        signInWithOtp,
         signInWithOAuth,
         signInWithSSO,
         signUpWithEmail,

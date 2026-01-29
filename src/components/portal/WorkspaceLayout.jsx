@@ -18,6 +18,8 @@ import { ScrollArea } from '@radix-ui/react-scroll-area';
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import { Separator } from '@radix-ui/react-separator';
 import { cn } from '@/lib/utils';
+import CloudBaudLogo from '../CloudBaudLogo';
+import { useAuth } from '../../context/AuthContext';
 
 // Mock Data for Sidebar
 const favorites = [
@@ -38,6 +40,8 @@ const suggested = [
 ];
 
 const WorkspaceLayout = () => {
+    const { user } = useAuth();
+
     return (
         <div className="flex h-screen bg-background font-sans text-foreground overflow-hidden">
             {/* Sidebar */}
@@ -45,9 +49,7 @@ const WorkspaceLayout = () => {
                 {/* Brand / Switcher */}
                 <div className="px-4 mb-6 flex items-center justify-between">
                     <Link to="/" className="flex items-center gap-2 font-semibold text-lg hover:opacity-80 transition-opacity">
-                        <div className="size-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
-                            <span className="font-bold">C</span>
-                        </div>
+                        <CloudBaudLogo className="size-8" />
                         <span>CloudBaud</span>
                     </Link>
                 </div>
@@ -95,24 +97,39 @@ const WorkspaceLayout = () => {
                         </Section>
                     </div>
                 </div>
-
-                {/* User Profile */}
-                <div className="p-4 border-t border-border mt-auto">
-                    <div className="flex items-center gap-3 hover:bg-accent p-2 rounded-md cursor-pointer transition-colors">
-                        <div className="size-8 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-medium text-xs">
-                            JD
-                        </div>
-                        <div className="flex-1 overflow-hidden">
-                            <div className="text-sm font-medium truncate">John Doe</div>
-                            <div className="text-xs text-muted-foreground truncate">john@cloudbaud.com</div>
-                        </div>
-                    </div>
-                </div>
             </aside>
 
             {/* Main Content Area */}
-            <main className="flex-1 overflow-auto bg-background/50 relative">
-                <Outlet />
+            <main className="flex-1 flex flex-col overflow-hidden bg-background/50 relative">
+                {/* Header: Search & User Profile */}
+                <header className="h-16 flex items-center justify-between px-8 border-b border-border/50 bg-background/50 backdrop-blur-sm sticky top-0 z-10">
+                    <div className="flex items-center gap-4 flex-1">
+                        <div className="relative w-full max-w-md">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                            <input
+                                type="text"
+                                placeholder="Search..."
+                                className="w-full bg-accent/20 border border-border/50 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3 hover:bg-accent p-2 rounded-md cursor-pointer transition-colors">
+                            <div className="text-right hidden sm:block">
+                                <div className="text-sm font-medium">{user?.user_metadata?.full_name || 'User'}</div>
+                                <div className="text-xs text-muted-foreground">{user?.email || ''}</div>
+                            </div>
+                            <div className="size-9 rounded-full bg-gradient-to-br from-brand-blue to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md uppercase">
+                                {(user?.email ? user.email[0] : 'U')}
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <div className="flex-1 overflow-auto">
+                    <Outlet />
+                </div>
             </main>
         </div>
     );
