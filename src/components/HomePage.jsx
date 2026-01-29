@@ -1,5 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import * as THREE from 'three';
+import GLOBE from 'vanta/dist/vanta.globe.min';
 import { ArrowRight, Code, Cloud, Server, Smartphone, Database, Award, Users, CheckCircle, TrendingUp, Brain, Building, Shield, Activity, BarChart3, Terminal } from 'lucide-react';
 import { Button } from './ui/button';
 import { useTheme } from 'next-themes';
@@ -13,80 +15,47 @@ const HomePage = () => {
   const vantaRef = useRef(null);
   const { theme } = useTheme();
 
+  // We need to store the effect instance in a ref to persist across renders 
+  // but we also want to mark when it's active so we don't double-init
+  const vantaEffect = useRef(null);
+
   useEffect(() => {
-    let vantaEffect = null;
+    if (!vantaRef.current) return;
 
-    const initVanta = () => {
-      if (window.VANTA && window.THREE && vantaRef.current) {
-        try {
-          vantaEffect = window.VANTA.GLOBE({
-            el: vantaRef.current,
-            mouseControls: true,
-            touchControls: true,
-            gyroControls: false,
-            minHeight: 200.00,
-            minWidth: 200.00,
-            scale: 1.00,
-            scaleMobile: 1.00,
-            color: 0x00d2ff,
-            color2: 0x29ff7e,
-            size: 1.1,
-            backgroundColor: theme === 'dark' ? 0x010816 : 0xffffff,
-            points: 12.00,
-            maxDistance: 20.00,
-            spacing: 16.00
-          });
-        } catch (error) {
-          console.error('Vanta initialization error:', error);
-        }
-      }
-    };
+    // cleanup previous effect if it exists (e.g. strict mode double-mount)
+    if (vantaEffect.current) {
+      vantaEffect.current.destroy();
+    }
 
-    const loadScripts = async () => {
-      const threeExists = document.querySelector('script[src*="three.min.js"]');
-      const vantaExists = document.querySelector('script[src*="vanta.globe.min.js"]');
-
-      if (window.THREE && window.VANTA) {
-        initVanta();
-        return;
-      }
-
-      if (!threeExists && !window.THREE) {
-        const threeScript = document.createElement('script');
-        threeScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js';
-        threeScript.onload = () => {
-          if (!vantaExists && !window.VANTA) {
-            const vantaScript = document.createElement('script');
-            vantaScript.src = 'https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js';
-            vantaScript.onload = initVanta;
-            document.head.appendChild(vantaScript);
-          } else {
-            initVanta();
-          }
-        };
-        document.head.appendChild(threeScript);
-      } else if (!vantaExists && !window.VANTA) {
-        const vantaScript = document.createElement('script');
-        vantaScript.src = 'https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js';
-        vantaScript.onload = initVanta;
-        document.head.appendChild(vantaScript);
-      } else {
-        initVanta();
-      }
-    };
-
-    loadScripts();
+    try {
+      vantaEffect.current = GLOBE({
+        el: vantaRef.current,
+        THREE: THREE, // Pass THREE directly to Vanta
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        scale: 1.00,
+        scaleMobile: 1.00,
+        color: 0x00d2ff,
+        color2: 0x29ff7e,
+        size: 1.1,
+        backgroundColor: theme === 'dark' ? 0x010816 : 0xffffff,
+        points: 12.00,
+        maxDistance: 20.00,
+        spacing: 16.00
+      });
+    } catch (error) {
+      console.error('[VANTA] Initialization error:', error);
+    }
 
     return () => {
-      if (vantaEffect) {
-        try {
-          vantaEffect.destroy();
-        } catch (error) {
-          console.log('Vanta cleanup error:', error);
-        }
+      if (vantaEffect.current) {
+        vantaEffect.current.destroy();
       }
     };
-  }, [theme]);
+  }, [theme]); // Re-run when theme changes to update background color
 
   const services = [
     {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from 'next-themes';
-import { Globe, ChevronDown, Smartphone } from 'lucide-react';
+import { Globe, ChevronDown, Smartphone, Linkedin, Github } from 'lucide-react';
 
 const Footer = () => {
   const { theme, setTheme } = useTheme();
@@ -137,10 +137,10 @@ const Footer = () => {
             {/* Social Links for Passive Growth Strategy */}
             <div className="flex items-center gap-4 mr-4 border-r border-slate-300 dark:border-slate-700 pr-4">
               <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-[#6e6e73] dark:text-[#86868b] hover:text-[#0077b5] transition-colors" aria-label="LinkedIn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect width="4" height="12" x="2" y="9" /><circle cx="4" cy="4" r="2" /></svg>
+                <Linkedin className="w-4 h-4" />
               </a>
               <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-[#6e6e73] dark:text-[#86868b] hover:text-black dark:hover:text-white transition-colors" aria-label="GitHub">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 4-1.5 8 5c.08.35.25.68.45.98a4.8 4.8 0 0 1 0 3.5c-.2.3-.37.64-.45.98-4 1.5-8 5-8 5-1.15 0-2.35 0-3.5-.28-1.02.73-2.25 1.08-3.5 1-.35 0-.68.17-.98.45a4.8 4.8 0 0 0-.45.98 5 5 0 0 0 5 5c3.5 0 5.5-2 5.5-5.5a4.8 4.8 0 0 0-1-3.5v-4z" /><line x1="9" x2="15" y1="19" y2="21" /></svg>
+                <Github className="w-4 h-4" />
               </a>
             </div>
 

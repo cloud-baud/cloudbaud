@@ -28,7 +28,6 @@ const Header = () => {
       className="border-b border-[#222] sticky top-0 z-50 h-[70px] flex items-center px-4 sm:px-6 lg:px-8"
       style={{
         backgroundColor: '#0f0f0f',
-        backgroundColor: '#0f0f0f',
         backgroundImage: `
           linear-gradient(90deg, rgba(255,255,255,0.01) 0%, rgba(0,0,0,0) 50%, rgba(255,255,255,0.01) 100%),
           repeating-linear-gradient(90deg, #111 0px, #111 1px, #161616 2px, #111 3px)
