@@ -168,14 +168,15 @@ const TechnologyDetailPage = () => {
                             </div>
 
                             {showFeatures && (
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 animate-in fade-in slide-in-from-top-4 duration-500">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-left animate-in fade-in slide-in-from-top-4 duration-500">
                                     {technology.features.map((feature, idx) => (
-                                        <div key={idx} className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md transition-shadow">
-                                            <div className="w-12 h-12 bg-blue-50 dark:bg-brand-blue/10 text-blue-600 dark:text-brand-blue rounded-lg flex items-center justify-center mb-6">
-                                                <CheckCircle className="w-6 h-6" />
-                                            </div>
-                                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{feature.title}</h3>
-                                            <p className="text-slate-600 dark:text-slate-400">{feature.description}</p>
+                                        <div key={idx} className="group pl-6 border-l-4 border-brand-blue/30 hover:border-brand-blue transition-colors duration-300">
+                                            <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 group-hover:text-brand-blue transition-colors">
+                                                {feature.title}
+                                            </h3>
+                                            <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+                                                {feature.description}
+                                            </p>
                                         </div>
                                     ))}
                                 </div>
