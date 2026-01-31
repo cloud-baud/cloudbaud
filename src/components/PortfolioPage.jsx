@@ -4,6 +4,7 @@ import { ArrowRight, Filter } from 'lucide-react';
 import { portfolioProjects, categories } from '../data/portfolio';
 import ProjectCard from './ProjectCard';
 import { Button } from './ui/button';
+import GenericDiscoveryWizard from './GenericDiscoveryWizard';
 
 const PortfolioPage = () => {
     const [selectedCategory, setSelectedCategory] = useState('All Projects');
@@ -179,6 +180,18 @@ const PortfolioPage = () => {
                                 </div>
                             </div>
                         ))}
+                    </div>
+
+                    <div className="mt-24">
+                        <div className="text-center mb-12">
+                            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Start Your Transformation</h3>
+                            <p className="text-gray-600 dark:text-gray-400">See a project you like? Let's build a similar success story for you.</p>
+                        </div>
+                        <GenericDiscoveryWizard
+                            serviceName="Project Discovery"
+                            serviceId="portfolio-inquiry"
+                            workloadOptions={['FinOps', 'App Modernization', 'Data Platform', 'AI Integration']}
+                        />
                     </div>
                 </div>
             </section>

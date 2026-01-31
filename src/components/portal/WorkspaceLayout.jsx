@@ -12,7 +12,9 @@ import {
     Calendar,
     Settings,
     ChevronRight,
-    MoreHorizontal
+    MoreHorizontal,
+    LogOut,
+    User
 } from 'lucide-react';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
@@ -20,6 +22,14 @@ import { Separator } from '@radix-ui/react-separator';
 import { cn } from '@/lib/utils';
 import CloudBaudLogo from '../CloudBaudLogo';
 import { useAuth } from '../../context/AuthContext';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
 
 // Mock Data for Sidebar
 const favorites = [
@@ -40,7 +50,41 @@ const suggested = [
 ];
 
 const WorkspaceLayout = () => {
-    const { user } = useAuth();
+    const { user, signOut } = useAuth();
+
+    // Global Navigation State
+    const [navItems, setNavItems] = useState(() => {
+        const saved = localStorage.getItem('portal_nav_active');
+        return saved ? JSON.parse(saved) : [
+            { id: '1', label: 'Home', href: '/sites/consulting' },
+            { id: '2', label: 'Documents', href: '/sites/consulting/docs' },
+            { id: '3', label: 'Team', href: '/sites/consulting/team' }
+        ];
+    });
+
+    // Listen for updates from Settings Page
+    React.useEffect(() => {
+        const handleNavUpdate = () => {
+            const saved = localStorage.getItem('portal_nav_active');
+            if (saved) setNavItems(JSON.parse(saved));
+        };
+
+        window.addEventListener('portal-nav-update', handleNavUpdate);
+        window.addEventListener('storage', handleNavUpdate); // For cross-tab updates
+
+        return () => {
+            window.removeEventListener('portal-nav-update', handleNavUpdate);
+            window.removeEventListener('storage', handleNavUpdate);
+        };
+    }, []);
+
+    // Sync with User Profile on Load
+    React.useEffect(() => {
+        if (user?.user_metadata?.portal_nav_active) {
+            setNavItems(user.user_metadata.portal_nav_active);
+            localStorage.setItem('portal_nav_active', JSON.stringify(user.user_metadata.portal_nav_active));
+        }
+    }, [user]);
 
     return (
         <div className="flex h-screen bg-background font-sans text-foreground overflow-hidden">
@@ -103,7 +147,20 @@ const WorkspaceLayout = () => {
             <main className="flex-1 flex flex-col overflow-hidden bg-background/50 relative">
                 {/* Header: Search & User Profile */}
                 <header className="h-16 flex items-center justify-between px-8 border-b border-border/50 bg-background/50 backdrop-blur-sm sticky top-0 z-10">
-                    <div className="flex items-center gap-4 flex-1">
+                    <div className="flex items-center gap-6 flex-1">
+                        {/* Global Navigation Links */}
+                        <nav className="hidden md:flex items-center gap-4 mr-auto">
+                            {navItems.map(item => (
+                                <Link
+                                    key={item.id}
+                                    to={item.href}
+                                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                                >
+                                    {item.label}
+                                </Link>
+                            ))}
+                        </nav>
+
                         <div className="relative w-full max-w-md">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                             <input
@@ -115,15 +172,42 @@ const WorkspaceLayout = () => {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-3 hover:bg-accent p-2 rounded-md cursor-pointer transition-colors">
-                            <div className="text-right hidden sm:block">
-                                <div className="text-sm font-medium">{user?.user_metadata?.full_name || 'User'}</div>
-                                <div className="text-xs text-muted-foreground">{user?.email || ''}</div>
-                            </div>
-                            <div className="size-9 rounded-full bg-gradient-to-br from-brand-blue to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md uppercase">
-                                {(user?.email ? user.email[0] : 'U')}
-                            </div>
-                        </div>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <div className="flex items-center gap-3 cursor-pointer hover:bg-accent/50 p-2 rounded-md transition-colors">
+                                    <div className="text-right hidden sm:block">
+                                        <div className="text-sm font-medium">
+                                            {user?.user_metadata?.full_name || user?.user_metadata?.name || user?.user_metadata?.first_name || 'User'}
+                                        </div>
+                                        <div className="text-xs text-muted-foreground">
+                                            {user?.email}
+                                            <span className="opacity-50 ml-1">({user?.app_metadata?.provider || 'email'})</span>
+                                        </div>
+                                    </div>
+                                    <div className="size-9 rounded-full bg-gradient-to-br from-brand-blue to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md uppercase">
+                                        {(user?.email ? user.email[0] : 'U')}
+                                    </div>
+                                    <ChevronRight className="rotate-90 text-muted-foreground w-4 h-4 ml-1" />
+                                </div>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56">
+                                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => window.location.href = '/portal/settings'}>
+                                    <User className="mr-2 h-4 w-4" />
+                                    <span>Profile</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => window.location.href = '/portal/settings'}>
+                                    <Settings className="mr-2 h-4 w-4" />
+                                    <span>Settings</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={signOut} className="text-red-500 focus:text-red-500">
+                                    <LogOut className="mr-2 h-4 w-4" />
+                                    <span>Sign Out</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </header>
 

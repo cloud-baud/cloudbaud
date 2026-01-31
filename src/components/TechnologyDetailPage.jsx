@@ -5,7 +5,9 @@ import { Button } from './ui/button';
 import SEO from './SEO';
 import { technicalCapabilities } from '../data/capabilities';
 import FabricDemo from './portal/FabricDemo';
+import FinOpsDashboard from './portal/FinOpsDashboard';
 import FabricDiscoveryWizard from './FabricDiscoveryWizard';
+import GenericDiscoveryWizard from './GenericDiscoveryWizard';
 import { useAuth } from '../context/AuthContext';
 
 const TechnologyDetailPage = () => {
@@ -90,15 +92,15 @@ const TechnologyDetailPage = () => {
                 </div>
             </section >
 
-            {/* Interactive Demo Section - Only for Microsoft Fabric */}
+            {/* Interactive Demo Section */}
             {
-                technology.slug === 'microsoft-fabric' && (
+                (technology.slug === 'microsoft-fabric' || technology.slug === 'finops-optimization') && (
                     <section className="py-12 px-4 sm:px-6 lg:px-8 bg-slate-900 border-y border-slate-800">
                         <div className="max-w-7xl mx-auto">
-                            <FabricDemo />
+                            {technology.slug === 'microsoft-fabric' && <FabricDemo />}
+                            {technology.slug === 'finops-optimization' && <FinOpsDashboard />}
                         </div>
                     </section>
-
                 )
             }
 
@@ -188,21 +190,23 @@ const TechnologyDetailPage = () => {
 
             {/* CTA */}
             {/* CTA - Hidden for Fabric as it has a dedicated wizard section */}
+            {/* Assessment Wizard for other technologies */}
             {techSlug !== 'microsoft-fabric' && (
-                <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-900 text-white">
-                    <div className="max-w-4xl mx-auto text-center">
-                        <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                            Start your {technology.text} project today
+                <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-950 border-t border-slate-900 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950/50 to-slate-950 pointer-events-none" />
+                    <div className="max-w-4xl mx-auto relative z-10 text-center mb-12">
+                        <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-blue to-brand-aqua mb-4">
+                            Start your {technology.text} Journey
                         </h2>
-                        <p className="text-xl text-slate-300 mb-10">
-                            Work with engineers who understand the deep internals of the platform.
+                        <p className="text-lg text-slate-400">
+                            Ready to scale? Complete this short assessment to get a custom engagement roadmap.
                         </p>
-                        <Button asChild size="lg" className="bg-white text-slate-900 hover:bg-slate-100 px-10 py-7 text-xl font-bold rounded-lg">
-                            <Link to="/contact">
-                                Schedule a Consultation
-                            </Link>
-                        </Button>
                     </div>
+                    <GenericDiscoveryWizard
+                        serviceName={technology.text}
+                        serviceId={techSlug}
+                        description={`Let's define the scope for your ${technology.title || technology.text} initiative.`}
+                    />
                 </section>
             )}
         </div >

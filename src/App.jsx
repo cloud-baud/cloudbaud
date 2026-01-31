@@ -2,10 +2,12 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import { ThemeProvider } from 'next-themes';
+import DynamicMsalProvider from './components/DynamicMsalProvider';
 import MarketingLayout from './components/MarketingLayout';
 import WorkspaceLayout from './components/portal/WorkspaceLayout';
 import PortalDashboard from './components/portal/PortalDashboard';
 import FabricDemo from './components/portal/FabricDemo';
+import SettingsPage from './components/portal/SettingsPage';
 import HomePage from './components/HomePage';
 import ServicesPage from './components/ServicesPage';
 import AboutPage from './components/AboutPage';
@@ -38,51 +40,54 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-      <AuthProvider>
-        <Router>
-          <AuthRedirector />
-          <Routes>
-            {/* Protected Portal Routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/portal" element={<WorkspaceLayout />}>
-                <Route index element={<PortalDashboard />} />
-                <Route path="fabric-demo" element={<FabricDemo />} />
-                <Route path="*" element={<PortalDashboard />} />
+    <DynamicMsalProvider>
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+        <AuthProvider>
+          <Router>
+            <AuthRedirector />
+            <Routes>
+              {/* Protected Portal Routes */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/portal" element={<WorkspaceLayout />}>
+                  <Route index element={<PortalDashboard />} />
+                  <Route path="settings" element={<SettingsPage />} />
+                  <Route path="fabric-demo" element={<FabricDemo />} />
+                  <Route path="*" element={<PortalDashboard />} />
+                </Route>
               </Route>
-            </Route>
 
-            {/* Marketing Website */}
-            <Route element={<MarketingLayout />}>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/agents" element={<AgentsPage />} />
-              <Route path="/agents/:slug" element={<AgentDetail />} />
-              <Route path="/capabilities" element={<CapabilitiesPage />} />
-              <Route path="/capabilities/:slug" element={<CapabilityDetailPage />} />
-              <Route path="/capabilities/:slug/:techSlug" element={<TechnologyDetailPage />} />
-              <Route path="/industries" element={<IndustriesPage />} />
-              <Route path="/industries/:slug" element={<IndustryDetail />} />
-              <Route path="/services" element={<ServicesPage />} />
-              <Route path="/ai-engineering" element={<AiEngineeringPage />} />
-              <Route path="/portfolio" element={<PortfolioPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/blog" element={<BlogPage />} />
-              <Route path="/blog/:slug" element={<BlogPost />} />
-              <Route path="/careers" element={<CareersPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-              <Route path="/terms-and-conditions" element={<TermsPage />} />
-              <Route path="/sales" element={<SalesPage />} />
-              <Route path="/legal" element={<LegalPage />} />
-              <Route path="/site-map" element={<SiteMapPage />} />
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/logout" element={<RedirectHandler to="/" />} />
-            </Route>
-          </Routes>
-        </Router>
-      </AuthProvider>
-    </ThemeProvider>
+              {/* Marketing Website */}
+              <Route element={<MarketingLayout />}>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/agents" element={<AgentsPage />} />
+                <Route path="/agents/:slug" element={<AgentDetail />} />
+                <Route path="/capabilities" element={<CapabilitiesPage />} />
+                <Route path="/capabilities/:slug" element={<CapabilityDetailPage />} />
+                <Route path="/capabilities/:slug/:techSlug" element={<TechnologyDetailPage />} />
+                <Route path="/industries" element={<IndustriesPage />} />
+                <Route path="/industries/:slug" element={<IndustryDetail />} />
+                <Route path="/services" element={<ServicesPage />} />
+                <Route path="/ai-engineering" element={<AiEngineeringPage />} />
+                <Route path="/portfolio" element={<PortfolioPage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/blog" element={<BlogPage />} />
+                <Route path="/blog/:slug" element={<BlogPost />} />
+                <Route path="/careers" element={<CareersPage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                <Route path="/terms-and-conditions" element={<TermsPage />} />
+                <Route path="/sales" element={<SalesPage />} />
+                <Route path="/legal" element={<LegalPage />} />
+                <Route path="/site-map" element={<SiteMapPage />} />
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/logout" element={<RedirectHandler to="/" />} />
+              </Route>
+            </Routes>
+          </Router>
+        </AuthProvider>
+      </ThemeProvider>
+    </DynamicMsalProvider>
   );
 }
 

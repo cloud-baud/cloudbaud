@@ -267,6 +267,18 @@ export const technicalCapabilities = [
         description: 'AWS, Azure, and Google Cloud Platform expertise',
         infographic: '/infographic-cloud.png',
         capabilities: [
+            {
+                slug: 'finops-optimization',
+                text: 'FinOps & Cost Optimization',
+                title: 'FinOps & Cloud Cost Optimization',
+                description: 'Maximize business value by enabling engineering and finance teams to collaborate on cloud spending decisions.',
+                image: '/infographic-cloud.png',
+                features: [
+                    { title: 'Visibility & Allocation', description: 'Real-time dashboards breaking down spend by business unit, application, and team.' },
+                    { title: 'Rate Optimization', description: 'Strategic management of Reserved Instances, Savings Plans, and Spot potential.' },
+                    { title: 'Cloud Governance', description: 'Automated policies to prevent waste and ensure budget accountability.' }
+                ]
+            },
             'Cloud migration',
             'Infrastructure as Code',
             'Serverless architecture',

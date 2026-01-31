@@ -16,6 +16,7 @@ import {
     Wrench,
     Clock
 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -72,11 +73,65 @@ const FabricDiscoveryWizard = () => {
 
     const onSubmit = async (data) => {
         setIsSubmitting(true);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
         console.log("Form Data:", data);
-        setIsSubmitting(false);
-        setIsSuccess(true);
+
+        try {
+            // 1. Save to Supabase
+            const { data: dbData, error: dbError } = await supabase
+                .from('assessments')
+                .insert({
+                    user_email: data.email,
+                    user_name: data.name,
+                    industry: data.industry,
+                    type: 'microsoft-fabric',
+                    status: 'pending',
+                    data: data,
+                    organization: data.industry // Mapping industry to org for now if org field missing
+                })
+                .select()
+                .single();
+
+            if (dbError) throw dbError;
+
+            // 2. Notify via Email (using Flask Backend Proxy)
+            try {
+                // Construct a direct dashboard link (mocking it for now as /portal/assessment/:id)
+                const dashboardLink = `https://cloudbaud.com/portal/assessment/${dbData.id}`;
+
+                await fetch('http://localhost:5000/api/notify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: 'jish.nath@cloudbaud.com',
+                        subject: `New Fabric Assessment: ${data.name}`,
+                        body: `A new Microsoft Fabric assessment has been submitted.\n\nUser: ${data.name} (${data.email})\nIndustry: ${data.industry}\n\nView details: ${dashboardLink}`
+                    })
+                });
+            } catch (notifyError) {
+                console.error("Failed to trigger email notification:", notifyError);
+                // Non-blocking error
+            }
+
+            // 3. Persist "Discovery Initiated" state for the dashboard (Local Logic)
+            localStorage.setItem('fabric_discovery_status', JSON.stringify({
+                status: 'Assessment Submitted',
+                date: new Date().toISOString(),
+                type: 'Microsoft Fabric',
+                stage: 'Architect Review',
+                id: dbData.id
+            }));
+
+            setIsSuccess(true);
+        } catch (error) {
+            console.error("Submission error:", error);
+            // Fallback: still show success to user if local storage worked? 
+            // Or show error. For better UX, we might fallback to just local storage if DB fails.
+            // But user requirement says "we DO need to save it to supabase".
+            // So we should probably alert simple error or handle gracefully.
+            alert("There was an issue submitting your assessment. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const nextStep = () => setStep(Math.min(step + 1, totalSteps));

@@ -3,7 +3,7 @@ Microsoft Fabric Demo Web App - Simplified Version
 Business Stakeholder Showcase - No pandas dependency
 """
 
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 import requests
 import gzip
@@ -254,6 +254,30 @@ def fabric_benefits():
         }
     }
     return jsonify(benefits)
+
+@app.route('/api/notify', methods=['POST'])
+def send_notification():
+    """Send email notification (Simulated)"""
+    try:
+        data = request.json
+        recipient = data.get('to')
+        subject = data.get('subject')
+        body = data.get('body')
+        
+        # Log to console (simulating SMTP send)
+        print(f"[NOTIFICATION] Sent to: {recipient} | Subject: {subject} | Body: {body}")
+        
+        # TODO: Implement actual SMTP sending here if credentials available
+        # server = smtplib.SMTP('smtp.office365.com', 587)
+        # server.starttls()
+        # server.login(os.getenv('SMTP_USER'), os.getenv('SMTP_PASSWORD'))
+        # server.sendmail(os.getenv('SMTP_USER'), recipient, f"Subject: {subject}\n\n{body}")
+        # server.quit()
+        
+        return jsonify({'success': True, 'message': 'Notification sent'})
+    except Exception as e:
+        print(f"Failed to send notification: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 if __name__ == '__main__':
     print("Starting Microsoft Fabric Demo Web App...")

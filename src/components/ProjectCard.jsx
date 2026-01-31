@@ -9,16 +9,27 @@ const ProjectCard = ({ project, featured = false }) => {
             className={`group bg-white dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700 rounded-2xl overflow-hidden hover:border-brand-blue hover:shadow-lg transition-all duration-300 ${featured ? 'md:col-span-2' : ''
                 }`}
         >
-            {/* ImagePlaceholder with Gradient */}
-            <div className={`relative ${featured ? 'h-36' : 'h-28'} bg-gradient-to-br from-brand-blue/10 to-brand-aqua/10 overflow-hidden`}>
-                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/40 dark:from-slate-900 dark:via-slate-900/60 to-transparent" />
+            {/* Image Banner */}
+            <div className={`relative ${featured ? 'h-72' : 'h-52'} bg-slate-900 overflow-hidden`}>
+                {project.image ? (
+                    <img
+                        src={project.image}
+                        alt={project.title}
+                        className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
+                    />
+                ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/10 to-brand-aqua/10" />
+                )}
+
+                {/* Gradient Overlay for Text Readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent pointer-events-none" />
 
                 {/* Tags */}
-                <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                <div className="absolute top-4 left-4 flex flex-wrap gap-2 z-10">
                     {project.tags.map((tag, index) => (
                         <span
                             key={index}
-                            className="px-3 py-1 bg-white/90 dark:bg-slate-900/80 backdrop-blur-sm border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-white text-xs font-medium rounded-full"
+                            className="px-3 py-1 bg-slate-900/80 backdrop-blur-md border border-slate-700/50 text-white text-xs font-medium rounded-full shadow-sm"
                         >
                             {tag}
                         </span>
@@ -26,8 +37,8 @@ const ProjectCard = ({ project, featured = false }) => {
                 </div>
 
                 {/* Category Badge */}
-                <div className="absolute bottom-4 left-4">
-                    <span className="px-4 py-2 bg-brand-blue text-black text-sm font-semibold rounded-full shadow-lg">
+                <div className="absolute bottom-4 left-4 z-10">
+                    <span className="px-4 py-2 bg-brand-blue text-black text-sm font-semibold rounded-full shadow-lg border border-brand-blue/20">
                         {project.category}
                     </span>
                 </div>
