@@ -10,8 +10,7 @@ import SocialAuthButtons from './SocialAuthButtons';
 
 const LoginPage = () => {
     const [loading, setLoading] = useState(false);
-    const [isMagicLink, setIsMagicLink] = useState(false);
-    const { signInWithEmail, signInWithOtp } = useAuth();
+    const { signInWithOtp } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -20,27 +19,14 @@ const LoginPage = () => {
         const email = e.target[0].value;
 
         try {
-            if (isMagicLink) {
-                await signInWithOtp(email);
-                toast.success('Magic link sent! Check your email to log in.');
-                // We keep loading state false here so they can retry or see the UI
-                setLoading(false);
-            } else {
-                const password = e.target[1].value;
-                await signInWithEmail(email, password);
-                toast.success('Successfully logged in!');
-                navigate('/portal');
-            }
+            await signInWithOtp(email);
+            toast.success('Magic link sent! Check your email to log in.');
+            setLoading(false);
         } catch (error) {
             console.error(error);
             toast.error(error.message || 'Failed to login');
             setLoading(false);
         }
-    };
-
-    const toggleAuthMethod = () => {
-        setIsMagicLink(!isMagicLink);
-        // Reset form parsing could be tricky without controlled inputs, but visual toggle is enough
     };
 
     return (
@@ -65,43 +51,14 @@ const LoginPage = () => {
                         </div>
                     </div>
 
-                    {!isMagicLink && (
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Password</label>
-                            <div className="relative">
-                                <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
-                                <input
-                                    type="password"
-                                    required={!isMagicLink}
-                                    className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                                    placeholder="••••••••"
-                                />
-                            </div>
-                        </div>
-                    )}
-
                     <Button type="submit" disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition-all">
-                        {loading ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : (isMagicLink ? 'Send Magic Link' : 'Sign In')}
-                    </Button>
-                </form>
-
-                <div className="mt-4 text-center">
-                    <button
-                        type="button"
-                        onClick={toggleAuthMethod}
-                        className="text-sm text-blue-600 hover:text-blue-500 font-medium flex items-center justify-center gap-2 mx-auto"
-                    >
-                        {isMagicLink ? (
+                        {loading ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : (
                             <>
-                                <Lock className="w-4 h-4" /> Sign in with Password
-                            </>
-                        ) : (
-                            <>
-                                <Wand2 className="w-4 h-4" /> Sign in with Magic Link
+                                <Wand2 className="w-4 h-4 mr-2" /> Send Magic Link
                             </>
                         )}
-                    </button>
-                </div>
+                    </Button>
+                </form>
 
                 <div className="mt-6">
                     <SocialAuthButtons />
