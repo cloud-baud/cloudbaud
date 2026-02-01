@@ -52,9 +52,16 @@ function App() {
                 <Route path="/portal" element={<WorkspaceLayout />}>
                   <Route index element={<PortalDashboard />} />
                   <Route path="settings" element={<SettingsPage />} />
-                  <Route path="finances" element={<FinOpsDashboard />} />
                   <Route path="fabric-demo" element={<FabricDemo />} />
+
+                  {/* Catch-all for sub-sites like /sites/consulting to use portal layout */}
+                  <Route path="sites/*" element={<PortalDashboard />} />
                   <Route path="*" element={<PortalDashboard />} />
+                </Route>
+
+                {/* Root-level App Modules (Authenticated) */}
+                <Route path="/finances" element={<WorkspaceLayout />}>
+                  <Route index element={<FinOpsDashboard />} />
                 </Route>
               </Route>
 

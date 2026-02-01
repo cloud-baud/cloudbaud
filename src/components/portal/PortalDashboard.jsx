@@ -24,6 +24,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import OutlookWidget from './OutlookWidget';
+import PageShell from './PageShell';
 
 // Inline Card components if not available globally yet, to ensure self-contained demo
 const SimpleCard = ({ children, className = "" }) => (
@@ -74,22 +75,17 @@ const PortalDashboard = () => {
     }, [user]);
 
     return (
-        <div className="max-w-6xl mx-auto p-8 pt-12 min-h-screen">
-
-            {/* Top Action Bar */}
-            <div className="flex items-center justify-between mb-12">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight mb-2 text-slate-900 dark:text-white">Client Portal</h1>
-                    <p className="text-slate-500">Manage your strategic initiatives and view project status.</p>
-                </div>
-
-                {/* Quick Actions */}
+        <PageShell
+            title="Client Portal"
+            subtitle="Manage your strategic initiatives and view project status."
+            actions={
                 <div className="flex gap-6">
                     <QuickAction icon={LinkIcon} label="Share Link" sublabel="Copy URL" />
                     <QuickAction icon={Upload} label="Upload" sublabel="Add assets" />
                     <QuickAction icon={Download} label="Download" sublabel="Backup data" />
                 </div>
-            </div>
+            }
+        >
 
             {/* Outlook / Productivity Widget */}
             <OutlookWidget />
@@ -245,7 +241,7 @@ const PortalDashboard = () => {
                 </div>
 
             </div>
-        </div>
+        </PageShell>
     );
 };
 

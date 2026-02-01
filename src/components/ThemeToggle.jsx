@@ -25,7 +25,7 @@ const ThemeToggle = () => {
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="w-10 h-10 rounded-lg bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm transition-colors border border-white/10"
+            className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-accent/50 text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Toggle theme"
         >
             {theme === 'dark' ? (

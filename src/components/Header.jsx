@@ -10,7 +10,11 @@ import logoIcon from '../assets/images/cloudbaud_icon.png';
 // Image import removed
 
 
+import { useAuth } from '../context/AuthContext';
+import CloudBaudLogo from './CloudBaudLogo';
+
 const Header = () => {
+  const { user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
 
@@ -40,15 +44,26 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="h-12 w-auto flex items-center justify-start shrink-0 transition-transform group-hover:scale-105">
-              <img
-                src={logo}
-                alt="CloudBaud"
-                className="h-full w-auto object-contain"
-                style={{ mixBlendMode: 'screen' }}
-              />
+              {user?.user_metadata?.custom_logo_url ? (
+                <img
+                  src={user.user_metadata.custom_logo_url}
+                  alt="CloudBaud"
+                  className="h-full w-auto object-contain"
+                  style={{ maxHeight: '48px' }}
+                />
+              ) : (
+                <img
+                  src={logo}
+                  alt="CloudBaud"
+                  className="h-full w-auto object-contain"
+                  style={{ mixBlendMode: 'screen' }}
+                />
+              )}
             </div>
             <div className="flex flex-col whitespace-nowrap pt-1">
-              <span className="text-xl md:text-2xl uppercase tracking-widest text-brand-blue font-bold">Innovative Engineering</span>
+              <span className="text-xl md:text-2xl uppercase tracking-widest text-brand-blue font-bold">
+                {user?.user_metadata?.site_name || "Innovative Engineering"}
+              </span>
             </div>
           </Link>
 

@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { Reorder } from 'framer-motion';
 import { toast } from 'sonner';
-import { User, Bell, Shield, Palette, Globe, Layers, Users as UsersIcon, LayoutGrid, PaintBucket, Lock, ChevronRight, ChevronDown, Check, Plus, MoveVertical, Puzzle, ZoomIn, X, Trash2, Pencil, Type, Image as ImageIcon } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+    User, Bell, Shield, Palette, Globe, Layers, Users as UsersIcon, LayoutGrid, PaintBucket, Lock,
+    ChevronRight, ChevronDown, Check, Plus, MoveVertical, Puzzle, ZoomIn, X, Trash2, Pencil, Type,
+    Image as ImageIcon, Sparkles
+} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/context/AuthContext';
 import { useMsal } from "@azure/msal-react";
@@ -29,6 +33,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { AUTH_CONFIG_CHANGE_EVENT } from '@/components/DynamicMsalProvider';
 import { supabase } from "@/lib/supabase";
+import PageShell from './PageShell';
 
 const collections = [
     { id: 'consulting', name: 'Consulting', type: 'collection', description: 'Client deliverables, engagement letters, and strategy documents.' },
@@ -41,8 +46,16 @@ const SettingsPage = () => {
     const { user } = useAuth();
     const { instance, accounts } = useMsal();
     const [graphData, setGraphData] = useState(null);
-    const [activeTab, setActiveTab] = useState('general');
+    const [activeTab, setActiveTab] = useState(() => {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('tab') || 'general';
+    });
     const [currentCollection, setCurrentCollection] = useState(collections[0]);
+    // Allow editing current collection details locally in the UI
+    const handleCollectionChange = (field, value) => {
+        setCurrentCollection(prev => ({ ...prev, [field]: value }));
+    };
+
     const [expandedImage, setExpandedImage] = useState(null);
 
     // Integrations State (Moved to top level)
@@ -95,6 +108,23 @@ const SettingsPage = () => {
         ];
     });
 
+    // AI Settings State
+    const [aiConfig, setAiConfig] = useState(() => {
+        return {
+            provider: localStorage.getItem('ai_provider') || 'ollama',
+            model: localStorage.getItem('ai_model') || 'llama3',
+            endpoint: localStorage.getItem('ai_endpoint') || 'http://localhost:11434/api/chat',
+            sdk: localStorage.getItem('ai_sdk') || 'custom_bridge'
+        };
+    });
+
+    const handleSaveAiConfig = () => {
+        localStorage.setItem('ai_provider', aiConfig.provider);
+        localStorage.setItem('ai_model', aiConfig.model);
+        localStorage.setItem('ai_endpoint', aiConfig.endpoint);
+        localStorage.setItem('ai_sdk', aiConfig.sdk);
+        toast.success("AI settings updated. Refresh to apply.");
+    };
     const [availableLinks, setAvailableLinks] = useState(() => {
         const saved = localStorage.getItem('portal_nav_available');
         return saved ? JSON.parse(saved) : [
@@ -186,6 +216,16 @@ const SettingsPage = () => {
     const [customLogo, setCustomLogo] = useState(user?.user_metadata?.custom_logo_url || '');
     const [siteName, setSiteName] = useState(user?.user_metadata?.site_name || 'CloudBaud');
 
+    // Sync Appearance from User Metadata when User loads (fix for reload issue)
+    React.useEffect(() => {
+        if (user?.user_metadata) {
+            setThemeColor(user.user_metadata.theme_color || '#00d2ff');
+            setFontFamily(user.user_metadata.font_family || 'Inter');
+            setCustomLogo(user.user_metadata.custom_logo_url || '');
+            setSiteName(user.user_metadata.site_name || 'CloudBaud');
+        }
+    }, [user]);
+
     // File Upload State
     const [isUploading, setIsUploading] = useState(false);
     const [previewAvatar, setPreviewAvatar] = useState(''); // For immediate visual feedback
@@ -226,11 +266,18 @@ const SettingsPage = () => {
             // 2. Upload
             const fileExt = file.name.split('.').pop();
             const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+
             const { error: uploadError } = await supabase.storage
                 .from('avatars')
                 .upload(fileName, file, { upsert: true });
 
-            if (uploadError) throw uploadError;
+            if (uploadError) {
+                // Check specifically for "Bucket not found"
+                if (uploadError.message?.includes("Bucket not found")) {
+                    throw new Error("Storage bucket 'avatars' missing. Please contact admin.");
+                }
+                throw uploadError;
+            }
 
             // 3. Get URL & Update State
             const { data } = supabase.storage.from('avatars').getPublicUrl(fileName);
@@ -239,8 +286,92 @@ const SettingsPage = () => {
             toast.success("Image uploaded!");
         } catch (error) {
             console.error('Upload error:', error);
-            toast.error(`Upload failed: ${error.message || 'Check connection/permissions'}`);
-            // We keep the preview so they see what they picked, but warn them it didn't save to cloud
+
+            // Fallback: Convert to Base64 if bucket fails
+            const file = event.target.files?.[0];
+
+            // Limit fallback to 800KB
+            if (file && file.size < 800 * 1024) {
+                try {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        setProfileForm(prev => ({ ...prev, avatar_url: reader.result }));
+                        toast.warning("Storage unavailable. Using inline image fallback. Record saved to profile.");
+                    };
+                    reader.readAsDataURL(file);
+                    return; // Handled via fallback
+                } catch (readErr) {
+                    console.error("Fallback failed", readErr);
+                }
+            } else if (file) {
+                toast.error(`Upload failed: Storage unavailable and file size (${(file.size / 1024).toFixed(0)}KB) exceeds inline limit (800KB).`);
+                return;
+            }
+
+            toast.error(`Upload failed: ${error.message || 'Check connection/permissions'} `);
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const handleLogoUpload = async (event) => {
+        if (!user) {
+            toast.error("You must be logged in to upload assets.");
+            return;
+        }
+
+        try {
+            setIsUploading(true);
+            const file = event.target.files?.[0];
+            if (!file) return;
+
+            // 1. Upload to 'avatars' bucket 
+            const fileExt = file.name.split('.').pop();
+            const fileName = `logo-${user.id}-${Date.now()}.${fileExt}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(fileName, file, { upsert: true });
+
+            if (uploadError) {
+                // Check specifically for "Bucket not found"
+                if (uploadError.message?.includes("Bucket not found")) {
+                    throw new Error("Storage bucket 'avatars' missing. Please contact admin.");
+                }
+                throw uploadError;
+            }
+
+            // 2. Get URL
+            const { data } = supabase.storage.from('avatars').getPublicUrl(fileName);
+
+            // 3. Update State
+            setCustomLogo(data.publicUrl);
+            toast.success("Logo uploaded! Click 'Save Branding' to persist.");
+        } catch (error) {
+            console.error('Logo upload error:', error);
+
+            // Fallback: Convert to Base64 if bucket fails (common in dev/demo)
+            const file = event.target.files?.[0];
+
+            // Limit fallback to 800KB (increased from 100KB) to allow decent quality logos without external storage
+            if (file && file.size < 800 * 1024) {
+                try {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        setCustomLogo(reader.result);
+                        toast.warning("Storage unavailable. Using inline image fallback. Click 'Save Branding' to persist.");
+                    };
+                    reader.readAsDataURL(file);
+                    return; // Handled via fallback
+                } catch (readErr) {
+                    console.error("Fallback failed", readErr);
+                }
+            } else if (file) {
+                toast.error(`Upload failed: Storage unavailable and file size (${(file.size / 1024).toFixed(0)}KB) exceeds inline limit (800KB).`);
+                return;
+            }
+
+            toast.error(`Upload failed: ${error.message}`);
         } finally {
             setIsUploading(false);
         }
@@ -267,9 +398,30 @@ const SettingsPage = () => {
     React.useEffect(() => {
         const root = document.documentElement;
         if (themeColor) root.style.setProperty('--color-primary', themeColor);
-        if (fontFamily === 'Inter') root.style.setProperty('--font-sans', '"Inter", sans-serif');
-        if (fontFamily === 'Mono') root.style.setProperty('--font-sans', 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace');
-        // Add more font logic as needed
+
+        switch (fontFamily) {
+            case 'Inter':
+                root.style.setProperty('--font-sans', '"Inter", sans-serif');
+                break;
+            case 'Roboto':
+                root.style.setProperty('--font-sans', '"Roboto", sans-serif');
+                break;
+            case 'Poppins':
+                root.style.setProperty('--font-sans', '"Poppins", sans-serif');
+                break;
+            case 'Lato':
+                root.style.setProperty('--font-sans', '"Lato", sans-serif');
+                break;
+            case 'Playfair':
+                // For serif, we might want to override sans too if it's the primary UI font
+                root.style.setProperty('--font-sans', '"Playfair Display", serif');
+                break;
+            case 'Mono':
+                root.style.setProperty('--font-sans', '"Fira Code", ui-monospace, monospace');
+                break;
+            default:
+                root.style.setProperty('--font-sans', '"Inter", sans-serif');
+        }
     }, [themeColor, fontFamily]);
 
     const handleSaveAppearance = async () => {
@@ -389,7 +541,7 @@ const SettingsPage = () => {
         switch (activeTab) {
             case 'profile':
                 return (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                    <div className="space-y-6">
                         <Card>
                             <CardHeader>
                                 <CardTitle>Public Profile</CardTitle>
@@ -499,7 +651,7 @@ const SettingsPage = () => {
                 );
             case 'general':
                 return (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                    <div className="space-y-6">
                         {/* Hub Inheritance Indicator */}
                         {/* Hub Inheritance Indicator - "The Banner" */}
                         <div className="relative overflow-hidden bg-gradient-to-r from-blue-50 to-white dark:from-blue-950/40 dark:to-slate-950 border border-blue-100 dark:border-blue-900/50 p-5 rounded-xl shadow-sm flex items-start gap-4 mb-6">
@@ -531,7 +683,7 @@ const SettingsPage = () => {
                                         type="text"
                                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus:ring-2 focus:ring-primary"
                                         value={currentCollection.name}
-                                        readOnly
+                                        onChange={(e) => handleCollectionChange('name', e.target.value)}
                                     />
                                 </div>
                                 <div className="grid gap-2">
@@ -539,7 +691,7 @@ const SettingsPage = () => {
                                     <textarea
                                         className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus:ring-2 focus:ring-primary"
                                         value={currentCollection.description}
-                                        readOnly
+                                        onChange={(e) => handleCollectionChange('description', e.target.value)}
                                     />
                                 </div>
                                 <div className="flex items-center justify-between pt-2">
@@ -580,7 +732,7 @@ const SettingsPage = () => {
                 );
             case 'permissions':
                 return (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                    <div className="space-y-6">
                         <Card>
                             <CardHeader>
                                 <CardTitle>Site Permissions ({currentCollection.name})</CardTitle>
@@ -638,7 +790,7 @@ const SettingsPage = () => {
                 );
             case 'appearance':
                 return (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                    <div className="space-y-6">
                         <Card>
                             <CardHeader>
                                 <CardTitle>Global Branding</CardTitle>
@@ -667,48 +819,64 @@ const SettingsPage = () => {
                                                 <div className="w-12 h-12 rounded-md shadow-sm flex items-center justify-center" style={{ backgroundColor: color.val }}>
                                                     {themeColor === color.val && <Check className="text-white drop-shadow-md" />}
                                                 </div>
-                                                <div className="text-[10px] text-center mt-1 font-medium text-muted-foreground">{color.name}</div>
+                                                <span className="text-xs font-medium mt-2 block text-center opacity-70">{color.name}</span>
                                             </div>
                                         ))}
-                                        <div className="space-y-2">
-                                            <div className="w-12 h-12 rounded-md border-2 border-dashed border-input flex items-center justify-center bg-slate-50 dark:bg-slate-900">
+
+                                        {/* Custom Color Picker */}
+                                        <div className="cursor-pointer rounded-lg p-1 border-2 border-transparent hover:border-border transition-all">
+                                            <div className="w-12 h-12 rounded-md border-2 border-dashed border-input flex items-center justify-center bg-slate-50 dark:bg-slate-900 relative">
                                                 <input
                                                     type="color"
                                                     value={themeColor}
                                                     onChange={(e) => setThemeColor(e.target.value)}
-                                                    className="w-8 h-8 opacity-0 absolute cursor-pointer"
+                                                    className="w-full h-full opacity-0 absolute cursor-pointer top-0 left-0"
                                                 />
-                                                <Palette className="size-5 text-muted-foreground" />
+                                                <Palette className="size-5 text-muted-foreground pointer-events-none" />
                                             </div>
-                                            <div className="text-[10px] text-center font-medium text-muted-foreground">Custom</div>
+                                            <span className="text-xs font-medium mt-2 block text-center opacity-70">Custom</span>
                                         </div>
                                     </div>
                                 </div>
 
                                 <Separator />
 
-                                {/* Typography */}
+                                {/* Typography Selector */}
                                 <div>
                                     <label className="text-sm font-medium mb-3 flex items-center gap-2">
                                         <Type className="size-4" /> Typography
                                     </label>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div
-                                            className={`p-4 border rounded-lg cursor-pointer transition-all ${fontFamily === 'Inter' ? 'border-primary bg-primary/5' : 'hover:border-primary/50'}`}
-                                            onClick={() => setFontFamily('Inter')}
-                                        >
-                                            <div className="font-sans text-lg font-semibold">Inter (System)</div>
-                                            <div className="text-sm text-muted-foreground">Clean, modern, and legible. The default choice for UI.</div>
-                                        </div>
-                                        <div
-                                            className={`p-4 border rounded-lg cursor-pointer transition-all font-mono ${fontFamily === 'Mono' ? 'border-primary bg-primary/5' : 'hover:border-primary/50'}`}
-                                            onClick={() => setFontFamily('Mono')}
-                                        >
-                                            <div className="text-lg font-semibold">JetBrains Mono</div>
-                                            <div className="text-sm text-muted-foreground">Technical, precise, and code-friendly.</div>
-                                        </div>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                        {[
+                                            { id: 'Inter', name: 'Inter (Default)', desc: 'Clean, Modern' },
+                                            { id: 'Roboto', name: 'Roboto', desc: 'Geometric, Friendly' },
+                                            { id: 'Poppins', name: 'Poppins', desc: 'Bold, Contemporary' },
+                                            { id: 'Lato', name: 'Lato', desc: 'Humanist, Warm' },
+                                            { id: 'Playfair', name: 'Playfair Display', desc: 'Elegant Serif' },
+                                            { id: 'Mono', name: 'Fira Code', desc: 'Technical / Dev' }
+                                        ].map(font => (
+                                            <div
+                                                key={font.id}
+                                                className={`p-3 rounded-lg border-2 cursor-pointer transition-all flex flex-col items-start gap-1 ${fontFamily === font.id ? 'border-primary bg-primary/5' : 'border-transparent bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                                                onClick={() => setFontFamily(font.id)}
+                                            >
+                                                <span className="text-sm font-semibold">{font.name}</span>
+                                                <span className="text-xs text-muted-foreground">{font.desc}</span>
+                                                {/* Preview */}
+                                                <div className="mt-2 text-xl font-bold opacity-80" style={{
+                                                    fontFamily: font.id === 'Mono' ? '"Fira Code", monospace' :
+                                                        font.id === 'Playfair' ? '"Playfair Display", serif' :
+                                                            `"${font.id}", sans-serif`
+                                                }}>
+                                                    Aa
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
+
+
+
 
                                 <Separator />
 
@@ -723,10 +891,65 @@ const SettingsPage = () => {
                                             <Input value={siteName} onChange={(e) => setSiteName(e.target.value)} placeholder="CloudBaud" />
                                             <p className="text-[10px] text-muted-foreground">Appears in the top-left header.</p>
                                         </div>
-                                        <div className="space-y-2">
-                                            <Label>Custom Logo URL</Label>
-                                            <Input value={customLogo} onChange={(e) => setCustomLogo(e.target.value)} placeholder="https://..." />
-                                            <p className="text-[10px] text-muted-foreground">Recommended: Transparent PNG, 40px height.</p>
+                                        <div className="space-y-3">
+                                            <Label>Custom Logo</Label>
+                                            <div className="flex items-start gap-4">
+                                                <div
+                                                    className="w-24 h-24 border-2 border-dashed border-input rounded-lg flex items-center justify-center bg-slate-50 dark:bg-slate-900 overflow-hidden cursor-pointer hover:border-brand-blue transition-colors group relative"
+                                                    onClick={() => document.getElementById('logo-upload').click()}
+                                                >
+                                                    {customLogo ? (
+                                                        <img src={customLogo} alt="Logo" className="w-full h-full object-contain p-2" />
+                                                    ) : (
+                                                        <ImageIcon className="text-muted-foreground opacity-50" />
+                                                    )}
+
+                                                    {/* Hover Overlay */}
+                                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <Pencil className="text-white size-5" />
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex-1 space-y-2">
+                                                    <Input
+                                                        value={customLogo}
+                                                        onChange={(e) => setCustomLogo(e.target.value)}
+                                                        placeholder="https://... or upload image"
+                                                    />
+                                                    <div className="flex items-center gap-2">
+                                                        <Button
+                                                            type="button"
+                                                            variant="secondary"
+                                                            size="sm"
+                                                            onClick={() => document.getElementById('logo-upload').click()}
+                                                            disabled={isUploading}
+                                                        >
+                                                            {isUploading ? 'Uploading...' : 'Upload Image'}
+                                                        </Button>
+                                                        {customLogo && (
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="text-red-500 hover:bg-red-50"
+                                                                onClick={() => setCustomLogo('')}
+                                                            >
+                                                                Remove
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-[10px] text-muted-foreground">
+                                                        Recommended: Transparent PNG, max height 50px.
+                                                    </p>
+                                                    <input
+                                                        type="file"
+                                                        id="logo-upload"
+                                                        className="hidden"
+                                                        accept="image/*"
+                                                        onChange={handleLogoUpload}
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -735,13 +958,13 @@ const SettingsPage = () => {
                                     <Button onClick={handleSaveAppearance}>Save Branding</Button>
                                 </div>
 
-                            </CardContent>
-                        </Card>
-                    </div>
+                            </CardContent >
+                        </Card >
+                    </div >
                 );
             case 'navigation':
                 return (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                    <div className="space-y-6">
                         <Card>
                             <CardHeader>
                                 <CardTitle>Global Navigation</CardTitle>
@@ -906,122 +1129,267 @@ const SettingsPage = () => {
             case 'integrations':
                 const isAuthenticated = accounts.length > 0;
                 return (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Microsoft 365 Integration</CardTitle>
-                                <CardDescription>Connect your workflow to Microsoft Graph to access files, people, and calendar events.</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                                {/* Configuration Section */}
-                                <div className="p-4 border border-blue-100 dark:border-blue-900 rounded-lg bg-blue-50 dark:bg-blue-900/10">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h4 className="font-semibold text-blue-900 dark:text-blue-100 flex items-center gap-2">
-                                            <Shield className="size-4" /> App Configuration
-                                        </h4>
-                                        {!isEditingConfig && (
-                                            <Button variant="ghost" size="sm" onClick={() => setIsEditingConfig(true)}>Configure</Button>
-                                        )}
-                                    </div>
+                    <>
+                        <div className="space-y-6">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Microsoft 365 Integration</CardTitle>
+                                    <CardDescription>Connect your workflow to Microsoft Graph to access files, people, and calendar events.</CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-6">
+                                    {/* Configuration Section */}
+                                    <div className="p-4 border border-blue-100 dark:border-blue-900 rounded-lg bg-blue-50 dark:bg-blue-900/10">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h4 className="font-semibold text-blue-900 dark:text-blue-100 flex items-center gap-2">
+                                                <Shield className="size-4" /> App Configuration
+                                            </h4>
+                                            {!isEditingConfig && (
+                                                <Button variant="ghost" size="sm" onClick={() => setIsEditingConfig(true)}>Configure</Button>
+                                            )}
+                                        </div>
 
-                                    {isEditingConfig ? (
-                                        <div className="space-y-3">
-                                            <div className="grid gap-2">
-                                                <label className="text-sm font-medium">Application (Client) ID</label>
-                                                <input
-                                                    type="text"
-                                                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                                                    placeholder="e.g. b4c9e2c7-1c4c..."
-                                                    value={clientId}
-                                                    onChange={(e) => setClientId(e.target.value)}
-                                                />
-                                                <p className="text-xs text-muted-foreground">
-                                                    Enter the Application ID from your Azure App Registration. Ensure functionality for <strong>Single Page Applications (SPA)</strong> is enabled with redirect URI: <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">{window.location.origin}/portal/settings</code>
-                                                </p>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Button size="sm" onClick={saveConfiguration} disabled={!clientId}>
-                                                    Save & Reload
-                                                </Button>
-                                                {localStorage.getItem('azure_client_id') && (
-                                                    <Button variant="outline" size="sm" onClick={() => setIsEditingConfig(false)}>Cancel</Button>
-                                                )}
-                                                <Button variant="ghost" size="sm" className="ml-auto text-red-500 hover:text-red-600 hover:bg-red-50" onClick={clearConfiguration}>
-                                                    Reset
-                                                </Button>
-                                            </div>
+                                        {isEditingConfig ? (
+                                            <div className="space-y-3">
+                                                <div className="grid gap-2">
+                                                    <label className="text-sm font-medium">Application (Client) ID</label>
+                                                    <input
+                                                        type="text"
+                                                        className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                                                        placeholder="e.g. b4c9e2c7-1c4c..."
+                                                        value={clientId}
+                                                        onChange={(e) => setClientId(e.target.value)}
+                                                    />
+                                                    <p className="text-xs text-muted-foreground">
+                                                        Enter the Application ID from your Azure App Registration. Ensure functionality for <strong>Single Page Applications (SPA)</strong> is enabled with redirect URI: <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">{window.location.origin}/portal/settings</code>
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Button size="sm" onClick={saveConfiguration} disabled={!clientId}>
+                                                        Save & Reload
+                                                    </Button>
+                                                    {localStorage.getItem('azure_client_id') && (
+                                                        <Button variant="outline" size="sm" onClick={() => setIsEditingConfig(false)}>Cancel</Button>
+                                                    )}
+                                                    <Button variant="ghost" size="sm" className="ml-auto text-red-500 hover:text-red-600 hover:bg-red-50" onClick={clearConfiguration}>
+                                                        Reset
+                                                    </Button>
+                                                </div>
 
-                                            {/* Visual Setup Guide */}
-                                            <div className="mt-6 border-t pt-4">
-                                                <h5 className="text-xs font-semibold mb-3 text-muted-foreground uppercase tracking-wider">Quick Setup Guide (Click to Expand)</h5>
-                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                    <div className="space-y-2 group cursor-pointer" onClick={() => setExpandedImage("/images/tutorials/azure-setup/step1.png")}>
-                                                        <div className="aspect-video bg-slate-900 rounded-md overflow-hidden border border-slate-200 dark:border-slate-800 relative">
-                                                            <img src="/images/tutorials/azure-setup/step1.png" alt="Search App Registrations" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                                                                <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                {/* Visual Setup Guide */}
+                                                <div className="mt-6 border-t pt-4">
+                                                    <h5 className="text-xs font-semibold mb-3 text-muted-foreground uppercase tracking-wider">Quick Setup Guide (Click to Expand)</h5>
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                        <div className="space-y-2 group cursor-pointer" onClick={() => setExpandedImage("/images/tutorials/azure-setup/step1.png")}>
+                                                            <div className="aspect-video bg-slate-900 rounded-md overflow-hidden border border-slate-200 dark:border-slate-800 relative">
+                                                                <img src="/images/tutorials/azure-setup/step1.png" alt="Search App Registrations" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                                                                    <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                                </div>
                                                             </div>
+                                                            <p className="text-xs text-muted-foreground">1. Search for <strong>App Registrations</strong> in Azure Portal.</p>
                                                         </div>
-                                                        <p className="text-xs text-muted-foreground">1. Search for <strong>App Registrations</strong> in Azure Portal.</p>
-                                                    </div>
-                                                    <div className="space-y-2 group cursor-pointer" onClick={() => setExpandedImage("/images/tutorials/azure-setup/step2.png")}>
-                                                        <div className="aspect-video bg-slate-900 rounded-md overflow-hidden border border-slate-200 dark:border-slate-800 relative">
-                                                            <img src="/images/tutorials/azure-setup/step2.png" alt="Copy Client ID" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                                                                <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                        <div className="space-y-2 group cursor-pointer" onClick={() => setExpandedImage("/images/tutorials/azure-setup/step2.png")}>
+                                                            <div className="aspect-video bg-slate-900 rounded-md overflow-hidden border border-slate-200 dark:border-slate-800 relative">
+                                                                <img src="/images/tutorials/azure-setup/step2.png" alt="Copy Client ID" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                                                                    <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                                </div>
                                                             </div>
+                                                            <p className="text-xs text-muted-foreground">2. Copy the <strong>Application (client) ID</strong> from Overview.</p>
                                                         </div>
-                                                        <p className="text-xs text-muted-foreground">2. Copy the <strong>Application (client) ID</strong> from Overview.</p>
-                                                    </div>
-                                                    <div className="space-y-2 group cursor-pointer" onClick={() => setExpandedImage("/images/tutorials/azure-setup/step3.png")}>
-                                                        <div className="aspect-video bg-slate-900 rounded-md overflow-hidden border border-slate-200 dark:border-slate-800 relative">
-                                                            <img src="/images/tutorials/azure-setup/step3.png" alt="Add Redirect URI" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                                                                <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                        <div className="space-y-2 group cursor-pointer" onClick={() => setExpandedImage("/images/tutorials/azure-setup/step3.png")}>
+                                                            <div className="aspect-video bg-slate-900 rounded-md overflow-hidden border border-slate-200 dark:border-slate-800 relative">
+                                                                <img src="/images/tutorials/azure-setup/step3.png" alt="Add Redirect URI" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                                                                    <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                                </div>
                                                             </div>
+                                                            <p className="text-xs text-muted-foreground">3. Add SPA Redirect URI: <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded break-all">{window.location.origin}/portal/settings</code></p>
                                                         </div>
-                                                        <p className="text-xs text-muted-foreground">3. Add SPA Redirect URI: <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded break-all">{window.location.origin}/portal/settings</code></p>
                                                     </div>
                                                 </div>
                                             </div>
+                                        ) : (
+                                            <div className="text-sm text-blue-800 dark:text-blue-200">
+                                                Using custom Configuration ID: <span className="font-mono">{clientId}</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <Separator />
+
+                                    <div className="flex items-center justify-between p-4 border rounded-lg bg-slate-50 dark:bg-slate-900/50">
+                                        <div className="flex items-center gap-4">
+                                            <div className="bg-blue-600 p-2 rounded-lg text-white">
+                                                <LayoutGrid className="size-6" />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-semibold">Microsoft Graph Connection</h4>
+                                                <p className="text-sm text-muted-foreground">
+                                                    {isAuthenticated
+                                                        ? `Connected as ${accounts[0].name} (${accounts[0].username})`
+                                                        : "Not connected"}
+                                                </p>
+                                            </div>
                                         </div>
-                                    ) : (
-                                        <div className="text-sm text-blue-800 dark:text-blue-200">
-                                            Using custom Configuration ID: <span className="font-mono">{clientId}</span>
+                                        <Button
+                                            variant={isAuthenticated ? "outline" : "default"}
+                                            onClick={isAuthenticated ? handleTestGraph : handleConnectMicrosoft}
+                                            disabled={!clientId && !import.meta.env.VITE_AZURE_CLIENT_ID}
+                                        >
+                                            {isAuthenticated ? "Test Connection" : "Connect Account"}
+                                        </Button>
+                                    </div>
+
+                                    {graphData && (
+                                        <div className="rounded-md border bg-slate-950 text-slate-50 p-4 font-mono text-xs overflow-auto max-h-60">
+                                            <pre>{JSON.stringify(graphData, null, 2)}</pre>
                                         </div>
                                     )}
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        {/* AI Integration Card */}
+                        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 delay-100">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Sparkles className="size-5 text-brand-blue" />
+                                        AI Agent Configuration
+                                    </CardTitle>
+                                    <CardDescription>Configure your AI assistant's brain, model, and capabilities.</CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">AI Provider</label>
+                                            <select
+                                                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                                value={aiConfig.provider}
+                                                onChange={(e) => setAiConfig({ ...aiConfig, provider: e.target.value })}
+                                            >
+                                                <option value="ollama">Ollama (Local)</option>
+                                                <option value="openai">OpenAI (Cloud)</option>
+                                                <option value="anthropic">Anthropic (Cloud)</option>
+                                            </select>
+                                            <p className="text-xs text-muted-foreground">The "Brain" that processes your requests.</p>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Model Name</label>
+                                            <Input
+                                                value={aiConfig.model}
+                                                onChange={(e) => setAiConfig({ ...aiConfig, model: e.target.value })}
+                                                placeholder="e.g. llama3, gpt-4"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">API Endpoint</label>
+                                            <Input
+                                                value={aiConfig.endpoint}
+                                                onChange={(e) => setAiConfig({ ...aiConfig, endpoint: e.target.value })}
+                                                placeholder="http://localhost:11434/api/chat"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Agent SDK</label>
+                                            <select
+                                                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                                value={aiConfig.sdk}
+                                                onChange={(e) => setAiConfig({ ...aiConfig, sdk: e.target.value })}
+                                            >
+                                                <option value="custom_bridge">Custom Bridge (Localhost)</option>
+                                                <option value="copilot_kit">CopilotKit (Cloud)</option>
+                                                <option value="langchain">LangChain (Node.js)</option>
+                                            </select>
+                                            <p className="text-xs text-muted-foreground">The "Hands" that execute filesystem changes.</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-end">
+                                        <Button onClick={handleSaveAiConfig}>Save AI Settings</Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </>
+                );
+            case 'hub':
+                return (
+                    <div className="space-y-6">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Layers className="size-5 text-purple-600" />
+                                    Hub Association Settings
+                                </CardTitle>
+                                <CardDescription>Manage how this site collection interacts with the parent Hub.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <div className="space-y-4">
+                                    <h4 className="font-medium text-sm">Parent Hub</h4>
+                                    <div className="border rounded-md p-4 bg-purple-50 dark:bg-purple-900/10 border-purple-100 flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="bg-purple-100 dark:bg-purple-900/40 p-2 rounded-lg">
+                                                <Globe className="size-5 text-purple-600 dark:text-purple-400" />
+                                            </div>
+                                            <div>
+                                                <div className="font-semibold text-purple-900 dark:text-purple-100">CloudBaud Enterprise Hub</div>
+                                                <div className="text-xs text-purple-600/80 dark:text-purple-400/80">https://hub.cloudbaud.com</div>
+                                            </div>
+                                        </div>
+                                        <Button variant="outline" size="sm">Change Hub</Button>
+                                    </div>
                                 </div>
 
                                 <Separator />
 
-                                <div className="flex items-center justify-between p-4 border rounded-lg bg-slate-50 dark:bg-slate-900/50">
-                                    <div className="flex items-center gap-4">
-                                        <div className="bg-blue-600 p-2 rounded-lg text-white">
-                                            <LayoutGrid className="size-6" />
+                                <div className="space-y-4">
+                                    <h4 className="font-medium text-sm">Inheritance Policies</h4>
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <div className="space-y-0.5">
+                                                <label className="text-sm font-medium">Sync Navigation</label>
+                                                <p className="text-xs text-muted-foreground">Automatically display Hub navigation links in this site's top bar.</p>
+                                            </div>
+                                            <Switch defaultChecked />
                                         </div>
-                                        <div>
-                                            <h4 className="font-semibold">Microsoft Graph Connection</h4>
-                                            <p className="text-sm text-muted-foreground">
-                                                {isAuthenticated
-                                                    ? `Connected as ${accounts[0].name} (${accounts[0].username})`
-                                                    : "Not connected"}
-                                            </p>
+                                        <div className="flex items-center justify-between">
+                                            <div className="space-y-0.5">
+                                                <label className="text-sm font-medium">Enforce Theme</label>
+                                                <p className="text-xs text-muted-foreground">Override local site colors with the Hub's branding standards (Blue/Slate).</p>
+                                            </div>
+                                            <Switch defaultChecked />
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <div className="space-y-0.5">
+                                                <label className="text-sm font-medium">Search Scope</label>
+                                                <p className="text-xs text-muted-foreground">Include this site's content in global Hub search results.</p>
+                                            </div>
+                                            <Switch defaultChecked />
                                         </div>
                                     </div>
-                                    <Button
-                                        variant={isAuthenticated ? "outline" : "default"}
-                                        onClick={isAuthenticated ? handleTestGraph : handleConnectMicrosoft}
-                                        disabled={!clientId && !import.meta.env.VITE_AZURE_CLIENT_ID}
-                                    >
-                                        {isAuthenticated ? "Test Connection" : "Connect Account"}
-                                    </Button>
                                 </div>
+                            </CardContent>
+                        </Card>
 
-                                {graphData && (
-                                    <div className="rounded-md border bg-slate-950 text-slate-50 p-4 font-mono text-xs overflow-auto max-h-60">
-                                        <pre>{JSON.stringify(graphData, null, 2)}</pre>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Cross-Site Content Sharing</CardTitle>
+                                <CardDescription>Allow other sites in this Hub to reference content from <strong>{currentCollection.name}</strong>.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-4">
+                                    <div className="flex items-center space-x-2 border p-3 rounded-md">
+                                        <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded">
+                                            <UsersIcon className="size-4" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-sm font-medium">Content Syndication</p>
+                                            <p className="text-xs text-muted-foreground">"News" and "Events" published here will appear on the Hub Home.</p>
+                                        </div>
+                                        <Switch defaultChecked />
                                     </div>
-                                )}
+                                </div>
                             </CardContent>
                         </Card>
                     </div>
@@ -1031,7 +1399,7 @@ const SettingsPage = () => {
     }
 
     return (
-        <div className="max-w-6xl mx-auto p-8 pt-10 min-h-screen">
+        <PageShell>
             {/* Hub Breadcrumb Header */}
             <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -1126,8 +1494,12 @@ const SettingsPage = () => {
                             Site Collection Admin
                         </h3>
                         <nav className="flex flex-col space-y-1">
-                            <Button variant="ghost" className="justify-start gap-2 text-muted-foreground hover:text-foreground">
-                                <Layers className="size-4" /> Hub Association
+                            <Button
+                                variant={activeTab === 'hub' ? 'secondary' : 'ghost'}
+                                className="justify-start gap-2"
+                                onClick={() => setActiveTab('hub')}
+                            >
+                                <Layers className="size-4" /> Hub Settings
                             </Button>
                             <Button
                                 variant={activeTab === 'integrations' ? 'secondary' : 'ghost'}
@@ -1171,8 +1543,10 @@ const SettingsPage = () => {
                     </div>
                 </div>
             )}
-        </div>
+        </PageShell>
     );
 };
 
 export default SettingsPage;
+
+

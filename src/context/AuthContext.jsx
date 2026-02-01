@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: provider,
             options: {
-                redirectTo: `http://localhost:17117/portal`,
+                redirectTo: `${window.location.origin}/portal`,
             },
         });
         if (error) throw error;
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
         const { data, error } = await supabase.auth.signInWithOtp({
             email,
             options: {
-                emailRedirectTo: `http://localhost:17117/portal`,
+                emailRedirectTo: `${window.location.origin}/portal`,
             },
         });
         if (error) throw error;
@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }) => {
         const { data, error } = await supabase.auth.signInWithSSO({
             domain: domain,
             options: {
-                redirectTo: `http://localhost:17117/portal`,
+                redirectTo: `${window.location.origin}/portal`,
             },
         });
         if (error) throw error;

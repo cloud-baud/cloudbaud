@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, Link } from 'react-router-dom';
 import {
     Home,
@@ -33,6 +33,8 @@ import {
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import ThemeToggle from '../ThemeToggle';
+import OllamaChatPanel from './OllamaChatPanel';
+import { Sparkles } from 'lucide-react'; // Import icon for the trigger button
 
 // Mock Data for Sidebar
 const favorites = [
@@ -54,6 +56,7 @@ const suggested = [
 
 const WorkspaceLayout = () => {
     const { user, signOut } = useAuth();
+    const [isChatOpen, setIsChatOpen] = useState(false); // State for chat panel
 
     // Global Navigation State
     const [navItems, setNavItems] = useState(() => {
@@ -75,7 +78,7 @@ const WorkspaceLayout = () => {
     });
 
     // Listen for updates from Settings Page
-    React.useEffect(() => {
+    useEffect(() => {
         const handleNavUpdate = () => {
             const saved = localStorage.getItem('portal_nav_active');
             if (saved) setNavItems(JSON.parse(saved));
@@ -90,9 +93,8 @@ const WorkspaceLayout = () => {
         };
     }, []);
 
-    // Sync with User Profile on Load
     // Sync with User Profile on Load (only if local is empty)
-    React.useEffect(() => {
+    useEffect(() => {
         const localData = localStorage.getItem('portal_nav_active');
         if (!localData && user?.user_metadata?.portal_nav_active) {
             setNavItems(user.user_metadata.portal_nav_active);
@@ -101,194 +103,245 @@ const WorkspaceLayout = () => {
     }, [user]);
 
     return (
-        <div className="flex h-screen bg-background font-sans text-foreground overflow-hidden">
-            {/* Sidebar */}
-            <aside className="w-[280px] flex-shrink-0 border-r border-border bg-card/30 flex flex-col pt-4">
-                {/* Brand / Switcher */}
-                <div className="px-6 mb-8 mt-2 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-3 font-semibold text-xl hover:opacity-90 transition-opacity">
+        <div className="flex flex-col h-screen bg-background font-sans text-foreground overflow-hidden">
+            {/* Top Navigation Bar - Full Width, Persistent Dark Mode */}
+            <header
+                className="relative flex-none h-[70px] flex items-center justify-between px-4 lg:px-8 border-b border-[#222] z-50 dark"
+                style={{
+                    backgroundColor: '#0f0f0f',
+                    backgroundImage: `
+                      linear-gradient(90deg, rgba(255,255,255,0.01) 0%, rgba(0,0,0,0) 50%, rgba(255,255,255,0.01) 100%),
+                      repeating-linear-gradient(90deg, #111 0px, #111 1px, #161616 2px, #111 3px)
+                    `,
+                }}
+            >
+                {/* Left: Brand + Search */}
+                <div className="flex items-center gap-6">
+                    <Link to="/" className="flex items-center gap-3 font-semibold text-xl hover:opacity-90 transition-opacity text-white shrink-0">
                         {user?.user_metadata?.custom_logo_url ? (
                             <img src={user.user_metadata.custom_logo_url} alt="Logo" className="h-8 w-auto object-contain" />
                         ) : (
                             <CloudBaudLogo className="size-8 text-brand-blue" />
                         )}
-                        <span className="tracking-tight">{user?.user_metadata?.site_name || 'CloudBaud'}</span>
+                        <span className="tracking-tight hidden xl:block">{user?.user_metadata?.site_name || 'CloudBaud'}</span>
                     </Link>
+
+                    {/* Prominent Search Bar (Next to Logo) */}
+                    <div className="relative w-64 hidden md:block">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            className="w-full bg-[#1a1a1a] border border-[#333] rounded-md pl-10 pr-4 py-2 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-blue transition-all placeholder:text-slate-500"
+                        />
+                    </div>
                 </div>
 
-                {/* Primary Nav */}
-                <nav className="px-2 space-y-1 mb-6">
-                    <NavItem to="/portal" icon={Home} label="Home" exact />
-                    <NavItem to="/portal/finances" icon={PieChart} label="Finances" />
-                    <NavItem to="/portal/search" icon={Search} label="Search" />
-                    <NavItem to="/portal/notifications" icon={Bell} label="Notifications" />
-                    <div className="pt-2">
-                        <button className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-md transition-colors group">
-                            <Plus className="size-5 text-muted-foreground group-hover:text-foreground" />
-                            <span>Create</span>
-                        </button>
-                    </div>
+                {/* Center: Global Navigation Links */}
+                <nav className="hidden lg:flex items-center gap-1 xl:gap-2 absolute left-1/2 top-1/2 -translate-x-1/2">
+                    <TopNavItem to="/portal" icon={Home} label="Home" exact />
+                    {user?.email === 'jishnunath@gmail.com' && (
+                        <TopNavItem to="/finances" icon={PieChart} label="Finances" />
+                    )}
+
+                    {/* Dynamic Nav Items */}
+                    {navItems.map(item => (
+                        item.subItems && item.subItems.length > 0 ? (
+                            <DropdownMenu key={item.id}>
+                                <DropdownMenuTrigger className="flex flex-col items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-white/10 transition-all focus:outline-none data-[state=open]:text-white data-[state=open]:bg-white/10 h-[58px] min-w-[70px]">
+                                    <div className="relative">
+                                        <Briefcase className="size-5 mb-0.5" />
+                                        <ChevronDown className="absolute -right-3 top-1/2 -translate-y-1/2 size-2.5 opacity-70" />
+                                    </div>
+                                    <span>{item.label}</span>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    {item.subItems.map(sub => (
+                                        <DropdownMenuItem key={sub.id} asChild>
+                                            <Link to={sub.href} className="w-full cursor-pointer">
+                                                {sub.label}
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        ) : (
+                            <TopNavItem
+                                key={item.id}
+                                to={item.href}
+                                icon={Briefcase} // Default icon if none provided
+                                label={item.label}
+                            />
+                        )
+                    ))}
                 </nav>
 
-                {/* Scrollable Content */}
-                <div className="flex-1 overflow-y-auto px-4 custom-scrollbar">
-                    <div className="space-y-6">
-                        <Section title="Favorites">
-                            {favorites.map((item) => (
-                                <SidebarLink key={item.label} {...item} />
-                            ))}
-                        </Section>
+                {/* Right: Actions & Profile */}
+                <div className="flex items-center gap-3">
 
-                        {/* People */}
-                        <Section title="People">
-                            {people.map((person) => (
-                                <div key={person.name} className="flex items-center gap-3 py-2 px-3 text-sm text-slate-600 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white rounded-lg cursor-pointer transition-all duration-200 group">
-                                    <div className="size-7 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 group-hover:border-brand-blue/50 transition-colors">
-                                        <img src={person.avatar} alt={person.name} className="h-full w-full object-cover" />
+                    {/* AI Assistant Toggle */}
+                    <button
+                        onClick={() => setIsChatOpen(!isChatOpen)}
+                        className={cn(
+                            "w-9 h-9 rounded-lg flex items-center justify-center transition-colors relative",
+                            isChatOpen
+                                ? "bg-brand-blue text-white shadow-lg shadow-brand-blue/20"
+                                : "hover:bg-white/10 text-slate-400 hover:text-white"
+                        )}
+                        title="Toggle AI Assistant"
+                    >
+                        <Sparkles className="size-4" />
+                    </button>
+
+                    {/* Notifications Bell */}
+                    <button className="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-white/10 text-slate-400 hover:text-white transition-colors relative">
+                        <Bell className="size-4" />
+                        <span className="absolute top-2.5 right-2.5 size-1.5 bg-red-500 rounded-full border-2 border-[#0f0f0f]"></span>
+                    </button>
+
+                    <ThemeToggle />
+
+                    <div className="h-6 w-px bg-[#333] mx-1" />
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <div className="flex items-center gap-3 cursor-pointer hover:bg-white/10 p-1.5 pr-2 rounded-full transition-colors border border-transparent">
+                                {user?.user_metadata?.avatar_url ? (
+                                    <div className="size-8 rounded-full overflow-hidden border border-slate-700">
+                                        <img src={user.user_metadata.avatar_url} alt="User" className="h-full w-full object-cover" />
                                     </div>
-                                    <span className="truncate font-medium">{person.name}</span>
-                                </div>
-                            ))}
-                        </Section>
-
-                        {/* Suggested */}
-                        <Section title="Suggested">
-                            {suggested.map((item) => (
-                                <SidebarLink key={item.label} {...item} />
-                            ))}
-                        </Section>
-                    </div>
-                </div>
-            </aside>
-
-            {/* Main Content Area */}
-            <main className="flex-1 flex flex-col overflow-hidden bg-background/50 relative">
-                {/* Header: Search & User Profile */}
-                <header className="h-16 flex items-center justify-between px-8 border-b border-border/50 bg-background/50 backdrop-blur-sm sticky top-0 z-10">
-                    <div className="flex items-center gap-6 flex-1">
-                        {/* Global Navigation Links */}
-                        <nav className="hidden md:flex items-center gap-4 mr-auto">
-                            {navItems.map(item => (
-                                item.subItems && item.subItems.length > 0 ? (
-                                    <DropdownMenu key={item.id}>
-                                        <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none data-[state=open]:text-foreground">
-                                            {item.label}
-                                            <ChevronDown className="size-3 opacity-70" />
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent>
-                                            {item.subItems.map(sub => (
-                                                <DropdownMenuItem key={sub.id} asChild>
-                                                    <Link to={sub.href} className="w-full cursor-pointer">
-                                                        {sub.label}
-                                                    </Link>
-                                                </DropdownMenuItem>
-                                            ))}
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
                                 ) : (
-                                    <Link
-                                        key={item.id}
-                                        to={item.href}
-                                        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                                    >
-                                        {item.label}
-                                    </Link>
-                                )
-                            ))}
-                        </nav>
+                                    <div className="size-8 rounded-full bg-gradient-to-br from-brand-blue to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-md uppercase">
+                                        {(user?.email ? user.email[0] : 'U')}
+                                    </div>
+                                )}
+                                <div className="text-left hidden sm:block">
+                                    <div className="text-sm font-semibold leading-none text-slate-200">
+                                        {user?.user_metadata?.full_name || 'User'}
+                                    </div>
+                                </div>
+                                <ChevronRight className="rotate-90 text-slate-500 w-3.5 h-3.5 ml-0.5" />
+                            </div>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-56">
+                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => window.location.href = '/portal/settings?tab=profile'}>
+                                <User className="mr-2 h-4 w-4" />
+                                <span>Profile</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => window.location.href = '/portal/settings'}>
+                                <Settings className="mr-2 h-4 w-4" />
+                                <span>Settings</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={signOut} className="text-red-500 focus:text-red-500">
+                                <LogOut className="mr-2 h-4 w-4" />
+                                <span>Sign Out</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            </header>
 
-                        <div className="relative w-full max-w-md">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                            <input
-                                type="text"
-                                placeholder="Search..."
-                                className="w-full bg-accent/20 border border-border/50 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
-                            />
+            {/* Main Content Area: Sidebar + Page */}
+            <div className="flex-1 flex overflow-hidden bg-[#f3f4f6] dark:bg-black/20">
+                {/* Secondary Sidebar (Contextual) */}
+                <aside className="w-[280px] flex-shrink-0 flex flex-col pt-6 pb-4 pl-4 lg:pl-6 bg-transparent h-full">
+                    {/* Floating Card Look for Sidebar content */}
+                    <div className="flex-1 flex flex-col bg-white dark:bg-[#1a1a1a] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mb-4 mr-2">
+
+                        {/* Action Primary */}
+                        <div className="p-4 pb-2">
+                            <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-brand-blue hover:bg-brand-blue/90 rounded-lg shadow-sm shadow-brand-blue/20 transition-all group">
+                                <Plus className="size-4" />
+                                <span>Create New</span>
+                            </button>
+                        </div>
+
+                        {/* Scrollable Content */}
+                        <div className="flex-1 overflow-y-auto px-2 custom-scrollbar">
+                            <div className="space-y-6 pt-2">
+                                <Section title="Overview">
+                                    <SidebarLink icon={FileText} label="My Feed" href="/portal" active />
+                                    <SidebarLink icon={Users} label="My Network" href="/portal/network" />
+                                </Section>
+
+                                <Section title="Favorites">
+                                    {favorites.map((item) => (
+                                        <SidebarLink key={item.label} {...item} />
+                                    ))}
+                                </Section>
+
+                                {/* People */}
+                                <Section title="People">
+                                    {people.map((person) => (
+                                        <div key={person.name} className="flex items-center gap-3 py-2 px-3 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white rounded-lg cursor-pointer transition-all duration-200 group">
+                                            <div className="size-7 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 group-hover:border-brand-blue/50 transition-colors">
+                                                <img src={person.avatar} alt={person.name} className="h-full w-full object-cover" />
+                                            </div>
+                                            <span className="truncate font-medium">{person.name}</span>
+                                        </div>
+                                    ))}
+                                </Section>
+
+                                {/* Suggested */}
+                                <Section title="Suggested">
+                                    {suggested.map((item) => (
+                                        <SidebarLink key={item.label} {...item} />
+                                    ))}
+                                </Section>
+                            </div>
                         </div>
                     </div>
+                </aside>
 
-                    <div className="flex items-center gap-3">
-                        <ThemeToggle />
-
-                        <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-1" />
-
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <div className="flex items-center gap-3 cursor-pointer hover:bg-accent/50 p-1.5 pr-2 rounded-full transition-colors border border-transparent hover:border-border/50">
-                                    {user?.user_metadata?.avatar_url ? (
-                                        <div className="size-8 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
-                                            <img src={user.user_metadata.avatar_url} alt="User" className="h-full w-full object-cover" />
-                                        </div>
-                                    ) : (
-                                        <div className="size-8 rounded-full bg-gradient-to-br from-brand-blue to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-md uppercase">
-                                            {(user?.email ? user.email[0] : 'U')}
-                                        </div>
-                                    )}
-                                    <div className="text-left hidden sm:block">
-                                        <div className="text-sm font-semibold leading-none">
-                                            {user?.user_metadata?.full_name || 'User'}
-                                        </div>
-                                        {/* Email hidden per request */}
-                                    </div>
-                                    <ChevronRight className="rotate-90 text-muted-foreground w-3.5 h-3.5 ml-0.5" />
-                                </div>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-56">
-                                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => window.location.href = '/portal/settings?tab=profile'}>
-                                    <User className="mr-2 h-4 w-4" />
-                                    <span>Profile</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => window.location.href = '/portal/settings'}>
-                                    <Settings className="mr-2 h-4 w-4" />
-                                    <span>Settings</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={signOut} className="text-red-500 focus:text-red-500">
-                                    <LogOut className="mr-2 h-4 w-4" />
-                                    <span>Sign Out</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                {/* Page Content */}
+                <main className="flex-1 flex flex-col overflow-auto relative p-4 lg:p-6">
+                    <div className="flex-1 bg-white dark:bg-[#0f0f0f] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col relative">
+                        <Outlet />
+                        {/* Ollama Chat Panel Overlay */}
+                        <OllamaChatPanel isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
                     </div>
-                </header>
-
-                <div className="flex-1 overflow-auto">
-                    <Outlet />
-                </div>
-            </main>
+                </main>
+            </div>
         </div>
     );
 };
 
 // Helper Components
-const NavItem = ({ to, icon: Icon, label, exact }) => (
+const TopNavItem = ({ to, icon: Icon, label, exact }) => (
     <NavLink
         to={to}
         end={exact}
         className={({ isActive }) =>
             cn(
-                "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 relative group overflow-hidden",
+                "flex flex-col items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 group h-[58px] min-w-[70px]",
                 isActive
-                    ? "bg-white dark:bg-white/10 text-brand-blue shadow-sm"
-                    : "text-slate-600 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
+                    ? "text-white"
+                    : "text-slate-400 hover:text-white hover:bg-white/10"
             )
         }
     >
         {({ isActive }) => (
             <>
-                {isActive && <div className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-brand-blue" />}
-                <Icon className={cn("size-5 transition-colors", isActive ? "text-brand-blue" : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300")} />
+                <Icon className={cn("size-5 mb-0.5 transition-colors", isActive ? "text-brand-blue" : "text-slate-400 group-hover:text-white")} />
                 <span>{label}</span>
+                {isActive && <div className="absolute bottom-0 h-1 w-full max-w-[40px] bg-brand-blue rounded-t-full" />}
             </>
         )}
     </NavLink>
 );
 
-const SidebarLink = ({ icon: Icon, label, href }) => (
-    <Link to={href} className="flex items-center gap-3 py-2 px-3 text-sm text-slate-600 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white rounded-lg transition-all duration-200 group">
-        {Icon && <Icon className="size-4 opacity-70 group-hover:opacity-100 transition-opacity text-slate-400 group-hover:text-brand-blue" />}
+const SidebarLink = ({ icon: Icon, label, href, active }) => (
+    <Link to={href} className={cn(
+        "flex items-center gap-3 py-2 px-3 text-sm rounded-lg transition-all duration-200 group relative",
+        active
+            ? "bg-brand-blue/10 text-brand-blue font-medium"
+            : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
+    )}>
+        {active && <div className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-brand-blue" />}
+        {Icon && <Icon className={cn("size-4 transition-colors", active ? "text-brand-blue" : "opacity-70 group-hover:opacity-100 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300")} />}
         <span className="truncate">{label}</span>
     </Link>
 );
