@@ -12,9 +12,11 @@ import {
     Calendar,
     Settings,
     ChevronRight,
+    ChevronDown,
     MoreHorizontal,
     LogOut,
-    User
+    User,
+    PieChart
 } from 'lucide-react';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
@@ -30,6 +32,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import ThemeToggle from '../ThemeToggle';
 
 // Mock Data for Sidebar
 const favorites = [
@@ -54,8 +57,17 @@ const WorkspaceLayout = () => {
 
     // Global Navigation State
     const [navItems, setNavItems] = useState(() => {
-        const saved = localStorage.getItem('portal_nav_active');
-        return saved ? JSON.parse(saved) : [
+        try {
+            const saved = localStorage.getItem('portal_nav_active');
+            const parsed = saved ? JSON.parse(saved) : null;
+            // Fallback if null or empty array to ensure nav doesn't disappear
+            if (parsed && Array.isArray(parsed) && parsed.length > 0) {
+                return parsed;
+            }
+        } catch (e) {
+            console.error("Failed to parse nav", e);
+        }
+        return [
             { id: '1', label: 'Home', href: '/sites/consulting' },
             { id: '2', label: 'Documents', href: '/sites/consulting/docs' },
             { id: '3', label: 'Team', href: '/sites/consulting/team' }
@@ -79,8 +91,10 @@ const WorkspaceLayout = () => {
     }, []);
 
     // Sync with User Profile on Load
+    // Sync with User Profile on Load (only if local is empty)
     React.useEffect(() => {
-        if (user?.user_metadata?.portal_nav_active) {
+        const localData = localStorage.getItem('portal_nav_active');
+        if (!localData && user?.user_metadata?.portal_nav_active) {
             setNavItems(user.user_metadata.portal_nav_active);
             localStorage.setItem('portal_nav_active', JSON.stringify(user.user_metadata.portal_nav_active));
         }
@@ -91,16 +105,21 @@ const WorkspaceLayout = () => {
             {/* Sidebar */}
             <aside className="w-[280px] flex-shrink-0 border-r border-border bg-card/30 flex flex-col pt-4">
                 {/* Brand / Switcher */}
-                <div className="px-4 mb-6 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2 font-semibold text-lg hover:opacity-80 transition-opacity">
-                        <CloudBaudLogo className="size-8" />
-                        <span>CloudBaud</span>
+                <div className="px-6 mb-8 mt-2 flex items-center justify-between">
+                    <Link to="/" className="flex items-center gap-3 font-semibold text-xl hover:opacity-90 transition-opacity">
+                        {user?.user_metadata?.custom_logo_url ? (
+                            <img src={user.user_metadata.custom_logo_url} alt="Logo" className="h-8 w-auto object-contain" />
+                        ) : (
+                            <CloudBaudLogo className="size-8 text-brand-blue" />
+                        )}
+                        <span className="tracking-tight">{user?.user_metadata?.site_name || 'CloudBaud'}</span>
                     </Link>
                 </div>
 
                 {/* Primary Nav */}
                 <nav className="px-2 space-y-1 mb-6">
                     <NavItem to="/portal" icon={Home} label="Home" exact />
+                    <NavItem to="/portal/finances" icon={PieChart} label="Finances" />
                     <NavItem to="/portal/search" icon={Search} label="Search" />
                     <NavItem to="/portal/notifications" icon={Bell} label="Notifications" />
                     <div className="pt-2">
@@ -114,7 +133,6 @@ const WorkspaceLayout = () => {
                 {/* Scrollable Content */}
                 <div className="flex-1 overflow-y-auto px-4 custom-scrollbar">
                     <div className="space-y-6">
-                        {/* Favorites */}
                         <Section title="Favorites">
                             {favorites.map((item) => (
                                 <SidebarLink key={item.label} {...item} />
@@ -124,11 +142,11 @@ const WorkspaceLayout = () => {
                         {/* People */}
                         <Section title="People">
                             {people.map((person) => (
-                                <div key={person.name} className="flex items-center gap-3 py-1.5 px-2 text-sm text-muted-foreground hover:bg-accent/50 hover:text-foreground rounded-md cursor-pointer transition-colors">
-                                    <div className="size-6 rounded-full overflow-hidden bg-muted">
+                                <div key={person.name} className="flex items-center gap-3 py-2 px-3 text-sm text-slate-600 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white rounded-lg cursor-pointer transition-all duration-200 group">
+                                    <div className="size-7 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 group-hover:border-brand-blue/50 transition-colors">
                                         <img src={person.avatar} alt={person.name} className="h-full w-full object-cover" />
                                     </div>
-                                    <span className="truncate">{person.name}</span>
+                                    <span className="truncate font-medium">{person.name}</span>
                                 </div>
                             ))}
                         </Section>
@@ -151,13 +169,31 @@ const WorkspaceLayout = () => {
                         {/* Global Navigation Links */}
                         <nav className="hidden md:flex items-center gap-4 mr-auto">
                             {navItems.map(item => (
-                                <Link
-                                    key={item.id}
-                                    to={item.href}
-                                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                                >
-                                    {item.label}
-                                </Link>
+                                item.subItems && item.subItems.length > 0 ? (
+                                    <DropdownMenu key={item.id}>
+                                        <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none data-[state=open]:text-foreground">
+                                            {item.label}
+                                            <ChevronDown className="size-3 opacity-70" />
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent>
+                                            {item.subItems.map(sub => (
+                                                <DropdownMenuItem key={sub.id} asChild>
+                                                    <Link to={sub.href} className="w-full cursor-pointer">
+                                                        {sub.label}
+                                                    </Link>
+                                                </DropdownMenuItem>
+                                            ))}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                ) : (
+                                    <Link
+                                        key={item.id}
+                                        to={item.href}
+                                        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                                    >
+                                        {item.label}
+                                    </Link>
+                                )
                             ))}
                         </nav>
 
@@ -171,29 +207,36 @@ const WorkspaceLayout = () => {
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
+                        <ThemeToggle />
+
+                        <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-1" />
+
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <div className="flex items-center gap-3 cursor-pointer hover:bg-accent/50 p-2 rounded-md transition-colors">
-                                    <div className="text-right hidden sm:block">
-                                        <div className="text-sm font-medium">
-                                            {user?.user_metadata?.full_name || user?.user_metadata?.name || user?.user_metadata?.first_name || 'User'}
+                                <div className="flex items-center gap-3 cursor-pointer hover:bg-accent/50 p-1.5 pr-2 rounded-full transition-colors border border-transparent hover:border-border/50">
+                                    {user?.user_metadata?.avatar_url ? (
+                                        <div className="size-8 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
+                                            <img src={user.user_metadata.avatar_url} alt="User" className="h-full w-full object-cover" />
                                         </div>
-                                        <div className="text-xs text-muted-foreground">
-                                            {user?.email}
-                                            <span className="opacity-50 ml-1">({user?.app_metadata?.provider || 'email'})</span>
+                                    ) : (
+                                        <div className="size-8 rounded-full bg-gradient-to-br from-brand-blue to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-md uppercase">
+                                            {(user?.email ? user.email[0] : 'U')}
                                         </div>
+                                    )}
+                                    <div className="text-left hidden sm:block">
+                                        <div className="text-sm font-semibold leading-none">
+                                            {user?.user_metadata?.full_name || 'User'}
+                                        </div>
+                                        {/* Email hidden per request */}
                                     </div>
-                                    <div className="size-9 rounded-full bg-gradient-to-br from-brand-blue to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md uppercase">
-                                        {(user?.email ? user.email[0] : 'U')}
-                                    </div>
-                                    <ChevronRight className="rotate-90 text-muted-foreground w-4 h-4 ml-1" />
+                                    <ChevronRight className="rotate-90 text-muted-foreground w-3.5 h-3.5 ml-0.5" />
                                 </div>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-56">
                                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => window.location.href = '/portal/settings'}>
+                                <DropdownMenuItem onClick={() => window.location.href = '/portal/settings?tab=profile'}>
                                     <User className="mr-2 h-4 w-4" />
                                     <span>Profile</span>
                                 </DropdownMenuItem>
@@ -226,28 +269,33 @@ const NavItem = ({ to, icon: Icon, label, exact }) => (
         end={exact}
         className={({ isActive }) =>
             cn(
-                "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200",
+                "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 relative group overflow-hidden",
                 isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                    ? "bg-white dark:bg-white/10 text-brand-blue shadow-sm"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
             )
         }
     >
-        <Icon className="size-5" />
-        <span>{label}</span>
+        {({ isActive }) => (
+            <>
+                {isActive && <div className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-brand-blue" />}
+                <Icon className={cn("size-5 transition-colors", isActive ? "text-brand-blue" : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300")} />
+                <span>{label}</span>
+            </>
+        )}
     </NavLink>
 );
 
 const SidebarLink = ({ icon: Icon, label, href }) => (
-    <Link to={href} className="flex items-center gap-3 py-1.5 px-2 text-sm text-muted-foreground hover:bg-accent/50 hover:text-foreground rounded-md transition-colors">
-        {Icon && <Icon className="size-4 opacity-70" />}
+    <Link to={href} className="flex items-center gap-3 py-2 px-3 text-sm text-slate-600 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white rounded-lg transition-all duration-200 group">
+        {Icon && <Icon className="size-4 opacity-70 group-hover:opacity-100 transition-opacity text-slate-400 group-hover:text-brand-blue" />}
         <span className="truncate">{label}</span>
     </Link>
 );
 
 const Section = ({ title, children }) => (
-    <div className="space-y-1">
-        <h3 className="px-2 text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider mb-2">{title}</h3>
+    <div className="space-y-1 mb-6">
+        <h3 className="px-3 text-xs font-semibold text-slate-400 dark:text-slate-500 mb-2 font-mono uppercase tracking-widest opacity-80">{title}</h3>
         {children}
     </div>
 );

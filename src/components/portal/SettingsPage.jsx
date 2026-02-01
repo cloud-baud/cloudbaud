@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { User, Bell, Shield, Palette, Globe, Layers, Users as UsersIcon, LayoutGrid, PaintBucket, Lock, ChevronRight, ChevronDown, Check, Plus, MoveVertical, Puzzle, ZoomIn, X, Trash2, Pencil } from 'lucide-react';
+import { Reorder } from 'framer-motion';
+import { toast } from 'sonner';
+import { User, Bell, Shield, Palette, Globe, Layers, Users as UsersIcon, LayoutGrid, PaintBucket, Lock, ChevronRight, ChevronDown, Check, Plus, MoveVertical, Puzzle, ZoomIn, X, Trash2, Pencil, Type, Image as ImageIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/context/AuthContext';
@@ -127,6 +129,15 @@ const SettingsPage = () => {
         localStorage.setItem('portal_nav_active', JSON.stringify(navItems));
         window.dispatchEvent(new CustomEvent('portal-nav-update'));
 
+        // Show toast confirmation
+        // We use a small debounce or check to prevent toast spam during rapid reordering if needed,
+        // but for now, we'll rely on the user's discrete actions (Add/Remove).
+        // For reorder, it might fire repeatedly, so we might want to check if the change was significant or just silence it for reorder?
+        // Actually, keeping it simple: triggering toast on "significant" actions (Add/Remove) manually is better than in useEffect.
+        // But for consistency:
+        // toast.success("Navigation updated"); // Moving this to handlers to avoid spam during hydration
+
+
         // Sync to Supabase if user is logged in
         if (user) {
             // Check if update is needed to avoid loop
@@ -161,9 +172,119 @@ const SettingsPage = () => {
         if (direction === 'add') {
             setNavItems([...navItems, item]);
             setAvailableLinks(availableLinks.filter(i => i.id !== item.id));
+            toast.success("Added to Global Navigation");
         } else {
             setAvailableLinks([...availableLinks, item]);
             setNavItems(navItems.filter(i => i.id !== item.id));
+            toast.info("Removed from Global Navigation");
+        }
+    };
+
+    // Appearance State (Hydrated from user metadata)
+    const [themeColor, setThemeColor] = useState(user?.user_metadata?.theme_color || '#00d2ff');
+    const [fontFamily, setFontFamily] = useState(user?.user_metadata?.font_family || 'Inter');
+    const [customLogo, setCustomLogo] = useState(user?.user_metadata?.custom_logo_url || '');
+    const [siteName, setSiteName] = useState(user?.user_metadata?.site_name || 'CloudBaud');
+
+    // File Upload State
+    const [isUploading, setIsUploading] = useState(false);
+    const [previewAvatar, setPreviewAvatar] = useState(''); // For immediate visual feedback
+
+    // Reset preview when tab opens or user changes
+    React.useEffect(() => {
+        setPreviewAvatar('');
+    }, [activeTab]);
+
+    // Profile Form State (Controlled)
+    const [profileForm, setProfileForm] = useState({
+        full_name: user?.user_metadata?.full_name || '',
+        job_title: user?.user_metadata?.job_title || '',
+        avatar_url: user?.user_metadata?.avatar_url || ''
+    });
+
+    // Update form when user data loads initially
+    React.useEffect(() => {
+        if (user) {
+            setProfileForm({
+                full_name: user.user_metadata?.full_name || '',
+                job_title: user.user_metadata?.job_title || '',
+                avatar_url: user.user_metadata?.avatar_url || ''
+            });
+        }
+    }, [user, activeTab]);
+
+    const uploadAvatar = async (event) => {
+        try {
+            setIsUploading(true);
+            const file = event.target.files?.[0];
+            if (!file) return;
+
+            // 1. Instant Preview
+            const objectUrl = URL.createObjectURL(file);
+            setPreviewAvatar(objectUrl);
+
+            // 2. Upload
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+            const { error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(fileName, file, { upsert: true });
+
+            if (uploadError) throw uploadError;
+
+            // 3. Get URL & Update State
+            const { data } = supabase.storage.from('avatars').getPublicUrl(fileName);
+            setProfileForm(prev => ({ ...prev, avatar_url: data.publicUrl }));
+
+            toast.success("Image uploaded!");
+        } catch (error) {
+            console.error('Upload error:', error);
+            toast.error(`Upload failed: ${error.message || 'Check connection/permissions'}`);
+            // We keep the preview so they see what they picked, but warn them it didn't save to cloud
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const handleSaveProfile = async () => {
+        const { error } = await supabase.auth.updateUser({
+            data: {
+                full_name: profileForm.full_name,
+                job_title: profileForm.job_title,
+                avatar_url: profileForm.avatar_url
+            }
+        });
+
+        if (error) {
+            toast.error("Failed to save profile");
+        } else {
+            toast.success("Profile updated successfully");
+            window.location.reload();
+        }
+    };
+
+    // Apply aesthetics live
+    React.useEffect(() => {
+        const root = document.documentElement;
+        if (themeColor) root.style.setProperty('--color-primary', themeColor);
+        if (fontFamily === 'Inter') root.style.setProperty('--font-sans', '"Inter", sans-serif');
+        if (fontFamily === 'Mono') root.style.setProperty('--font-sans', 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace');
+        // Add more font logic as needed
+    }, [themeColor, fontFamily]);
+
+    const handleSaveAppearance = async () => {
+        const { error } = await supabase.auth.updateUser({
+            data: {
+                theme_color: themeColor,
+                font_family: fontFamily,
+                custom_logo_url: customLogo,
+                site_name: siteName
+            }
+        });
+        if (error) toast.error("Failed to save appearance");
+        else {
+            toast.success("Appearance updated");
+            window.location.reload(); // Reload to ensure Layout picks up new Logo/Name
         }
     };
 
@@ -173,10 +294,34 @@ const SettingsPage = () => {
     const [tempLabel, setTempLabel] = useState('');
     const [tempHref, setTempHref] = useState('');
 
+    // Sub-item management state
+    const [tempSubItems, setTempSubItems] = useState([]);
+    const [subLabel, setSubLabel] = useState('');
+    const [subHref, setSubHref] = useState('');
+
+    const handleAddSubItem = () => {
+        if (!subLabel || !subHref) return;
+        const newSub = {
+            id: crypto.randomUUID(), // Local temporary ID
+            label: subLabel,
+            href: subHref
+        };
+        setTempSubItems([...tempSubItems, newSub]);
+        setSubLabel('');
+        setSubHref('');
+    };
+
+    const handleRemoveSubItem = (subId) => {
+        setTempSubItems(tempSubItems.filter(s => s.id !== subId));
+    };
+
     const openAddDialog = () => {
         setEditingLink(null);
         setTempLabel('');
         setTempHref('');
+        setTempSubItems([]);
+        setSubLabel('');
+        setSubHref('');
         setIsDialogOpen(true);
     };
 
@@ -184,6 +329,9 @@ const SettingsPage = () => {
         setEditingLink(link);
         setTempLabel(link.label);
         setTempHref(link.href);
+        setTempSubItems(link.subItems || []);
+        setSubLabel('');
+        setSubHref('');
         setIsDialogOpen(true);
     };
 
@@ -192,17 +340,19 @@ const SettingsPage = () => {
 
         if (editingLink) {
             // Edit existing
-            const updateList = (list) => list.map(item => item.id === editingLink.id ? { ...item, label: tempLabel, href: tempHref } : item);
+            const updateList = (list) => list.map(item => item.id === editingLink.id ? { ...item, label: tempLabel, href: tempHref, subItems: tempSubItems } : item);
             setNavItems(updateList(navItems));
             setAvailableLinks(updateList(availableLinks));
         } else {
             // Add new
             const newLink = {
-                id: crypto.randomUUID(),
+                id: Date.now().toString(36) + Math.random().toString(36).substring(2),
                 label: tempLabel,
-                href: tempHref
+                href: tempHref,
+                subItems: tempSubItems
             };
             setAvailableLinks([...availableLinks, newLink]);
+            toast.success("Link Created");
         }
         setIsDialogOpen(false);
     };
@@ -237,18 +387,136 @@ const SettingsPage = () => {
 
     const renderContent = () => {
         switch (activeTab) {
+            case 'profile':
+                return (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Public Profile</CardTitle>
+                                <CardDescription>Manage how you appear to other users across the CloudBaud workspace.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <div className="flex flex-col md:flex-row gap-8 items-start">
+                                    {/* Avatar Preview */}
+                                    <div className="flex flex-col items-center gap-3">
+                                        <div
+                                            className="h-24 w-24 rounded-full overflow-hidden border-4 border-slate-100 dark:border-slate-800 shadow-lg bg-slate-200 relative group cursor-pointer hover:border-brand-blue transition-colors"
+                                            onClick={() => document.getElementById('avatar-upload').click()}
+                                        >
+                                            {/* Show Preview if exists, else User Metadata */}
+                                            {(previewAvatar || user?.user_metadata?.avatar_url) ? (
+                                                <img
+                                                    src={previewAvatar || user.user_metadata.avatar_url}
+                                                    alt="Profile"
+                                                    className="h-full w-full object-cover transition-opacity duration-300"
+                                                />
+                                            ) : (
+                                                <div className="h-full w-full bg-gradient-to-br from-brand-blue to-purple-600 flex items-center justify-center text-white text-3xl font-bold uppercase">
+                                                    {user?.email?.[0] || 'U'}
+                                                </div>
+                                            )}
+
+                                            {/* Edit Overlay Hint */}
+                                            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                                <Pencil className="text-white size-6" />
+                                            </div>
+                                        </div>
+                                        <div className="text-xs text-muted-foreground text-center max-w-[150px]">
+                                            Click to upload image<br />
+                                            <span className="opacity-70 text-[10px]">(Rec: 400x400px)</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Edit Form */}
+                                    <div className="flex-1 space-y-4 w-full">
+                                        <div className="grid gap-2">
+                                            <Label>Full Name</Label>
+                                            <Input
+                                                value={profileForm.full_name}
+                                                onChange={(e) => setProfileForm({ ...profileForm, full_name: e.target.value })}
+                                                placeholder="e.g. Jane Doe"
+                                            />
+                                        </div>
+
+                                        <div className="grid gap-2">
+                                            <Label>Job Title</Label>
+                                            <Input
+                                                value={profileForm.job_title}
+                                                onChange={(e) => setProfileForm({ ...profileForm, job_title: e.target.value })}
+                                                placeholder="e.g. Senior Platform Consultant"
+                                            />
+                                        </div>
+
+                                        <div className="grid gap-2">
+                                            <Label>Avatar Image</Label>
+                                            <div className="flex flex-col gap-3">
+                                                {/* File Upload Input */}
+                                                <div className="flex items-center gap-2">
+                                                    <Input
+                                                        type="file"
+                                                        id="avatar-upload"
+                                                        accept="image/*"
+                                                        onChange={uploadAvatar}
+                                                        disabled={isUploading}
+                                                        className="cursor-pointer file:cursor-pointer file:text-brand-blue file:font-medium"
+                                                    />
+                                                    {isUploading && <span className="text-xs text-brand-blue animate-pulse font-medium">Uploading...</span>}
+                                                </div>
+
+                                                <div className="relative">
+                                                    <div className="absolute inset-0 flex items-center">
+                                                        <span className="w-full border-t" />
+                                                    </div>
+                                                    <div className="relative flex justify-center text-xs uppercase">
+                                                        <span className="bg-background px-2 text-muted-foreground">Or use URL</span>
+                                                    </div>
+                                                </div>
+
+                                                <Input
+                                                    value={profileForm.avatar_url}
+                                                    onChange={(e) => {
+                                                        setProfileForm({ ...profileForm, avatar_url: e.target.value });
+                                                        setPreviewAvatar(e.target.value); // Update preview if manually typing URL
+                                                    }}
+                                                    placeholder="https://..."
+                                                />
+                                            </div>
+                                            <p className="text-[10px] text-muted-foreground">
+                                                Supported formats: JPG, PNG, GIF. Max size 2MB.
+                                            </p>
+                                        </div>
+
+                                        <div className="pt-2 flex justify-end">
+                                            <Button onClick={handleSaveProfile} disabled={isUploading}>
+                                                {isUploading ? 'Uploading...' : 'Save Changes'}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                );
             case 'general':
                 return (
                     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                         {/* Hub Inheritance Indicator */}
-                        <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 p-4 rounded-lg flex items-start gap-3 mb-6">
-                            <Layers className="size-5 text-blue-600 dark:text-blue-400 mt-0.5" />
-                            <div>
-                                <h4 className="font-medium text-blue-900 dark:text-blue-100">Hub Association: CloudBaud Enterprise</h4>
-                                <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                        {/* Hub Inheritance Indicator - "The Banner" */}
+                        <div className="relative overflow-hidden bg-gradient-to-r from-blue-50 to-white dark:from-blue-950/40 dark:to-slate-950 border border-blue-100 dark:border-blue-900/50 p-5 rounded-xl shadow-sm flex items-start gap-4 mb-6">
+                            <div className="absolute top-0 left-0 w-1 h-full bg-blue-500" />
+                            <div className="bg-blue-100 dark:bg-blue-900/50 p-2.5 rounded-lg shadow-inner">
+                                <Layers className="size-6 text-blue-600 dark:text-blue-400" />
+                            </div>
+                            <div className="flex-1 z-10">
+                                <h4 className="font-semibold text-base text-slate-900 dark:text-slate-100">
+                                    Hub Association: <span className="text-blue-600 dark:text-blue-400">CloudBaud Enterprise</span>
+                                </h4>
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
                                     The <strong>{currentCollection.name}</strong> collection inherits navigation, theme, and compliance policies from the CloudBaud Hub.
                                 </p>
                             </div>
+                            {/* Decorative Background Blob */}
+                            <div className="absolute -right-6 -top-6 w-24 h-24 bg-blue-400/10 rounded-full blur-2xl pointer-events-none" />
                         </div>
 
                         <Card>
@@ -373,36 +641,100 @@ const SettingsPage = () => {
                     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                         <Card>
                             <CardHeader>
-                                <CardTitle>Change the Look ({currentCollection.name})</CardTitle>
-                                <CardDescription>Customize how this specific collection appears to you and your teams.</CardDescription>
+                                <CardTitle>Global Branding</CardTitle>
+                                <CardDescription>Customize the visual identity of your workspace.</CardDescription>
                             </CardHeader>
-                            <CardContent className="space-y-6">
+                            <CardContent className="space-y-8">
+
+                                {/* Color Scheme */}
                                 <div>
-                                    <label className="text-sm font-medium mb-3 block">Theme Selection</label>
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <div className={`border-2 ${ctxData.theme === 'Dark Nebula' ? 'border-primary' : 'border-transparent'} rounded-lg p-1 cursor-pointer`}>
-                                            <div className="h-20 bg-slate-950 rounded-md flex items-center justify-center relative overflow-hidden">
-                                                <div className="absolute top-0 left-0 w-full h-2 bg-brand-blue"></div>
-                                                <span className="text-xs text-white">Dark Nebula</span>
+                                    <label className="text-sm font-medium mb-3 flex items-center gap-2">
+                                        <Palette className="size-4" /> Theme Colors
+                                    </label>
+                                    <div className="flex flex-wrap gap-4">
+                                        {[
+                                            { name: 'Tech Blue', val: '#00d2ff' },
+                                            { name: 'Neon Purple', val: '#8b5cf6' },
+                                            { name: 'Emerald', val: '#10b981' },
+                                            { name: 'Sunset', val: '#f59e0b' },
+                                            { name: 'Crimson', val: '#e11d48' }
+                                        ].map(color => (
+                                            <div
+                                                key={color.val}
+                                                className={`cursor-pointer rounded-lg p-1 border-2 transition-all ${themeColor === color.val ? 'border-foreground scale-110' : 'border-transparent hover:border-border'}`}
+                                                onClick={() => setThemeColor(color.val)}
+                                            >
+                                                <div className="w-12 h-12 rounded-md shadow-sm flex items-center justify-center" style={{ backgroundColor: color.val }}>
+                                                    {themeColor === color.val && <Check className="text-white drop-shadow-md" />}
+                                                </div>
+                                                <div className="text-[10px] text-center mt-1 font-medium text-muted-foreground">{color.name}</div>
                                             </div>
-                                        </div>
-                                        <div className={`border-2 ${ctxData.theme === 'Enterprise Light' ? 'border-primary' : 'border-transparent'} rounded-lg p-1 cursor-pointer`}>
-                                            <div className="h-20 bg-white border border-slate-100 rounded-md flex items-center justify-center relative overflow-hidden">
-                                                <div className="absolute top-0 left-0 w-full h-2 bg-blue-600"></div>
-                                                <span className="text-xs text-slate-900">Enterprise Light</span>
+                                        ))}
+                                        <div className="space-y-2">
+                                            <div className="w-12 h-12 rounded-md border-2 border-dashed border-input flex items-center justify-center bg-slate-50 dark:bg-slate-900">
+                                                <input
+                                                    type="color"
+                                                    value={themeColor}
+                                                    onChange={(e) => setThemeColor(e.target.value)}
+                                                    className="w-8 h-8 opacity-0 absolute cursor-pointer"
+                                                />
+                                                <Palette className="size-5 text-muted-foreground" />
                                             </div>
-                                        </div>
-                                        <div className="border border-input hover:border-primary/50 rounded-lg p-1 cursor-pointer transition-colors">
-                                            <div className="h-20 bg-emerald-950 rounded-md flex items-center justify-center relative overflow-hidden">
-                                                <div className="absolute top-0 left-0 w-full h-2 bg-emerald-500"></div>
-                                                <span className="text-xs text-white">FinOps Focus</span>
-                                            </div>
+                                            <div className="text-[10px] text-center font-medium text-muted-foreground">Custom</div>
                                         </div>
                                     </div>
-                                    <p className="text-xs text-muted-foreground mt-2">
-                                        Current Theme: <strong>{ctxData.theme}</strong>. Changes apply only to the {currentCollection.name} site.
-                                    </p>
                                 </div>
+
+                                <Separator />
+
+                                {/* Typography */}
+                                <div>
+                                    <label className="text-sm font-medium mb-3 flex items-center gap-2">
+                                        <Type className="size-4" /> Typography
+                                    </label>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div
+                                            className={`p-4 border rounded-lg cursor-pointer transition-all ${fontFamily === 'Inter' ? 'border-primary bg-primary/5' : 'hover:border-primary/50'}`}
+                                            onClick={() => setFontFamily('Inter')}
+                                        >
+                                            <div className="font-sans text-lg font-semibold">Inter (System)</div>
+                                            <div className="text-sm text-muted-foreground">Clean, modern, and legible. The default choice for UI.</div>
+                                        </div>
+                                        <div
+                                            className={`p-4 border rounded-lg cursor-pointer transition-all font-mono ${fontFamily === 'Mono' ? 'border-primary bg-primary/5' : 'hover:border-primary/50'}`}
+                                            onClick={() => setFontFamily('Mono')}
+                                        >
+                                            <div className="text-lg font-semibold">JetBrains Mono</div>
+                                            <div className="text-sm text-muted-foreground">Technical, precise, and code-friendly.</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <Separator />
+
+                                {/* Logo & Naming */}
+                                <div className="space-y-4">
+                                    <label className="text-sm font-medium flex items-center gap-2">
+                                        <ImageIcon className="size-4" /> Brand Assets
+                                    </label>
+                                    <div className="grid gap-4 md:grid-cols-2">
+                                        <div className="space-y-2">
+                                            <Label>Site Name</Label>
+                                            <Input value={siteName} onChange={(e) => setSiteName(e.target.value)} placeholder="CloudBaud" />
+                                            <p className="text-[10px] text-muted-foreground">Appears in the top-left header.</p>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Custom Logo URL</Label>
+                                            <Input value={customLogo} onChange={(e) => setCustomLogo(e.target.value)} placeholder="https://..." />
+                                            <p className="text-[10px] text-muted-foreground">Recommended: Transparent PNG, 40px height.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="pt-4 flex justify-end">
+                                    <Button onClick={handleSaveAppearance}>Save Branding</Button>
+                                </div>
+
                             </CardContent>
                         </Card>
                     </div>
@@ -424,26 +756,31 @@ const SettingsPage = () => {
                                             <span className="text-xs text-muted-foreground">{navItems.length} items</span>
                                         </h4>
                                         <div className="space-y-2">
-                                            {navItems.map((item, idx) => (
-                                                <div key={item.id} className="flex items-center justify-between bg-white dark:bg-slate-800 p-2 border rounded shadow-sm group">
-                                                    <div className="flex items-center gap-2 overflow-hidden">
-                                                        <MoveVertical className="size-4 text-slate-400 cursor-grab flex-shrink-0" />
-                                                        <div className="flex flex-col min-w-0">
-                                                            <span className="text-sm font-medium truncate">{item.label}</span>
-                                                            <span className="text-[10px] text-muted-foreground truncate">{item.href}</span>
+                                            <Reorder.Group axis="y" values={navItems} onReorder={setNavItems} className="space-y-2">
+                                                {navItems.map((item, idx) => (
+                                                    <Reorder.Item key={item.id} value={item} whileDrag={{ scale: 1.02, boxShadow: "0 5px 15px rgba(0,0,0,0.1)" }} className="relative z-10">
+                                                        <div className="flex items-center justify-between bg-white dark:bg-slate-800 p-2 border rounded shadow-sm group cursor-move">
+                                                            <div className="flex items-center gap-2 overflow-hidden pointer-events-none">
+                                                                {/* pointer-events-none on content ensures drag isn't blocked, but we set cursor-move on parent */}
+                                                                <MoveVertical className="size-4 text-slate-400 flex-shrink-0" />
+                                                                <div className="flex flex-col min-w-0">
+                                                                    <span className="text-sm font-medium truncate">{item.label}</span>
+                                                                    <span className="text-[10px] text-muted-foreground truncate">{item.href}</span>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); openEditDialog(item); }}>
+                                                                    <Pencil className="size-3" />
+                                                                </Button>
+                                                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20" onClick={(e) => { e.stopPropagation(); moveItem(item, 'remove'); }}>
+                                                                    <span className="sr-only">Remove</span>
+                                                                    &times;
+                                                                </Button>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => openEditDialog(item)}>
-                                                            <Pencil className="size-3" />
-                                                        </Button>
-                                                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20" onClick={() => moveItem(item, 'remove')}>
-                                                            <span className="sr-only">Remove</span>
-                                                            &times;
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            ))}
+                                                    </Reorder.Item>
+                                                ))}
+                                            </Reorder.Group>
                                             {navItems.length === 0 && (
                                                 <div className="text-center py-4 text-sm text-muted-foreground italic">No links in top bar</div>
                                             )}
@@ -511,10 +848,54 @@ const SettingsPage = () => {
                                                     placeholder="e.g. /sites/marketing OR https://google.com"
                                                 />
                                             </div>
+
+                                            <Separator className="my-2" />
+
+                                            {/* Sub-Navigation Section */}
+                                            <div className="space-y-3">
+                                                <div className="flex items-center justify-between">
+                                                    <Label>Sub-Links (Dropdown)</Label>
+                                                    <span className="text-xs text-muted-foreground">{tempSubItems.length} items</span>
+                                                </div>
+
+                                                {/* List of Subs */}
+                                                {tempSubItems.length > 0 && (
+                                                    <div className="bg-slate-50 dark:bg-slate-900/50 rounded-md p-2 space-y-1 max-h-[150px] overflow-y-auto">
+                                                        {tempSubItems.map(sub => (
+                                                            <div key={sub.id} className="flex items-center justify-between text-sm bg-white dark:bg-slate-800 p-2 rounded border shadow-sm">
+                                                                <div className="flex flex-col">
+                                                                    <span className="font-medium">{sub.label}</span>
+                                                                    <span className="text-[10px] text-muted-foreground">{sub.href}</span>
+                                                                </div>
+                                                                <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:bg-red-50" onClick={() => handleRemoveSubItem(sub.id)}>
+                                                                    <X className="size-3" />
+                                                                </Button>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+
+                                                {/* Add New Sub Inputs */}
+                                                <div className="grid grid-cols-12 gap-2 items-end">
+                                                    <div className="col-span-5 grid gap-1.5">
+                                                        <Label htmlFor="sub-label" className="text-xs">Label</Label>
+                                                        <Input id="sub-label" value={subLabel} onChange={e => setSubLabel(e.target.value)} placeholder="Sub Item" className="h-8 text-sm" />
+                                                    </div>
+                                                    <div className="col-span-5 grid gap-1.5">
+                                                        <Label htmlFor="sub-href" className="text-xs">URL</Label>
+                                                        <Input id="sub-href" value={subHref} onChange={e => setSubHref(e.target.value)} placeholder="/page" className="h-8 text-sm" />
+                                                    </div>
+                                                    <div className="col-span-2">
+                                                        <Button size="sm" variant="secondary" className="w-full h-8" onClick={handleAddSubItem} disabled={!subLabel || !subHref}>
+                                                            <Plus className="size-4" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                         <DialogFooter>
                                             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                                            <Button onClick={handleSaveLink}>Save Link</Button>
+                                            <Button onClick={handleSaveLink} disabled={!tempLabel.trim() || !tempHref.trim()}>Save Link</Button>
                                         </DialogFooter>
                                     </DialogContent>
                                 </Dialog>
@@ -686,11 +1067,15 @@ const SettingsPage = () => {
                 {/* Sidebar */}
                 <div className="md:col-span-3 space-y-6">
                     <div>
-                        <h3 className="mb-2 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        <h3 className="mb-3 px-4 text-sm font-semibold text-primary">
                             My Personal Settings
                         </h3>
                         <nav className="flex flex-col space-y-1">
-                            <Button variant="ghost" className="justify-start gap-2 text-muted-foreground hover:text-foreground">
+                            <Button
+                                variant={activeTab === 'profile' ? 'secondary' : 'ghost'}
+                                className="justify-start gap-2"
+                                onClick={() => setActiveTab('profile')}
+                            >
                                 <User className="size-4" /> My Profile
                             </Button>
                             <Button variant="ghost" className="justify-start gap-2 text-muted-foreground hover:text-foreground">
@@ -700,7 +1085,7 @@ const SettingsPage = () => {
                     </div>
 
                     <div>
-                        <h3 className="mb-2 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        <h3 className="mb-3 px-4 text-sm font-semibold text-primary">
                             {currentCollection.name} Administration
                         </h3>
                         {/* Navigation Items */}
@@ -737,7 +1122,7 @@ const SettingsPage = () => {
                     </div>
 
                     <div>
-                        <h3 className="mb-2 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        <h3 className="mb-3 px-4 text-sm font-semibold text-primary">
                             Site Collection Admin
                         </h3>
                         <nav className="flex flex-col space-y-1">

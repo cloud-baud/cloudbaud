@@ -7,6 +7,7 @@ import MarketingLayout from './components/MarketingLayout';
 import WorkspaceLayout from './components/portal/WorkspaceLayout';
 import PortalDashboard from './components/portal/PortalDashboard';
 import FabricDemo from './components/portal/FabricDemo';
+import FinOpsDashboard from './components/portal/FinOpsDashboard';
 import SettingsPage from './components/portal/SettingsPage';
 import HomePage from './components/HomePage';
 import ServicesPage from './components/ServicesPage';
@@ -51,6 +52,7 @@ function App() {
                 <Route path="/portal" element={<WorkspaceLayout />}>
                   <Route index element={<PortalDashboard />} />
                   <Route path="settings" element={<SettingsPage />} />
+                  <Route path="finances" element={<FinOpsDashboard />} />
                   <Route path="fabric-demo" element={<FabricDemo />} />
                   <Route path="*" element={<PortalDashboard />} />
                 </Route>
