@@ -5,6 +5,7 @@ import GLOBE from 'vanta/dist/vanta.globe.min';
 import { ArrowRight, Code, Cloud, Server, Smartphone, Database, Award, Users, CheckCircle, TrendingUp, Brain, Building, Shield, Activity, BarChart3, Terminal } from 'lucide-react';
 import { Button } from './ui/button';
 import { useTheme } from 'next-themes';
+import { useContent } from '../context/ContentContext';
 import SEO from './SEO';
 import TechnologyStack from './TechnologyStack';
 import ProcessTimeline from './ProcessTimeline';
@@ -14,6 +15,10 @@ import PlatformDashboard from './PlatformDashboard';
 const HomePage = () => {
   const vantaRef = useRef(null);
   const { theme } = useTheme();
+  const contentContext = useContent();
+
+  console.log('HomePage Render - ContentContext:', contentContext);
+  const content = contentContext?.content || {}; // Fallback if context is missing
 
   // We need to store the effect instance in a ref to persist across renders 
   // but we also want to mark when it's active so we don't double-init
@@ -176,6 +181,66 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+      {/* Dynamic AI Showcase Section (Managed via Control Pane) */}
+      {content?.aiShowcase?.enabled && (
+        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-[#020617] relative overflow-hidden border-y border-brand-blue/20">
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay"></div>
+          <div className="max-w-7xl mx-auto relative z-10 flex flex-col md:flex-row items-center gap-12">
+            <div className="flex-1 space-y-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-semibold mb-2">
+                <Brain className="w-4 h-4" />
+                <span>{content.aiShowcase.highlight || "New Capability"}</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+                {content.aiShowcase.title}
+              </h2>
+              <p className="text-xl text-slate-300 leading-relaxed">
+                {content.aiShowcase.description}
+              </p>
+              <div className="flex gap-4 pt-4">
+                <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white font-bold h-12 px-8">
+                  <Link to="/ai-engineering">
+                    Explore AI Agents
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Link>
+                </Button>
+              </div>
+            </div>
+            {/* Visual Representation of Agentic Workflow */}
+            <div className="flex-1 w-full relative">
+              <div className="relative aspect-video bg-slate-900 rounded-xl border border-slate-800 p-6 overflow-hidden shadow-2xl group">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-blue-500"></div>
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
+                        <Bot className="w-4 h-4 text-purple-400" />
+                      </div>
+                      <span className="font-mono text-sm text-slate-400">Agent_Orchestrator_v2</span>
+                    </div>
+                    <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                  </div>
+                  <div className="space-y-3 font-mono text-xs md:text-sm">
+                    <div className="flex gap-3 items-center text-slate-300">
+                      <span className="text-slate-600">INPUT:</span>
+                      <span className="bg-slate-800 px-2 py-1 rounded text-purple-300">"Analyze tax implications for 2024 hiring plan"</span>
+                    </div>
+                    <div className="flex gap-3 items-start text-slate-300">
+                      <span className="text-slate-600 mt-1">PLAN:</span>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2"><CheckCircle className="w-3 h-3 text-green-500" /> Retrieve payroll data (Access: Granted)</div>
+                        <div className="flex items-center gap-2"><CheckCircle className="w-3 h-3 text-green-500" /> Query IRS guidelines (RAG Vector DB)</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 border border-slate-500 rounded-full animate-spin border-t-transparent"></div> Simulating fiscal scenarios...</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Platform Insights Section - THE NANO BANANA INFOGRAPHIC */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-900/40 transition-colors border-y border-slate-200 dark:border-slate-800">

@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useContent } from '../../../context/ContentContext';
 import { useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
     FileDown, Printer, Filter, Plus, Columns, Rows,
     Save, Undo, Redo, Eraser, Bold, Italic,
     AlignLeft, AlignCenter, AlignRight,
-    Lock, LockOpen, Upload, X
+    Lock, LockOpen, Upload, X, Activity
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -157,6 +158,7 @@ const EditableCell = ({ value, onSave, type = 'text', formatter, className, isLo
 };
 
 const TaxDashboard = () => {
+    const { content } = useContent();
     // --- Persistence Helper ---
     const loadState = (key, fallback) => {
         try {
@@ -604,12 +606,12 @@ const TaxDashboard = () => {
                 </div>
             )}
 
-            {/* Content Area: Table + File Pane */}
-            <div className="flex gap-4 items-start mt-2">
+            {/* Content Area: Table + File Pane + Activity Log */}
+            <div className="flex gap-4 items-start mt-2 h-[calc(100vh-200px)]">
                 {/* Main Spreadsheet View */}
                 <div className={cn(
-                    "bg-white dark:bg-[#1a1a1a] border border-slate-300 dark:border-slate-700 shadow-sm overflow-x-auto select-none transition-all duration-300",
-                    showFilePane ? "w-[70%]" : "w-full"
+                    "bg-white dark:bg-[#1a1a1a] border border-slate-300 dark:border-slate-700 shadow-sm overflow-auto select-none transition-all duration-300 h-full",
+                    showFilePane ? "w-[50%]" : (content?.taxActivities?.showLog ? "w-[75%]" : "w-full")
                 )}>
                     <table className="w-full border-collapse min-w-[1000px] table-fixed">
                         <thead>
@@ -816,6 +818,51 @@ const TaxDashboard = () => {
                                     </Button>
                                 </div>
                             )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Activity Log Pane (Controlled by Control Pane) */}
+                {content?.taxActivities?.showLog && !showFilePane && (
+                    <div className="w-[25%] bg-white dark:bg-[#1a1a1a] border border-slate-300 dark:border-slate-700 h-full rounded-lg shadow-sm flex flex-col animate-in slide-in-from-right duration-300 shrink-0">
+                        <div className="flex items-center justify-between p-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                            <h3 className="font-semibold text-sm text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                <Activity className="size-4 text-green-500" />
+                                Tax Activity Log
+                            </h3>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-0">
+                            <div className="p-3 border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer">
+                                <div className="flex items-center justify-between mb-1">
+                                    <span className="text-xs font-bold text-slate-600 dark:text-slate-400">System</span>
+                                    <span className="text-[10px] text-slate-400">Just now</span>
+                                </div>
+                                <p className="text-xs text-slate-500">Dashboard loaded correctly.</p>
+                            </div>
+                            <div className="p-3 border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer">
+                                <div className="flex items-center justify-between mb-1">
+                                    <span className="text-xs font-bold text-brand-blue">Jishnu N.</span>
+                                    <span className="text-[10px] text-slate-400">2h ago</span>
+                                </div>
+                                <p className="text-xs text-slate-500">Updated 2024 W2 Wages for CloudBaud LLC.</p>
+                            </div>
+                            <div className="p-3 border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer">
+                                <div className="flex items-center justify-between mb-1">
+                                    <span className="text-xs font-bold text-brand-blue">Jishnu N.</span>
+                                    <span className="text-[10px] text-slate-400">5h ago</span>
+                                </div>
+                                <p className="text-xs text-slate-500">Attached receipt: <code>server_costs_jan.pdf</code></p>
+                            </div>
+                            <div className="p-3 border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer opacity-50">
+                                <div className="flex items-center justify-between mb-1">
+                                    <span className="text-xs font-bold text-slate-500">AutoSave</span>
+                                    <span className="text-[10px] text-slate-400">Yesterday</span>
+                                </div>
+                                <p className="text-xs text-slate-500">Snapshot created.</p>
+                            </div>
+                        </div>
+                        <div className="p-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                            <Button size="sm" variant="outline" className="w-full text-xs h-8">View Full Audit Trail</Button>
                         </div>
                     </div>
                 )}

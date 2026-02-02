@@ -39,6 +39,8 @@ import AuthRedirector from './components/AuthRedirector';
 import AiEngineeringPage from './components/AiEngineeringPage';
 
 import { AuthProvider } from './context/AuthContext';
+import { ContentProvider } from './context/ContentContext';
+import ContentControl from './components/portal/ContentControl';
 
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -47,76 +49,78 @@ function App() {
     <DynamicMsalProvider>
       <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
         <AuthProvider>
-          <Router>
-            <AuthRedirector />
-            <Routes>
-              {/* Protected Portal Routes */}
-              <Route element={<ProtectedRoute />}>
-                <Route path="/portal" element={<WorkspaceLayout />}>
-                  <Route index element={<PortalDashboard />} />
-                  <Route path="settings" element={<SettingsPage />} />
-                  <Route path="fabric-demo" element={<FabricDemo />} />
+          <ContentProvider>
+            <Router>
+              <AuthRedirector />
+              <Routes>
+                {/* Protected Portal Routes */}
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/portal" element={<WorkspaceLayout />}>
+                    <Route index element={<PortalDashboard />} />
+                    <Route path="settings" element={<SettingsPage />} />
+                    <Route path="fabric-demo" element={<FabricDemo />} />
 
-                  {/* Placeholder Routes for Sidebar Items */}
-                  <Route path="tasks" element={<PlaceholderPage />} />
-                  <Route path="deck" element={<PlaceholderPage />} />
-                  <Route path="interview" element={<PlaceholderPage />} />
-                  <Route path="fundraising" element={<PlaceholderPage />} />
-                  <Route path="engineering" element={<PlaceholderPage />} />
-                  <Route path="network" element={<PlaceholderPage />} />
+                    {/* Placeholder Routes for Sidebar Items */}
+                    <Route path="tasks" element={<PlaceholderPage />} />
+                    <Route path="deck" element={<PlaceholderPage />} />
+                    <Route path="interview" element={<PlaceholderPage />} />
+                    <Route path="fundraising" element={<PlaceholderPage />} />
+                    <Route path="engineering" element={<PlaceholderPage />} />
+                    <Route path="network" element={<PlaceholderPage />} />
 
-                  {/* Business Apps Routes */}
-                  <Route path="finance-board" element={<ContextLayout />}>
-                    <Route index element={<PlaceholderPage />} />
-                    <Route path="taxes" element={<TaxDashboard />} />
-                    <Route path="bookkeeping" element={<PlaceholderPage />} />
-                    <Route path="accounting" element={<PlaceholderPage />} />
-                    <Route path="investments" element={<PlaceholderPage />} />
+                    {/* Business Apps Routes */}
+                    <Route path="finance-board" element={<ContextLayout />}>
+                      <Route index element={<PlaceholderPage />} />
+                      <Route path="taxes" element={<TaxDashboard />} />
+                      <Route path="bookkeeping" element={<PlaceholderPage />} />
+                      <Route path="accounting" element={<PlaceholderPage />} />
+                      <Route path="investments" element={<PlaceholderPage />} />
+                    </Route>
+                    <Route path="support" element={<PlaceholderPage />} />
+                    <Route path="crm" element={<PlaceholderPage />} />
+                    <Route path="sales" element={<PlaceholderPage />} />
+
+                    {/* Catch-all for sub-sites like /sites/consulting to use portal layout */}
+                    <Route path="sites/*" element={<PortalDashboard />} />
+                    <Route path="*" element={<PortalDashboard />} />
                   </Route>
-                  <Route path="support" element={<PlaceholderPage />} />
-                  <Route path="crm" element={<PlaceholderPage />} />
-                  <Route path="sales" element={<PlaceholderPage />} />
 
-                  {/* Catch-all for sub-sites like /sites/consulting to use portal layout */}
-                  <Route path="sites/*" element={<PortalDashboard />} />
-                  <Route path="*" element={<PortalDashboard />} />
+                  {/* Root-level App Modules (Authenticated) */}
+                  <Route path="/finances" element={<WorkspaceLayout />}>
+                    <Route index element={<FinOpsDashboard />} />
+                  </Route>
                 </Route>
 
-                {/* Root-level App Modules (Authenticated) */}
-                <Route path="/finances" element={<WorkspaceLayout />}>
-                  <Route index element={<FinOpsDashboard />} />
+                {/* Marketing Website */}
+                <Route element={<MarketingLayout />}>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/agents" element={<AgentsPage />} />
+                  <Route path="/agents/:slug" element={<AgentDetail />} />
+                  <Route path="/capabilities" element={<CapabilitiesPage />} />
+                  <Route path="/capabilities/:slug" element={<CapabilityDetailPage />} />
+                  <Route path="/capabilities/:slug/:techSlug" element={<TechnologyDetailPage />} />
+                  <Route path="/industries" element={<IndustriesPage />} />
+                  <Route path="/industries/:slug" element={<IndustryDetail />} />
+                  <Route path="/services" element={<ServicesPage />} />
+                  <Route path="/ai-engineering" element={<AiEngineeringPage />} />
+                  <Route path="/portfolio" element={<PortfolioPage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/blog" element={<BlogPage />} />
+                  <Route path="/blog/:slug" element={<BlogPost />} />
+                  <Route path="/careers" element={<CareersPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                  <Route path="/terms-and-conditions" element={<TermsPage />} />
+                  <Route path="/sales" element={<SalesPage />} />
+                  <Route path="/legal" element={<LegalPage />} />
+                  <Route path="/site-map" element={<SiteMapPage />} />
+                  <Route path="/signup" element={<SignupPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/logout" element={<RedirectHandler to="/" />} />
                 </Route>
-              </Route>
-
-              {/* Marketing Website */}
-              <Route element={<MarketingLayout />}>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/agents" element={<AgentsPage />} />
-                <Route path="/agents/:slug" element={<AgentDetail />} />
-                <Route path="/capabilities" element={<CapabilitiesPage />} />
-                <Route path="/capabilities/:slug" element={<CapabilityDetailPage />} />
-                <Route path="/capabilities/:slug/:techSlug" element={<TechnologyDetailPage />} />
-                <Route path="/industries" element={<IndustriesPage />} />
-                <Route path="/industries/:slug" element={<IndustryDetail />} />
-                <Route path="/services" element={<ServicesPage />} />
-                <Route path="/ai-engineering" element={<AiEngineeringPage />} />
-                <Route path="/portfolio" element={<PortfolioPage />} />
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/blog" element={<BlogPage />} />
-                <Route path="/blog/:slug" element={<BlogPost />} />
-                <Route path="/careers" element={<CareersPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-                <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-                <Route path="/terms-and-conditions" element={<TermsPage />} />
-                <Route path="/sales" element={<SalesPage />} />
-                <Route path="/legal" element={<LegalPage />} />
-                <Route path="/site-map" element={<SiteMapPage />} />
-                <Route path="/signup" element={<SignupPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/logout" element={<RedirectHandler to="/" />} />
-              </Route>
-            </Routes>
-          </Router>
+              </Routes>
+            </Router>
+          </ContentProvider>
         </AuthProvider>
       </ThemeProvider>
     </DynamicMsalProvider>

@@ -36,6 +36,7 @@ import { supabase, envInfo } from "@/lib/supabase";
 import { hasHubAdminAccess } from '@/utils/rbac';
 import PageShell from './PageShell';
 import { Database, ArrowRightLeft, Server } from 'lucide-react';
+import ContentControl from './ContentControl';
 
 const collections = [
     { id: 'consulting', name: 'Consulting', type: 'collection', description: 'Client deliverables, engagement letters, and strategy documents.' },
@@ -1475,6 +1476,13 @@ const SettingsPage = () => {
                         </Card>
                     </div>
                 );
+
+            case 'content':
+                return (
+                    <div className="space-y-6">
+                        <ContentControl />
+                    </div>
+                );
             default: return null;
         }
     }
@@ -1588,6 +1596,13 @@ const SettingsPage = () => {
                                 onClick={() => setActiveTab('integrations')}
                             >
                                 <Puzzle className="size-4" /> Integrations
+                            </Button>
+                            <Button
+                                variant={activeTab === 'content' ? 'secondary' : 'ghost'}
+                                className="justify-start gap-2"
+                                onClick={() => setActiveTab('content')}
+                            >
+                                <LayoutGrid className="size-4" /> Content Control
                             </Button>
                             <Button variant="ghost" className="justify-start gap-2 text-muted-foreground hover:text-foreground">
                                 <LayoutGrid className="size-4" /> Site Features
