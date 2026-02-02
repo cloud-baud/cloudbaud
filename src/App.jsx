@@ -9,6 +9,9 @@ import PortalDashboard from './components/portal/PortalDashboard';
 import FabricDemo from './components/portal/FabricDemo';
 import FinOpsDashboard from './components/portal/FinOpsDashboard';
 import SettingsPage from './components/portal/SettingsPage';
+import PlaceholderPage from './components/portal/PlaceholderPage';
+import ContextLayout from './components/portal/ContextLayout';
+import TaxDashboard from './components/portal/finance/TaxDashboard';
 import HomePage from './components/HomePage';
 import ServicesPage from './components/ServicesPage';
 import AboutPage from './components/AboutPage';
@@ -53,6 +56,26 @@ function App() {
                   <Route index element={<PortalDashboard />} />
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="fabric-demo" element={<FabricDemo />} />
+
+                  {/* Placeholder Routes for Sidebar Items */}
+                  <Route path="tasks" element={<PlaceholderPage />} />
+                  <Route path="deck" element={<PlaceholderPage />} />
+                  <Route path="interview" element={<PlaceholderPage />} />
+                  <Route path="fundraising" element={<PlaceholderPage />} />
+                  <Route path="engineering" element={<PlaceholderPage />} />
+                  <Route path="network" element={<PlaceholderPage />} />
+
+                  {/* Business Apps Routes */}
+                  <Route path="finance-board" element={<ContextLayout />}>
+                    <Route index element={<PlaceholderPage />} />
+                    <Route path="taxes" element={<TaxDashboard />} />
+                    <Route path="bookkeeping" element={<PlaceholderPage />} />
+                    <Route path="accounting" element={<PlaceholderPage />} />
+                    <Route path="investments" element={<PlaceholderPage />} />
+                  </Route>
+                  <Route path="support" element={<PlaceholderPage />} />
+                  <Route path="crm" element={<PlaceholderPage />} />
+                  <Route path="sales" element={<PlaceholderPage />} />
 
                   {/* Catch-all for sub-sites like /sites/consulting to use portal layout */}
                   <Route path="sites/*" element={<PortalDashboard />} />

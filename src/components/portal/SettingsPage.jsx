@@ -32,8 +32,10 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { AUTH_CONFIG_CHANGE_EVENT } from '@/components/DynamicMsalProvider';
-import { supabase } from "@/lib/supabase";
+import { supabase, envInfo } from "@/lib/supabase";
+import { hasHubAdminAccess } from '@/utils/rbac';
 import PageShell from './PageShell';
+import { Database, ArrowRightLeft, Server } from 'lucide-react';
 
 const collections = [
     { id: 'consulting', name: 'Consulting', type: 'collection', description: 'Client deliverables, engagement letters, and strategy documents.' },
@@ -1394,6 +1396,85 @@ const SettingsPage = () => {
                         </Card>
                     </div>
                 );
+            case 'hub-admin':
+                if (!hasHubAdminAccess(user)) return null;
+                return (
+                    <div className="space-y-6">
+                        <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 to-slate-800 border border-slate-700 p-6 rounded-xl shadow-lg text-white">
+                            <div className="flex items-start justify-between relative z-10">
+                                <div>
+                                    <h3 className="text-lg font-bold flex items-center gap-2">
+                                        <Shield className="size-5 text-red-500" /> Hub Administration
+                                    </h3>
+                                    <p className="text-slate-300 text-sm mt-1 max-w-lg">
+                                        Restricted Access: You are viewing this because you are logged in as <strong>{user?.email}</strong>.
+                                    </p>
+                                </div>
+                                <div className="px-3 py-1 bg-red-500/20 border border-red-500/50 rounded text-xs font-mono text-red-200">
+                                    GOD MODE
+                                </div>
+                            </div>
+                        </div>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Database className="size-5" /> Database Environment
+                                </CardTitle>
+                                <CardDescription>Manage data flow between Test and Production environments.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className={`p-4 rounded-lg border-2 ${envInfo.isLocalhost ? 'border-green-500 bg-green-500/5' : 'border-slate-200 dark:border-slate-800'}`}>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <div className="font-semibold flex items-center gap-2">
+                                                <Server className="size-4" /> TEST Database
+                                            </div>
+                                            {envInfo.isLocalhost && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded font-bold">ACTIVE (Localhost)</span>}
+                                        </div>
+                                        <div className="text-xs font-mono text-muted-foreground break-all">
+                                            {import.meta.env.VITE_SUPABASE_URL_TEST || 'Inheriting Base URL'}
+                                        </div>
+                                    </div>
+
+                                    <div className={`p-4 rounded-lg border-2 ${!envInfo.isLocalhost ? 'border-blue-500 bg-blue-500/5' : 'border-slate-200 dark:border-slate-800'}`}>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <div className="font-semibold flex items-center gap-2">
+                                                <Server className="size-4" /> PROD Database
+                                            </div>
+                                            {!envInfo.isLocalhost && <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-bold">ACTIVE (Production)</span>}
+                                        </div>
+                                        <div className="text-xs font-mono text-muted-foreground break-all">
+                                            {import.meta.env.VITE_SUPABASE_URL_PROD || 'Inheriting Base URL'}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <Separator />
+
+                                <div className="bg-yellow-50 dark:bg-yellow-900/10 border-l-4 border-yellow-500 p-4">
+                                    <div className="flex items-start">
+                                        <ArrowRightLeft className="size-5 text-yellow-600 mt-0.5 mr-3" />
+                                        <div>
+                                            <h4 className="font-medium text-yellow-900 dark:text-yellow-200">Schema & Data Migration</h4>
+                                            <p className="text-sm text-yellow-800 dark:text-yellow-300 mt-1">
+                                                Migrate delta (schema changes + vital data) from <strong>TEST</strong> to <strong>PROD</strong>. This operation is irreversible.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="mt-4 flex gap-3">
+                                        <Button variant="default" className="bg-yellow-600 hover:bg-yellow-700 text-white" onClick={() => toast.info("Migration Simulator: No changes moved (Safe Mode)")}>
+                                            Dry Run
+                                        </Button>
+                                        <Button variant="destructive" onClick={() => toast.success("Migration Started: Moving delta to Production...")}>
+                                            Migrate to Production
+                                        </Button>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                );
             default: return null;
         }
     }
@@ -1511,6 +1592,17 @@ const SettingsPage = () => {
                             <Button variant="ghost" className="justify-start gap-2 text-muted-foreground hover:text-foreground">
                                 <LayoutGrid className="size-4" /> Site Features
                             </Button>
+
+                            {/* Hub Admin (Restricted) */}
+                            {hasHubAdminAccess(user) && (
+                                <Button
+                                    variant={activeTab === 'hub-admin' ? 'secondary' : 'ghost'}
+                                    className="justify-start gap-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium mt-4 border border-dashed border-red-200 dark:border-red-900"
+                                    onClick={() => setActiveTab('hub-admin')}
+                                >
+                                    <Shield className="size-4" /> Hub Admin
+                                </Button>
+                            )}
                         </nav>
                     </div>
                 </div>
