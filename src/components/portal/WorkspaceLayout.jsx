@@ -28,7 +28,7 @@ import { ScrollArea } from '@radix-ui/react-scroll-area';
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import { Separator } from '@radix-ui/react-separator';
 import { cn } from '@/lib/utils';
-import CloudBaudLogo from '../CloudBaudLogo';
+import CloudBaudLogo from '../common/CloudBaudLogo';
 import { useAuth } from '../../context/AuthContext';
 import {
     DropdownMenu,
@@ -38,7 +38,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import ThemeToggle from '../ThemeToggle';
+import ThemeToggle from '../layout/ThemeToggle';
 import OllamaChatPanel from './OllamaChatPanel';
 import { Sparkles } from 'lucide-react'; // Import icon for the trigger button
 
@@ -115,7 +115,6 @@ const WorkspaceLayout = () => {
             console.error("Failed to parse nav", e);
         }
         return [
-            { id: '1', label: 'Home', href: '/sites/consulting', icon: 'Home' },
             { id: '2', label: 'Documents', href: '/sites/consulting/docs', icon: 'FileText' },
             { id: '3', label: 'Team', href: '/sites/consulting/team', icon: 'Users' }
         ];
@@ -161,7 +160,7 @@ const WorkspaceLayout = () => {
             >
                 {/* Left: Brand + Search */}
                 <div className="flex items-center gap-6">
-                    <Link to="/" className="flex items-center gap-3 font-semibold text-xl hover:opacity-90 transition-opacity text-white shrink-0">
+                    <Link to="/portal" className="flex items-center gap-3 font-semibold text-xl hover:opacity-90 transition-opacity text-white shrink-0">
                         {user?.user_metadata?.custom_logo_url ? (
                             <img src={user.user_metadata.custom_logo_url} alt="Logo" className="h-8 w-auto object-contain" />
                         ) : (
@@ -183,7 +182,6 @@ const WorkspaceLayout = () => {
 
                 {/* Center: Global Navigation Links */}
                 <nav className="hidden lg:flex items-center gap-1 xl:gap-2 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <TopNavItem to="/portal" icon={Home} label="Home" exact />
                     {user?.email === 'jishnunath@gmail.com' && (
                         <TopNavItem to="/finances" icon={PieChart} label="Finances" />
                     )}
@@ -370,7 +368,7 @@ const WorkspaceLayout = () => {
                     <div className="flex-1 bg-white dark:bg-[#0f0f0f] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col relative">
                         <Outlet />
                         {/* Ollama Chat Panel Overlay */}
-                        <OllamaChatPanel isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+                        <OllamaChatPanel isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} variant="overlay" />
                     </div>
                 </main>
             </div>

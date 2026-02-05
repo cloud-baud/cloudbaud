@@ -3,8 +3,8 @@ import { createRoot } from 'react-dom/client'
 import { HelmetProvider } from 'react-helmet-async'
 import { MsalProvider } from "@azure/msal-react";
 import { msalInstance } from "@/lib/authConfig";
-import './index.css'
-import App from './App.jsx'
+import './index.css';
+import App from './App'
 
 // Initialize MSAL outside the root render to avoid re-instantiation
 msalInstance.initialize().then(() => {

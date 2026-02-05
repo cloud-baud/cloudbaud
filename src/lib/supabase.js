@@ -9,12 +9,15 @@ const testUrl = import.meta.env.VITE_SUPABASE_URL_TEST || import.meta.env.VITE_S
 const testKey = import.meta.env.VITE_SUPABASE_ANON_KEY_TEST || import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const forceProd = import.meta.env.VITE_USE_PROD_ON_LOCALHOST === 'true';
 
 // Determine active config based on environment
-// Localhost -> Test DB
+// Localhost -> Test DB (unless forced to Prod)
 // Production -> Prod DB
-const activeUrl = isLocalhost ? testUrl : prodUrl;
-const activeKey = isLocalhost ? testKey : prodKey;
+const useTestConfig = isLocalhost && !forceProd;
+
+const activeUrl = useTestConfig ? testUrl : prodUrl;
+const activeKey = useTestConfig ? testKey : prodKey;
 
 if (!activeUrl || !activeKey) {
     console.warn('Supabase URL or Key missing in environment variables');

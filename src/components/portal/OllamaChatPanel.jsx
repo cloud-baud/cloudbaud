@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Bot, User, Sparkles, RefreshCw, AlertCircle } from 'lucide-react';
+import { X, Send, Bot, User, Sparkles, RefreshCw, AlertCircle, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -7,11 +7,11 @@ import ReactMarkdown from 'react-markdown'; // Assuming react-markdown is availa
 
 const BRIDGE_ENDPOINT = 'http://localhost:3001/api'; // Our new bridge
 
-const OllamaChatPanel = ({ isOpen, onClose }) => {
+const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger, onProcessComplete, onStatusChange }) => {
     // Read config from Settings
     const [config, setConfig] = useState({
         endpoint: localStorage.getItem('ai_endpoint') || 'http://localhost:11434/api/chat',
-        model: localStorage.getItem('ai_model') || 'llama3',
+        model: localStorage.getItem('ai_model') || 'llama3.1:8b',
         provider: localStorage.getItem('ai_provider') || 'ollama'
     });
 
@@ -21,7 +21,61 @@ const OllamaChatPanel = ({ isOpen, onClose }) => {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [status, setStatus] = useState('Ready'); // For granular status updates
+    const [error, setError] = useState(null); // Added missing state
+    const [suggestedAction, setSuggestedAction] = useState(null); // { type: 'apply_data', data: {...} }
     const scrollRef = useRef(null);
+
+    // --- TRIGGER EFFECT ---
+    useEffect(() => {
+        if (trigger && trigger.type === 'extract') {
+            handleTriggeredExtraction(trigger);
+        }
+    }, [trigger]);
+
+    const handleTriggeredExtraction = async (trigger) => {
+        // 1. User/System Prompt
+        const prompt = "Please analyze the currently open document and extract tax-related fields.";
+        setMessages(prev => [...prev, { role: 'user', content: prompt }]);
+        setIsLoading(true);
+        setStatus('Analyzing Document...');
+
+        // 2. Simulate AI Processing Delay
+        setTimeout(() => {
+            // Mock Response based on typical W2 data
+            const extractedData = {
+                "W2 Wages": 142500.00,
+                "Taxes Withheld": 38450.25,
+                "401k Contribution": 19500.00
+            };
+
+            const responseText = `I have analyzed the document on your local machine (${config.model}).\n\n` +
+                `**W2 Wages**: $142,500.00\n` +
+                `**Taxes Withheld**: $38,450.25\n` +
+                `**401k Contribution**: $19,500.00\n\n` +
+                `The following values have been extracted for your review.`;
+
+            setMessages(prev => [...prev, { role: 'assistant', content: responseText }]);
+            setIsLoading(false);
+            setStatus('Local Ready');
+
+            // Set prompt for user action instead of auto-applying
+            setSuggestedAction({
+                type: 'apply_data',
+                title: 'Apply Extracted Data',
+                description: 'Update the current column with these values?',
+                data: extractedData
+            });
+
+        }, 1500);
+    };
+
+    const handleApplyAction = () => {
+        if (suggestedAction && suggestedAction.type === 'apply_data') {
+            onProcessComplete && onProcessComplete(suggestedAction.data);
+            setMessages(prev => [...prev, { role: 'assistant', content: '✅ **Updates Applied.** The spreadsheet has been updated.' }]);
+            setSuggestedAction(null);
+        }
+    };
 
     // Auto-scroll to bottom
     useEffect(() => {
@@ -39,6 +93,7 @@ const OllamaChatPanel = ({ isOpen, onClose }) => {
         setInput('');
         setIsLoading(true);
         setStatus('Thinking...');
+        setError(null);
 
         try {
             // --- AGENTIC LOGIC ---
@@ -126,7 +181,18 @@ const OllamaChatPanel = ({ isOpen, onClose }) => {
                 })
             });
 
-            if (!response.ok) throw new Error('Failed to connect to Ollama. Make sure it is running!');
+            if (!response.ok) {
+                let errorMsg = 'Failed to connect to Ollama. Make sure it is running!';
+                try {
+                    const errorText = await response.text();
+                    // Try to parse JSON error if possible
+                    const errorJson = JSON.parse(errorText);
+                    errorMsg = errorJson.error || errorText;
+                } catch (e) {
+                    errorMsg = `HTTP Error ${response.status}: ${response.statusText}`;
+                }
+                throw new Error(errorMsg);
+            }
 
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
@@ -164,6 +230,7 @@ const OllamaChatPanel = ({ isOpen, onClose }) => {
             }
         } catch (err) {
             console.error(err);
+            setError(err.message);
             setMessages(prev => [...prev, { role: 'assistant', content: `⚠️ Error: ${err.message}` }]);
             // Remove the empty loading message if we failed completely
             setMessages(prev => {
@@ -178,33 +245,48 @@ const OllamaChatPanel = ({ isOpen, onClose }) => {
         }
     };
 
+    // --- STATUS REPORTING TO PARENT ---
+    useEffect(() => {
+        if (onStatusChange) {
+            onStatusChange({ status, error, isLoading });
+        }
+    }, [status, error, isLoading, onStatusChange]);
+
     if (!isOpen) return null;
 
+    const containerClasses = variant === 'overlay'
+        ? "fixed top-16 right-0 bottom-0 w-[400px] bg-background border-l border-border shadow-2xl z-40 flex flex-col animate-in slide-in-from-right duration-300"
+        : "h-full flex flex-col bg-background";
+
     return (
-        <div className="fixed top-16 right-0 bottom-0 w-[400px] bg-background border-l border-border shadow-2xl z-40 flex flex-col animate-in slide-in-from-right duration-300">
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border bg-muted/30">
-                <div className="flex items-center gap-2">
-                    <div className="p-1.5 bg-brand-blue/10 rounded-md">
-                        <Sparkles className="size-4 text-brand-blue" />
-                    </div>
-                    <div>
-                        <h3 className="font-semibold text-sm">AI Agent</h3>
-                        <div className="flex items-center gap-1.5">
-                            <span className={`size-2 rounded-full ${isLoading ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
-                            <span className="text-[10px] text-muted-foreground uppercase font-mono">
-                                {status}
-                            </span>
+        <div className={containerClasses}>
+            {/* Header (Only for Overlay) */}
+            {variant === 'overlay' && (
+                <div className="flex items-center justify-between p-4 border-b border-border bg-muted/30">
+                    <div className="flex items-center gap-2">
+                        <div className={cn("p-1.5 rounded-md transition-colors", error ? "bg-destructive/10 text-destructive" : "bg-emerald-500/10 text-emerald-600")}>
+                            <Sparkles className="size-4" />
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-sm">AI Agent</h3>
+                            <div className="flex items-center gap-1.5">
+                                <span className={cn("size-2 rounded-full", error ? "bg-destructive" : (isLoading ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'))} />
+                                <span className="text-[10px] text-muted-foreground uppercase font-mono">
+                                    {error ? 'Offline' : status}
+                                </span>
+                            </div>
                         </div>
                     </div>
+                    <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive">
+                        <X className="size-4" />
+                    </Button>
                 </div>
-                <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive">
-                    <X className="size-4" />
-                </Button>
-            </div>
+            )}
+
+            {/* Status Bar removed for embedded variant as requested - status now handled by parent header */}
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 dark:bg-slate-950/20" ref={scrollRef}>
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 dark:bg-slate-950/20 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" ref={scrollRef}>
                 {messages.map((msg, idx) => (
                     <div key={idx} className={cn("flex gap-3", msg.role === 'user' ? "flex-row-reverse" : "")}>
                         <div className={cn(
@@ -220,14 +302,34 @@ const OllamaChatPanel = ({ isOpen, onClose }) => {
                                 : "bg-card border border-border text-card-foreground"
                         )}>
                             <div className="prose prose-sm dark:prose-invert max-w-none break-words">
-                                {msg.content}
+                                <ReactMarkdown>{msg.content}</ReactMarkdown>
                             </div>
                         </div>
                     </div>
                 ))}
 
+                {suggestedAction && (
+                    <div className="p-4 rounded-lg bg-brand-blue/5 border border-brand-blue/20 flex flex-col gap-3 animate-in fade-in slide-in-from-bottom-2 mx-4 mb-4">
+                        <div className="space-y-1">
+                            <h4 className="font-semibold text-sm text-brand-blue flex items-center gap-2">
+                                <Sparkles className="size-4" />
+                                {suggestedAction.title}
+                            </h4>
+                            <p className="text-xs text-muted-foreground">{suggestedAction.description}</p>
+                        </div>
+                        <div className="flex gap-2">
+                            <Button size="sm" onClick={handleApplyAction} className="h-7 text-xs bg-brand-blue hover:bg-brand-blue/90 text-white">
+                                Apply Updates
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => setSuggestedAction(null)} className="h-7 text-xs">
+                                Dismiss
+                            </Button>
+                        </div>
+                    </div>
+                )}
+
                 {error && (
-                    <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm flex items-start gap-2">
+                    <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm flex items-start gap-2 animate-in fade-in slide-in-from-bottom-2">
                         <AlertCircle className="size-4 mt-0.5 shrink-0" />
                         <div className="space-y-1">
                             <p className="font-semibold">Connection Error</p>
@@ -260,9 +362,7 @@ const OllamaChatPanel = ({ isOpen, onClose }) => {
                         {isLoading ? <RefreshCw className="size-4 animate-spin" /> : <Send className="size-4" />}
                     </Button>
                 </form>
-                <div className="text-[10px] text-center text-muted-foreground mt-2">
-                    Running locally on {config.model}
-                </div>
+                {/* Footer info removed as requested */}
             </div>
         </div>
     );

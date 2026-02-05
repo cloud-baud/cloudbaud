@@ -202,6 +202,40 @@ export const industries = [
             solution: 'Refactored to microservices with CI/CD automation',
             results: ['10x deployment frequency', '99.99% uptime', '5x faster feature delivery']
         }
+    },
+    {
+        id: 'public-sector',
+        name: 'Public Sector & Government',
+        slug: 'public-sector',
+        icon: 'Landmark',
+        description: 'Secure, compliant modernization for Federal (IRS, DOJ, US Army) and State agencies.',
+        challenges: [
+            'Legacy Mainframe Modernization',
+            'Strict Compliance (FedRAMP/FISMA)',
+            'Citizen Trust & Experience',
+            'Siloed Inter-Agency Data'
+        ],
+        solutions: [
+            {
+                title: 'GovCloud Migration',
+                description: 'Secure workloads on Azure Government & AWS GovCloud (IL4/IL5)'
+            },
+            {
+                title: 'Citizen Service Portals',
+                description: 'Accessible, mobile-friendly digital services for taxpayers and veterans'
+            },
+            {
+                title: 'Fraud Detection AI',
+                description: 'Advanced analytics to prevent tax and benefits fraud'
+            }
+        ],
+        technologies: ['Azure Government (GCC High)', 'Salesforce Public Sector', 'Power Platform', 'Snowflake Gov'],
+        caseStudy: {
+            client: 'State Revenue Agency',
+            challenge: 'Manual processing of tax returns creating 6-month backlog',
+            solution: 'Implemented automated document processing pipeline with AI',
+            results: ['90% reduction in backlog', '24h turnaround time', '$50M recovered revenue']
+        }
     }
 ];
 

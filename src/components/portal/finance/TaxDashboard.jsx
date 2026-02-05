@@ -6,11 +6,13 @@ import {
     FileDown, Printer, Filter, Plus, Columns, Rows,
     Save, Undo, Redo, Eraser, Bold, Italic,
     AlignLeft, AlignCenter, AlignRight,
-    Lock, LockOpen, Upload, X, Activity
+    Lock, LockOpen, Upload, X, Activity, MessageSquare, Bot, Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import WorkspaceChat from '../WorkspaceChat';
+import OllamaChatPanel from '../OllamaChatPanel';
 
 // Initial Data
 const INITIAL_YEARS = [2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
@@ -191,7 +193,8 @@ const TaxDashboard = () => {
     const [lockedState, setLockedState] = useState(() => loadState('tax_dashboard_v2_locks', { cells: {}, rows: {}, cols: {} }));
 
     const [isSaving, setIsSaving] = useState(false);
-    const [showFilePane, setShowFilePane] = useState(false);
+    const [activeRightTab, setActiveRightTab] = useState('chat'); // 'chat' | 'agent' | 'activity' | null
+    const [showFilePanel, setShowFilePanel] = useState(false);
     const [filePreviewUrl, setFilePreviewUrl] = useState(null);
 
     // --- View Mode State ---
@@ -225,7 +228,22 @@ const TaxDashboard = () => {
     const dragRef = useRef({ active: false, type: null, id: null, startPos: 0, startSize: 0 });
     const fileInputRef = useRef(null);
 
+    const [agentTrigger, setAgentTrigger] = useState(null);
+    const [agentStatus, setAgentStatus] = useState({ status: 'Ready', error: null, isLoading: false });
+
     // --- Actions ---
+    const handleRunExtraction = () => {
+        // 1. Open the Agent Panel
+        setActiveRightTab('agent');
+
+        // 2. Send Signal (timestamp ensures effect fires even if already open)
+        setAgentTrigger({
+            type: 'extract',
+            context: 'current_file',
+            timestamp: Date.now()
+        });
+    };
+
     const handleImportClick = () => {
         if (fileInputRef.current) {
             fileInputRef.current.click();
@@ -238,7 +256,7 @@ const TaxDashboard = () => {
             // Create object URL for preview
             const url = URL.createObjectURL(file);
             setFilePreviewUrl(url);
-            setShowFilePane(true);
+            setShowFilePanel(true);
 
             // Reset input so same file can be selected again
             event.target.value = '';
@@ -473,6 +491,12 @@ const TaxDashboard = () => {
     }, []);
 
     const getColStyle = (id) => {
+        // Dynamic resizing when Split View is active to ensure visibility
+        if (showFilePanel && viewMode === 'single') {
+            if (id === 'label') return { width: '60%' };
+            if (id == focusedYear) return { width: '40%' };
+        }
+
         const width = colWidths[id];
         return { width: width === 'auto' ? 'auto' : `${width}px`, minWidth: width === 'auto' ? 'auto' : `${width}px` };
     };
@@ -598,7 +622,7 @@ const TaxDashboard = () => {
                                         {years.map(y => <option key={y} value={y}>{y}</option>)}
                                     </select>
                                 </div>
-                                <RibbonBtn icon={FileDown} label="File Pane" onClick={() => setShowFilePane(!showFilePane)} />
+                                <RibbonBtn icon={FileDown} label="File Pane" onClick={() => setShowFilePanel(!showFilePanel)} />
                                 <div className="text-sm text-slate-500 px-4">View options (Freeze panes, etc.) would go here.</div>
                             </TabsContent>
                         </div>
@@ -606,266 +630,367 @@ const TaxDashboard = () => {
                 </div>
             )}
 
-            {/* Content Area: Table + File Pane + Activity Log */}
-            <div className="flex gap-4 items-start mt-2 h-[calc(100vh-200px)]">
+            {/* Content Area: Table + Right Panel (Tabs) */}
+            <div className="flex items-start mt-2 h-[calc(100vh-200px)] overflow-hidden relative">
                 {/* Main Spreadsheet View */}
-                <div className={cn(
-                    "bg-white dark:bg-[#1a1a1a] border border-slate-300 dark:border-slate-700 shadow-sm overflow-auto select-none transition-all duration-300 h-full",
-                    showFilePane ? "w-[50%]" : (content?.taxActivities?.showLog ? "w-[75%]" : "w-full")
-                )}>
-                    <table className="w-full border-collapse min-w-[1000px] table-fixed">
-                        <thead>
-                            {/* Column Handles Row (A, B, C...) */}
-                            <tr>
-                                {/* Corner Cell */}
-                                <th className="w-8 min-w-[32px] h-6 bg-slate-100 dark:bg-slate-800 border-r border-b border-slate-300 dark:border-slate-700"></th>
+                <div className="flex-1 flex h-full overflow-hidden mr-2">
+                    {/* Main Spreadsheet View */}
+                    <div className={cn(
+                        "bg-white dark:bg-[#1a1a1a] border border-slate-300 dark:border-slate-700 shadow-sm overflow-auto select-none transition-all duration-300 h-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]",
+                        showFilePanel ? "hidden lg:block lg:w-[50%] rounded-r-none border-r-0" : "flex-1 rounded-lg" // 50% if file panel open, else fills space
+                    )}>
+                        <table className="w-full border-collapse min-w-[1000px] table-fixed">
+                            <thead>
+                                {/* Column Handles Row (A, B, C...) */}
+                                <tr>
+                                    {/* Corner Cell */}
+                                    <th className="w-8 min-w-[32px] h-6 bg-slate-100 dark:bg-slate-800 border-r border-b border-slate-300 dark:border-slate-700"></th>
 
-                                {/* Label Column Handle (A) */}
-                                <th
-                                    className={cn(
-                                        "h-6 border-r border-b border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-[10px] text-slate-500 font-mono font-medium text-center relative group select-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800",
-                                        isSelected('col', 'label') && "bg-brand-blue/20 text-brand-blue font-bold"
-                                    )}
-                                    style={getColStyle('label')}
-                                    onClick={() => handleSelectCol('label')}
-                                >
-                                    A
-                                    <div className="absolute inset-y-0 right-0 w-1 md:w-2 cursor-col-resize hover:bg-brand-blue/50 z-20"
-                                        onMouseDown={(e) => startResize(e, 'col', 'label')}
-                                        onDoubleClick={() => handleDoubleClick('col', 'label')}
-                                        onClick={e => e.stopPropagation()}
-                                    />
-                                </th>
-
-                                {/* Year Column Handles (B, C, D...) */}
-                                {visibleYears.map((year, i) => (
+                                    {/* Label Column Handle (A) */}
                                     <th
-                                        key={`handle-${year}`}
                                         className={cn(
-                                            "h-6 border-r border-b border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-[10px] text-slate-500 font-mono font-medium text-center relative group select-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800",
-                                            isSelected('col', year) && "bg-brand-blue/20 text-brand-blue font-bold"
+                                            "h-5 border-r border-b border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-[10px] text-slate-500 font-mono font-medium text-center relative group select-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800",
+                                            isSelected('col', 'label') && "bg-brand-blue/20 text-brand-blue font-bold"
                                         )}
-                                        style={getColStyle(year)}
-                                        onClick={() => handleSelectCol(year)}
+                                        style={getColStyle('label')}
+                                        onClick={() => handleSelectCol('label')}
                                     >
-                                        {String.fromCharCode(66 + i)}
+                                        A
                                         <div className="absolute inset-y-0 right-0 w-1 md:w-2 cursor-col-resize hover:bg-brand-blue/50 z-20"
-                                            onMouseDown={(e) => startResize(e, 'col', year)}
-                                            onDoubleClick={() => handleDoubleClick('col', year)}
+                                            onMouseDown={(e) => startResize(e, 'col', 'label')}
+                                            onDoubleClick={() => handleDoubleClick('col', 'label')}
                                             onClick={e => e.stopPropagation()}
                                         />
                                     </th>
-                                ))}
-                            </tr>
 
-                            {/* Data Headers (Label, Indexes) - Now purely informational */}
-                            <tr>
-                                {/* Gutter Column Header */}
-                                <th className="w-8 min-w-[32px] bg-slate-100 dark:bg-slate-800 border-r border-b border-slate-300 dark:border-slate-700"></th>
-
-                                <th
-                                    className={cn(
-                                        "p-0 border border-slate-300 dark:border-slate-600 bg-[#0f2a4a] text-white relative group box-border h-10 select-none",
-                                        isSelected('col', 'label') && "ring-2 ring-inset ring-brand-aqua z-10"
-                                    )}
-                                    style={getColStyle('label')}
-                                >
-                                    <div className="flex items-center justify-center h-full w-full">Label</div>
-                                </th>
-                                {visibleYears.map(year => (
-                                    <th
-                                        key={year}
-                                        className={cn(
-                                            "p-2 border border-slate-300 dark:border-slate-600 bg-[#0f2a4a] text-white font-bold text-center relative group box-border h-10 cursor-default",
-                                            isSelected('col', year) && "ring-2 ring-inset ring-brand-aqua z-10"
-                                        )}
-                                        style={getColStyle(year)}
-                                    >
-                                        <div
-                                            className="flex items-center justify-center w-full h-full overflow-hidden hover:text-brand-aqua hover:underline cursor-pointer transition-colors"
-                                            onClick={() => setSearchParams({ year: year.toString() })}
-                                            title="Click to focus this year"
+                                    {/* Year Column Handles (B, C, D...) */}
+                                    {visibleYears.map((year, i) => (
+                                        <th
+                                            key={`handle-${year}`}
+                                            className={cn(
+                                                "h-5 border-r border-b border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-[10px] text-slate-500 font-mono font-medium text-center relative group select-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800",
+                                                isSelected('col', year) && "bg-brand-blue/20 text-brand-blue font-bold"
+                                            )}
+                                            style={getColStyle(year)}
+                                            onClick={() => handleSelectCol(year)}
                                         >
-                                            {year}
-                                        </div>
+                                            {String.fromCharCode(66 + i)}
+                                            <div className="absolute inset-y-0 right-0 w-1 md:w-2 cursor-col-resize hover:bg-brand-blue/50 z-20"
+                                                onMouseDown={(e) => startResize(e, 'col', year)}
+                                                onDoubleClick={() => handleDoubleClick('col', year)}
+                                                onClick={e => e.stopPropagation()}
+                                            />
+                                        </th>
+                                    ))}
+                                </tr>
+
+                                {/* Data Headers (Label, Indexes) - Now purely informational */}
+                                <tr>
+                                    {/* Gutter Column Header */}
+                                    <th className="w-8 min-w-[32px] bg-slate-100 dark:bg-slate-800 border-r border-b border-slate-300 dark:border-slate-700"></th>
+
+                                    <th
+                                        className={cn(
+                                            "p-0 border border-slate-300 dark:border-slate-600 bg-[#0f2a4a] text-white relative group box-border h-8 select-none text-center text-xs",
+                                            isSelected('col', 'label') && "ring-2 ring-inset ring-brand-aqua z-10"
+                                        )}
+                                        style={getColStyle('label')}
+                                    >
+                                        <div className="flex items-center justify-center h-full w-full">Label</div>
                                     </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {taxData.map((section, sectionIndex) => (
-                                <React.Fragment key={section.id}>
-                                    {section.title && (
-                                        <tr>
-                                            {/* Gutter for Section Header - Selects all rows in section? Or just placeholder */}
-                                            <td className="w-8 border-r border-b border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800"></td>
+                                    {visibleYears.map(year => (
+                                        <th
+                                            key={year}
+                                            className={cn(
+                                                "p-1 border border-slate-300 dark:border-slate-600 bg-[#0f2a4a] text-white font-bold text-center relative group box-border h-8 cursor-default text-xs",
+                                                isSelected('col', year) && "ring-2 ring-inset ring-brand-aqua z-10"
+                                            )}
+                                            style={getColStyle(year)}
+                                        >
+                                            <div
+                                                className="flex items-center justify-center w-full h-full overflow-hidden hover:text-brand-aqua hover:underline cursor-pointer transition-colors"
+                                                onClick={() => setSearchParams({ year: year.toString() })}
+                                                title="Click to focus this year"
+                                            >
+                                                {year}
+                                            </div>
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {taxData.map((section, sectionIndex) => (
+                                    <React.Fragment key={section.id}>
+                                        {section.title && (
+                                            <tr>
+                                                {/* Gutter for Section Header */}
+                                                <td className="w-8 border-r border-b border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800"></td>
 
-                                            <td className="p-2 border border-slate-300 dark:border-slate-600 bg-[#0f2a4a] text-white font-bold text-left text-lg overflow-hidden truncate">
-                                                <div className="flex items-center gap-2 cursor-pointer hover:text-brand-aqua transition-colors" onClick={() => toggleSection(section.id)}>
-                                                    {collapsedSections[section.id] ? (
-                                                        <span className="text-sm px-1 border border-white/30 rounded">+</span>
-                                                    ) : (
-                                                        <span className="text-sm px-1.5 border border-white/30 rounded">-</span>
-                                                    )}
-                                                    {section.title}
-                                                </div>
-                                            </td>
-                                            {visibleYears.map(year => (
-                                                <td key={year} className="border border-slate-300 dark:border-slate-600 bg-[#0f2a4a]"></td>
-                                            ))}
-                                        </tr>
-                                    )}
-
-                                    {!collapsedSections[section.id] && section.rows.map((row, rowIndex) => {
-                                        const rowId = `${section.id}-${rowIndex}`;
-                                        const h = rowHeights[rowId];
-                                        return (
-                                            <tr key={rowIndex} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" style={{ height: h ? `${h}px` : 'auto' }}>
-                                                {/* Gutter Row Selection */}
-                                                <td
-                                                    className={cn(
-                                                        "w-8 text-[10px] text-center text-slate-400 font-mono bg-slate-50 dark:bg-slate-900 border-r border-b border-slate-300 dark:border-slate-700 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 select-none",
-                                                        isSelected('row', rowId) && "bg-brand-blue/20 text-brand-blue border-r-brand-blue font-bold"
-                                                    )}
-                                                    onClick={() => handleSelectRow(section.id, rowIndex)}
-                                                >
-                                                    {rowIndex + 1}
-                                                </td>
-
-                                                <td
-                                                    className={cn(
-                                                        "p-2 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 font-medium text-sm bg-white dark:bg-[#1a1a1a] relative group overflow-hidden align-middle box-border",
-                                                        isSelected('cell', { sectionId: section.id, rowIndex, colKey: 'label' }) && "bg-brand-blue/10 ring-2 ring-inset ring-brand-blue z-10"
-                                                    )}
-                                                    onClick={() => handleSelectCell(section.id, rowIndex, 'label')}
-                                                >
-                                                    <div className={cn("w-full h-full flex items-center", colWidths.label === 'auto' ? 'whitespace-nowrap' : 'truncate')}>
-                                                        <EditableCell
-                                                            value={row.label}
-                                                            isLocked={isCellLocked(section.id, rowIndex, 'label')}
-                                                            onSave={(val) => handleCellUpdate(section.id, rowIndex, 'label', val)}
-                                                        />
+                                                {/* SECTION HEADER - NOW CENTERED & COMPACT */}
+                                                <td className="py-1 px-2 border border-slate-300 dark:border-slate-600 bg-[#0f2a4a] text-white font-bold text-center text-sm overflow-hidden truncate">
+                                                    <div className="flex items-center justify-center gap-2 cursor-pointer hover:text-brand-aqua transition-colors" onClick={() => toggleSection(section.id)}>
+                                                        {collapsedSections[section.id] ? (
+                                                            <span className="text-[10px] px-1 border border-white/30 rounded">+</span>
+                                                        ) : (
+                                                            <span className="text-[10px] px-1 border border-white/30 rounded">-</span>
+                                                        )}
+                                                        {section.title}
                                                     </div>
-                                                    {(row.label.includes('W2 Wages') || row.label.includes('Child Education')) && (
-                                                        <span className="absolute top-0 right-0 border-t-[8px] border-r-[8px] border-t-red-500 border-r-transparent transform rotate-0 pointer-events-none" />
-                                                    )}
-                                                    <div className="absolute bottom-0 left-0 right-0 h-1 md:h-1.5 cursor-row-resize hover:bg-brand-blue/50 z-20 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                        onMouseDown={(e) => startResize(e, 'row', rowId)}
-                                                        onDoubleClick={() => handleDoubleClick('row', rowId)}
-                                                        onClick={e => e.stopPropagation()}
-                                                    />
                                                 </td>
                                                 {visibleYears.map(year => (
-                                                    <td
-                                                        key={year}
-                                                        className={cn(
-                                                            "p-2 border border-slate-300 dark:border-slate-600 text-right text-slate-700 dark:text-slate-300 text-sm font-mono bg-white dark:bg-[#1a1a1a] whitespace-nowrap overflow-hidden align-middle box-border cursor-pointer",
-                                                            isSelected('cell', { sectionId: section.id, rowIndex, colKey: year }) && "bg-brand-blue/10 ring-2 ring-inset ring-brand-blue z-10"
-                                                        )}
-                                                        onClick={() => handleSelectCell(section.id, rowIndex, year)}
-                                                    >
-                                                        <EditableCell
-                                                            value={row.values[year]}
-                                                            type="number"
-                                                            formatter={formatCurrency}
-                                                            isLocked={isCellLocked(section.id, rowIndex, year)}
-                                                            onSave={(val) => handleCellUpdate(section.id, rowIndex, year, val)}
-                                                            className="justify-end"
-                                                        />
-                                                    </td>
+                                                    <td key={year} className="border border-slate-300 dark:border-slate-600 bg-[#0f2a4a]"></td>
                                                 ))}
                                             </tr>
-                                        );
-                                    })}
+                                        )}
 
-                                    {['w2', 'rental'].includes(section.id) && !collapsedSections[section.id] && (
-                                        <tr>
-                                            <td className="w-8 border-r border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800"></td>
-                                            <td colSpan={visibleYears.length + 1} className="h-6 border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#1a1a1a]"></td>
-                                        </tr>
+                                        {!collapsedSections[section.id] && section.rows.map((row, rowIndex) => {
+                                            const rowId = `${section.id}-${rowIndex}`;
+                                            const h = rowHeights[rowId];
+                                            return (
+                                                <tr key={rowIndex} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" style={{ height: h ? `${h}px` : 'auto' }}>
+                                                    {/* Gutter Row Selection */}
+                                                    <td
+                                                        className={cn(
+                                                            "w-8 text-[10px] text-center text-slate-400 font-mono bg-slate-50 dark:bg-slate-900 border-r border-b border-slate-300 dark:border-slate-700 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 select-none",
+                                                            isSelected('row', rowId) && "bg-brand-blue/20 text-brand-blue border-r-brand-blue font-bold"
+                                                        )}
+                                                        onClick={() => handleSelectRow(section.id, rowIndex)}
+                                                    >
+                                                        {rowIndex + 1}
+                                                    </td>
+
+                                                    <td
+                                                        className={cn(
+                                                            "py-0.5 px-1 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 font-medium text-xs bg-white dark:bg-[#1a1a1a] relative group overflow-hidden align-middle box-border",
+                                                            isSelected('cell', { sectionId: section.id, rowIndex, colKey: 'label' }) && "bg-brand-blue/10 ring-2 ring-inset ring-brand-blue z-10"
+                                                        )}
+                                                        onClick={() => handleSelectCell(section.id, rowIndex, 'label')}
+                                                    >
+                                                        {/* ROW LABEL CELL - NOW CENTERED */}
+                                                        <div className={cn("w-full h-full flex items-center justify-center text-center", colWidths.label === 'auto' ? 'whitespace-nowrap' : 'truncate')}>
+                                                            <EditableCell
+                                                                value={row.label}
+                                                                isLocked={isCellLocked(section.id, rowIndex, 'label')}
+                                                                onSave={(val) => handleCellUpdate(section.id, rowIndex, 'label', val)}
+                                                            />
+                                                        </div>
+                                                        {(row.label.includes('W2 Wages') || row.label.includes('Child Education')) && (
+                                                            <span className="absolute top-0 right-0 border-t-[6px] border-r-[6px] border-t-red-500 border-r-transparent transform rotate-0 pointer-events-none" />
+                                                        )}
+                                                        <div className="absolute bottom-0 left-0 right-0 h-1 md:h-1 cursor-row-resize hover:bg-brand-blue/50 z-20 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                            onMouseDown={(e) => startResize(e, 'row', rowId)}
+                                                            onDoubleClick={() => handleDoubleClick('row', rowId)}
+                                                            onClick={e => e.stopPropagation()}
+                                                        />
+                                                    </td>
+                                                    {visibleYears.map(year => (
+                                                        <td
+                                                            key={year}
+                                                            className={cn(
+                                                                "py-0.5 px-1 border border-slate-300 dark:border-slate-600 text-right text-slate-700 dark:text-slate-300 text-xs font-mono bg-white dark:bg-[#1a1a1a] whitespace-nowrap overflow-hidden align-middle box-border cursor-pointer",
+                                                                isSelected('cell', { sectionId: section.id, rowIndex, colKey: year }) && "bg-brand-blue/10 ring-2 ring-inset ring-brand-blue z-10"
+                                                            )}
+                                                            onClick={() => handleSelectCell(section.id, rowIndex, year)}
+                                                        >
+                                                            <EditableCell
+                                                                value={row.values[year]}
+                                                                type="number"
+                                                                formatter={formatCurrency}
+                                                                isLocked={isCellLocked(section.id, rowIndex, year)}
+                                                                onSave={(val) => handleCellUpdate(section.id, rowIndex, year, val)}
+                                                                className="justify-end"
+                                                            />
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                            );
+                                        })}
+
+                                        {['w2', 'rental'].includes(section.id) && !collapsedSections[section.id] && (
+                                            <tr>
+                                                <td className="w-8 border-r border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800"></td>
+                                                <td colSpan={visibleYears.length + 1} className="h-6 border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#1a1a1a]"></td>
+                                            </tr>
+                                        )}
+                                    </React.Fragment>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* R2 Pane: File View (50% of Main Pane, or 100% on Mobile) */}
+                    {showFilePanel && (
+                        <div className="w-full lg:w-[50%] bg-white dark:bg-[#1a1a1a] border border-slate-300 dark:border-slate-700 h-full rounded-r-lg shadow-sm flex flex-col animate-in slide-in-from-right duration-300 shrink-0 border-l-0">
+                            <div className="flex items-center justify-between p-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                                <h3 className="font-semibold text-sm text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                    <FileDown className="size-4" />
+                                    File Preview
+                                </h3>
+                                <div className="flex items-center gap-2">
+                                    {filePreviewUrl && (
+                                        <Button
+                                            size="sm"
+                                            className="h-8 bg-brand-blue hover:bg-brand-blue/90 text-white shadow-sm flex items-center gap-2 px-3 transition-all"
+                                            onClick={handleRunExtraction}
+                                            title="Extract data from this document to the spreadsheet"
+                                        >
+                                            <Sparkles className="size-3.5" />
+                                            <span className="hidden sm:inline">Run Extraction</span>
+                                        </Button>
                                     )}
-                                </React.Fragment>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-
-                {/* File View Pane (30%) */}
-                {showFilePane && (
-                    <div className="w-[30%] bg-white dark:bg-[#1a1a1a] border border-slate-300 dark:border-slate-700 h-[600px] rounded-lg shadow-sm flex flex-col animate-in slide-in-from-right duration-300 shrink-0">
-                        <div className="flex items-center justify-between p-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                            <h3 className="font-semibold text-sm text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                                <FileDown className="size-4" />
-                                File Preview
-                            </h3>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => setShowFilePane(false)}>
-                                <X className="size-4" />
-                            </Button>
-                        </div>
-                        <div className="flex-1 bg-slate-100 dark:bg-slate-950 p-4 overflow-hidden relative">
-                            {filePreviewUrl ? (
-                                <iframe
-                                    src={filePreviewUrl}
-                                    className="w-full h-full border rounded bg-white"
-                                    title="PDF Preview"
-                                />
-                            ) : (
-                                <div className="flex flex-col items-center justify-center h-full text-slate-400">
-                                    <FileDown className="size-12 mb-2 opacity-50" />
-                                    <p className="text-sm">No file selected</p>
-                                    <Button variant="outline" size="sm" className="mt-4" onClick={() => document.querySelector('input[type="file"]').click()}>
-                                        Select File
+                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200" onClick={() => setShowFilePanel(false)}>
+                                        <X className="size-4" />
                                     </Button>
                                 </div>
-                            )}
+                            </div>
+                            <div className="flex-1 bg-slate-100 dark:bg-slate-950 p-4 overflow-hidden relative">
+                                {filePreviewUrl ? (
+                                    <iframe
+                                        src={filePreviewUrl}
+                                        className="w-full h-full border rounded bg-white"
+                                        title="PDF Preview"
+                                    />
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center h-full text-slate-400">
+                                        <FileDown className="size-12 mb-2 opacity-50" />
+                                        <p className="text-sm">No file selected</p>
+                                        <Button variant="outline" size="sm" className="mt-4" onClick={() => document.querySelector('input[type="file"]').click()}>
+                                            Select File
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
 
-                {/* Activity Log Pane (Controlled by Control Pane) */}
-                {content?.taxActivities?.showLog && !showFilePane && (
-                    <div className="w-[25%] bg-white dark:bg-[#1a1a1a] border border-slate-300 dark:border-slate-700 h-full rounded-lg shadow-sm flex flex-col animate-in slide-in-from-right duration-300 shrink-0">
-                        <div className="flex items-center justify-between p-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                            <h3 className="font-semibold text-sm text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                                <Activity className="size-4 text-green-500" />
-                                Tax Activity Log
-                            </h3>
+                {/* Right Tabbed Panel System (R1) */}
+                <div className="h-full shrink-0 flex">
+                    {/* Content Panel (Slide Out) */}
+                    {activeRightTab && (
+                        <div className="absolute top-0 bottom-0 right-10 w-80 z-50 lg:static lg:z-auto lg:h-full bg-white dark:bg-[#1a1a1a] border border-slate-300 dark:border-slate-700 border-r-0 rounded-l-lg shadow-2xl lg:shadow-sm flex flex-col animate-in slide-in-from-right duration-300">
+                            {/* Header per Tab */}
+                            <div className="flex items-center justify-between p-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 rounded-tl-lg">
+                                <h3 className="font-semibold text-sm text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                    {activeRightTab === 'chat' && <><MessageSquare className="size-4 text-brand-blue" /> Team Chat </>}
+                                    {activeRightTab === 'agent' && (
+                                        <div className={cn("flex items-center gap-2",
+                                            agentStatus.error ? "text-destructive" : (agentStatus.isLoading ? "text-amber-600" : "text-emerald-600")
+                                        )}>
+                                            <Bot className="size-4" />
+                                            AI Agent
+                                            <span className="text-[10px] uppercase font-mono bg-black/5 dark:bg-white/10 px-1 rounded ml-1">
+                                                {agentStatus.error ? 'Offline' : (agentStatus.isLoading ? 'Working' : 'Ready')}
+                                            </span>
+                                        </div>
+                                    )}
+                                    {activeRightTab === 'activity' && <><Activity className="size-4 text-green-500" /> Activity Log </>}
+                                </h3>
+                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => setActiveRightTab(null)}>
+                                    <X className="size-3" />
+                                </Button>
+                            </div>
+
+                            {/* Tab Content */}
+                            <div className="flex-1 overflow-hidden relative">
+                                {activeRightTab === 'chat' && <WorkspaceChat />}
+                                {activeRightTab === 'agent' && (
+                                    <OllamaChatPanel
+                                        trigger={agentTrigger}
+                                        onStatusChange={setAgentStatus}
+                                        onProcessComplete={(data) => {
+                                            const targetYear = (viewMode === 'single' && focusedYear) ? focusedYear : Math.max(...years);
+                                            // ...
+                                            console.log(`Applying data for year ${targetYear}:`, data);
+
+                                            // Fuzzy Map: Extracted Key -> exact row Label match logic or substring
+                                            // Ideally, we'd have stable IDs. For now, matching labels.
+                                            const keyMap = {
+                                                "W2 Wages": "W2 Wages (Primary)",
+                                                "Taxes Withheld": "Federal Tax Withheld",
+                                                "401k Contribution": "401k Contributions"
+                                            };
+
+                                            setTaxData(prev => prev.map(section => {
+                                                const newRows = section.rows.map(row => {
+                                                    // Check if this row matches any extracted key
+                                                    for (const [extractedKey, extractedValue] of Object.entries(data)) {
+                                                        const targetLabel = keyMap[extractedKey] || extractedKey;
+
+                                                        // Simple inclusion check or exact match
+                                                        if (row.label.trim() === targetLabel || (extractedKey === 'Taxes Withheld' && row.label.includes('Withheld'))) {
+                                                            return {
+                                                                ...row,
+                                                                values: {
+                                                                    ...row.values,
+                                                                    [targetYear]: extractedValue
+                                                                }
+                                                            };
+                                                        }
+                                                    }
+                                                    return row;
+                                                });
+                                                return { ...section, rows: newRows };
+                                            }));
+                                        }}
+                                    />
+                                )}
+                                {activeRightTab === 'activity' && (
+                                    <div className="h-full bg-white dark:bg-[#1a1a1a] p-3 text-sm text-slate-500">
+                                        Activity log content placeholder...
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                        <div className="flex-1 overflow-y-auto p-0">
-                            <div className="p-3 border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer">
-                                <div className="flex items-center justify-between mb-1">
-                                    <span className="text-xs font-bold text-slate-600 dark:text-slate-400">System</span>
-                                    <span className="text-[10px] text-slate-400">Just now</span>
-                                </div>
-                                <p className="text-xs text-slate-500">Dashboard loaded correctly.</p>
-                            </div>
-                            <div className="p-3 border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer">
-                                <div className="flex items-center justify-between mb-1">
-                                    <span className="text-xs font-bold text-brand-blue">Jishnu N.</span>
-                                    <span className="text-[10px] text-slate-400">2h ago</span>
-                                </div>
-                                <p className="text-xs text-slate-500">Updated 2024 W2 Wages for CloudBaud LLC.</p>
-                            </div>
-                            <div className="p-3 border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer">
-                                <div className="flex items-center justify-between mb-1">
-                                    <span className="text-xs font-bold text-brand-blue">Jishnu N.</span>
-                                    <span className="text-[10px] text-slate-400">5h ago</span>
-                                </div>
-                                <p className="text-xs text-slate-500">Attached receipt: <code>server_costs_jan.pdf</code></p>
-                            </div>
-                            <div className="p-3 border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer opacity-50">
-                                <div className="flex items-center justify-between mb-1">
-                                    <span className="text-xs font-bold text-slate-500">AutoSave</span>
-                                    <span className="text-[10px] text-slate-400">Yesterday</span>
-                                </div>
-                                <p className="text-xs text-slate-500">Snapshot created.</p>
-                            </div>
-                        </div>
-                        <div className="p-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                            <Button size="sm" variant="outline" className="w-full text-xs h-8">View Full Audit Trail</Button>
-                        </div>
+                    )}
+
+                    {/* Right Edge Tab Strip */}
+                    <div className={cn(
+                        "w-10 h-full flex flex-col items-center py-4 gap-4 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-r-lg",
+                        activeRightTab ? "rounded-none border-l-0" : "rounded-l-lg"
+                    )}>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className={cn("h-8 w-8 rounded-full", activeRightTab === 'chat' ? "bg-white dark:bg-slate-800 shadow-sm text-brand-blue" : "text-slate-500")}
+                            onClick={() => setActiveRightTab(activeRightTab === 'chat' ? null : 'chat')}
+                            title="Team Chat"
+                        >
+                            <MessageSquare className="size-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className={cn("h-8 w-8 rounded-full", activeRightTab === 'agent' ? "bg-white dark:bg-slate-800 shadow-sm text-purple-600" : "text-slate-500")}
+                            onClick={() => setActiveRightTab(activeRightTab === 'agent' ? null : 'agent')}
+                            title="AI Agent"
+                        >
+                            <Bot className="size-4" />
+                        </Button>
+                        {/* File Pane Button (Toggles R2, distinct from R1) */}
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className={cn("h-8 w-8 rounded-full", showFilePanel ? "bg-white dark:bg-slate-800 shadow-sm text-brand-blue" : "text-slate-500")}
+                            onClick={() => setShowFilePanel(!showFilePanel)}
+                            title="File Pane (50%)"
+                        >
+                            <FileDown className="size-4" />
+                        </Button>
+
+                        <Separator className="w-4" />
+
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className={cn("h-8 w-8 rounded-full", activeRightTab === 'activity' ? "bg-white dark:bg-slate-800 shadow-sm text-brand-blue" : "text-slate-500")}
+                            onClick={() => setActiveRightTab(activeRightTab === 'activity' ? null : 'activity')}
+                            title="Activity Log"
+                        >
+                            <Activity className="size-4" />
+                        </Button>
                     </div>
-                )}
+                </div>
             </div>
 
             {/* Hidden File Input for W2 Import */}

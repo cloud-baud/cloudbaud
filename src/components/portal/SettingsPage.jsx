@@ -105,7 +105,6 @@ const SettingsPage = () => {
         // We sync with Supabase in useEffect once user is loaded
         const saved = localStorage.getItem('portal_nav_active');
         return saved ? JSON.parse(saved) : [
-            { id: '1', label: 'Home', href: '/sites/consulting' },
             { id: '2', label: 'Documents', href: '/sites/consulting/docs' },
             { id: '3', label: 'Team', href: '/sites/consulting/team' }
         ];

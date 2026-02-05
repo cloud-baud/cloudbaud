@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import { ThemeProvider } from 'next-themes';
-import DynamicMsalProvider from './components/DynamicMsalProvider';
-import MarketingLayout from './components/MarketingLayout';
+import DynamicMsalProvider from './components/auth/DynamicMsalProvider';
+import MarketingLayout from './components/layout/MarketingLayout';
 import WorkspaceLayout from './components/portal/WorkspaceLayout';
 import PortalDashboard from './components/portal/PortalDashboard';
 import FabricDemo from './components/portal/FabricDemo';
@@ -12,37 +12,38 @@ import SettingsPage from './components/portal/SettingsPage';
 import PlaceholderPage from './components/portal/PlaceholderPage';
 import ContextLayout from './components/portal/ContextLayout';
 import TaxDashboard from './components/portal/finance/TaxDashboard';
-import HomePage from './components/HomePage';
-import ServicesPage from './components/ServicesPage';
-import AboutPage from './components/AboutPage';
-import ContactPage from './components/ContactPage';
-import PortfolioPage from './components/PortfolioPage';
-import BlogPage from './components/BlogPage';
-import BlogPost from './components/BlogPost';
-import CareersPage from './components/CareersPage';
-import AgentsPage from './components/AgentsPage';
-import AgentDetail from './components/AgentDetail';
-import CapabilitiesPage from './components/CapabilitiesPage';
-import CapabilityDetailPage from './components/CapabilityDetailPage';
-import TechnologyDetailPage from './components/TechnologyDetailPage';
-import IndustriesPage from './components/IndustriesPage';
-import IndustryDetail from './components/IndustryDetail';
-import PrivacyPolicyPage from './components/PrivacyPolicyPage';
-import TermsPage from './components/TermsPage';
-import SalesPage from './components/SalesPage';
-import LegalPage from './components/LegalPage';
-import SiteMapPage from './components/SiteMapPage';
-import SignupPage from './components/SignupPage';
-import LoginPage from './components/LoginPage';
-import RedirectHandler from './components/RedirectHandler';
-import AuthRedirector from './components/AuthRedirector';
-import AiEngineeringPage from './components/AiEngineeringPage';
+import HomePage from './pages/HomePage';
+import ServicesPage from './pages/ServicesPage';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import PortfolioPage from './pages/PortfolioPage';
+
+import BlogPage from './pages/BlogPage';
+import BlogPost from './pages/BlogPost';
+import CareersPage from './pages/CareersPage';
+import AgentsPage from './pages/AgentsPage';
+import AgentDetail from './pages/AgentDetail';
+import CapabilitiesPage from './pages/CapabilitiesPage';
+import CapabilityDetailPage from './pages/CapabilityDetailPage';
+import TechnologyDetailPage from './pages/TechnologyDetailPage';
+import IndustriesPage from './pages/IndustriesPage';
+import IndustryDetail from './pages/IndustryDetail';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsPage from './pages/TermsPage';
+import SalesPage from './pages/SalesPage';
+import LegalPage from './pages/LegalPage';
+import SiteMapPage from './pages/SiteMapPage';
+import SignupPage from './pages/SignupPage';
+import LoginPage from './pages/LoginPage';
+import RedirectHandler from './components/auth/RedirectHandler';
+import AuthRedirector from './components/auth/AuthRedirector';
+import AiEngineeringPage from './pages/AiEngineeringPage';
 
 import { AuthProvider } from './context/AuthContext';
 import { ContentProvider } from './context/ContentContext';
 import ContentControl from './components/portal/ContentControl';
 
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
   return (
@@ -104,6 +105,7 @@ function App() {
                   <Route path="/services" element={<ServicesPage />} />
                   <Route path="/ai-engineering" element={<AiEngineeringPage />} />
                   <Route path="/portfolio" element={<PortfolioPage />} />
+
                   <Route path="/about" element={<AboutPage />} />
                   <Route path="/blog" element={<BlogPage />} />
                   <Route path="/blog/:slug" element={<BlogPost />} />
@@ -119,6 +121,8 @@ function App() {
                   <Route path="/logout" element={<RedirectHandler to="/" />} />
                 </Route>
               </Routes>
+              {/* Dev Tools (Only visible in Development) */}
+              <DevPersonaSwitcher />
             </Router>
           </ContentProvider>
         </AuthProvider>
@@ -128,4 +132,3 @@ function App() {
 }
 
 export default App;
-

@@ -19,17 +19,17 @@ const SUB_NAVS = {
     'finance': [
         {
             label: 'Taxes',
-            href: '/portal/finance-board',
+            href: '/portal/finance-board/taxes',
             icon: Calculator,
             children: [
-                { label: '2024', href: '/portal/finance-board?year=2024' },
-                { label: '2023', href: '/portal/finance-board?year=2023' },
-                { label: '2022', href: '/portal/finance-board?year=2022' },
-                { label: '2021', href: '/portal/finance-board?year=2021' },
-                { label: '2020', href: '/portal/finance-board?year=2020' },
-                { label: '2019', href: '/portal/finance-board?year=2019' },
-                { label: '2018', href: '/portal/finance-board?year=2018' },
-                { label: '2017', href: '/portal/finance-board?year=2017' }
+                { label: '2024', href: '/portal/finance-board/taxes?year=2024' },
+                { label: '2023', href: '/portal/finance-board/taxes?year=2023' },
+                { label: '2022', href: '/portal/finance-board/taxes?year=2022' },
+                { label: '2021', href: '/portal/finance-board/taxes?year=2021' },
+                { label: '2020', href: '/portal/finance-board/taxes?year=2020' },
+                { label: '2019', href: '/portal/finance-board/taxes?year=2019' },
+                { label: '2018', href: '/portal/finance-board/taxes?year=2018' },
+                { label: '2017', href: '/portal/finance-board/taxes?year=2017' }
             ]
         },
         { label: 'Bookkeeping', href: '/portal/finance-board/bookkeeping', icon: BookOpen },
