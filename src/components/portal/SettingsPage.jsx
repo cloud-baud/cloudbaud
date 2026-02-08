@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { AUTH_CONFIG_CHANGE_EVENT } from '@/components/DynamicMsalProvider';
+import { AUTH_CONFIG_CHANGE_EVENT } from '@/components/auth/DynamicMsalProvider';
 import { supabase, envInfo } from "@/lib/supabase";
 import { hasHubAdminAccess } from '@/utils/rbac';
 import PageShell from './PageShell';
@@ -154,6 +154,7 @@ const SettingsPage = () => {
                 setAvailableLinks(cloudAvailable);
             }
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user?.id]); // Only run when user ID changes (login/load)
 
     // Persist navigation changes to LocalStorage AND Supabase
@@ -982,7 +983,7 @@ const SettingsPage = () => {
                                         </h4>
                                         <div className="space-y-2">
                                             <Reorder.Group axis="y" values={navItems} onReorder={setNavItems} className="space-y-2">
-                                                {navItems.map((item, idx) => (
+                                                {navItems.map((item) => (
                                                     <Reorder.Item key={item.id} value={item} whileDrag={{ scale: 1.02, boxShadow: "0 5px 15px rgba(0,0,0,0.1)" }} className="relative z-10">
                                                         <div className="flex items-center justify-between bg-white dark:bg-slate-800 p-2 border rounded shadow-sm group cursor-move">
                                                             <div className="flex items-center gap-2 overflow-hidden pointer-events-none">
@@ -1128,7 +1129,7 @@ const SettingsPage = () => {
                         </Card>
                     </div>
                 );
-            case 'integrations':
+            case 'integrations': {
                 const isAuthenticated = accounts.length > 0;
                 return (
                     <>
@@ -1315,6 +1316,7 @@ const SettingsPage = () => {
                         </div>
                     </>
                 );
+            }
             case 'hub':
                 return (
                     <div className="space-y-6">

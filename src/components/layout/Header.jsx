@@ -5,8 +5,8 @@ import { Button } from '../ui/button';
 import ThemeToggle from './ThemeToggle';
 
 
-import logo from '../assets/images/cloudbaud_logo.png';
-import logoIcon from '../assets/images/cloudbaud_icon.png';
+import logo from '../../assets/images/cloudbaud_logo.png';
+import logoIcon from '../../assets/images/cloudbaud_icon.png';
 // Image import removed
 
 
