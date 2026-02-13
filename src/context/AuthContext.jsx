@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { toast } from 'sonner';
 
 const AuthContext = createContext({});
 
@@ -18,6 +19,21 @@ export const AuthProvider = ({ children }) => {
         const isAuthCallback = window.location.hash.includes('access_token') || 
                               window.location.hash.includes('type=magiclink') || 
                               window.location.search.includes('code=');
+
+        // Check for error in URL (OAuth failures)
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        const errorDesc = urlParams.get('error_description');
+        if (error) {
+            console.error('Auth Callback Error:', error, errorDesc);
+            // Delay toast slightly to ensure Toaster is mounted
+            setTimeout(() => {
+                toast.error(`Login Failed: ${errorDesc || error}`, {
+                    description: "Please check your Supabase/LinkedIn redirect configurations.",
+                    duration: 8000,
+                });
+            }, 500);
+        }
 
         async function getSession() {
             try {

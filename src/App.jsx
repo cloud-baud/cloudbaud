@@ -62,6 +62,7 @@ import AccessManagement from './collaboration/admin/AccessManagement';
 import CmdbDashboard from './collaboration/it/CmdbDashboard';
 import CalendarPage from './collaboration/productivity/CalendarPage';
 import BookingPage from './pages/BookingPage';
+import { Toaster } from './shared/ui/sonner';
 
 function App() {
   console.log('App: Rendering...');
@@ -71,6 +72,7 @@ function App() {
         <AuthProvider>
           <ContentProvider>
             <Router>
+              <Toaster />
               <AuthRedirector />
               <Routes>
                 <Route path="/book" element={<BookingPage />} />
