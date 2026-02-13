@@ -51,12 +51,19 @@
   /* Brushed Steel */
   --color-steel-light: #f8fafc;
   --color-steel-dark: #0f172a;
+  --image-steel-gradient: var(--steel-gradient);
 }
 
 :root {
   --radius: 0.625rem;
   /* Steel Metal Finish - Light Mode */
-  --background: radial-gradient(circle at 50% -20%, #e2e8f0 0%, #cbd5e1 50%, #94a3b8 100%);
+  --background: #e2e8f0;
+  --steel-gradient: radial-gradient(
+    circle at 50% -20%,
+    #e2e8f0 0%,
+    #cbd5e1 50%,
+    #94a3b8 100%
+  );
   --foreground: #0f172a;
   --card: rgba(255, 255, 255, 0.7);
   --card-foreground: #0f172a;
@@ -91,7 +98,13 @@
 
 .dark {
   /* Steel Metal Finish - Dark Mode - Deep Industrial Slate */
-  --background: radial-gradient(circle at 50% -20%, #1e293b 0%, #0f172a 40%, #020617 100%);
+  --background: #0f172a;
+  --steel-gradient: radial-gradient(
+    circle at 50% -20%,
+    #1e293b 0%,
+    #0f172a 40%,
+    #020617 100%
+  );
   --foreground: #f8fafc;
   --card: rgba(15, 23, 42, 0.8);
   --card-foreground: #f8fafc;
@@ -131,6 +144,6 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground bg-[image:var(--steel-gradient)] bg-fixed bg-no-repeat bg-cover;
   }
 }

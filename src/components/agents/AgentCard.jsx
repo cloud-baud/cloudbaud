@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { PenTool, Users, TrendingUp, ArrowRight, Check } from 'lucide-react';
-import { Button } from '../ui/button';
+import { Button } from '@/shared/ui/button';
 
 const iconMap = {
     PenTool,

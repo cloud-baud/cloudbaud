@@ -14,13 +14,22 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         let mounted = true;
 
+        // Check for auth callback parameters in URL
+        const isAuthCallback = window.location.hash.includes('access_token') || 
+                              window.location.hash.includes('type=magiclink') || 
+                              window.location.search.includes('code=');
+
         async function getSession() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (mounted) {
                     setSession(session);
                     setUser(session?.user ?? null);
-                    setLoading(false);
+                    // Only stop loading if we aren't waiting for a callback redirect
+                    // OR if we already have a session (callback matched)
+                    if (!isAuthCallback || session) {
+                        setLoading(false);
+                    }
                 }
             } catch (err) {
                 console.error('Session error:', err);
@@ -42,9 +51,17 @@ export const AuthProvider = ({ children }) => {
                     return session?.user ?? null;
                 });
 
+                // Always stop loading on auth state change (success or fail)
                 setLoading(false);
             }
         });
+        
+        // Safety timeout: If url looked like auth but nothing happened, stop loading eventually
+        if (isAuthCallback) {
+            setTimeout(() => {
+                 if (mounted) setLoading((l) => l ? false : l);
+            }, 5000);
+        }
 
         return () => {
             mounted = false;
@@ -52,13 +69,46 @@ export const AuthProvider = ({ children }) => {
         };
     }, []);
 
+    // Helper: Check if email is allowed
+    const checkAccess = async (email) => {
+        try {
+            const { data: patterns, error } = await supabase
+                .from('allowed_access')
+                .select('email_pattern')
+                .eq('is_active', true);
+
+            if (error) throw error;
+
+            const emailLower = email.toLowerCase();
+            const isAllowed = patterns?.some(p => {
+                const pattern = p.email_pattern.toLowerCase();
+                // Check for domain wildcard (starts with @) or exact match
+                return pattern.startsWith('@') 
+                    ? emailLower.endsWith(pattern) 
+                    : emailLower === pattern;
+            });
+
+            if (!isAllowed) {
+                throw new Error('Access Restricted: Your email is not on the allowed list.');
+            }
+            return true;
+        } catch (err) {
+            console.error('Access check failed:', err);
+            // If it's our specific error, rethrow it. Otherwise generic error.
+            if (err.message.startsWith('Access')) throw err;
+            throw new Error('Unable to verify access permissions.');
+        }
+    };
+
     const signInWithEmail = async (email, password) => {
+        await checkAccess(email);
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         return data;
     };
 
     const signInWithOAuth = async (provider) => {
+        // OAuth checks happen post-login or via DB triggers since we don't have email yet
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: provider,
             options: {
@@ -70,6 +120,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const signInWithOtp = async (email) => {
+        await checkAccess(email);
         const { data, error } = await supabase.auth.signInWithOtp({
             email,
             options: {
@@ -92,6 +143,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const signUpWithEmail = async (email, password, metadata = {}) => {
+        await checkAccess(email);
         const { data, error } = await supabase.auth.signUp({
             email,
             password,

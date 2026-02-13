@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Button } from '../ui/button';
+import { Button } from '@/shared/ui/button';
 import { Building2, Linkedin } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -15,8 +15,12 @@ const SocialAuthButtons = () => {
             setLoading(true);
             await signInWithOAuth(provider);
         } catch (error) {
-            console.error(error);
-            toast.error(`Failed to login with ${provider}`);
+            console.error("OAuth Error:", error);
+            if (error.status === 400 || error.message?.includes("400")) {
+                 toast.error(`Config Error: ${provider} is not enabled in Supabase OR 'http://localhost:17117' is not in Redirect URLs.`);
+            } else {
+                 toast.error(error.message || `Failed to login with ${provider}`);
+            }
             setLoading(false);
         }
     };

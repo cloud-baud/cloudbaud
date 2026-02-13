@@ -1,35 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { MsalProvider } from "@azure/msal-react";
-import { msalInstance as defaultInstance, createMsalInstance } from "../../lib/authConfig";
-import { graphService } from "../../services/graphService";
+// import { MsalProvider } from "@azure/msal-react"; // Temporarily disabled
+import { msalInstance as defaultInstance } from "../../lib/authConfig";
 
-// Event name for when the auth config changes
 export const AUTH_CONFIG_CHANGE_EVENT = 'auth-config-change';
 
 const DynamicMsalProvider = ({ children }) => {
-    const [instance, setInstance] = useState(defaultInstance);
-
-    useEffect(() => {
-        const handleConfigChange = () => {
-            console.log("Re-initializing MSAL with new configuration...");
-            const newInstance = createMsalInstance();
-            setInstance(newInstance);
-
-            // Important: Update the service singleton too
-            graphService.setMsalInstance(newInstance);
-        };
-
-        window.addEventListener(AUTH_CONFIG_CHANGE_EVENT, handleConfigChange);
-
-        return () => {
-            window.removeEventListener(AUTH_CONFIG_CHANGE_EVENT, handleConfigChange);
-        };
-    }, []);
-
+    // Just render children for now to unblock the UI
+    console.log("DynamicMsalProvider: Rendering children directly (Bypass Mode)");
     return (
-        <MsalProvider instance={instance}>
+        <div data-msal-bypass="true">
             {children}
-        </MsalProvider>
+        </div>
     );
 };
 

@@ -28,7 +28,7 @@ const AuthRedirector = () => {
 
             if (isAuthCallback) {
                 // Redirect to portal if we detected an auth callback
-                navigate('/portal', { replace: true });
+                navigate('/collaboration', { replace: true });
             }
         } catch (e) {
             console.error("Error parsing URL in AuthRedirector", e);

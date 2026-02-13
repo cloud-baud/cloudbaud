@@ -26,6 +26,19 @@ class FabricDemo:
         
         # Try multiple time ranges for better reliability
         now = datetime.now(timezone.utc)
+
+        # distinct: Check connectivity first to fail fast if offline
+        try:
+            # Check a likely existing file (6 hours ago)
+            check_time = now - timedelta(hours=6)
+            check_url = f"https://data.gharchive.org/{check_time.strftime('%Y-%m-%d-%H')}.json.gz"
+            print(f"Checking connectivity to {check_url}...")
+            requests.head(check_url, timeout=2) # Short timeout for connectivity check
+        except (requests.ConnectionError, requests.Timeout) as e:
+            print(f"✗ Connectivity check failed: {e}")
+            print("→ Switching to offline demo mode immediately")
+            return False
+
         
         # Try different hour ranges to find available data
         hour_ranges = [
@@ -46,8 +59,8 @@ class FabricDemo:
                 url = f"https://data.gharchive.org/{hour_time.strftime('%Y-%m-%d-%H')}.json.gz"
                 
                 try:
-                    print(f"Trying: {url}")
-                    response = requests.get(url, timeout=30)
+                    print(f"Trying: {url} (timeout=3s)")
+                    response = requests.get(url, timeout=3)
                     response.raise_for_status()
                     
                     decompressed = gzip.decompress(response.content).decode('utf-8')

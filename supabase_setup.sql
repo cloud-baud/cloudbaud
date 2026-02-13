@@ -16,6 +16,7 @@ alter table public.assessments enable row level security;
 
 -- Policy: Allow authenticated users to insert their own assessments
 -- (Or allow anon if public discovery is allowed, assuming anon key usage)
+drop policy if exists "Allow insert for all users" on public.assessments;
 create policy "Allow insert for all users"
 on public.assessments
 for insert
@@ -23,6 +24,7 @@ with check (true);
 
 -- Policy: Allow users to view their own assessments (based on email match or auth.uid())
 -- Assuming email matching for now since auth might be loose
+drop policy if exists "Allow select for own email" on public.assessments;
 create policy "Allow select for own email"
 on public.assessments
 for select
@@ -30,6 +32,8 @@ using (auth.uid() = id); -- This is placeholder, real policy depends on auth set
 -- If using anon key without auth, we might just allow insert and select by ID if known.
 
 -- For admin dashboard (service role will bypass RLS), but for client dashboard:
+-- Using DROP IF EXISTS to handle re-runs
+drop policy if exists "Allow read for own records" on public.assessments;
 create policy "Allow read for own records"
 on public.assessments
 for select
@@ -40,6 +44,7 @@ using (true); -- TEMPORARY: Allow reading all (for demo dashboard simplicity)
 alter table public.assessments add column if not exists user_id uuid references auth.users(id);
 
 -- Update policy to use user_id if available
+-- Note: duplicated drop/create logic from above, consolidating to the final desired state
 drop policy if exists "Allow read for own records" on public.assessments;
 create policy "Allow read for own records"
 on public.assessments

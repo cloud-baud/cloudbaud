@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { ChevronLeft, ChevronRight, Star, Quote } from 'lucide-react';
 import { testimonials } from '../../data/testimonials';
-import { Button } from '../ui/button';
+import { Button } from '@/shared/ui/button';
 
 const TestimonialCarousel = () => {
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });

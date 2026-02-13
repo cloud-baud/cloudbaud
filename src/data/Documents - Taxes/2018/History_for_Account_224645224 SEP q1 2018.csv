@@ -1,0 +1,53 @@
+Run Date,Action,Symbol,Security Description,Security Type,Quantity,Price ($),Commission ($),Fees ($),Accrued Interest ($),Amount ($),Settlement Date
+ 03/29/2018, INTEREST EARNED, QHMAQ, FDIC INSURED DEPOSIT AT DISCOVER BANK I,Cash,,,,,,0.14,
+ 03/29/2018, YOU BOUGHT, TNDM, TANDEM DIABETES CARE INC COM NEW,Cash,300,4.95,4.95,,,-1489.95, 04/03/2018
+ 03/29/2018, YOU BOUGHT, TNDM, TANDEM DIABETES CARE INC COM NEW,Cash,100,4.94,4.95,,,-498.85, 04/03/2018
+ 03/27/2018, YOU SOLD, TEUM, PARETEUM CORP COM NEW,Cash,-500,3.13,4.95,0.04,,1560.26, 03/29/2018
+ 03/26/2018, YOU SOLD, DXR, DAXOR CORP,Cash,-100,9.83,4.95,0.03,,978.09, 03/28/2018
+ 03/21/2018, YOU BOUGHT, AVGR, AVINGER INC COM NEW,Cash,100,1.22,4.95,,,-126.85, 03/23/2018
+ 03/15/2018, EARLY DIST NO EXCEPT VS X86-337692-1     CASH, , No Description,Cash,,,,,,-800, 
+ 03/13/2018, YOU BOUGHT, TNDM, TANDEM DIABETES CARE INC COM NEW,Cash,100,3.77,4.95,,,-381.95, 03/15/2018
+ 03/13/2018, YOU BOUGHT, SYNC, SYNACOR INC COM,Cash,100,2.13,4.95,,,-217.95, 03/15/2018
+ 03/13/2018, YOU BOUGHT, SPEX, SPHERIX INC COM PAR NEW,Cash,100,2.14,4.95,,,-219.44, 03/15/2018
+ 03/13/2018, YOU BOUGHT, SRNE, SORRENTO THERAPEUTICS INC COM NEW,Cash,100,7.6,4.95,,,-765.15, 03/15/2018
+ 03/13/2018, YOU BOUGHT,750459109, RADISYS CORP *CASH MERGER AT $1.72 PER ,Cash,100,0.8,4.95,,,-84.84, 03/15/2018
+ 03/13/2018, YOU BOUGHT, OHGI, ONE HORIZON GROUP INC COM,Cash,100,1.14,4.95,,,-119.28, 03/15/2018
+ 03/13/2018, YOU BOUGHT, 64065J106, NEOVASC INC COM ISIN CA64065J1066 SEDOL,Cash,1000,0.15,4.95,,,-157.95, 03/15/2018
+ 03/13/2018, YOU BOUGHT, NSPR, INSPIREMD INC COM USD0.0001,Cash,100,2.58,4.95,,,-262.87, 03/15/2018
+ 03/13/2018, YOU BOUGHT, FTFT, FUTURE FINTECH GROUP INC COM,Cash,100,2.8,4.95,,,-284.95, 03/15/2018
+ 03/13/2018, YOU BOUGHT, EKSO, EKSO BIONICS HLDGS INC COM NEW,Cash,100,1.7,4.95,,,-174.84, 03/15/2018
+ 03/13/2018, YOU BOUGHT, DXR, DAXOR CORP,Cash,100,5.26,4.95,,,-530.95, 03/15/2018
+ 03/13/2018, YOU BOUGHT, CNET, CHINANET ONLINE HOLDINGS INC COM USD0.0,Cash,100,2.48,4.95,,,-252.85, 03/15/2018
+ 03/13/2018, YOU BOUGHT, 12542Q508, CHF SOLUTIONS INC COM NEW 1 FOR 14 R/S ,Cash,100,3.94,4.95,,,-399.34, 03/15/2018
+ 03/13/2018, YOU BOUGHT, BUROF, BURCON NUTRASCIENCE CORP COM NPV ISIN #,Cash,300,0.49,4.95,,,-152.7, 03/15/2018
+ 03/09/2018, CONTRIBUTION         SEP CONTRIBUTION, , No Description,Cash,,,,,,5000, 
+ 03/06/2018, YOU BOUGHT, VTGN, VISTAGEN THERAPEUTICS INC COM NEW,Cash,100,1.48,4.95,,,-152.9, 03/08/2018
+ 03/06/2018, YOU BOUGHT, 45790J305, INPIXON COM NEW 1 FOR 40 R/S INTO INPIX,Cash,100,1.5,4.95,,,-154.47, 03/08/2018
+ 03/06/2018, YOU BOUGHT, GNCA, GENOCEA BIOSCIENCES INC COM USD0.001,Cash,100,1.17,4.95,,,-121.47, 03/08/2018
+ 03/06/2018, YOU BOUGHT, GENE, GENETIC TECHNOLOGIES LTD SPONSORED ADR,Cash,100,1.41,4.95,,,-145.55, 03/08/2018
+ 03/06/2018, YOU BOUGHT,315721308, FIBROCELL SCIENCE INC COM PAR 1 FOR 5 R,Cash,100,0.64,4.95,,,-69.14, 03/08/2018
+ 03/06/2018, YOU BOUGHT,286221106, ELEVEN BIOTHERAPEUTICS INC COM,Cash,100,1.08,4.95,,,-112.47, 03/08/2018
+ 03/06/2018, YOU BOUGHT, APHB, AMPLIPHI BIOSCIENCES CORP COM PAR,Cash,100,1.46,4.95,,,-150.9, 03/08/2018
+ 03/01/2018, YOU BOUGHT, TEUM, PARETEUM CORP COM NEW,Cash,300,2.17,4.95,,,-657.45, 03/05/2018
+ 02/28/2018, INTEREST EARNED, QHMAQ, FDIC INSURED DEPOSIT AT DISCOVER BANK I,Cash,,,,,,0.01, 
+ 02/28/2018, YOU BOUGHT, TEUM, PARETEUM CORP COM NEW,Cash,102,2.24,4.95,,,-233.32, 03/02/2018
+ 02/27/2018, ROLLOVER CASH        VS X86-337692-1, , No Description,Cash,,,,,,1800, 
+ 02/12/2018, YOU SOLD             CASH LIQUIDATION, TEUM, PARETEUM CORP COM NEW,Cash,-902,1.9,32.95,0.04,,1680.9, 02/14/2018
+ 02/05/2018, YOU BOUGHT, TEUM, PARETEUM CORP COM NEW,Cash,1000,1.69,4.95,,,-1694.25, 02/07/2018
+ 01/31/2018, INTEREST EARNED, QHMAQ, FDIC INSURED DEPOSIT AT DISCOVER BANK I,Cash,,,,,,0.13, 
+ 01/18/2018, EARLY DIST NO EXCEPT VS X86-337692-1     PART PREMATURE DISTR, , No Description,Cash,,,,,,-1800, 
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+The data and information in this spreadsheet is provided to you solely for your use and is not for distribution. The spreadsheet is provided for,,,,,,,,,,,
+"informational purposes only, and is not intended to provide advice, nor should it be construed as an offer to sell, a solicitation of an offer to buy or a",,,,,,,,,,,
+recommendation for any security by Fidelity or any third party. Data and information shown is based on information known to Fidelity as of the date it was,,,,,,,,,,,
+exported and is subject to change. It should not be used in place of your account statements or trade confirmations and is not intended for tax reporting,,,,,,,,,,,
+"purposes. For more information on the data included in this spreadsheet, including any limitations thereof, go to Fidelity.com.",,,,,,,,,,,
+,,,,,,,,,,,
+"Brokerage services are provided by Fidelity Brokerage Services LLC, 900 Salem Street, Smithfield, RI 02917. Custody and other services provided by National",,,,,,,,,,,
+"Financial Services LLC. Both are Fidelity Investment companies and members SIPC, NYSE.",,,,,,,,,,,
+,,,,,,,,,,,
+Date downloaded 03/12/2019, 4:10 PM,,,,,,,,,,

@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, ChevronDown } from 'lucide-react';
-import { Button } from '../ui/button';
+import { Button } from '@/shared/ui/button';
 import ThemeToggle from './ThemeToggle';
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/ui/dropdown-menu";
+import { supabase } from '@/lib/supabase';
 
 import logo from '../../assets/images/cloudbaud_logo.png';
-import logoIcon from '../../assets/images/cloudbaud_icon.png';
-// Image import removed
 
 
 import { useAuth } from '../../context/AuthContext';
@@ -16,15 +20,62 @@ import CloudBaudLogo from '../common/CloudBaudLogo';
 const Header = () => {
   const { user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const [industries, setIndustries] = useState([]);
 
-  const services = [
+  const [services, setServices] = useState([
     { name: 'Data Engineering', href: '/capabilities/data-engineering' },
     { name: 'AI Engineering', href: '/ai-engineering' },
     { name: 'App Dev', href: '/capabilities/custom-applications' },
     { name: 'Platforms', href: '/capabilities/devops-infrastructure' },
-    { name: 'Industries', href: '/industries' },
-  ];
+  ]);
+
+  useEffect(() => {
+    // Parallel fetch for Navigation and Industries
+    const fetchData = async () => {
+      try {
+        const [navRes, indRes] = await Promise.all([
+          supabase
+            .from('site_navigation')
+            .select('label, path')
+            .eq('is_active', true)
+            .order('order_index'),
+          supabase
+            .from('industries')
+            .select('name, slug')
+            .eq('is_active', true)
+            .order('name')
+        ]);
+
+        if (navRes.data) {
+          setServices(navRes.data.map(item => ({ name: item.label, href: item.path })));
+        }
+        
+        if (indRes.data) {
+          setIndustries(indRes.data);
+        }
+      } catch (error) {
+        console.error('Error fetching header data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const linkStyles = {
+    fontFamily: "'Segoe UI', sans-serif",
+    color: '#ffffff',
+    textShadow: '0 0 8px rgba(255, 255, 255, 0.3)'
+  };
+
+  const handleMouseEnter = (e) => {
+    e.currentTarget.style.textShadow = '0 0 15px rgba(255, 255, 255, 0.8)';
+    e.currentTarget.style.filter = 'brightness(1.2)';
+  };
+
+  const handleMouseLeave = (e) => {
+    e.currentTarget.style.textShadow = '0 0 8px rgba(255, 255, 255, 0.3)';
+    e.currentTarget.style.filter = 'none';
+  };
 
   return (
     <header
@@ -68,39 +119,55 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden xl:flex items-center space-x-6">
-            {/* Capabilities Expanded */}
             {services.map((service) => (
               <Link
                 key={service.name}
                 to={service.href}
                 className="text-sm font-semibold uppercase tracking-widest transition-all duration-300 ease-in-out whitespace-nowrap"
-                style={{
-                  fontFamily: "'Segoe UI', sans-serif",
-                  color: '#ffffff',
-                  textShadow: '0 0 8px rgba(255, 255, 255, 0.3)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.textShadow = '0 0 15px rgba(255, 255, 255, 0.8)';
-                  e.currentTarget.style.filter = 'brightness(1.2)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.textShadow = '0 0 8px rgba(255, 255, 255, 0.3)';
-                  e.currentTarget.style.filter = 'none';
-                }}
+                style={linkStyles}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
               >
                 {service.name}
               </Link>
             ))}
 
-            {/* Industries removed, merged into services above */}
+            {/* Industries Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="outline-none flex items-center gap-1 text-sm font-semibold uppercase tracking-widest transition-all duration-300 ease-in-out whitespace-nowrap cursor-pointer"
+                style={linkStyles}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
+                Industries <ChevronDown className="w-4 h-4 opacity-50" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-slate-900 border-slate-800 text-slate-200 w-56">
+                <DropdownMenuItem asChild>
+                   <Link to="/industries" className="w-full cursor-pointer font-bold text-white mb-2 pb-2 border-b border-slate-700">All Industries</Link>
+                </DropdownMenuItem>
+                {industries.map((ind) => (
+                  <DropdownMenuItem key={ind.slug} asChild>
+                    <Link to={`/industries/${ind.slug}`} className="w-full cursor-pointer hover:bg-slate-800 focus:bg-slate-800">
+                      {ind.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
-
-          {/* Actions */}
+          
+          {/* Mobile Menu Logic continues... */}
           <div className="hidden md:flex items-center space-x-4">
             <ThemeToggle />
-            <Button asChild className="bg-brand-blue hover:bg-brand-blue/90 text-white rounded-lg px-6 font-bold shadow-lg shadow-brand-blue/20">
-              <Link to="/login">Login</Link>
-            </Button>
+            {user ? (
+               <Button asChild className="bg-brand-blue hover:bg-brand-blue/90 text-white rounded-lg px-6 font-bold shadow-lg shadow-brand-blue/20">
+                 <Link to="/collaboration">Go to App</Link>
+               </Button>
+            ) : (
+                <Button asChild className="bg-brand-blue hover:bg-brand-blue/90 text-white rounded-lg px-6 font-bold shadow-lg shadow-brand-blue/20">
+                  <Link to="/login">Login</Link>
+                </Button>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -152,6 +219,29 @@ const Header = () => {
                         onClick={() => setIsMenuOpen(false)}
                       >
                         {service.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Industries Section */}
+                <div className="pt-2">
+                  <Link
+                    to="/industries"
+                    className="block text-slate-400 text-xs uppercase tracking-wider mb-4 px-2 font-bold hover:text-white transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Industries
+                  </Link>
+                  <div className="grid grid-cols-1 gap-2">
+                    {industries.map((ind) => (
+                      <Link
+                        key={ind.slug}
+                        to={`/industries/${ind.slug}`}
+                        className="block pl-4 py-2 text-slate-300 hover:text-white transition-colors"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {ind.name}
                       </Link>
                     ))}
                   </div>

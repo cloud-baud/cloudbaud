@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle2, Share2, Maximize2, X } from 'lucide-react';
-import { Button } from '../ui/button';
+import { Button } from '@/shared/ui/button';
 import {
     Dialog,
     DialogContent,
     DialogTrigger,
     DialogClose,
-} from "@/components/ui/dialog";
+} from "@/shared/ui/dialog";
 
 const ProjectCard = ({ project, featured = false }) => {
     const [isCopied, setIsCopied] = useState(false);

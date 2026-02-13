@@ -3,7 +3,7 @@ import {
     LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, ReferenceLine
 } from 'recharts';
 import { Activity, Server, DollarSign, ShieldCheck, Zap, Database } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card';
 
 const dataPerformance = [
     { time: '00:00', jobs: 240, latency: 45 },

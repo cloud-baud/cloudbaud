@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import * as LucideIcons from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Progress } from '@/components/ui/progress';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Textarea } from '@/shared/ui/textarea';
+import { Label } from '@/shared/ui/label';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/shared/ui/card';
+import { RadioGroup, RadioGroupItem } from '@/shared/ui/radio-group';
+import { Checkbox } from '@/shared/ui/checkbox';
+import { Progress } from '@/shared/ui/progress';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/shared/ui/select';
 
 const AssessmentEngine = ({ config, assessmentType, ...props }) => {
+    // ... (existing state) ...
     const [step, setStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
@@ -19,6 +21,23 @@ const AssessmentEngine = ({ config, assessmentType, ...props }) => {
 
     // Config fallback
     if (!config) return <div className="p-4 text-red-500">Assessment configuration missing.</div>;
+
+    const [industries, setIndustries] = useState([]);
+
+    useEffect(() => {
+        const fetchIndustries = async () => {
+            const { data } = await supabase
+                .from('industries')
+                .select('name')
+                .eq('is_active', true)
+                .order('name');
+            
+            if (data) {
+                setIndustries(data.map(i => i.name));
+            }
+        };
+        fetchIndustries();
+    }, []);
 
     const { steps, title, description } = config;
 
@@ -33,9 +52,11 @@ const AssessmentEngine = ({ config, assessmentType, ...props }) => {
             icon: 'Send',
             fields: [
                 { id: 'timeline', label: 'Target Timeline', type: 'radio-group', options: ['Immediate (0-3 months)', 'Short Term (3-6 months)', 'Long Term (6+ months)', 'Exploratory'] },
+                { id: 'industry', label: 'Industry', type: 'select', options: industries, required: true, placeholder: 'Select your industry...' },
                 { id: 'budget', label: 'Estimated Budget Scope', type: 'radio-group', options: ['<$50k', '$50k - $200k', '$200k - $500k', '$500k+'] },
                 { id: 'name', label: 'Full Name', type: 'text', placeholder: 'John Doe', required: true },
                 { id: 'email', label: 'Work Email', type: 'email', placeholder: 'john@company.com', required: true },
+                { id: 'company', label: 'Organization', type: 'text', placeholder: 'Acme Corp', required: true },
                 { id: 'role', label: 'Job Title', type: 'text', placeholder: 'CTO / Director of Engineering' }
             ]
         });
@@ -200,6 +221,28 @@ const AssessmentEngine = ({ config, assessmentType, ...props }) => {
                                             {...register(field.id, { required: field.required })}
                                             placeholder={field.placeholder}
                                             className={`${commonClasses} min-h-[120px]`}
+                                        />
+                                    )}
+
+                                    {field.type === 'select' && (
+                                        <Controller
+                                            name={field.id}
+                                            control={control}
+                                            rules={{ required: field.required }}
+                                            render={({ field: { onChange, value } }) => (
+                                                <Select onValueChange={onChange} defaultValue={value}>
+                                                    <SelectTrigger className={commonClasses}>
+                                                        <SelectValue placeholder={field.placeholder || "Select an option"} />
+                                                    </SelectTrigger>
+                                                    <SelectContent className="bg-slate-900 border-slate-800 text-slate-200">
+                                                        {field.options && field.options.map((opt) => (
+                                                            <SelectItem key={opt} value={opt} className="focus:bg-slate-800 focus:text-white cursor-pointer">
+                                                                {opt}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            )}
                                         />
                                     )}
 
