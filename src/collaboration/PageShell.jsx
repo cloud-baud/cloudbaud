@@ -12,10 +12,11 @@ const PageShell = ({
     className,
     title,
     subtitle,
-    actions
+    actions,
+    maxWidth = "max-w-6xl" // Default width, can be overridden (e.g. "max-w-full", "max-w-7xl")
 }) => {
     return (
-        <div className={cn("max-w-6xl mx-auto p-8 pt-10 min-h-screen animate-in fade-in duration-500", className)}>
+        <div className={cn(`${maxWidth} mx-auto p-8 pt-10 min-h-screen animate-in fade-in duration-500`, className)}>
             {/* Standardized Page Header */}
             {(title || subtitle || actions) && (
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-8">

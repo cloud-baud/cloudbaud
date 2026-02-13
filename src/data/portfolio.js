@@ -1,152 +1,157 @@
 export const portfolioProjects = [
+    // FINANCE: Algorithmic Risk Modeling (Fabric + Databricks)
     {
-        id: 'finops-intelligence',
-        title: 'Enterprise FinOps Intelligence',
-        client: 'Global SaaS Provider',
-        category: 'Architecture',
-        tags: ['Azure Cost Management', 'Power BI', 'FinOps'],
-        image: '/portfolio/finops-dashboard.png',
-        description: 'Real-time FinOps dashboard providing 360-degree visibility into Azure spend, forecasting, and anomaly detection.',
-        challenge: 'Client was struggling with spiraling cloud costs and lacked visibility into resource utilization across 50+ subscriptions. Monthly audits were manual and prone to errors.',
-        solution: 'Implemented a centralized FinOps cockpit integrating Azure Cost Management data with custom budgets and forecasts. Automated recommendations for reserved instances and savings plans.',
+        id: 'finance-risk-modeling',
+        title: 'Algorithmic Risk Analytics Platform',
+        client: 'FinTech Demo',
+        category: 'Data Engineering',
+        tags: ['Microsoft Fabric', 'Databricks', 'PySpark', 'Power BI'],
+        industry: 'Finance',
+        image: '/portfolio/finance-dashboard.png', // Placeholder
+        description: 'End-to-end risk modeling platform processing 1M+ transactions daily for real-time fraud detection and liquidity forecasting.',
+        challenge: 'Financial institutions require sub-second risk assessment on high-velocity transaction streams. Legacy batch processing systems introduced dangerous latency in fraud detection.',
+        solution: 'Architected a lakehouse solution on Microsoft Fabric using Databricks for real-time stream processing. Implemented Delta Lake for ACID transactions and Power BI for executive risk dashboards.',
         results: [
-            '35% reduction in monthly cloud spend',
-            'Real-time anomaly detection alerts',
-            'Automated chargeback to business units',
-            'ROI achieved in 2 months'
+            'Sub-second fraud detection latency',
+            'Unified batch and streaming architecture',
+            '30% reduction in compute costs via autoscaling',
+            'Regulatory compliance automated reporting'
         ],
-        technologies: ['Azure', 'Power BI', 'Cost Management API', 'React', 'Python'],
+        technologies: ['Microsoft Fabric', 'Azure Databricks', 'Delta Lake', 'PySpark', 'Power BI'],
+        duration: '4 months',
+        year: '2025'
+    },
+
+    // HEALTHCARE: HIPAA-Compliant Data Lake (Azure + Terraform)
+    {
+        id: 'healthcare-data-lake',
+        title: 'Secure HIPAA-Compliant Data Lake',
+        client: 'HealthCare Demo',
+        category: 'Architecture',
+        tags: ['Azure', 'Terraform', 'Security', 'Compliance'],
+        industry: 'Healthcare',
+        image: '/portfolio/healthcare-architecture.png', // Placeholder
+        description: 'Zero-trust cloud infrastructure for securing sensitive patient health information (PHI) at scale.',
+        challenge: 'Healthcare providers struggle to innovate with data due to strict HIPAA compliance requirements. Manual infrastructure provisioning was error-prone and unscalable.',
+        solution: 'Deployed a fully automated Azure landing zone using Terraform. Implemented strict network isolation, encryption in transit/rest, and automated compliance auditing policies.',
+        results: [
+            '100% Infrastructure-as-Code (Terraform)',
+            'Automated HIPAA compliance validation',
+            'Zero-trust network architecture',
+            'Secure research enclaves for data scientists'
+        ],
+        technologies: ['Azure', 'Terraform', 'Azure Policy', 'Key Vault', 'Sentinel'],
+        duration: '3 months',
+        year: '2024'
+    },
+
+    // SUPPLY CHAIN: IoT Real-time Tracking (Azure IoT + Stream Analytics)
+    {
+        id: 'supply-chain-iot',
+        title: 'Global Supply Chain Control Tower',
+        client: 'Logistics Demo',
+        category: 'Custom Applications',
+        tags: ['IoT Hub', 'Stream Analytics', 'Cosmos DB', 'React'],
+        industry: 'Supply Chain',
+        image: '/portfolio/supply-chain-map.png', // Placeholder
+        description: 'Real-time visibility platform tracking shipment telemetry (location, temp, shock) across global logistics networks.',
+        challenge: 'Global logistics firms lack visibility into shipment conditions in transit, leading to spoilage and lost inventory. Legacy EDI systems provided only milestone updates.',
+        solution: 'Built an IoT ingestion pipeline using Azure IoT Hub and Stream Analytics. Data is visualized in a real-time React dashboard backed by Cosmos DB for low-latency geo-spatial queries.',
+        results: [
+            'Real-time telemetry for 50k+ active shipments',
+            'Predictive delay alerts via ML',
+            'Reduced spoilage by 15% via temp monitoring',
+            'Global comprehensive visibility'
+        ],
+        technologies: ['Azure IoT Hub', 'Stream Analytics', 'Cosmos DB', 'React', 'Azure Maps'],
+        duration: '5 months',
+        year: '2024'
+    },
+
+    // PUBLIC SECTOR: Transparency Portal (Power BI + Fabric)
+    {
+        id: 'public-sector-transparency',
+        title: 'State Budget Transparency Portal',
+        client: 'GovTech Demo',
+        category: 'Data & Platforms',
+        tags: ['Power BI', 'Fabric', 'Open Data', 'Accessibility'],
+        industry: 'Public Sector',
+        image: '/portfolio/gov-portal.png', // Placeholder
+        description: 'Citizen-facing open data portal visualizing state budget allocation, expenditure, and performance metrics.',
+        challenge: 'Government agencies needed to build trust with citizens by making budget data accessible and understandable, moving away from opaque PDF reports.',
+        solution: 'Developed a high-concurrency public dashboard using Power BI Embedded backed by Microsoft Fabric OneLake. Designed with strict WCAG 2.1 accessibility standards.',
+        results: [
+            'WCAG 2.1 AA Compliant',
+            'Supports 100k+ concurrent citizen viewers',
+            'Automated data refresh from ERP systems',
+            'Interactive drill-down capabilities'
+        ],
+        technologies: ['Microsoft Fabric', 'Power BI Embedded', 'React', 'Azure CDN'],
         duration: '3 months',
         year: '2025'
     },
+
+    // EDUCATION: Scalable LMS Infrastructure (Terraform + Kubernetes)
     {
-        id: 1,
-        title: 'Enterprise Database Modernization',
-        client: 'FinanceCore Systems',
-        category: 'Database Development',
-        tags: ['PostgreSQL', 'Cloud Migration', 'Performance Optimization'],
-        image: null,
-        description: 'Migrated legacy Oracle database to cloud-native PostgreSQL with zero downtime, achieving 60% performance improvement.',
-        challenge: 'A financial services company was running on a 15-year-old Oracle database that was expensive to maintain and couldn\'t scale with modern demands. They needed to migrate to a cloud-native solution without any downtime.',
-        solution: 'We designed and executed a phased migration strategy using PostgreSQL with advanced replication. Implemented automated data validation, optimized queries, and built a comprehensive monitoring system.',
+        id: 'education-lms-scale',
+        title: 'Hyper-Scale LMS Infrastructure',
+        client: 'EdTech Demo',
+        category: 'Architecture',
+        tags: ['Kubernetes', 'AKS', 'Redis', 'Microservices'],
+        industry: 'Education',
+        image: '/portfolio/edtech-infra.png', // Placeholder
+        description: 'Cloud-native infrastructure supporting millions of concurrent students for online learning platforms.',
+        challenge: 'An EdTech platform faced crashing during exam periods due to inability to handle massive concurrent user spikes.',
+        solution: 'Re-architected the monolithic application into microservices running on Azure Kubernetes Service (AKS). Implemented KEDA for event-driven autoscaling based on HTTP traffic.',
         results: [
-            '60% improvement in query performance',
-            'Zero downtime during migration',
-            '70% reduction in database licensing costs',
-            'Scalable architecture supporting 10x growth'
+            'Auto-scales from 10 to 1,000 pods in minutes',
+            '99.99% uptime during peak exam windows',
+            '50% cost reduction during off-peak hours',
+            'Global content delivery acceleration'
         ],
-        technologies: ['PostgreSQL', 'AWS RDS', 'Python', 'Apache Kafka', 'Terraform'],
-        duration: '4 months',
-        year: '2024'
-    },
-    {
-        id: 2,
-        title: 'AI-Powered Healthcare Analytics',
-        client: 'HealthTech Solutions',
-        category: 'AI Engineering',
-        tags: ['Machine Learning', 'NLP', 'Real-time Analytics'],
-        image: null,
-        description: 'Built an AI platform that processes patient data to predict health risks and recommend preventive care interventions.',
-        challenge: 'Healthcare provider needed to analyze millions of patient records to identify at-risk patients and provide personalized care recommendations while maintaining HIPAA compliance.',
-        solution: 'Developed a machine learning pipeline using advanced NLP to extract insights from unstructured medical records. Built real-time prediction models and integrated with existing EMR systems.',
-        results: [
-            '85% accuracy in risk prediction',
-            '40% reduction in hospital readmissions',
-            'Processed 2M+ patient records',
-            'Full HIPAA compliance achieved'
-        ],
-        technologies: ['Python', 'TensorFlow', 'BERT', 'FastAPI', 'Azure ML', 'MongoDB'],
+        technologies: ['Azure Kubernetes Service', 'KEDA', 'Redis', 'Terraform', 'Helm'],
         duration: '6 months',
         year: '2024'
     },
+
+    // E-COMMERCE: Personalization Engine (Databricks + ML)
     {
-        id: 3,
-        title: 'Custom Retail CRM Platform',
-        client: 'RetailHub Inc',
-        category: 'Custom Applications',
-        tags: ['Full Stack', 'CRM', 'E-commerce Integration'],
-        image: null,
-        description: 'Enterprise CRM system with omnichannel customer engagement, inventory management, and advanced analytics.',
-        challenge: 'Growing retail chain needed a unified system to manage customer relationships across online and physical stores, with real-time inventory synchronization.',
-        solution: 'Built a custom CRM platform with React frontend, Node.js backend, and microservices architecture. Integrated with existing e-commerce, POS, and logistics systems.',
+        id: 'ecommerce-personalization',
+        title: 'Real-time Personalization Engine',
+        client: 'Retail Demo',
+        category: 'AI Engineering',
+        tags: ['Databricks', 'MLflow', 'Redis', 'API'],
+        industry: 'E-commerce',
+        image: '/portfolio/retail-rec.png', // Placeholder
+        description: 'Machine learning API delivering sub-50ms personalized product recommendations based on user behavior.',
+        challenge: 'E-commerce retailer needed to increase conversion rates by showing relevant products to users in real-time, replacing static rules-based recommendations.',
+        solution: 'Built a recommendation engine using PySpark on Databricks. Models are trained nightly and served via a high-performance API using Redis for feature caching.',
         results: [
-            '300% increase in customer retention',
-            'Real-time inventory across 50+ stores',
-            '25% boost in sales conversion',
-            'Reduced customer service response time by 60%'
+            '25% increase in conversion rate',
+            'Sub-50ms API response time',
+            'A/B testing framework for model evaluation',
+            'Scalable to millions of users'
         ],
-        technologies: ['React', 'Node.js', 'PostgreSQL', 'Redis', 'Docker', 'Kubernetes'],
-        duration: '5 months',
-        year: '2023'
-    },
-    {
-        id: 4,
-        title: 'Cloud Infrastructure Transformation',
-        client: 'LogisticsPro',
-        category: 'Architecture',
-        tags: ['Cloud Native', 'Kubernetes', 'DevOps'],
-        image: null,
-        description: 'Complete cloud infrastructure redesign enabling global scale and 99.99% uptime for logistics platform.',
-        challenge: 'Logistics company experiencing downtime during peak periods and struggling to scale globally with on-premise infrastructure.',
-        solution: 'Architected cloud-native infrastructure using Kubernetes, implemented CI/CD pipelines, and built comprehensive observability platform. Executed seamless migration from on-premise to AWS.',
-        results: [
-            '99.99% uptime achieved',
-            '80% reduction in infrastructure costs',
-            'Global deployment in 12 regions',
-            'Deployment time reduced from days to minutes'
-        ],
-        technologies: ['AWS', 'Kubernetes', 'Terraform', 'Prometheus', 'Grafana', 'GitLab CI/CD'],
-        duration: '7 months',
-        year: '2024'
-    },
-    {
-        id: 5,
-        title: 'Educational Mobile App Platform',
-        client: 'EduLearn Platform',
-        category: 'Mobile Development',
-        tags: ['React Native', 'Mobile First', 'Offline Support'],
-        image: null,
-        description: 'Cross-platform mobile learning app with offline capabilities, gamification, and AI-driven personalized learning paths.',
-        challenge: 'Education startup needed a mobile app that works in low-connectivity areas and adapts to individual student learning styles.',
-        solution: 'Developed React Native app with robust offline-first architecture, AI-powered content recommendation engine, and engaging gamification features.',
-        results: [
-            '500K+ active students',
-            '4.8 star rating on app stores',
-            '90% student engagement rate',
-            'Works seamlessly offline in 20+ countries'
-        ],
-        technologies: ['React Native', 'Python', 'Firebase', 'TensorFlow Lite', 'GraphQL'],
+        technologies: ['Databricks', 'MLflow', 'Python', 'Redis', 'FastAPI'],
         duration: '4 months',
-        year: '2023'
-    },
-    {
-        id: 6,
-        title: 'Real-time Data Pipeline Platform',
-        client: 'StreamData Corp',
-        category: 'Data & Platforms',
-        tags: ['Data Engineering', 'Real-time Processing', 'Analytics'],
-        image: null,
-        description: 'High-throughput data pipeline processing millions of events per second with real-time analytics and ML inference.',
-        challenge: 'IoT company needed to process and analyze sensor data from millions of devices in real-time to detect anomalies and trigger alerts.',
-        solution: 'Built scalable data pipeline using Apache Kafka and Spark Streaming, implemented real-time ML inference, and created interactive analytics dashboard.',
-        results: [
-            '10M+ events processed per second',
-            'Sub-100ms latency for critical alerts',
-            '99.9% data accuracy maintained',
-            'Reduced infrastructure costs by 50%'
-        ],
-        technologies: ['Apache Kafka', 'Spark', 'Python', 'ClickHouse', 'dbt', 'Airflow'],
-        duration: '5 months',
-        year: '2024'
+        year: '2025'
     }
 ];
 
 export const categories = [
     'All Projects',
-    'Database Development',
+    'Data Engineering',
+    'Architecture',
     'AI Engineering',
     'Custom Applications',
-    'Architecture',
-    'Mobile Development',
     'Data & Platforms'
+];
+
+export const industries = [
+    'Finance',
+    'Healthcare',
+    'Supply Chain',
+    'Public Sector',
+    'Education',
+    'E-commerce'
 ];

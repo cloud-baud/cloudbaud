@@ -15,7 +15,8 @@ import {
   ChevronDown, 
   ArrowUpRight,
   TrendingUp,
-  Users
+  Users,
+  LayoutGrid
 } from 'lucide-react';
 import { 
   AreaChart, 
@@ -36,6 +37,7 @@ import { Badge } from '@/shared/ui/badge';
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+  { id: 'portfolio', label: 'Public Demos', icon: LayoutGrid },
   { id: 'campaigns', label: 'Campaigns', icon: Megaphone },
   { id: 'leads', label: 'Leads', icon: Target },
   { id: 'email', label: 'Email', icon: Mail },
@@ -108,8 +110,9 @@ const MarketingDashboard = () => {
       {/* Main Content Area */}
       <div className="flex-1 overflow-auto p-4 lg:p-6 bg-slate-50 dark:bg-[#0f0f0f]">
         {activeTab === 'overview' && <OverviewView />}
+        {activeTab === 'portfolio' && <PortfolioView />}
         {activeTab === 'campaigns' && <CampaignsView />}
-        {activeTab !== 'overview' && activeTab !== 'campaigns' && (
+        {activeTab !== 'overview' && activeTab !== 'portfolio' && activeTab !== 'campaigns' && (
           <div className="flex flex-col items-center justify-center h-[400px] text-slate-500">
             <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
               <Settings className="w-8 h-8 opacity-50" />
@@ -128,11 +131,15 @@ const MarketingDashboard = () => {
 const OverviewView = () => (
   <div className="space-y-6 max-w-7xl mx-auto">
     {/* KPI Cards */}
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <KPICard label="Active Campaigns" value="12" change="+2" type="positive" />
-      <KPICard label="Total Leads (MQL)" value="1,240" change="+15%" type="positive" />
-      <KPICard label="Avg. Click Rate" value="3.2%" change="-0.4%" type="negative" />
-      <KPICard label="Marketing ROI" value="285%" change="+12%" type="positive" />
+    {/* Compact Ticker Style KPIs */}
+    <div className="flex items-center gap-4 mb-6 overflow-x-auto pb-1 scrollbar-hide">
+      <CompactStatCard label="Active Campaigns" value="12" icon={Megaphone} color="text-purple-600" />
+      <div className="h-6 w-px bg-border/60 shrink-0 hidden md:block" />
+      <CompactStatCard label="Total MQLs" value="1,240" icon={Users} color="text-blue-500" />
+      <div className="h-6 w-px bg-border/60 shrink-0 hidden md:block" />
+      <CompactStatCard label="Avg. Click Rate" value="3.2%" icon={Target} color="text-pink-500" />
+      <div className="h-6 w-px bg-border/60 shrink-0 hidden md:block" />
+      <CompactStatCard label="Marketing ROI" value="285%" icon={TrendingUp} color="text-emerald-500" />
     </div>
 
     {/* Charts Row */}
@@ -183,15 +190,16 @@ const OverviewView = () => (
   </div>
 );
 
-const KPICard = ({ label, value, change, type }) => (
-  <div className="bg-white dark:bg-[#1a1a1a] p-4 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-    <div className="absolute top-0 left-0 w-1 h-full bg-purple-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-    <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{label}</div>
-    <div className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{value}</div>
-    <div className={cn("text-xs font-semibold flex items-center gap-1", type === 'positive' ? 'text-green-600' : 'text-red-500')}>
-      {type === 'positive' ? <ArrowUpRight className="h-3 w-3" /> : <ArrowUpRight className="h-3 w-3 rotate-180" />}
-      {change} <span className="text-slate-400 font-normal">vs last month</span>
-    </div>
+
+const CompactStatCard = ({ label, value, icon: LucideIcon, color = "text-brand-blue" }) => (
+  <div className="flex items-center gap-3 px-3 py-1.5 rounded-lg bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 shadow-sm min-w-fit">
+      <div className={`p-1 rounded-md bg-slate-100 dark:bg-slate-800 ${color}`}>
+          <LucideIcon className="size-3.5" />
+      </div>
+      <div className="flex items-baseline gap-2">
+          <span className="text-sm font-bold text-slate-900 dark:text-white">{value}</span>
+          <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wide">{label}</span>
+      </div>
   </div>
 );
 

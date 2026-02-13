@@ -124,11 +124,15 @@ const SalesDashboard = () => {
 const SalesOverview = () => (
   <div className="space-y-6 max-w-7xl mx-auto">
     {/* KPI Cards */}
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <KPICard label="Closed Revenue" value="$450k" change="+12%" type="positive" />
-      <KPICard label="Open Pipeline" value="$2.1M" change="+5%" type="positive" />
-      <KPICard label="Win Rate" value="32%" change="-1.5%" type="negative" />
-      <KPICard label="Avg. Deal Size" value="$18.5k" change="+3%" type="positive" />
+    {/* Compact Ticker Style KPIs */}
+    <div className="flex items-center gap-4 mb-6 overflow-x-auto pb-1 scrollbar-hide">
+      <CompactStatCard label="Pipeline" value="$2.1M" icon={Briefcase} color="text-brand-blue" />
+      <div className="h-6 w-px bg-border/60 shrink-0 hidden md:block" />
+      <CompactStatCard label="Win Rate" value="32%" icon={CheckCircle} color="text-emerald-500" />
+      <div className="h-6 w-px bg-border/60 shrink-0 hidden md:block" />
+      <CompactStatCard label="Avg. Deal" value="$18.5k" icon={DollarSign} color="text-amber-500" />
+      <div className="h-6 w-px bg-border/60 shrink-0 hidden md:block" />
+      <CompactStatCard label="Forecast" value="$450k" icon={TrendingUp} color="text-purple-500" />
     </div>
 
     {/* Charts Row */}
@@ -184,47 +188,76 @@ const SalesOverview = () => (
   </div>
 );
 
-const KPICard = ({ label, value, change, type }) => (
-  <div className="bg-white dark:bg-[#1a1a1a] p-4 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-    <div className="absolute top-0 left-0 w-1 h-full bg-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-    <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{label}</div>
-    <div className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{value}</div>
-    <div className={cn("text-xs font-semibold flex items-center gap-1", type === 'positive' ? 'text-green-600' : 'text-red-500')}>
-      {type === 'positive' ? <ArrowUpRight className="h-3 w-3" /> : <ArrowUpRight className="h-3 w-3 rotate-180" />}
-      {change} <span className="text-slate-400 font-normal">vs last quarter</span>
-    </div>
+
+
+const CompactStatCard = ({ label, value, icon: LucideIcon, color = "text-brand-blue" }) => (
+  <div className="flex items-center gap-3 px-3 py-1.5 rounded-lg bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 shadow-sm min-w-fit">
+      <div className={`p-1 rounded-md bg-slate-100 dark:bg-slate-800 ${color}`}>
+          <LucideIcon className="size-3.5" />
+      </div>
+      <div className="flex items-baseline gap-2">
+          <span className="text-sm font-bold text-slate-900 dark:text-white">{value}</span>
+          <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wide">{label}</span>
+      </div>
   </div>
 );
 
 const OpportunitiesView = () => (
-  <div className="space-y-4 max-w-[1600px] mx-auto">
-    <div className="bg-white dark:bg-[#1a1a1a] rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-      <table className="w-full text-sm text-left">
-        <thead className="text-xs text-slate-500 bg-slate-50 dark:bg-slate-900/50 uppercase border-b border-slate-200 dark:border-slate-800">
-          <tr>
-            <th className="px-6 py-3">Opportunity Name</th>
-            <th className="px-6 py-3">Account</th>
-            <th className="px-6 py-3">Stage</th>
-            <th className="px-6 py-3">Amount</th>
-            <th className="px-6 py-3">Close Date</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-          {[
-            { name: 'Acme Corp Renewal', account: 'Acme Corp', stage: 'Negotiation', amount: '$120,000', date: 'Feb 28, 2024' },
-            { name: 'Global Tech Expansion', account: 'Global Tech', stage: 'Proposal', amount: '$450,000', date: 'Mar 15, 2024' },
-            { name: 'StartUp Inc Seed', account: 'StartUp Inc', stage: 'Discovery', amount: '$25,000', date: 'Feb 10, 2024' },
-          ].map((op, idx) => (
-            <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-              <td className="px-6 py-4 font-medium text-emerald-600 hover:underline cursor-pointer">{op.name}</td>
-              <td className="px-6 py-4">{op.account}</td>
-              <td className="px-6 py-4"><Badge variant="outline" className="border-emerald-200 text-emerald-700 bg-emerald-50">{op.stage}</Badge></td>
-              <td className="px-6 py-4 font-semibold">{op.amount}</td>
-              <td className="px-6 py-4 text-slate-500">{op.date}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+  <div className="h-full overflow-x-auto pb-4">
+    <div className="flex gap-4 min-w-[1200px] h-full">
+      {/* Column: Qualification */}
+      <KanbanColumn title="Qualification" count={3} total="$145k">
+        <KanbanCard title="Acme Corp Renewal" value="$120k" company="Acme Corp" days="12 days" color="bg-blue-500" />
+        <KanbanCard title="StartUp Expansion" value="$25k" company="StartUp Inc" days="2 days" color="bg-blue-500" />
+      </KanbanColumn>
+      
+      {/* Column: Probable */}
+      <KanbanColumn title="Probable (60%)" count={2} total="$450k">
+        <KanbanCard title="Global Tech Deal" value="$450k" company="Global Tech" days="5 days" color="bg-amber-500" />
+        <KanbanCard title="Logistics Upgrade" value="$80k" company="FastShip LLC" days="8 days" color="bg-amber-500" />
+      </KanbanColumn>
+
+      {/* Column: Negotiation */}
+      <KanbanColumn title="Negotiation" count={1} total="$120k">
+         <KanbanCard title="Enterprise License" value="$120k" company="BigBank Corp" days="15 days" color="bg-purple-500" />
+      </KanbanColumn>
+
+      {/* Column: Closed Won */}
+      <KanbanColumn title="Closed Won" count={5} total="$850k">
+        <KanbanCard title="Q1 Service Contract" value="$200k" company="RetailGiant" days="Closed" color="bg-emerald-500" />
+      </KanbanColumn>
+    </div>
+  </div>
+);
+
+const KanbanColumn = ({ title, count, total, children }) => (
+  <div className="flex-1 min-w-[280px] bg-slate-100 dark:bg-[#1a1a1a]/50 rounded-lg p-3 flex flex-col h-full border border-slate-200 dark:border-slate-800">
+    <div className="flex items-center justify-between mb-3 px-1">
+      <div className="flex items-center gap-2">
+        <h3 className="font-semibold text-sm text-slate-700 dark:text-slate-300">{title}</h3>
+        <span className="bg-white dark:bg-slate-800 text-xs px-2 py-0.5 rounded-full text-slate-500 font-medium border border-slate-200 dark:border-slate-700">{count}</span>
+      </div>
+      <span className="text-xs font-mono text-slate-500">{total}</span>
+    </div>
+    <div className="flex-1 space-y-3 overflow-y-auto pr-1">
+      {children}
+    </div>
+  </div>
+);
+
+const KanbanCard = ({ title, value, company, days, color }) => (
+  <div className="bg-white dark:bg-[#1a1a1a] p-3 rounded-md border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing border-l-4" style={{ borderLeftColor: 'transparent' }}>
+    <div className="flex justify-between items-start mb-2">
+       <div className={`w-8 h-1 rounded-full ${color} mb-2`}></div>
+       <span className="text-[10px] text-slate-400 font-medium px-1.5 py-0.5 bg-slate-50 dark:bg-slate-800 rounded">{days}</span>
+    </div>
+    <h4 className="font-medium text-sm text-slate-900 dark:text-slate-100 mb-0.5">{title}</h4>
+    <p className="text-xs text-slate-500 mb-2">{company}</p>
+    <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+      <span className="font-bold text-sm text-slate-700 dark:text-slate-300">{value}</span>
+      <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-500">
+          {company.charAt(0)}
+      </div>
     </div>
   </div>
 );

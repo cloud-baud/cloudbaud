@@ -49,6 +49,7 @@ import AiEngineeringPage from './portal/pages/engineering/AiEngineeringPage';
 import { AuthProvider } from './context/AuthContext';
 import { ContentProvider } from './context/ContentContext';
 import ContentControl from './collaboration/ContentControl';
+import ConsultingDashboard from './collaboration/consulting/ConsultingDashboard';
 
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import DevPersonaSwitcher from './components/auth/DevPersonaSwitcher';
@@ -105,6 +106,7 @@ function App() {
                     <Route path="crm" element={<CrmDashboard />} />
                     <Route path="sales" element={<SalesDashboard />} />
                     <Route path="marketing" element={<MarketingDashboard />} />
+                    <Route path="consulting" element={<ConsultingDashboard />} />
                     <Route path="system-status" element={<SystemStatus />} />
 
                     {/* IT Routes */}

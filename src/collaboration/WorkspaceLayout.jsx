@@ -82,6 +82,11 @@ const suggested = [
 
 const operationsApps = [
     {
+        icon: Briefcase,
+        label: 'Consulting',
+        href: '/collaboration/consulting'
+    },
+    {
         icon: PieChart,
         label: 'Finance',
         href: '/collaboration/finance'
