@@ -1,22 +1,25 @@
 
 import React, { useState } from 'react';
-import { 
+import {
   LayoutDashboard, 
   Megaphone, 
   Target, 
   Mail, 
   Share2, 
   BarChart, 
-  Plus, 
   Search, 
   Settings, 
-  Filter, 
   RefreshCw, 
   ChevronDown, 
   ArrowUpRight,
   TrendingUp,
   Users,
-  LayoutGrid
+  Layers,
+  FileEdit,
+  CheckCircle,
+  Globe,
+  Filter,
+  Plus
 } from 'lucide-react';
 import { 
   AreaChart, 
@@ -35,9 +38,158 @@ import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Badge } from '@/shared/ui/badge';
 
+/* --- CMS / Publishing View (The ECM Engine) --- */
+const CmsPublishingView = () => (
+    <div className="space-y-6">
+        <div className="flex items-center justify-between">
+            <div>
+                <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Content Staging Area</h2>
+                <p className="text-sm text-slate-500">Manage the lifecycle of public assets from Draft to Production.</p>
+            </div>
+            <div className="flex gap-2">
+                <Button variant="outline" size="sm"><Filter className="w-4 h-4 mr-2" /> Filter</Button>
+                <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white"><Plus className="w-4 h-4 mr-2" /> Create Content</Button>
+            </div>
+        </div>
+
+        {/* Pipeline Layout (Kitchen -> Pass -> Restaurant) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-280px)] min-h-[500px]">
+            
+            {/* COLUMN 1: DRAFTS (The Kitchen) */}
+            <CmsColumn 
+                title="Drafts & Concepts" 
+                count={3} 
+                icon={FileEdit}
+                color="bg-slate-100 dark:bg-slate-800"
+                borderColor="border-slate-200 dark:border-slate-700"
+            >
+                 <CmsCard 
+                    title="Healthcare AI V2" 
+                    type="Case Study"
+                    author="Jishnu N." 
+                    updated="2h ago"
+                    status="Draft"
+                />
+                 <CmsCard 
+                    title="Fabric ETL Demo Script" 
+                    type="Technical Asset"
+                    author="Consulting Team" 
+                    updated="1d ago"
+                    status="Raw"
+                />
+                <CmsCard 
+                    title="Q1 Financial Report" 
+                    type="Blog Post"
+                    author="Finance Ops" 
+                    updated="3d ago"
+                    status="Draft"
+                />
+            </CmsColumn>
+
+            {/* COLUMN 2: STAGING (The Pass) */}
+            <CmsColumn 
+                title="Staging & Review" 
+                count={2} 
+                icon={CheckCircle}
+                color="bg-indigo-50/50 dark:bg-indigo-900/10"
+                borderColor="border-indigo-200 dark:border-indigo-800"
+            >
+                 <CmsCard 
+                    title="Supply Chain IoT Map" 
+                    type="Interactive Demo"
+                    author="Marketing" 
+                    updated="5h ago"
+                    status="Review"
+                    badge="Needs Approval"
+                />
+                 <CmsCard 
+                    title="Azure Migration Guide" 
+                    type="Whitepaper (Gated)"
+                    author="Jishnu N." 
+                    updated="2d ago"
+                    status="Staged"
+                />
+            </CmsColumn>
+
+            {/* COLUMN 3: LIVE (The Restaurant) */}
+            <CmsColumn 
+                title="Production (Live)" 
+                count={6} 
+                icon={Globe}
+                color="bg-emerald-50/50 dark:bg-emerald-900/10"
+                borderColor="border-emerald-200 dark:border-emerald-800"
+            >
+                {[
+                    'Algorithmic Risk Platform',
+                    'HIPAA Data Lake',
+                    'Education LMS Scale',
+                    'GovTech Portal'
+                ].map((item, i) => (
+                     <CmsCard 
+                        key={i}
+                        title={item}
+                        type="Public Portfolio"
+                        author="System" 
+                        updated="Live"
+                        status="Published"
+                        isLive
+                    />
+                ))}
+            </CmsColumn>
+
+        </div>
+    </div>
+);
+
+const CmsColumn = ({ title, count, icon: Icon, children, color, borderColor }) => (
+    <div className={`flex flex-col rounded-xl border ${borderColor} ${color} h-full`}>
+        <div className="p-4 border-b border-inherit flex items-center justify-between">
+            <h3 className="font-semibold flex items-center gap-2 text-slate-800 dark:text-slate-100">
+                <Icon className="w-4 h-4" /> {title}
+            </h3>
+            <Badge variant="secondary" className="bg-white/50 dark:bg-black/20">{count}</Badge>
+        </div>
+        <div className="p-4 flex-1 overflow-y-auto space-y-3">
+            {children}
+        </div>
+    </div>
+);
+
+const CmsCard = ({ title, type, author, updated, status, badge, isLive }) => (
+    <div className="group bg-white dark:bg-[#1a1a1a] p-3 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all cursor-move">
+        <div className="flex justify-between items-start mb-2">
+            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">{type}</span>
+            {isLive ? (
+                <div className="flex items-center gap-1 text-[10px] text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
+                </div>
+            ) : (
+                <MoreHorizontal className="w-4 h-4 text-slate-300 hover:text-slate-600" />
+            )}
+        </div>
+        <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-1 group-hover:text-purple-600 transition-colors">{title}</h4>
+        
+        {badge && (
+            <Badge variant="outline" className="text-[10px] h-5 px-1.5 mb-2 border-amber-200 bg-amber-50 text-amber-700">
+                {badge}
+            </Badge>
+        )}
+
+        <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-50 dark:border-slate-800">
+            <div className="flex items-center gap-1.5">
+                <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-[9px] font-bold text-slate-500">
+                    {author.charAt(0)}
+                </div>
+                <span className="text-xs text-slate-500">{author}</span>
+            </div>
+            <span className="text-[10px] text-slate-400">{updated}</span>
+        </div>
+    </div>
+);
+
 const TABS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-  { id: 'portfolio', label: 'Public Demos', icon: LayoutGrid },
+  { id: 'cms', label: 'Content CMS', icon: Layers }, 
   { id: 'campaigns', label: 'Campaigns', icon: Megaphone },
   { id: 'leads', label: 'Leads', icon: Target },
   { id: 'email', label: 'Email', icon: Mail },
@@ -110,9 +262,9 @@ const MarketingDashboard = () => {
       {/* Main Content Area */}
       <div className="flex-1 overflow-auto p-4 lg:p-6 bg-slate-50 dark:bg-[#0f0f0f]">
         {activeTab === 'overview' && <OverviewView />}
-        {activeTab === 'portfolio' && <PortfolioView />}
+        {activeTab === 'cms' && <CmsPublishingView />}
         {activeTab === 'campaigns' && <CampaignsView />}
-        {activeTab !== 'overview' && activeTab !== 'portfolio' && activeTab !== 'campaigns' && (
+        {activeTab !== 'overview' && activeTab !== 'cms' && activeTab !== 'campaigns' && (
           <div className="flex flex-col items-center justify-center h-[400px] text-slate-500">
             <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
               <Settings className="w-8 h-8 opacity-50" />

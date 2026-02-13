@@ -258,8 +258,91 @@ const HackathonsView = () => (
 );
 
 const SpeakingView = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="space-y-6">
+        {/* CFP Pipeline (New Section) */}
         <div className="bg-white dark:bg-[#1a1a1a] p-5 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
+            <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                <Trophy className="w-4 h-4 text-amber-500" /> Active CFPs (Call for Papers)
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 rounded-md border border-amber-200 bg-amber-50 dark:bg-amber-900/10 dark:border-amber-800/30">
+                    <div className="flex justify-between items-start mb-2">
+                        <Badge className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200">Due in 5 Days</Badge>
+                        <Button variant="ghost" size="icon" className="h-6 w-6"><MoreHorizontal className="w-4 h-4" /></Button>
+                    </div>
+                    <h4 className="font-bold text-slate-900 dark:text-slate-100">O'Reilly Software Architecture</h4>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Topic: "Evolutionary RAG Patterns"</p>
+                    <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
+                        <span>Status: <span className="font-medium text-slate-900 dark:text-slate-200">Drafting</span></span>
+                        <span>Deadline: Feb 28</span>
+                    </div>
+                </div>
+                 <div className="p-4 rounded-md border border-slate-200 bg-white dark:bg-slate-800/50 dark:border-slate-700">
+                    <div className="flex justify-between items-start mb-2">
+                        <Badge variant="outline">Planning</Badge>
+                        <Button variant="ghost" size="icon" className="h-6 w-6"><MoreHorizontal className="w-4 h-4" /></Button>
+                    </div>
+                    <h4 className="font-bold text-slate-900 dark:text-slate-100">KubeCon NA 2026</h4>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Topic: "Scaling FinOps on AKS"</p>
+                    <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
+                        <span>Status: <span className="font-medium text-slate-900 dark:text-slate-200">Not Started</span></span>
+                        <span>Deadline: Mar 15</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {/* AI CFP Scout Agent */}
+        <div className="bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 text-white p-6 rounded-xl border border-indigo-500/30 shadow-xl relative overflow-hidden">
+            {/* Background Decoration */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
+            
+            <div className="flex justify-between items-start relative z-10 mb-6">
+                <div>
+                    <h3 className="text-xl font-bold flex items-center gap-2">
+                        <span className="flex h-3 w-3 relative">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                        </span>
+                        CFP Scout Agent
+                    </h3>
+                    <p className="text-indigo-200 text-sm mt-1">Scanning global tech events for "AI Architecture" & "FinOps"</p>
+                </div>
+                <Button size="sm" className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm">
+                    <RefreshCw className="w-4 h-4 mr-2" /> Scan Now
+                </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-10">
+                {[
+                    { name: 'AI Engineer World\'s Fair', loc: 'San Francisco', date: 'Jun 2026', match: '98%', topic: 'Agentic Patterns', deadline: '2 Days' },
+                    { name: 'Gartner Data & Analytics', loc: 'London, UK', date: 'Jul 2026', match: '85%', topic: 'Enterprise RAG', deadline: '1 Week' },
+                    { name: 'TechCrunch Disrupt', loc: 'Berlin', date: 'Sep 2026', match: '92%', topic: 'Scaling AI Startups', deadline: '3 Weeks' }
+                ].map((conf, i) => (
+                    <div key={i} className="bg-white/5 backdrop-blur-md border border-white/10 p-4 rounded-lg hover:bg-white/10 transition-colors group cursor-pointer">
+                        <div className="flex justify-between items-start mb-2">
+                            <Badge className="bg-emerald-500/20 text-emerald-300 border-none">{conf.match} Match</Badge>
+                            <span className="text-xs font-mono text-indigo-200">{conf.deadline} left</span>
+                        </div>
+                        <h4 className="font-bold text-lg mb-1 group-hover:text-amber-300 transition-colors">{conf.name}</h4>
+                        <div className="flex items-center gap-2 text-xs text-slate-300 mb-3">
+                            <Globe className="w-3 h-3" /> {conf.loc} • {conf.date}
+                        </div>
+                        <div className="p-2 bg-black/20 rounded text-xs text-indigo-200 mb-3">
+                            <span className="text-slate-400">Suggested Topic:</span><br/>
+                            "{conf.topic}"
+                        </div>
+                        <Button size="sm" className="w-full bg-indigo-600 hover:bg-indigo-500 border-none h-7 text-xs">
+                            Start Drafting
+                        </Button>
+                    </div>
+                ))}
+            </div>
+        </div>
+
+        {/* Existing Commitments */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white dark:bg-[#1a1a1a] p-5 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
             <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-indigo-500" /> Upcoming Talks
             </h3>
