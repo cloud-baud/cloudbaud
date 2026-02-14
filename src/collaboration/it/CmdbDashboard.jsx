@@ -56,28 +56,31 @@ const CmdbDashboard = () => {
             buildStatus: 'Ready',
             lastDeploy: '2026-02-13T01:15:00Z',
             repoUrl: 'https://github.com/jishnath/cloudbaud.com',
-            screenshot: 'https://api.netlify.com/api/v1/badges/54b07907-6ac7-4209-8e9a-b6df1a3457f6/deploy-status' // Utilizing badge as proxy for status
+            screenshot: '/cmdb-thumbnails/cloudbaud-thumb.png' 
         },
         'systemsdesign.pro': {
             siteId: '80497b07-75d5-41e0-a8e2-5409544dc3a7',
             adminUrl: 'https://app.netlify.com/sites/systemsdesign/overview',
             buildStatus: 'Ready',
             lastDeploy: '2026-02-10T14:20:00Z',
-            repoUrl: 'https://github.com/jishnath/systems-design-platform'
+            repoUrl: 'https://github.com/jishnath/systems-design-platform',
+            screenshot: '/cmdb-thumbnails/systemsdesign-thumb.png'
         },
         'jishnunath.com': {
             siteId: '4783a135-9b8d-46fc-8be5-ab209c5dfd0d',
             adminUrl: 'https://app.netlify.com/sites/jishnunath/overview',
             buildStatus: 'Ready',
             lastDeploy: '2026-01-10T03:47:00Z',
-            repoUrl: 'https://github.com/jishnath/portfolio'
+            repoUrl: 'https://github.com/jishnath/portfolio',
+            screenshot: '/cmdb-thumbnails/jishnunath-thumb.png'
         },
         'kampuz.online': {
             siteId: '614566d4-cd99-4d34-b8d8-88ec5fbbfc8e',
             adminUrl: 'https://app.netlify.com/sites/lucky-crepe-7f79dc/overview',
             buildStatus: 'Ready',
             lastDeploy: '2025-12-28T18:26:00Z',
-            repoUrl: 'https://github.com/jishnath/kampuz-web'
+            repoUrl: 'https://github.com/jishnath/kampuz-web',
+            screenshot: '/cmdb-thumbnails/kampuz-thumb.png'
         }
     };
 
@@ -456,9 +459,21 @@ const CmdbDashboard = () => {
                                     <div key={app.id} className="group relative bg-card border border-border rounded-xl p-5 hover:shadow-lg hover:border-brand-blue/30 transition-all duration-300 flex flex-col h-full">
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="size-10 rounded-lg bg-gradient-to-br from-brand-blue/10 to-purple-500/10 flex items-center justify-center text-brand-blue border border-brand-blue/20 shadow-sm relative overflow-hidden">
-                                                    {/* If we had a screenshot, we could use it here. For now, initial. */}
-                                                    <span className="font-bold text-lg">{app.name.charAt(0)}</span>
+                                                <div className="size-16 rounded-lg bg-slate-100 dark:bg-slate-800 border border-border shadow-sm relative overflow-hidden shrink-0 group-hover:border-brand-blue/50 transition-colors">
+                                                    {app.screenshot ? (
+                                                        <img 
+                                                            src={app.screenshot} 
+                                                            alt={`${app.name} thumbnail`} 
+                                                            className="w-full h-full object-cover object-top hover:scale-110 transition-transform duration-500"
+                                                            onError={(e) => {
+                                                                e.currentTarget.style.display = 'none';
+                                                                e.currentTarget.nextSibling.style.display = 'flex';
+                                                            }}
+                                                        />
+                                                    ) : null}
+                                                    <div className="absolute inset-0 flex items-center justify-center bg-slate-100 dark:bg-slate-800" style={{ display: app.screenshot ? 'none' : 'flex' }}>
+                                                        <span className="font-bold text-lg text-slate-400">{app.name.charAt(0)}</span>
+                                                    </div>
                                                 </div>
                                                 <div>
                                                     <h3 className="font-bold text-foreground group-hover:text-brand-blue transition-colors flex items-center gap-2">
