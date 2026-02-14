@@ -13,11 +13,8 @@ const getUser = async () => {
 export const loadTaxState = async () => {
     try {
         const user = await getUser();
-        const { data, error } = await supabase
-            .from('user_tax_state')
-            .select('*')
-            .eq('user_id', user.id)
-            .maybeSingle();
+        // Secure API Call
+        const { data, error } = await supabase.rpc('api_get_user_tax_state');
 
         if (error) throw error;
         return data || null; // Return null if no state exists yet
@@ -33,16 +30,14 @@ export const saveTaxState = async (state) => {
         const user = await getUser();
         
         // Upsert based on user_id
+        // Secure API Call
         const { error } = await supabase
-            .from('user_tax_state')
-            .upsert({
-                user_id: user.id,
-                years: state.years,
-                tax_data: state.taxData,
-                col_widths: state.colWidths,
-                row_heights: state.rowHeights,
-                updated_at: new Date()
-            }, { onConflict: 'user_id' });
+            .rpc('api_save_user_tax_state', {
+                p_years: state.years, 
+                p_tax_data: state.taxData, 
+                p_col_widths: state.colWidths, 
+                p_row_heights: state.rowHeights
+            });
 
         if (error) throw error;
         return true;
@@ -56,20 +51,40 @@ export const saveTaxState = async (state) => {
 // --- V2 API: MULTI-SCHEMA ARCHITECTURE ---
 
 // 1. Client Input Categories (Your personal categories - stable across years)
-export const getClientCategories = async () => {
-    const user = await getUser();
-    const { data, error } = await supabase
-        .from('client_input_categories')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('sort_order', { ascending: true });
-    
-    if (error) throw error;
-    return data;
+// 1a. Chart of Accounts (General Ledger)
+export const getChartOfAccounts = async () => {
+    try {
+        const user = await getUser();
+        // Secure API Call
+        const { data, error } = await supabase.rpc('api_get_chart_of_accounts');
+        
+        if (error) {
+            console.warn("COA fetch failed, falling back", error);
+            return [];
+        }
+        return data;
+    } catch (err) {
+        console.error("Error fetching COA:", err);
+        return [];
+    }
 };
 
-// Keep for backward compatibility
-export const getChartOfAccounts = getClientCategories;
+// 1b. Client Input Categories (Legacy Tax)
+export const getClientCategories = async () => {
+    try {
+        const user = await getUser();
+        // Secure API Call
+        const { data, error } = await supabase.rpc('api_get_client_categories');
+        
+        if (error) {
+            // Table might not exist in Prod yet, return empty to trigger fallback
+            return [];
+        }
+        return data;
+    } catch (err) {
+        return [];
+    }
+};
 
 // 2. Tax Entries for a specific year (from year-specific schema)
 export const getTaxEntries = async (year) => {
@@ -77,14 +92,9 @@ export const getTaxEntries = async (year) => {
     
     const user = await getUser();
     
-    // Query from year-specific schema: tax_2017.client_input_values
-    const { data, error } = await supabase
-        .from(`tax_${year}.client_input_values`)
-        .select(`
-            *,
-            category:client_input_categories(*)
-        `)
-        .eq('user_id', user.id);
+    // Query from finance schema with year filter
+    // Secure API Call
+    const { data, error } = await supabase.rpc('api_get_tax_entries', { p_year: year });
     
     if (error) {
         console.error(`Error fetching tax entries for ${year}:`, error);
@@ -103,7 +113,7 @@ export const updateTaxCell = async (accountId, year, amount, notes = null) => {
         await getUser(); // Auth check locally first
         
         const { data, error } = await supabase
-            .rpc('update_tax_cell', {
+            .rpc('api_update_tax_cell', {
                 p_account_id: accountId,
                 p_year: year,
                 p_amount: amount,
@@ -135,18 +145,14 @@ export const uploadTaxDocument = async (file, meta = {}) => {
         if (uploadError) throw uploadError;
 
         // 2. Create Database Record
+        // 2. Create Database Record via Secure API
         const { data: docRecord, error: dbError } = await supabase
-            .from('tax_documents')
-            .insert({
-                user_id: user.id,
-                filename: file.name,
-                year: meta.year,
-                doc_type: meta.type || 'SUPPORTING',
-                storage_path: uploadData.path,
-                created_at: new Date()
-            })
-            .select()
-            .single();
+            .rpc('api_register_tax_document', {
+                p_filename: file.name,
+                p_storage_path: uploadData.path,
+                p_year: meta.year,
+                p_doc_type: meta.type || 'SUPPORTING'
+            });
 
         if (dbError) throw dbError;
         
@@ -165,11 +171,9 @@ export const uploadTaxDocument = async (file, meta = {}) => {
 
 // Retrieve documents for a Cell Link
 export const getMyDocuments = async (year) => {
-    const user = await getUser();
-    let query = supabase.from('tax_documents').select('*').eq('user_id', user.id);
-    if (year) query = query.eq('year', year);
+    await getUser();
+    const { data, error } = await supabase.rpc('api_get_tax_documents', { p_year: year || null });
     
-    const { data, error } = await query;
     if (error) throw error;
     return data;
 };
@@ -177,6 +181,7 @@ export const getMyDocuments = async (year) => {
 // V2 Link: Using Normalized Entry ID instead of generic cell string
 export const linkDocumentToEntry = async (entryId, docId, page = 1) => {
     const { error } = await supabase
+        .schema('finance')
         .from('entry_evidence')
         .insert({
             entry_id: entryId,
@@ -193,28 +198,20 @@ export const linkDocumentToCell = async (cellId, docId, page = 1) => {
     const { sectionId, rowIndex, colKey } = cellId;
 
     const { error } = await supabase
-        .from('tax_cell_references')
-        .upsert({
-            user_id: user.id,
-            section_id: sectionId,
-            row_index: rowIndex,
-            col_key: colKey,
-            document_id: docId,
-            page_number: page
-        }, { onConflict: 'user_id, section_id, row_index, col_key' });
+        .rpc('api_link_document_to_cell', {
+            p_section_id: sectionId,
+            p_row_index: rowIndex,
+            p_col_key: colKey,
+            p_doc_id: docId,
+            p_page: page
+        });
 
     if (error) throw error;
 };
 
 export const getCellLinks = async () => {
-    const user = await getUser();
-    const { data, error } = await supabase
-        .from('tax_cell_references')
-        .select(`
-            *,
-            document:tax_documents(*)
-        `)
-        .eq('user_id', user.id);
+    await getUser();
+    const { data, error } = await supabase.rpc('api_get_cell_links');
 
     if (error) throw error;
     
@@ -238,12 +235,10 @@ export const getCellLinks = async () => {
 // Retrieve Tax Returns mapped by Year
 export const getYearReturns = async () => {
     try {
-        const user = await getUser();
-        const { data, error } = await supabase
-            .from('tax_documents')
-            .select('*')
-            .eq('user_id', user.id)
-            .eq('doc_type', 'RETURN');
+        await getUser();
+        // Use generic doc fetch, then filter in memory if API doesn't support specific type filter yet
+        // Or update API to support it. For now, client-side filter is fine for small count.
+        const { data, error } = await supabase.rpc('api_get_tax_documents', { p_year: null });
 
         if (error) throw error;
 

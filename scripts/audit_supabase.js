@@ -19,8 +19,15 @@ async function getTables(client, name) {
     try {
         await client.connect();
         const res = await client.query(`
-            SELECT table_name 
-            FROM information_schema.tables 
+            SELECT 
+                t.table_name,
+                (SELECT count(*) FROM information_schema.columns WHERE table_name = t.table_name) as column_count,
+                CASE 
+                    WHEN t.table_name IN ('chart_of_accounts', 'universal_coa', 'cmdb_applications') THEN 
+                        (xpath('/row/c/text()', query_to_xml(format('select count(*) as c from %I', t.table_name), false, true, '')))[1]::text::int
+                    ELSE 0
+                END as approx_row_count
+            FROM information_schema.tables t
             WHERE table_schema = 'public' 
             ORDER BY table_name;
         `);
@@ -28,7 +35,10 @@ async function getTables(client, name) {
         if (res.rows.length === 0) {
             console.log('(No tables found)');
         } else {
-            res.rows.forEach(row => console.log(`- ${row.table_name}`));
+            res.rows.forEach(row => {
+                const countStr = row.approx_row_count > 0 ? ` (${row.approx_row_count} rows)` : '';
+                console.log(`- ${row.table_name}${countStr}`);
+            });
         }
     } catch (err) {
         console.error(`Error connecting to ${name}:`, err.message);
