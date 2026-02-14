@@ -128,7 +128,7 @@ export const AuthProvider = ({ children }) => {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: provider,
             options: {
-                redirectTo: `${window.location.origin}/portal`,
+                redirectTo: `${window.location.origin}/collaboration`,
             },
         });
         if (error) throw error;
@@ -140,7 +140,7 @@ export const AuthProvider = ({ children }) => {
         const { data, error } = await supabase.auth.signInWithOtp({
             email,
             options: {
-                emailRedirectTo: `${window.location.origin}/portal`,
+                emailRedirectTo: `${window.location.origin}/collaboration`,
             },
         });
         if (error) throw error;
@@ -151,7 +151,7 @@ export const AuthProvider = ({ children }) => {
         const { data, error } = await supabase.auth.signInWithSSO({
             domain: domain,
             options: {
-                redirectTo: `${window.location.origin}/portal`,
+                redirectTo: `${window.location.origin}/collaboration`,
             },
         });
         if (error) throw error;

@@ -394,6 +394,7 @@ const CmdbDashboard = () => {
                                 </form>
                             </DialogContent>
                         </Dialog>
+                        </div>
                     )}
                 </div>
             }
@@ -642,16 +643,19 @@ const CmdbDashboard = () => {
     );
 };
 
-const StatCard = ({ label, value, icon: IconComponent, color = "text-brand-blue" }) => (
-    <div className="flex items-center gap-3 px-3 py-1.5 rounded-lg bg-card/40 border border-border/50 hover:bg-card hover:border-border transition-colors group min-w-fit">
-        <div className={`p-1 rounded-md bg-secondary/30 ${color} group-hover:bg-secondary/50 transition-colors`}>
-            <IconComponent className="size-3.5" />
+const StatCard = ({ label, value, icon, color = "text-brand-blue" }) => {
+    const Icon = icon;
+    return (
+        <div className="flex items-center gap-3 px-3 py-1.5 rounded-lg bg-card/40 border border-border/50 hover:bg-card hover:border-border transition-colors group min-w-fit">
+            <div className={`p-1 rounded-md bg-secondary/30 ${color} group-hover:bg-secondary/50 transition-colors`}>
+                <Icon className="size-3.5" />
+            </div>
+            <div className="flex items-baseline gap-2">
+                <span className="text-sm font-bold text-foreground">{value}</span>
+                <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">{label}</span>
+            </div>
         </div>
-        <div className="flex items-baseline gap-2">
-            <span className="text-sm font-bold text-foreground">{value}</span>
-            <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">{label}</span>
-        </div>
-    </div>
-);
+    );
+};
 
 export default CmdbDashboard;
