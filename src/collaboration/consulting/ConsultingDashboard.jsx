@@ -383,6 +383,7 @@ const SpeakingView = () => (
             </div>
         </div>
     </div>
+</div>
 );
 
 const PatentsView = () => (
