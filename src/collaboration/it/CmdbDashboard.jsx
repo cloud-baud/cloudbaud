@@ -16,7 +16,8 @@ import {
     Trash2,
     LayoutList,
     LayoutGrid,
-    ArrowUpDown
+    ArrowUpDown,
+    RefreshCw
 } from 'lucide-react';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
@@ -39,6 +40,41 @@ import {
 import { CmdbService } from '@/services/cmdbService';
 import { useAuth } from '@/context/AuthContext';
 
+const NETLIFY_METADATA = {
+    'cloudbaud.com': {
+        siteId: '54b07907-6ac7-4209-8e9a-b6df1a3457f6',
+        adminUrl: 'https://app.netlify.com/projects/cloudbaud',
+        buildStatus: 'Ready',
+        lastDeploy: '2026-02-13T01:15:00Z',
+        repoUrl: 'https://github.com/jishnath/cloudbaud.com',
+        screenshot: '/cmdb-thumbnails/cloudbaud-thumb.png' 
+    },
+    'systemsdesign.pro': {
+        siteId: '80497b07-75d5-41e0-a8e2-5409544dc3a7',
+        adminUrl: 'https://app.netlify.com/sites/systemsdesign/overview',
+        buildStatus: 'Ready',
+        lastDeploy: '2026-02-10T14:20:00Z',
+        repoUrl: 'https://github.com/jishnath/systems-design-platform',
+        screenshot: '/cmdb-thumbnails/systemsdesign-thumb.png'
+    },
+    'jishnunath.com': {
+        siteId: '4783a135-9b8d-46fc-8be5-ab209c5dfd0d',
+        adminUrl: 'https://app.netlify.com/sites/jishnunath/overview',
+        buildStatus: 'Ready',
+        lastDeploy: '2026-01-10T03:47:00Z',
+        repoUrl: 'https://github.com/jishnath/portfolio',
+        screenshot: '/cmdb-thumbnails/jishnunath-thumb.png'
+    },
+    'kampuz.online': {
+        siteId: '614566d4-cd99-4d34-b8d8-88ec5fbbfc8e',
+        adminUrl: 'https://app.netlify.com/sites/lucky-crepe-7f79dc/overview',
+        buildStatus: 'Ready',
+        lastDeploy: '2025-12-28T18:26:00Z',
+        repoUrl: 'https://github.com/jishnath/kampuz-web',
+        screenshot: '/cmdb-thumbnails/kampuz-thumb.png'
+    }
+};
+
 const CmdbDashboard = () => {
     const { user } = useAuth();
     const [searchTerm, setSearchTerm] = useState('');
@@ -48,42 +84,6 @@ const CmdbDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     
-    // Netlify Metadata Mapping (Enrichment Layer)
-    const NETLIFY_METADATA = {
-        'cloudbaud.com': {
-            siteId: '54b07907-6ac7-4209-8e9a-b6df1a3457f6',
-            adminUrl: 'https://app.netlify.com/projects/cloudbaud',
-            buildStatus: 'Ready',
-            lastDeploy: '2026-02-13T01:15:00Z',
-            repoUrl: 'https://github.com/jishnath/cloudbaud.com',
-            screenshot: '/cmdb-thumbnails/cloudbaud-thumb.png' 
-        },
-        'systemsdesign.pro': {
-            siteId: '80497b07-75d5-41e0-a8e2-5409544dc3a7',
-            adminUrl: 'https://app.netlify.com/sites/systemsdesign/overview',
-            buildStatus: 'Ready',
-            lastDeploy: '2026-02-10T14:20:00Z',
-            repoUrl: 'https://github.com/jishnath/systems-design-platform',
-            screenshot: '/cmdb-thumbnails/systemsdesign-thumb.png'
-        },
-        'jishnunath.com': {
-            siteId: '4783a135-9b8d-46fc-8be5-ab209c5dfd0d',
-            adminUrl: 'https://app.netlify.com/sites/jishnunath/overview',
-            buildStatus: 'Ready',
-            lastDeploy: '2026-01-10T03:47:00Z',
-            repoUrl: 'https://github.com/jishnath/portfolio',
-            screenshot: '/cmdb-thumbnails/jishnunath-thumb.png'
-        },
-        'kampuz.online': {
-            siteId: '614566d4-cd99-4d34-b8d8-88ec5fbbfc8e',
-            adminUrl: 'https://app.netlify.com/sites/lucky-crepe-7f79dc/overview',
-            buildStatus: 'Ready',
-            lastDeploy: '2025-12-28T18:26:00Z',
-            repoUrl: 'https://github.com/jishnath/kampuz-web',
-            screenshot: '/cmdb-thumbnails/kampuz-thumb.png'
-        }
-    };
-
     // New App Form State
     const [newApp, setNewApp] = useState({
         name: '',
@@ -97,22 +97,24 @@ const CmdbDashboard = () => {
 
     const isAdmin = user?.email?.toLowerCase() === 'jish.nath@cloudbaud.com';
 
-    useEffect(() => {
-        fetchApps();
-    }, []);
-
-    const fetchApps = async () => {
+    const fetchApps = React.useCallback(async () => {
         try {
             setLoading(true);
             const data = await CmdbService.getApps();
             
-            // Enrich with Netlify Metadata
+            // Enrich with NETLIFY_METADATA if DB fields are missing
             const enrichedData = (data || []).map(app => {
                 const meta = NETLIFY_METADATA[app.domain?.toLowerCase()] || {};
                 return {
-                    ...app,
-                    ...meta,
-                    // Prefer metadata values if DB is empty
+                    ...app, // Spread DB fields first
+                    // Map DB snake_case to component camelCase if DB has it, else use meta
+                    screenshot: app.screenshot_url || meta.screenshot || null,
+                    adminUrl: app.admin_url || meta.adminUrl || null,
+                    siteId: app.site_id || meta.siteId || null,
+                    lastDeploy: app.last_deploy_at || meta.lastDeploy || null,
+                    buildStatus: app.build_status || meta.buildStatus || null,
+                    
+                    // Fallbacks for core fields
                     github_repo: app.github_repo || meta.repoUrl || '', 
                     app_id: app.app_id || meta.siteId?.substring(0, 8).toUpperCase() || ''
                 };
@@ -121,6 +123,51 @@ const CmdbDashboard = () => {
             setApps(enrichedData);
         } catch (err) {
             console.error('Error fetching apps:', err);
+        } finally {
+            setLoading(false);
+        }
+    }, [])
+
+    useEffect(() => {
+        fetchApps();
+    }, [fetchApps]);
+
+
+
+    const handleSyncMetadata = async () => {
+        if (!confirm('This will sync local Netlify metadata to the Supabase database. Continue?')) return;
+        
+        try {
+            setLoading(true);
+            let updateCount = 0;
+            
+            // Iterate over hardcoded metadata and upsert to DB
+            for (const [domain, meta] of Object.entries(NETLIFY_METADATA)) {
+                // Find existing app by domain to get other fields if needed, or just upsert known fields
+                // We'll trust upsertAppByDomain to handle the merge/creation
+                
+                // Map component fields to DB snake_case
+                const dbPayload = {
+                    domain: domain,
+                    // If creating new, we might need name etc, but for now we assume these apps exist or we are just updating metadata
+                    // Ideally we should match existing apps.
+                    screenshot_url: meta.screenshot,
+                    admin_url: meta.adminUrl,
+                    site_id: meta.siteId,
+                    last_deploy_at: meta.lastDeploy,
+                    build_status: meta.buildStatus,
+                    github_repo: meta.repoUrl
+                };
+
+                await CmdbService.upsertAppByDomain(domain, dbPayload);
+                updateCount++;
+            }
+            
+            alert(`Successfully synced ${updateCount} apps to Supabase.`);
+            fetchApps(); // Refresh to show DB data
+        } catch (err) {
+            console.error('Error syncing metadata:', err);
+            alert('Failed to sync metadata to Supabase.');
         } finally {
             setLoading(false);
         }
@@ -188,6 +235,16 @@ const CmdbDashboard = () => {
             maxWidth="max-w-full"
             actions={
                 <div className="flex items-center gap-3">
+                    {/* 1. Search Input */}
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                        <Input 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Search apps..." 
+                            className="w-64 pl-9 bg-card"
+                        />
+                    </div>
 
 
                     {/* 2. Filter Button */}
@@ -243,20 +300,30 @@ const CmdbDashboard = () => {
                         </Button>
                     </div>
 
-                    {/* 5. Add Button (Admin Only) */}
+                    {/* 5. Actions (Admin Only) */}
                     {isAdmin && (
-                        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                            <DialogTrigger asChild>
-                                <Button className="bg-brand-blue hover:bg-brand-blue/90 gap-2">
-                                    <Plus className="size-4" />
-                                    Add App
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="bg-slate-900 border-slate-800 text-white sm:max-w-[425px]">
-                                <DialogHeader>
-                                    <DialogTitle>Add New Application</DialogTitle>
-                                </DialogHeader>
-                                <form onSubmit={handleCreateApp} className="grid gap-4 py-4">
+                        <div className="flex gap-2">
+                            <Button 
+                                variant="outline" 
+                                className="gap-2 bg-card text-muted-foreground hover:text-brand-blue"
+                                onClick={handleSyncMetadata}
+                                title="Sync local metadata to Supabase"
+                            >
+                                <RefreshCw className="size-4" />
+                            </Button>
+
+                            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                                <DialogTrigger asChild>
+                                    <Button className="bg-brand-blue hover:bg-brand-blue/90 gap-2">
+                                        <Plus className="size-4" />
+                                        Add App
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="bg-slate-900 border-slate-800 text-white sm:max-w-[425px]">
+                                    <DialogHeader>
+                                        <DialogTitle>Add New Application</DialogTitle>
+                                    </DialogHeader>
+                                    <form onSubmit={handleCreateApp} className="grid gap-4 py-4">
                                     <div className="grid grid-cols-4 items-center gap-4">
                                         <Label htmlFor="name" className="text-right">Name</Label>
                                         <Input 
@@ -575,10 +642,10 @@ const CmdbDashboard = () => {
     );
 };
 
-const StatCard = ({ label, value, icon: LucideIcon, color = "text-brand-blue" }) => (
+const StatCard = ({ label, value, icon: IconComponent, color = "text-brand-blue" }) => (
     <div className="flex items-center gap-3 px-3 py-1.5 rounded-lg bg-card/40 border border-border/50 hover:bg-card hover:border-border transition-colors group min-w-fit">
         <div className={`p-1 rounded-md bg-secondary/30 ${color} group-hover:bg-secondary/50 transition-colors`}>
-            <LucideIcon className="size-3.5" />
+            <IconComponent className="size-3.5" />
         </div>
         <div className="flex items-baseline gap-2">
             <span className="text-sm font-bold text-foreground">{value}</span>

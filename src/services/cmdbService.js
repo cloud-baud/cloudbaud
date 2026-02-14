@@ -46,5 +46,17 @@ export const CmdbService = {
 
         if (error) throw error;
         return true;
+    },
+
+    // SYNC: Upsert app based on domain (for syncing external metadata)
+    upsertAppByDomain: async (domain, appData) => {
+        const { data, error } = await supabase
+            .from('cmdb_applications')
+            .upsert(appData, { onConflict: 'domain' })
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
     }
 };
