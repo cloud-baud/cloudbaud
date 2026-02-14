@@ -21,7 +21,7 @@ const PortfolioPage = () => {
 
     const filteredProjects = selectedCategory === 'All Projects'
         ? portfolioProjects
-        : portfolioProjects.filter(project => project.category === selectedCategory);
+        : portfolioProjects.filter(project => project.categories && project.categories.includes(selectedCategory));
 
     return (
         <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
@@ -162,9 +162,8 @@ const PortfolioPage = () => {
 export default PortfolioPage;
 
 const PortfolioDetailCard = ({ project }) => {
-    const { user } = useAuth();
-    const [activeTab, setActiveTab] = useState('executive');
-
+    // Content tabs are handled by the Tabs component intrinsically
+    
     return (
         <div id={project.id} className="scroll-mt-20">
             <div className="bg-white dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700 rounded-3xl overflow-hidden shadow-sm dark:shadow-none">
@@ -187,16 +186,16 @@ const PortfolioDetailCard = ({ project }) => {
                  )}
 
                 <div className="p-8">
-                     <Tabs defaultValue="executive" className="w-full" onValueChange={setActiveTab}>
+                     <Tabs defaultValue="executive" className="w-full">
                         <TabsList className="grid w-full grid-cols-3 mb-8 bg-slate-100 dark:bg-slate-900/50 p-1 rounded-xl">
                             <TabsTrigger value="executive" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm">
                                 Executive Summary
                             </TabsTrigger>
                             <TabsTrigger value="architecture" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm flex items-center gap-2">
-                                <Server className="w-4 h-4" /> Architecture <Lock className="w-3 h-3 text-slate-400" />
+                                <Server className="w-4 h-4" /> Architecture
                             </TabsTrigger>
                             <TabsTrigger value="implementation" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm flex items-center gap-2">
-                                <FileCode className="w-4 h-4" /> Implementation <Lock className="w-3 h-3 text-slate-400" />
+                                <FileCode className="w-4 h-4" /> Implementation
                             </TabsTrigger>
                         </TabsList>
 
@@ -227,47 +226,90 @@ const PortfolioDetailCard = ({ project }) => {
                             </div>
                         </TabsContent>
 
-                        {/* ARCHITECTURE VIEW (Gated) */}
-                        <TabsContent value="architecture" className="relative min-h-[400px]">
-                            <div className="filter blur-sm select-none opacity-50 pointer-events-none p-6 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl">
-                                <h3 className="text-xl font-bold mb-4">System Architecture Diagram</h3>
-                                <div className="h-64 bg-slate-200 dark:bg-slate-800 rounded mb-4" />
-                                <div className="h-4 w-3/4 bg-slate-200 dark:bg-slate-800 rounded mb-2" />
-                                <div className="h-4 w-1/2 bg-slate-200 dark:bg-slate-800 rounded" />
-                            </div>
-                            
-                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 dark:bg-black/60 backdrop-blur-[1px] rounded-xl z-10">
-                                <Lock className="w-12 h-12 text-gray-400 mb-4" />
-                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Architecture Blocked</h3>
-                                <p className="text-gray-600 dark:text-gray-300 mb-6 text-center max-w-sm">
-                                    Join CloudBaud to access detailed Reference Architectures, Security Models, and Component Diagrams.
-                                </p>
-                                <Button className="bg-brand-blue text-black hover:bg-brand-blue/90">
-                                    Register to Unlock (Free)
-                                </Button>
-                            </div>
+                        {/* ARCHITECTURE VIEW (Public for Demo) */}
+                        <TabsContent value="architecture" className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            {project.architecture ? (
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    <div className="space-y-6">
+                                        <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+                                            <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                                                <Server className="w-5 h-5 text-indigo-500" /> System Design
+                                            </h4>
+                                            <p className="text-gray-600 dark:text-gray-300 mb-6">{project.architecture.summary}</p>
+                                            
+                                            <div className="space-y-4">
+                                                {project.architecture.components.map((comp, i) => (
+                                                    <div key={i} className="flex gap-4 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700 shadow-sm">
+                                                        <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-sm shrink-0">
+                                                            {i + 1}
+                                                        </div>
+                                                        <div>
+                                                            <h5 className="font-semibold text-gray-900 dark:text-white text-sm">{comp.name}</h5>
+                                                            <p className="text-xs text-gray-500 dark:text-gray-400 leading-snug">{comp.desc}</p>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Mock Diagram Placeholder */}
+                                    <div className="bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-center min-h-[300px] relative overflow-hidden group">
+                                        <div className="absolute inset-0 bg-grid-slate-200/50 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:bg-grid-slate-700/25" />
+                                        <img 
+                                            src={project.architecture.diagram} 
+                                            alt="Architecture Diagram"
+                                            className="max-w-[80%] max-h-[80%] shadow-2xl rounded border border-slate-200 dark:border-slate-700 bg-white"
+                                            onError={(e) => {
+                                                e.target.style.display = 'none';
+                                                e.target.nextSibling.style.display = 'flex';
+                                            }}
+                                        />
+                                        <div className="hidden absolute inset-0 flex-col items-center justify-center text-slate-400">
+                                            <Server className="w-16 h-16 mb-4 opacity-20" />
+                                            <p>Architecture Diagram Visual</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="p-12 text-center text-slate-500">Architecture details pending...</div>
+                            )}
                         </TabsContent>
 
-                        {/* IMPLEMENTATION VIEW (Paid) */}
-                         <TabsContent value="implementation" className="relative min-h-[400px]">
-                            <div className="filter blur-sm select-none opacity-50 pointer-events-none p-6 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl">
-                                <h3 className="text-xl font-bold mb-4 font-mono">infrastructure/main.tf</h3>
-                                <div className="h-4 w-full bg-slate-200 dark:bg-slate-800 rounded mb-2" />
-                                <div className="h-4 w-5/6 bg-slate-200 dark:bg-slate-800 rounded mb-2" />
-                                <div className="h-4 w-4/5 bg-slate-200 dark:bg-slate-800 rounded mb-2" />
-                                <div className="h-4 w-full bg-slate-200 dark:bg-slate-800 rounded mb-2" />
-                            </div>
-                            
-                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 dark:bg-black/60 backdrop-blur-[1px] rounded-xl z-10">
-                                <FileCode className="w-12 h-12 text-brand-aqua mb-4" />
-                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Developer Kit</h3>
-                                <p className="text-gray-600 dark:text-gray-300 mb-6 text-center max-w-sm">
-                                    Get the full Terraform templates, PySpark notebooks, and deployment scripts for this solution.
-                                </p>
-                                <Button className="bg-brand-aqua text-black hover:bg-brand-aqua/90">
-                                    Purchase Kit ($499)
-                                </Button>
-                            </div>
+                        {/* IMPLEMENTATION VIEW (Public for Demo) */}
+                         <TabsContent value="implementation" className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            {project.implementation ? (
+                                <div className="space-y-6">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-lg font-bold flex items-center gap-2">
+                                            <FileCode className="w-5 h-5 text-emerald-500" /> Implementation Patterns
+                                        </h3>
+                                        <Badge variant="outline" className="font-mono text-xs">Verified Code</Badge>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                        {project.implementation.files.map((file, i) => (
+                                            <div key={i} className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700 shadow-lg flex flex-col">
+                                                <div className="px-4 py-2 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+                                                    <span className="font-mono text-xs text-slate-400">{file.name}</span>
+                                                    <span className="text-[10px] text-slate-500 uppercase">{file.lang}</span>
+                                                </div>
+                                                <div className="p-4 overflow-x-auto flex-1">
+                                                    <pre className="text-xs font-mono text-emerald-300 leading-relaxed">
+                                                        <code>{file.code}</code>
+                                                    </pre>
+                                                </div>
+                                                <div className="px-4 py-2 bg-slate-900/50 border-t border-slate-800 text-[10px] text-slate-500 flex justify-end gap-2">
+                                                    <button className="hover:text-white transition-colors">Copy</button>
+                                                    <button className="hover:text-white transition-colors">Raw</button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="p-12 text-center text-slate-500">Implementation details pending...</div>
+                            )}
                         </TabsContent>
 
                      </Tabs>

@@ -27,8 +27,10 @@ import {
     Settings,
     Grid,
     Search,
-    Plus
+    Plus,
+    Mail
 } from 'lucide-react';
+import { Badge } from '@/shared/ui/badge';
 import { useAuth } from '@/context/AuthContext';
 
 
@@ -103,10 +105,10 @@ const PortalDashboard = () => {
     }, []);
 
     const recentDocs = [
-        { id: 1, title: 'Q1 Financial Report', status: 'Draft', date: '2h ago', category: 'Finance', icon: FileText, accent: 'blue' },
-        { id: 2, title: 'Project Alpha Spec', status: 'Published', date: '5h ago', category: 'Engineering', icon: LayoutTemplate, accent: 'purple' },
-        { id: 3, title: 'Client Onboarding', status: 'In Review', date: '1d ago', category: 'Sales', icon: Users, accent: 'green' },
-        { id: 4, title: 'System Architecture', status: 'Live', date: '2d ago', category: 'IT', icon: Globe, accent: 'orange' },
+        { id: 1, title: 'Fabric ETL Pipeline.ipynb', status: 'Draft', date: '2h ago', category: 'Demo / Engineering', icon: FileText, accent: 'blue' },
+        { id: 2, title: 'Schedule C (Business) 2025', status: 'Review', date: '5h ago', category: 'Taxes / Finance', icon: LayoutTemplate, accent: 'purple' },
+        { id: 3, title: 'Project Alpha Proposal.docx', status: 'In Review', date: '1d ago', category: 'Sales / RFP', icon: Users, accent: 'green' },
+        { id: 4, title: 'CFP: O\'Reilly Architecture', status: 'Drafting', date: '2d ago', category: 'Consulting / Speaking', icon: Globe, accent: 'orange' },
     ];
 
     return (
@@ -137,10 +139,10 @@ const PortalDashboard = () => {
 
             {/* Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard label="Active Projects" value="12" trend="+2.5%" icon={Grid} trendUp={true} />
-                <StatCard label="Pending Tasks" value="8" trend="-4.1%" icon={CheckCircle2} trendUp={true} />
-                <StatCard label="Team Members" value="24" trend="+1" icon={Users} trendUp={true} />
-                <StatCard label="System Status" value="99.9%" trend="Stable" icon={Activity} trendUp={true} />
+                <StatCard label="Active Deadlines" value="3" trend="Critical" icon={Clock} trendUp={false} />
+                <StatCard label="Open RFPs" value="$1.2M" trend="Pipeline" icon={Grid} trendUp={true} />
+                <StatCard label="Speaking Gigs" value="2" trend="Upcoming" icon={Users} trendUp={true} />
+                <StatCard label="Tax Status" value="Filings" trend="On Track" icon={Activity} trendUp={true} />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -230,35 +232,58 @@ const PortalDashboard = () => {
                         </div>
                     </div>
 
-                     {/* Upcoming Events (Static for now) */}
+                     {/* Upcoming Events (Unified Calendar) */}
                      <div className="bg-card border border-border rounded-xl p-5">
-                        <h3 className="font-semibold mb-4 flex items-center gap-2">
-                            <Clock className="size-4" /> Upcoming
+                        <h3 className="font-semibold mb-4 flex items-center justify-between">
+                            <span className="flex items-center gap-2"><Clock className="size-4" /> Unified Calendar</span>
+                            <span className="text-xs text-muted-foreground font-normal">jish.nath@cloudbaud.com</span>
                         </h3>
                         <div className="space-y-4">
-                            <div className="flex gap-3 items-start">
-                                <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 p-2 rounded-lg text-xs font-bold text-center min-w-[3rem]">
+                            <div className="flex gap-3 items-start group hover:bg-slate-50 dark:hover:bg-slate-800/50 p-2 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-slate-100 dark:hover:border-slate-700">
+                                <div className="bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 p-2 rounded-lg text-xs font-bold text-center min-w-[3rem]">
                                     <div>FEB</div>
                                     <div className="text-lg">14</div>
                                 </div>
                                 <div>
-                                    <h4 className="font-medium text-sm">Team Sync</h4>
-                                    <p className="text-xs text-muted-foreground">10:00 AM - 11:00 AM</p>
+                                    <div className="flex items-center gap-2">
+                                        <h4 className="font-medium text-sm">RFP Submission Due</h4>
+                                        <Badge className="bg-rose-100 text-rose-700 border-rose-200 h-4 px-1 text-[10px]">Critical</Badge>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">Project Alpha (Global SaaS)</p>
+                                    <p className="text-[10px] text-slate-400 mt-1 flex items-center gap-1"><Mail className="w-3 h-3"/> Sales Calendar</p>
                                 </div>
                             </div>
-                            <div className="flex gap-3 items-start">
-                                <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 p-2 rounded-lg text-xs font-bold text-center min-w-[3rem]">
+
+                            <div className="flex gap-3 items-start group hover:bg-slate-50 dark:hover:bg-slate-800/50 p-2 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-slate-100 dark:hover:border-slate-700">
+                                <div className="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 p-2 rounded-lg text-xs font-bold text-center min-w-[3rem]">
                                     <div>FEB</div>
+                                    <div className="text-lg">28</div>
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <h4 className="font-medium text-sm">CFP Deadline</h4>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">O'Reilly Software Architecture</p>
+                                    <p className="text-[10px] text-slate-400 mt-1 flex items-center gap-1"><Globe className="w-3 h-3"/> Speaking Calendar</p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3 items-start group hover:bg-slate-50 dark:hover:bg-slate-800/50 p-2 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-slate-100 dark:hover:border-slate-700">
+                                <div className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 p-2 rounded-lg text-xs font-bold text-center min-w-[3rem]">
+                                    <div>APR</div>
                                     <div className="text-lg">15</div>
                                 </div>
                                 <div>
-                                    <h4 className="font-medium text-sm">Project Review</h4>
-                                    <p className="text-xs text-muted-foreground">2:00 PM - 3:30 PM</p>
+                                    <div className="flex items-center gap-2">
+                                        <h4 className="font-medium text-sm">Tax Filing (IRS)</h4>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">Q1 Estimated Payments</p>
+                                    <p className="text-[10px] text-slate-400 mt-1 flex items-center gap-1"><Activity className="w-3 h-3"/> Finance Calendar</p>
                                 </div>
                             </div>
                         </div>
                         <button className="w-full mt-4 text-xs text-muted-foreground hover:text-primary transition-colors flex items-center justify-center gap-1">
-                            View Calendar <ArrowRight className="size-3" />
+                            <LinkIcon className="size-3" /> Sync Outlook Calendar
                         </button>
                     </div>
                 </div>

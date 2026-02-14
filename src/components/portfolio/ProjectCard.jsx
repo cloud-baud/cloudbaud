@@ -82,7 +82,7 @@ const ProjectCard = ({ project, featured = false }) => {
                 {/* Category Badge */}
                 <div className="absolute bottom-4 left-4 z-10 pointer-events-none">
                     <span className="px-4 py-2 bg-brand-blue text-black text-sm font-semibold rounded-full shadow-lg border border-brand-blue/20">
-                        {project.category}
+                        {project.categories ? project.categories[0] : 'Project'}
                     </span>
                 </div>
             </div>
