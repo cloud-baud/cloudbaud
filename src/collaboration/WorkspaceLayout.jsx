@@ -43,7 +43,8 @@ import {
 } from '@/shared/ui/dropdown-menu';
 import ThemeToggle from '@/components/layout/ThemeToggle';
 import OllamaChatPanel from './OllamaChatPanel';
-import { Sparkles } from 'lucide-react'; // Import icon for the trigger button
+import { Sparkles } from 'lucide-react'; 
+import { isFinanceAuthorized } from '@/components/auth/FinanceGuard'; // Import permission check
 
 // Icon Mapping for Dynamic Navigation
 const ICON_MAP = {
@@ -362,7 +363,9 @@ const WorkspaceLayout = () => {
                             </Section>
 
                             <Section title="Operations" collapsed={isSidebarCollapsed}>
-                                {operationsApps.map((item) => (
+                                {operationsApps
+                                    .filter(app => app.label !== 'Finance' || isFinanceAuthorized(user)) // Hide Finance if not authorized
+                                    .map((item) => (
                                     <SidebarLink key={item.label} {...item} collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
                                 ))}
                             </Section>

@@ -102,8 +102,22 @@ const HomePage = () => {
       <SEO
         title="CloudBaud - Intelligent Systems Engineering"
         description="Hire expert AI Engineers for custom ML/LLM solutions. We build production-grade RAG systems, AI agents, and scalable data platforms on Azure Databricks. Specializing in Healthcare & Finance."
-        keywords="CloudBaud, AI Engineering, Azure Databricks, Data Engineering, RAG Systems, Machine Learning, Cloud Solutions, DevOps, Healthcare Data, Unity Catalog, Enterprise AI, Intelligent Systems, Seattle Tech, Custom LLM"
         canonical="/"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "CloudBaud",
+          "url": "https://cloudbaud.com",
+          "logo": "https://cloudbaud.com/cloudbaud_logo_clean_1769644805025.png",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+1-425-749-2101",
+            "contactType": "sales"
+          },
+          "sameAs": [
+            "https://www.linkedin.com/company/cloudbaud"
+          ]
+        }}
       />
 
       {/* Hero Section */}

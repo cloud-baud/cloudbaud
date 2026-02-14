@@ -52,6 +52,7 @@ import ContentControl from './collaboration/ContentControl';
 import ConsultingDashboard from './collaboration/consulting/ConsultingDashboard';
 
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import FinanceGuard from './components/auth/FinanceGuard'; // NEW: Finance Guard
 import DevPersonaSwitcher from './components/auth/DevPersonaSwitcher';
 
 
@@ -95,12 +96,14 @@ function App() {
                     <Route path="network" element={<PlaceholderPage />} />
 
                     {/* Business Apps Routes */}
-                    <Route path="finance" element={<ContextLayout />}>
-                      <Route index element={<FinOpsDashboard />} />
-                      <Route path="taxes" element={<TaxDashboard />} />
-                      <Route path="bookkeeping" element={<BookkeepingDashboard />} />
-                      <Route path="accounting" element={<AccountingDashboard />} />
-                      <Route path="investments" element={<PlaceholderPage />} />
+                    <Route element={<FinanceGuard />}>
+                        <Route path="finance" element={<ContextLayout />}>
+                            <Route index element={<FinOpsDashboard />} />
+                            <Route path="taxes" element={<TaxDashboard />} />
+                            <Route path="bookkeeping" element={<BookkeepingDashboard />} />
+                            <Route path="accounting" element={<AccountingDashboard />} />
+                            <Route path="investments" element={<PlaceholderPage />} />
+                        </Route>
                     </Route>
                     <Route path="support" element={<PlaceholderPage />} />
                     <Route path="crm" element={<CrmDashboard />} />
