@@ -1,7 +1,8 @@
-
------
+---
 description: setup a new Supabase environment and capture project details
 ---
+
+# Setup Supabase Account
 
 1. Ask user for Supabase Project URL and Anon Key.
 2. Ask user for a friendly name for this project (e.g., "Personal", "Work", "ClientX").
