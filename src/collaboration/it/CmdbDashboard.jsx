@@ -48,6 +48,39 @@ const CmdbDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     
+    // Netlify Metadata Mapping (Enrichment Layer)
+    const NETLIFY_METADATA = {
+        'cloudbaud.com': {
+            siteId: '54b07907-6ac7-4209-8e9a-b6df1a3457f6',
+            adminUrl: 'https://app.netlify.com/projects/cloudbaud',
+            buildStatus: 'Ready',
+            lastDeploy: '2026-02-13T01:15:00Z',
+            repoUrl: 'https://github.com/jishnath/cloudbaud.com',
+            screenshot: 'https://api.netlify.com/api/v1/badges/54b07907-6ac7-4209-8e9a-b6df1a3457f6/deploy-status' // Utilizing badge as proxy for status
+        },
+        'systemsdesign.pro': {
+            siteId: '80497b07-75d5-41e0-a8e2-5409544dc3a7',
+            adminUrl: 'https://app.netlify.com/sites/systemsdesign/overview',
+            buildStatus: 'Ready',
+            lastDeploy: '2026-02-10T14:20:00Z',
+            repoUrl: 'https://github.com/jishnath/systems-design-platform'
+        },
+        'jishnunath.com': {
+            siteId: '4783a135-9b8d-46fc-8be5-ab209c5dfd0d',
+            adminUrl: 'https://app.netlify.com/sites/jishnunath/overview',
+            buildStatus: 'Ready',
+            lastDeploy: '2026-01-10T03:47:00Z',
+            repoUrl: 'https://github.com/jishnath/portfolio'
+        },
+        'kampuz.online': {
+            siteId: '614566d4-cd99-4d34-b8d8-88ec5fbbfc8e',
+            adminUrl: 'https://app.netlify.com/sites/lucky-crepe-7f79dc/overview',
+            buildStatus: 'Ready',
+            lastDeploy: '2025-12-28T18:26:00Z',
+            repoUrl: 'https://github.com/jishnath/kampuz-web'
+        }
+    };
+
     // New App Form State
     const [newApp, setNewApp] = useState({
         name: '',
@@ -69,7 +102,20 @@ const CmdbDashboard = () => {
         try {
             setLoading(true);
             const data = await CmdbService.getApps();
-            setApps(data || []);
+            
+            // Enrich with Netlify Metadata
+            const enrichedData = (data || []).map(app => {
+                const meta = NETLIFY_METADATA[app.domain?.toLowerCase()] || {};
+                return {
+                    ...app,
+                    ...meta,
+                    // Prefer metadata values if DB is empty
+                    github_repo: app.github_repo || meta.repoUrl || '', 
+                    app_id: app.app_id || meta.siteId?.substring(0, 8).toUpperCase() || ''
+                };
+            });
+
+            setApps(enrichedData);
         } catch (err) {
             console.error('Error fetching apps:', err);
         } finally {
@@ -410,13 +456,26 @@ const CmdbDashboard = () => {
                                     <div key={app.id} className="group relative bg-card border border-border rounded-xl p-5 hover:shadow-lg hover:border-brand-blue/30 transition-all duration-300 flex flex-col h-full">
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="size-10 rounded-lg bg-gradient-to-br from-brand-blue/10 to-purple-500/10 flex items-center justify-center text-brand-blue border border-brand-blue/20 shadow-sm">
-                                                    {app.name.charAt(0)}
+                                                <div className="size-10 rounded-lg bg-gradient-to-br from-brand-blue/10 to-purple-500/10 flex items-center justify-center text-brand-blue border border-brand-blue/20 shadow-sm relative overflow-hidden">
+                                                    {/* If we had a screenshot, we could use it here. For now, initial. */}
+                                                    <span className="font-bold text-lg">{app.name.charAt(0)}</span>
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-bold text-foreground group-hover:text-brand-blue transition-colors">{app.name}</h3>
-                                                    <div className="text-xs text-muted-foreground font-mono bg-muted/50 px-1.5 py-0.5 rounded w-fit mt-0.5">
-                                                        {app.app_id}
+                                                    <h3 className="font-bold text-foreground group-hover:text-brand-blue transition-colors flex items-center gap-2">
+                                                        {app.name}
+                                                        {app.buildStatus && (
+                                                            <div className="size-2 rounded-full bg-emerald-500 animate-pulse" title={`Build Status: ${app.buildStatus}`} />
+                                                        )}
+                                                    </h3>
+                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                        <div className="text-xs text-muted-foreground font-mono bg-muted/50 px-1.5 py-0.5 rounded w-fit">
+                                                            {app.app_id}
+                                                        </div>
+                                                        {app.lastDeploy && (
+                                                            <span className="text-[10px] text-muted-foreground">
+                                                                Deployed: {new Date(app.lastDeploy).toLocaleDateString()}
+                                                            </span>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
@@ -428,6 +487,14 @@ const CmdbDashboard = () => {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuItem>View Details</DropdownMenuItem>
+                                                    {app.adminUrl && (
+                                                        <DropdownMenuItem asChild>
+                                                            <a href={app.adminUrl} target="_blank" rel="noopener noreferrer" className="flex items-center">
+                                                                <ExternalLink className="mr-2 h-4 w-4" />
+                                                                Manage on Netlify
+                                                            </a>
+                                                        </DropdownMenuItem>
+                                                    )}
                                                     {isAdmin && (
                                                         <DropdownMenuItem 
                                                             className="text-red-500 focus:text-red-500 focus:bg-red-500/10"
@@ -451,7 +518,7 @@ const CmdbDashboard = () => {
                                             </div>
                                             <div className="flex items-center justify-between text-sm">
                                                 <span className="text-muted-foreground flex items-center gap-2">
-                                                    {app.hosting === 'Netlify' ? <Cloud className="size-3.5" /> : <Server className="size-3.5" />} Hosting
+                                                    {app.hosting === 'Netlify' ? <Cloud className="size-3.5 text-teal-400" /> : <Server className="size-3.5" />} Hosting
                                                 </span>
                                                 <span className="text-foreground">{app.hosting}</span>
                                             </div>
@@ -459,7 +526,13 @@ const CmdbDashboard = () => {
                                                 <span className="text-muted-foreground flex items-center gap-2">
                                                     <Github className="size-3.5" /> Repo
                                                 </span>
-                                                <span className="text-foreground truncate max-w-[150px]">{app.github_repo || '-'}</span>
+                                                {app.repoUrl ? (
+                                                    <a href={app.repoUrl} target="_blank" rel="noopener noreferrer" className="text-xs hover:underline text-foreground truncate max-w-[150px]">
+                                                        {app.repoUrl.replace('https://github.com/', '')}
+                                                    </a>
+                                                ) : (
+                                                    <span className="text-foreground text-xs truncate max-w-[150px]">{app.github_repo || '-'}</span>
+                                                )}
                                             </div>
                                         </div>
 
