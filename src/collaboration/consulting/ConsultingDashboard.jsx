@@ -147,10 +147,10 @@ const ConsultingKPIs = ({ activeTab }) => {
     );
 };
 
-const CompactStatCard = ({ label, value, icon: LucideIcon, color = "text-indigo-500" }) => (
+const CompactStatCard = ({ label, value, icon: Icon, color = "text-indigo-500" }) => (
   <div className="flex items-center gap-3 px-3 py-1.5 rounded-lg bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 shadow-sm min-w-fit">
       <div className={`p-1 rounded-md bg-slate-100 dark:bg-slate-800 ${color}`}>
-          <LucideIcon className="size-3.5" />
+          <Icon className="size-3.5" />
       </div>
       <div className="flex items-baseline gap-2">
           <span className="text-sm font-bold text-slate-900 dark:text-white">{value}</span>
