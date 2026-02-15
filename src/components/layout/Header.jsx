@@ -105,10 +105,9 @@ const Header = () => {
                 <CloudBaudLogo className="h-full w-auto p-1" />
               )}
             </div>
-              <span className="text-xl md:text-2xl tracking-widest text-brand-blue font-bold">
-                {user?.user_metadata?.site_name || "CloudBaud"}
-              </span>
-            </div>
+            <span className="text-xl md:text-2xl tracking-widest text-brand-blue font-bold">
+              {user?.user_metadata?.site_name || "CloudBaud"}
+            </span>
           </Link>
 
           {/* Desktop Navigation */}

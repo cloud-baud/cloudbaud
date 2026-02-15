@@ -54,6 +54,10 @@ const SettingsPage = () => {
         return params.get('tab') || 'general';
     });
     const [currentCollection, setCurrentCollection] = useState(collections[0]);
+    
+    // Track initial state for dirty detection
+    const [initialState, setInitialState] = useState(null);
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     // Allow editing current collection details locally in the UI
     const handleCollectionChange = (field, value) => {
         setCurrentCollection(prev => ({ ...prev, [field]: value }));
@@ -226,6 +230,21 @@ const SettingsPage = () => {
             setFontFamily(user.user_metadata.font_family || 'Inter');
             setCustomLogo(user.user_metadata.custom_logo_url || '');
             setSiteName(user.user_metadata.site_name || 'CloudBaud');
+            
+            // Capture initial state for dirty tracking
+            setInitialState({
+                themeColor: user.user_metadata.theme_color || '#00d2ff',
+                fontFamily: user.user_metadata.font_family || 'Inter',
+                customLogo: user.user_metadata.custom_logo_url || '',
+                siteName: user.user_metadata.site_name || 'CloudBaud',
+                navItems: user.user_metadata.portal_nav_active || navItems,
+                aiConfig: {
+                    provider: localStorage.getItem('ai_provider') || 'ollama',
+                    model: localStorage.getItem('ai_model') || 'llama3',
+                    endpoint: localStorage.getItem('ai_endpoint') || 'http://localhost:11434/api/chat',
+                    sdk: localStorage.getItem('ai_sdk') || 'custom_bridge'
+                }
+            });
         }
     }, [user]);
 
@@ -442,6 +461,81 @@ const SettingsPage = () => {
             window.location.reload(); // Reload to ensure Layout picks up new Logo/Name
         }
     };
+
+    // Detect changes across all settings
+    React.useEffect(() => {
+        if (!initialState) return;
+        
+        const hasChanges = 
+            themeColor !== initialState.themeColor ||
+            fontFamily !== initialState.fontFamily ||
+            customLogo !== initialState.customLogo ||
+            siteName !== initialState.siteName ||
+            JSON.stringify(navItems) !== JSON.stringify(initialState.navItems) ||
+            aiConfig.provider !== initialState.aiConfig.provider ||
+            aiConfig.model !== initialState.aiConfig.model ||
+            aiConfig.endpoint !== initialState.aiConfig.endpoint ||
+            aiConfig.sdk !== initialState.aiConfig.sdk;
+        
+        setHasUnsavedChanges(hasChanges);
+    }, [themeColor, fontFamily, customLogo, siteName, navItems, aiConfig, initialState]);
+
+    // Global Save All Changes
+    const handleSaveAllChanges = async () => {
+        try {
+            // Save appearance settings
+            await supabase.auth.updateUser({
+                data: {
+                    theme_color: themeColor,
+                    font_family: fontFamily,
+                    custom_logo_url: customLogo,
+                    site_name: siteName,
+                    portal_nav_active: navItems
+                }
+            });
+
+            // Save AI config to localStorage
+            localStorage.setItem('ai_provider', aiConfig.provider);
+            localStorage.setItem('ai_model', aiConfig.model);
+            localStorage.setItem('ai_endpoint', aiConfig.endpoint);
+            localStorage.setItem('ai_sdk', aiConfig.sdk);
+
+            // Update initial state to current state
+            setInitialState({
+                themeColor,
+                fontFamily,
+                customLogo,
+                siteName,
+                navItems,
+                aiConfig
+            });
+
+            toast.success("All settings saved successfully!");
+            setHasUnsavedChanges(false);
+            
+            // Reload to ensure all components pick up changes
+            setTimeout(() => window.location.reload(), 500);
+        } catch (error) {
+            console.error('Save error:', error);
+            toast.error("Failed to save settings");
+        }
+    };
+
+    // Global Discard Changes
+    const handleDiscardChanges = () => {
+        if (!initialState) return;
+        
+        setThemeColor(initialState.themeColor);
+        setFontFamily(initialState.fontFamily);
+        setCustomLogo(initialState.customLogo);
+        setSiteName(initialState.siteName);
+        setNavItems(initialState.navItems);
+        setAiConfig(initialState.aiConfig);
+        
+        toast.info("Changes discarded");
+        setHasUnsavedChanges(false);
+    };
+
 
     // Custom Link Management
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -1060,6 +1154,7 @@ const SettingsPage = () => {
                                                 <Label htmlFor="link-label">Display Label</Label>
                                                 <Input
                                                     id="link-label"
+                                                    className="text-foreground"
                                                     value={tempLabel}
                                                     onChange={(e) => setTempLabel(e.target.value)}
                                                     placeholder="e.g. My Dashboard"
@@ -1069,6 +1164,7 @@ const SettingsPage = () => {
                                                 <Label htmlFor="link-href">URL Destination</Label>
                                                 <Input
                                                     id="link-href"
+                                                    className="text-foreground"
                                                     value={tempHref}
                                                     onChange={(e) => setTempHref(e.target.value)}
                                                     placeholder="e.g. /sites/marketing OR https://google.com"
@@ -1648,6 +1744,35 @@ const SettingsPage = () => {
                             className="max-w-full max-h-[85vh] rounded-lg shadow-2xl border border-white/10"
                             onClick={(e) => e.stopPropagation()}
                         />
+                    </div>
+                </div>
+            )}
+
+            {/* Sticky Action Bar - Shows when there are unsaved changes */}
+            {hasUnsavedChanges && (
+                <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shadow-lg z-40 animate-in slide-in-from-bottom duration-300">
+                    <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="h-2 w-2 bg-amber-500 rounded-full animate-pulse"></div>
+                            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                                You have unsaved changes
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <Button 
+                                variant="outline" 
+                                onClick={handleDiscardChanges}
+                                className="min-w-[120px]"
+                            >
+                                Discard Changes
+                            </Button>
+                            <Button 
+                                onClick={handleSaveAllChanges}
+                                className="min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                                Save All Changes
+                            </Button>
+                        </div>
                     </div>
                 </div>
             )}

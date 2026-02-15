@@ -8,8 +8,8 @@ import WorkspaceLayout from './collaboration/WorkspaceLayout';
 import PortalDashboard from './collaboration/PortalDashboard';
 import FabricDemo from './collaboration/sales/FabricDemo';
 import FinOpsDashboard from './finance/dashboards/FinOpsDashboard';
-// import SettingsPage from './collaboration/settings/SettingsPage'; // OLD: Local version
-import { SettingsPage } from 'common-features/frontend/components/features/settings/SettingsPage'; // NEW: CommonFeatures master
+// import SettingsPage from './collaboration/settings/SettingsPage'; // Local version (deprecated)
+import { SettingsPage } from 'common-features/frontend/components/features/settings/SettingsPage'; // CommonFeatures master
 import PlaceholderPage from './collaboration/PlaceholderPage';
 import ContextLayout from './collaboration/ContextLayout';
 import TaxDashboard from './finance/dashboards/TaxDashboard';
@@ -46,6 +46,7 @@ import LoginPage from './pages/auth/LoginPage';
 import RedirectHandler from './components/auth/RedirectHandler';
 import AuthRedirector from './components/auth/AuthRedirector';
 import AiEngineeringPage from './portal/pages/engineering/AiEngineeringPage';
+import CompetencyLandingPage from './portal/pages/competencies/CompetencyLandingPage';
 
 import { AuthProvider } from './context/AuthContext';
 import { ContentProvider } from './context/ContentContext';
@@ -140,6 +141,7 @@ function App() {
                   <Route path="/capabilities" element={<CapabilitiesPage />} />
                   <Route path="/capabilities/:slug" element={<CapabilityDetailPage />} />
                   <Route path="/capabilities/:slug/:techSlug" element={<TechnologyDetailPage />} />
+                  <Route path="/competencies/:slug" element={<CompetencyLandingPage />} />
                   <Route path="/industries" element={<IndustriesPage />} />
                   <Route path="/industries/:slug" element={<IndustryDetail />} />
                   <Route path="/services" element={<ServicesPage />} />

@@ -24,9 +24,15 @@ const CompetencyLandingPage = () => {
   const fetchCompetency = async () => {
     try {
       setLoading(true);
+      
+      // Query from marketing schema
       const { data, error } = await supabase
-        .from('competencies')
-        .select('*')
+        .from('competency_demos')
+        .select(`
+          *,
+          competency:competencies(id, slug, title, category, icon, tagline, overview),
+          industry:industries(id, slug, name, icon)
+        `)
         .eq('slug', slug)
         .eq('is_active', true)
         .single();
@@ -43,10 +49,10 @@ const CompetencyLandingPage = () => {
     }
   };
 
-  const trackView = async (competencyId) => {
+  const trackView = async (demoId) => {
     try {
       await supabase.from('demo_analytics').insert({
-        competency_id: competencyId,
+        demo_id: demoId,
         user_id: user?.id || null,
         session_id: getSessionId(),
         interaction_type: 'view',
@@ -61,7 +67,7 @@ const CompetencyLandingPage = () => {
     if (!competency) return;
     try {
       await supabase.from('demo_analytics').insert({
-        competency_id: competency.id,
+        demo_id: competency.id,
         user_id: user?.id || null,
         session_id: getSessionId(),
         interaction_type: interactionType,
@@ -120,8 +126,8 @@ const CompetencyLandingPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SEO
-        title={`${competency.title} | CloudBaud`}
-        description={competency.meta_description || competency.tagline}
+        title={`${competency.competency.title} | CloudBaud`}
+        description={competency.tagline}
         canonical={`/competencies/${competency.slug}`}
       />
 
@@ -139,10 +145,11 @@ const CompetencyLandingPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-semibold mb-4">
-                <span>{competency.category}</span>
+                <span>{competency.competency.category}</span>
+                {competency.industry && <span>• {competency.industry.name}</span>}
               </div>
               <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white leading-tight">
-                {competency.title}
+                {competency.competency.title}
               </h1>
               <p className="text-2xl text-slate-300 mb-4 leading-relaxed">
                 {competency.tagline}
@@ -181,7 +188,7 @@ const CompetencyLandingPage = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between py-3 border-b border-slate-800">
                   <span className="text-slate-400">Demo Type</span>
-                  <span className="text-white font-semibold capitalize">{competency.architecture_diagram_type?.replace('_', ' ')}</span>
+                  <span className="text-white font-semibold capitalize">{competency.demo_type?.replace('_', ' ')}</span>
                 </div>
                 <div className="flex items-center justify-between py-3 border-b border-slate-800">
                   <span className="text-slate-400">Time to Explore</span>
@@ -223,7 +230,7 @@ const CompetencyLandingPage = () => {
           </div>
 
           {/* Mode Toggle */}
-          {competency.architecture_diagram_type === 'react_flow' && (
+          {competency.demo_type === 'react_flow' && (
             <div className="flex justify-center gap-4 mb-8">
               <button
                 onClick={() => {
@@ -255,9 +262,9 @@ const CompetencyLandingPage = () => {
           )}
 
           {/* Demo Component */}
-          {competency.architecture_diagram_type === 'react_flow' && competency.architecture_config && (
+          {competency.demo_type === 'react_flow' && competency.demo_config && (
             <InteractiveArchitecture
-              config={competency.architecture_config}
+              config={competency.demo_config}
               mode={mode}
               height="600px"
               onNodeClick={(node) => {
@@ -272,7 +279,7 @@ const CompetencyLandingPage = () => {
               <iframe
                 src={competency.demo_embed_url}
                 className="w-full h-[600px]"
-                title={`${competency.title} Demo`}
+                title={`${competency.competency.title} Demo`}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
