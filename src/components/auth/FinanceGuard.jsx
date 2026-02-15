@@ -7,6 +7,7 @@ import { ShieldAlert } from 'lucide-react';
 // In a future PROD version, this should move to a DB table 'finance_access_control'
 const ALLOWED_FINANCE_EMAILS = [
     'jish.nath@cloudbaud.com',
+    'admin@shiftleft.digital',
     'cpa@example.com' // TODO: Replace with actual CPA email when onboarded
 ];
 

@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
+import process from 'process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,9 +40,9 @@ if (fs.existsSync(envPath)) {
     console.error("❌ .env file not found!");
 }
 
-// 2. Determine Connection Details (Prioritize PROD as requested)
-const projectUrl = env.VITE_SUPABASE_URL_PROD || env.VITE_SUPABASE_URL;
-const dbPassword = env.VITE_SUPABASE_DB_PASSWORD_PROD || env.VITE_SUPABASE_DB_PASSWORD_TEST;
+// 2. Determine Connection Details (Default to TEST for local development)
+const projectUrl = env.VITE_SUPABASE_URL_TEST || env.VITE_SUPABASE_URL;
+const dbPassword = env.VITE_SUPABASE_DB_PASSWORD_TEST || env.VITE_SUPABASE_DB_PASSWORD_PROD;
 
 if (!projectUrl || !dbPassword) {
     console.error("❌ Mising Supabase credentials in .env");
@@ -67,21 +68,32 @@ async function deploy() {
         console.log("✅ Connected.");
 
         // 3. Read SQL File
-        const sqlPath = path.join(rootDir, 'src', 'data', 'tax_deploy_master.sql');
-        if (!fs.existsSync(sqlPath)) {
-            throw new Error(`SQL file not found at ${sqlPath}`);
+        // 3. Read SQL Files in sequential order
+        const filesToRun = [
+            path.join(rootDir, 'src', 'data', 'tax_deploy_multi_schema.sql'),
+            path.join(rootDir, 'secure_finance_api.sql'),
+            path.join(rootDir, 'src', 'data', 'populate_coa_func.sql'),
+            path.join(rootDir, 'src', 'data', 'tax_rpc_helpers.sql'),
+            path.join(rootDir, 'src', 'data', 'seed_2017_data.sql')
+        ];
+
+        console.log("🚀 Executing Finance Stack Deployment...");
+
+        for (const sqlPath of filesToRun) {
+            console.log(`\n📄 Executing: ${path.basename(sqlPath)}`);
+            if (!fs.existsSync(sqlPath)) {
+                throw new Error(`File not found: ${sqlPath}`);
+            }
+            const sql = fs.readFileSync(sqlPath, 'utf8');
+            await client.query(sql);
+            console.log(`   ✅ Success`);
         }
-        const sql = fs.readFileSync(sqlPath, 'utf8');
 
-        console.log("🚀 Executing Tax Dashboard Schema...");
-        
-        // Execute
-        await client.query(sql);
-
-        console.log("✅ Schema deployed successfully!");
-        console.log("   - Tables created (Chart of Accounts, Entries, Audit Log)");
-        console.log("   - RLS Policies applied");
-        console.log("   - Seed data inserted for latest user");
+        console.log("\n✅ Full Finance Stack deployed successfully!");
+        console.log("   - Multi-Schema Base Created");
+        console.log("   - Security API Layer Applied");
+        console.log("   - Default Population Function Created");
+        console.log("   - Seed Data Inserted");
 
     } catch (err) {
         console.error("❌ Deployment Failed:", err.message);

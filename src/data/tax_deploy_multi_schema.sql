@@ -45,10 +45,12 @@ CREATE TABLE public.chart_of_accounts (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES auth.users(id) NOT NULL,
     name TEXT NOT NULL,
+    code TEXT, -- Added for Universal Access ID (e.g. "CHK-001")
     type TEXT NOT NULL, -- 'INCOME', 'EXPENSE', 'ASSET', 'LIABILITY'
     section TEXT, -- 'w2', 'biz', 'rental', 'ira', 'deductions', 'taxes'
     sort_order INTEGER DEFAULT 0,
-    created_at TIMESTAMPTZ DEFAULT now()
+    created_at TIMESTAMPTZ DEFAULT now(),
+    UNIQUE(user_id, code) -- Prevent duplicate codes for the same user
 );
 
 -- Client Input Categories (Your personal categories - stable)

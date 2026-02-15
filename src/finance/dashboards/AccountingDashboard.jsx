@@ -3,8 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/sha
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table';
 import { Badge } from '@/shared/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
-import { RefreshCw, ChevronRight } from 'lucide-react';
-import { getChartOfAccounts } from '../../services/taxService';
+
+import { RefreshCw, ChevronRight, Save, FileDown, Printer, Filter, Plus, Pencil, Trash2, SlidersHorizontal } from 'lucide-react';
+import { Ribbon, RibbonButton, RibbonSeparator, RibbonGroup } from '../../components/layout/Ribbon'; // Import Ribbon
+import { Button } from '@/shared/ui/button'; // Import Button for toggle
+import { getChartOfAccounts } from '../api/taxService';
 
 // Helper for type colors
 const getTypeColor = (type) => {
@@ -94,6 +97,7 @@ const AccountingDashboard = () => {
     const [accounts, setAccounts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('ALL');
+    const [showRibbon, setShowRibbon] = useState(true); // Ribbon Toggle State
 
     useEffect(() => {
         const fetchData = async () => {
@@ -228,6 +232,62 @@ const AccountingDashboard = () => {
 
     return (
         <div className="p-8 max-w-[1600px] mx-auto space-y-4 animate-in fade-in duration-500">
+            {/* Ribbon Integration */}
+            <div className="flex justify-end mb-2">
+                 <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setShowRibbon(!showRibbon)}
+                    className="text-muted-foreground hover:text-foreground mb-1"
+                >
+                    {showRibbon ? 'Hide Ribbon' : 'Show Ribbon'}
+                </Button>
+            </div>
+
+            {showRibbon && (
+                <Ribbon
+                    className="mb-6"
+                    defaultTab="home"
+                    tabs={[
+                        {
+                            id: 'home',
+                            label: 'Home',
+                            content: (
+                                <>
+                                    <RibbonButton icon={Save} label="Save" disabled />
+                                    <RibbonButton icon={RefreshCw} label="Refresh" onClick={() => window.location.reload()} />
+                                    <RibbonSeparator />
+                                    <RibbonButton icon={Plus} label="New Account" />
+                                    <RibbonButton icon={Pencil} label="Edit" disabled />
+                                    <RibbonButton icon={Trash2} label="Delete" disabled />
+                                </>
+                            )
+                        },
+                        {
+                            id: 'report',
+                            label: 'Reports',
+                            content: (
+                                <>
+                                    <RibbonButton icon={FileDown} label="Export CSV" />
+                                    <RibbonButton icon={FileDown} label="Export PDF" />
+                                    <RibbonButton icon={Printer} label="Print" />
+                                </>
+                            )
+                        },
+                        {
+                            id: 'view',
+                            label: 'View',
+                            content: (
+                                <>
+                                    <RibbonButton icon={Filter} label="Filter" />
+                                    <RibbonButton icon={SlidersHorizontal} label="Group By" />
+                                </>
+                            )
+                        }
+                    ]}
+                />
+            )}
+
             {/* Breadcrumb Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">

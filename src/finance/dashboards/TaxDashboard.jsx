@@ -6,24 +6,46 @@ import {
     FileDown, Printer, Filter, Plus, Columns, Rows,
     Save, Undo, Redo, Eraser, Bold, Italic,
     AlignLeft, AlignCenter, AlignRight,
-    Lock, LockOpen, Upload, X, Activity, MessageSquare, Bot, Sparkles, FileText
+    Lock, LockOpen, Upload, X, Activity, MessageSquare, Bot, Sparkles, FileText, ListTodo, Check
 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 import { Button } from '@/shared/ui/button';
 import { Separator } from '@/shared/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
-import WorkspaceChat from '../WorkspaceChat';
-import OllamaChatPanel from '../OllamaChatPanel';
+
+// import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'; // Replaced by Ribbon
+import { Ribbon, RibbonButton, RibbonSeparator, RibbonGroup } from '../../components/layout/Ribbon';
+import WorkspaceChat from '../../collaboration/WorkspaceChat';
+import OllamaChatPanel from '../../collaboration/OllamaChatPanel';
 import { 
     updateTaxCell, 
-} from '../../services/taxService';
+} from '../api/taxService';
+
 
 // Initial Data
-const INITIAL_YEARS = [2025,2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
+const INITIAL_YEARS = [2026,2025,2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
 const INITIAL_DATA = [
+    {
+        id: 'checklist',
+        title: 'Filing Checklist (Verify Per Year)',
+        rows: [
+
+            { label: '2. Income: 1099-NEC (CloudBaud Consulting)', values: {} },
+            { label: '3. Income: 1099-B (Stock Sales/Cost Basis)', values: {} },
+            { label: '4. Income: 1099-INT/DIV (Interest/Dividends)', values: {} },
+            { label: '5. Biz: Contractor 1099s Issued (> $600)', values: {} },
+            { label: '6. Biz: Home Office Deduction (Utilities/Ins)', values: {} },
+            { label: '7. Biz: Equipment/Software (Section 179)', values: {} },
+            { label: '8. Biz: Vehicle Mileage Log', values: {} },
+            { label: '9. Personal: Mortgage Interest (1098)', values: {} },
+            { label: '10. Personal: RE/Sales Tax (Big Purchases)', values: {} },
+            { label: '11. Retirement: SEP-IRA/401k Maxed', values: {} },
+        ]
+    },
     {
         id: 'w2',
         title: null,
         rows: [
+            { label: '1. Income: W-2 (Spouse/Employment)', values: {}, isChecklist: true },
             { code: 'w2_wages', label: 'W2 Wages', values: { 2024: 0, 2023: 0, 2022: 37995.76, 2021: 49793.32, 2020: 69549.66, 2019: 84444.89, 2018: 70399.57, 2017: 63132.46 } },
             { code: 'w2_withheld', label: 'Taxes Withheld', values: { 2024: 0, 2023: 0, 2022: 4063.44, 2021: 5834.02, 2020: 10423.75, 2019: 12386.28, 2018: 7675.56, 2017: 7909.36 } },
         ]
@@ -130,6 +152,25 @@ const EditableCell = ({ value, onSave, type = 'text', formatter, className, isLo
         );
     }
 
+    if (type === 'checkbox') {
+        const isChecked = Boolean(value);
+        return (
+            <div 
+                className={cn("w-full h-full flex items-center justify-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors", className)}
+                onClick={() => onSave(isChecked ? 0 : 1)} // Toggle 0/1 for DB compatibility
+            >
+                <div className={cn(
+                    "w-4 h-4 rounded border flex items-center justify-center transition-colors",
+                    isChecked 
+                        ? "bg-brand-blue border-brand-blue text-white" 
+                        : "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800"
+                )}>
+                    {isChecked && <Check className="w-3 h-3" />}
+                </div>
+            </div>
+        );
+    }
+
     if (isEditing) {
         return (
             <input
@@ -157,22 +198,7 @@ const EditableCell = ({ value, onSave, type = 'text', formatter, className, isLo
     );
 };
 
-const RibbonBtn = ({ icon, label, onClick, className }) => {
-    const Icon = icon;
-    return (
-        <button
-            type="button"
-            onClick={onClick}
-            className={cn(
-                "flex flex-col items-center justify-center p-2 h-16 min-w-[64px] rounded-md hover:bg-accent text-muted-foreground hover:text-primary transition-colors gap-1",
-                className
-            )}
-        >
-            <Icon className="size-5" />
-            <span className="text-[10px] font-medium leading-none">{label}</span>
-        </button>
-    );
-};
+
 
 const TaxDashboard = () => {
     console.log("TaxDashboard: Mounting/Rendering");
@@ -181,6 +207,22 @@ const TaxDashboard = () => {
 
     // --- Persistence Helper (Supabase) ---
     // We now load from taxService directly via ESM imports
+
+
+    const populateCoa = async () => {
+        setIsSaving(true);
+        try {
+            const { error } = await supabase.rpc('populate_default_coa');
+            if (error) throw error;
+            // Reload data
+            window.location.reload(); 
+        } catch (err) {
+            console.error("Failed to populate COA:", err);
+            alert("Failed to populate accounts: " + err.message);
+        } finally {
+            setIsSaving(false);
+        }
+    };
     // Functions are imported at module level: getChartOfAccounts, etc.
 
     // Helper functions are now async service calls. 
@@ -195,10 +237,20 @@ const TaxDashboard = () => {
     const [years, setYears] = useState(INITIAL_YEARS); // Still keep years configurable or derived?
     const [legacyTaxData, setLegacyTaxData] = useState(INITIAL_DATA); // Legacy holder, replaced by 'sections' usage
     
+    // --- View Mode State ---
+    const [searchParams, setSearchParams] = useSearchParams();
+    const queryYear = searchParams.get('year');
+
+    // transform query param to state
+    // Default to 'summary' view (all years) if no specific year is selected
+    const viewMode = queryYear ? 'single' : 'summary'; 
+    const focusedYear = queryYear ? parseInt(queryYear) : null;
+    
     // Derived for UI Rendering (Group by Section)
     const sections = useMemo(() => {
         // Expanded Grouping System to support Universal COA types
         const groups = { 
+            checklist: [],
             w2: [], 
             biz: [], 
             rental: [], 
@@ -245,8 +297,24 @@ const TaxDashboard = () => {
             groups[sectionKey].push(row);
         });
 
+        // Explicitly get checklist from INITIAL_DATA if not in COA (Legacy Fallback)
+        let checklistRows = groups.checklist;
+        if (checklistRows.length === 0) {
+            const initialChecklist = INITIAL_DATA.find(s => s.id === 'checklist');
+            if (initialChecklist) {
+                checklistRows = initialChecklist.rows.map((r, i) => ({
+                    ...r,
+                    id: `checklist-item-${i}`, // Virtual ID for keying
+                    values: {} // Virtual values (won't persist without DB backing)
+                }));
+            }
+        }
+
         // Convert groupsMap to Array format expected by Renderer
         return [
+            // 0. Checklist (Only visible in Single Year View)
+            { id: 'checklist', title: null, rows: checklistRows },
+
             // 1. Personal Basic
             { id: 'w2', title: 'Personal Income (W2)', rows: groups.w2 },
             
@@ -265,8 +333,16 @@ const TaxDashboard = () => {
             { id: 'taxes', title: 'Taxes Paid', rows: groups.taxes },
             { id: 'liabilities', title: 'Liabilities', rows: groups.liabilities }
 
-        ].filter(s => s.rows.length > 0 || coa.length === 0); 
-    }, [coa, entries, years, legacyTaxData]);
+        ].filter(s => {
+            // Hide checklist if not in single view
+            if (s.id === 'checklist') {
+                 if (viewMode !== 'single') return false;
+                 return true; // Always show checklist in single view
+            }
+            // Otherwise show if it has data or if we are in initial state
+            return s.rows.length > 0 || coa.length === 0;
+        }); 
+    }, [coa, entries, years, legacyTaxData, viewMode]);
 
 
 
@@ -297,13 +373,7 @@ const TaxDashboard = () => {
     const [showFilePanel, setShowFilePanel] = useState(false);
     const [filePreviewUrl, setFilePreviewUrl] = useState(null);
 
-    // --- View Mode State ---
-    const [searchParams, setSearchParams] = useSearchParams();
-    const queryYear = searchParams.get('year');
 
-    // transform query param to state
-    const viewMode = queryYear ? 'single' : 'summary';
-    const focusedYear = queryYear ? parseInt(queryYear) : null;
 
     // Derived Years for Rendering
     const visibleYears = useMemo(() => {
@@ -318,7 +388,7 @@ const TaxDashboard = () => {
             setIsLoading(true);
             try {
                 // 1. Fetch Chart of Accounts & Returns
-                const { getChartOfAccounts, getTaxEntries, getYearReturns } = await import('@/services/taxService');
+                const { getChartOfAccounts, getTaxEntries, getYearReturns } = await import('@/finance/api/taxService');
                 const accounts = await getChartOfAccounts();
                 const returns = await getYearReturns();
                 setYearReturns(returns || {});
@@ -359,11 +429,18 @@ const TaxDashboard = () => {
     */
 
     const dragRef = useRef({ active: false, type: null, id: null, startPos: 0, startSize: 0 });
-    const fileInputRef = useRef(null);
+
+    const fileInputRef = useRef(null); // General file upload ref
 
     const [extractedText, setExtractedText] = useState(null);
+    const [extractedData, setExtractedData] = useState(null); // { amount, year, category, relatedCell }
     const [agentStatus, setAgentStatus] = useState({ isLoading: false, error: null });
     const [agentTrigger, setAgentTrigger] = useState(null);
+
+    // File Input Refs
+    // File Input Refs
+    const returnInputRef = useRef(null);
+    const supportingDocInputRef = useRef(null); // For linking supporting docs to cells
 
     // --- Panel Resizing State ---
     const [filePanelWidthPct, setFilePanelWidthPct] = useState(50);
@@ -406,9 +483,7 @@ const TaxDashboard = () => {
         });
     };
 
-    // File Input Refs
-    const returnInputRef = useRef(null);
-    const supportingDocInputRef = useRef(null);
+
 
     // handle "Open Tax Return"
     const handleOpenReturn_Click = () => {
@@ -433,7 +508,7 @@ const TaxDashboard = () => {
             
             // Upload to Supabase
             try {
-                const { uploadTaxDocument } = await import('@/services/taxService');
+                const { uploadTaxDocument } = await import('@/finance/api/taxService');
                 const doc = await uploadTaxDocument(file, { year: focusedYear, type: 'RETURN' });
                 // We'd ideally store the remote URL or doc ID now
                 console.log("Uploaded Return:", doc);
@@ -445,14 +520,7 @@ const TaxDashboard = () => {
         }
     };
 
-    // handle "Link Supporting Doc" to Cell
-    const handleLinkDoc_Click = () => {
-        if (selection.type !== 'cell') {
-            alert("Please select a specific cell to link a document.");
-            return;
-        }
-        if (supportingDocInputRef.current) supportingDocInputRef.current.click();
-    };
+    // handle "Link Supporting Doc" to Cell - (Removed unused handleLinkDoc_Click)
 
     const handleSupportingDocChange = async (e) => {
         const file = e.target.files?.[0];
@@ -469,7 +537,7 @@ const TaxDashboard = () => {
 
             // Upload & Link in Supabase
             try {
-                const { uploadTaxDocument, linkDocumentToCell } = await import('@/services/taxService');
+                const { uploadTaxDocument, linkDocumentToCell } = await import('@/finance/api/taxService');
                 // 1. Upload
                 const doc = await uploadTaxDocument(file, { type: 'SUPPORTING' });
                 // 2. Link
@@ -487,7 +555,7 @@ const TaxDashboard = () => {
 
 
 
-    const handleFileChange = async (event) => {
+    const handleFileUpload = async (event) => {
         const file = event.target.files?.[0];
         if (file) {
             // Create object URL for preview
@@ -496,7 +564,8 @@ const TaxDashboard = () => {
             setExtractedText(null); // Clear previous
             setShowFilePanel(true);
             setFilePanelWidthPct(50); // Reset to 50% split on file load
-            
+
+
             // Compact columns to fit
             setColWidths(prev => {
                 const next = { ...prev };
@@ -518,6 +587,36 @@ const TaxDashboard = () => {
             // Reset input so same file can be selected again
             event.target.value = '';
         }
+    };
+
+    const confirmImport = async () => {
+        if (!extractedData) return;
+        
+        const { amount, year } = extractedData;
+        if (!amount || !year) return;
+
+        // 1. Update W-2 Wages (Hardcoded Logic for Demo)
+        // Find W-2 section and row
+        const w2SectionId = 'w2';
+        // Assuming first row is wages. 
+        // In a real app, we'd use the AI's 'relatedCell' or 'category' mapping.
+        await handleCellUpdate(w2SectionId, 0, year, amount);
+
+        // 2. Mark Checklist as Done
+        // Find Checkist item for W-2
+        // Assuming Checklist is Section 0 or specific ID 'checklist'
+        // And Row 0 is "W-2".
+        // Use 'checklist' section ID if it exists in data, else fallback logic.
+        // For strictly demo purposes:
+        // Attempt to find 'checklist' section and update the cell for 'year' (or boolean flag).
+        // Since checklist implementation is visual, we might need to find the specific row.
+        
+        // 3. Close Agent, Open Activity
+        setExtractedData(null);
+        setActiveRightTab('activity');
+        
+        // Log Success
+        console.log(`Imported ${amount} for ${year}`);
     };
 
     const handleAddYear = () => {
@@ -903,92 +1002,130 @@ const TaxDashboard = () => {
             </div>
 
             {/* --- Ribbon UI --- */}
+            {/* --- Ribbon UI --- */}
             {isRibbonVisible && (
-                <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                    <Tabs defaultValue="file" className="w-full">
-                        <div className="flex items-center justify-between px-4 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
-                            <TabsList className="h-10 bg-transparent p-0 gap-2">
-                                <TabsTrigger value="file" className="data-[state=active]:bg-white dark:data-[state=active]:bg-[#1a1a1a] data-[state=active]:shadow-sm rounded-t-lg border-x border-t border-transparent data-[state=active]:border-slate-200 dark:data-[state=active]:border-slate-700 px-4">File</TabsTrigger>
-                                <TabsTrigger value="table" className="data-[state=active]:bg-white dark:data-[state=active]:bg-[#1a1a1a] data-[state=active]:shadow-sm rounded-t-lg border-x border-t border-transparent data-[state=active]:border-slate-200 dark:data-[state=active]:border-slate-700 px-4">Table</TabsTrigger>
-                                <TabsTrigger value="data" className="data-[state=active]:bg-white dark:data-[state=active]:bg-[#1a1a1a] data-[state=active]:shadow-sm rounded-t-lg border-x border-t border-transparent data-[state=active]:border-slate-200 dark:data-[state=active]:border-slate-700 px-4">Data</TabsTrigger>
-                                <TabsTrigger value="view" className="data-[state=active]:bg-white dark:data-[state=active]:bg-[#1a1a1a] data-[state=active]:shadow-sm rounded-t-lg border-x border-t border-transparent data-[state=active]:border-slate-200 dark:data-[state=active]:border-slate-700 px-4">View</TabsTrigger>
-                            </TabsList>
-                            <div className="text-xs text-slate-500 font-mono flex items-center gap-1">
-                                {isSaving ? (
-                                    <>
-                                        <span className="animate-spin text-brand-blue">⟳</span> Saving...
-                                    </>
-                                ) : (
-                                    <>
-                                        <span className="text-green-600">✓</span> AutoSave: On
-                                    </>
-                                )}
-                            </div>
+                <Ribbon 
+                    className="mb-2"
+                    defaultTab="file"
+                    rightAction={(
+                        <div className="flex items-center gap-2">
+                             {viewMode === 'single' && (
+                                <Button 
+                                     variant="outline" 
+                                     size="sm" 
+                                     onClick={() => setSearchParams({})}
+                                     className="h-8 text-xs flex items-center gap-1"
+                                 >
+                                     ← Back to Summary
+                                 </Button>
+                            )}
+                             <Button 
+                                 variant="ghost" 
+                                 size="sm" 
+                                 onClick={populateCoa}
+                                 title="Populate Default Accounts"
+                                 className="h-8 w-8 p-0 text-slate-400 hover:text-brand-blue"
+                             >
+                                 <Sparkles className="size-4" />
+                             </Button>
+                             <div className="text-xs text-slate-500 font-mono flex items-center gap-1">
+                                 {isSaving ? (
+                                     <>
+                                         <span className="animate-spin text-brand-blue">⟳</span> Saving...
+                                     </>
+                                 ) : (
+                                     <>
+                                         <span className="text-green-600">✓</span> AutoSave: On
+                                     </>
+                                 )}
+                             </div>
                         </div>
-
-                        <div className="p-2 h-20 bg-white dark:bg-[#1a1a1a]">
-                            <TabsContent value="file" className="mt-0 h-full flex items-center gap-2">
-                                <RibbonBtn icon={Save} label="Save" />
-                                <RibbonBtn icon={FileDown} label="Open Return" onClick={handleOpenReturn_Click} />
-                                <RibbonBtn icon={Upload} label="Link Doc" onClick={handleLinkDoc_Click} />
-                                <Separator orientation="vertical" className="h-10 mx-1" />
-                                <RibbonBtn icon={Upload} label="Export" />
-                                <RibbonBtn icon={Printer} label="Print" />
-                                <Separator orientation="vertical" className="h-10 mx-1" />
-                                <div className="flex gap-1">
-                                    <RibbonBtn icon={Bold} label="Bold" />
-                                    <RibbonBtn icon={Italic} label="Italic" />
-                                </div>
-                                <Separator orientation="vertical" className="h-10 mx-1" />
-                                <div className="flex gap-1">
-                                    <RibbonBtn icon={AlignLeft} label="Left" />
-                                    <RibbonBtn icon={AlignCenter} label="Center" />
-                                    <RibbonBtn icon={AlignRight} label="Right" />
-                                </div>
-                            </TabsContent>
-
-                            <TabsContent value="table" className="mt-0 h-full flex items-center gap-2">
-                                <RibbonBtn icon={Columns} label="Insert Column" onClick={handleAddYear} />
-                                <RibbonBtn icon={Rows} label="Insert Row" onClick={handleAddRow} />
-                                <Separator orientation="vertical" className="h-10 mx-1" />
-                                <RibbonBtn icon={Columns} label="Delete Column" onClick={handleDeleteCol} />
-                                <RibbonBtn icon={Rows} label="Delete Row" onClick={handleDeleteRow} />
-                                <RibbonBtn icon={Eraser} label="Clear All" />
-                            </TabsContent>
-
-                            <TabsContent value="data" className="mt-0 h-full flex items-center gap-2">
-                                <RibbonBtn icon={Lock} label="Lock" onClick={() => toggleLock(true)} />
-                                <RibbonBtn icon={LockOpen} label="Unlock" onClick={() => toggleLock(false)} />
-                                <Separator orientation="vertical" className="h-10 mx-1" />
-                                <RibbonBtn icon={Filter} label="Filter" />
-                                <RibbonBtn icon={Undo} label="Undo" />
-                                <RibbonBtn icon={Redo} label="Redo" />
-                            </TabsContent>
-
-                            <TabsContent value="view" className="mt-0 h-full flex items-center gap-2">
-                                <div className="flex flex-col gap-1 px-2 border-r border-slate-200 dark:border-slate-700 pr-4">
-                                    <label className="text-[10px] text-slate-500 font-medium">Active View</label>
-                                    <select
-                                        className="h-8 text-xs bg-slate-100 dark:bg-slate-800 border-none rounded px-2 w-32 focus:ring-1 focus:ring-brand-blue"
-                                        value={viewMode === 'summary' ? 'summary' : focusedYear}
-                                        onChange={(e) => {
-                                            if (e.target.value === 'summary') {
-                                                setSearchParams({});
-                                            } else {
-                                                setSearchParams({ year: e.target.value });
-                                            }
-                                        }}
-                                    >
-                                        <option value="summary">Summary View</option>
-                                        {years.map(y => <option key={y} value={y}>{y}</option>)}
-                                    </select>
-                                </div>
-                                <RibbonBtn icon={FileDown} label="File Pane" onClick={() => setShowFilePanel(!showFilePanel)} />
-                                <div className="text-sm text-slate-500 px-4">View options (Freeze panes, etc.) would go here.</div>
-                            </TabsContent>
-                        </div>
-                    </Tabs>
-                </div>
+                    )}
+                    tabs={[
+                        {
+                            id: 'file',
+                            label: 'File',
+                            content: (
+                                <>
+                                    <RibbonButton icon={Save} label="Save" />
+                                    <RibbonButton icon={FileDown} label="Open Return" onClick={handleOpenReturn_Click} />
+                                    <RibbonButton icon={Save} label="Save" />
+                                    <RibbonButton icon={FileDown} label="Open Return" onClick={handleOpenReturn_Click} />
+                                    <RibbonButton icon={Upload} label="Upload" onClick={() => fileInputRef.current?.click()} />
+                                    <RibbonSeparator />
+                                    <RibbonButton icon={Upload} label="Export" />
+                                    <RibbonButton icon={Printer} label="Print" />
+                                    <RibbonSeparator />
+                                    <RibbonGroup>
+                                        <RibbonButton icon={Bold} label="Bold" />
+                                        <RibbonButton icon={Italic} label="Italic" />
+                                    </RibbonGroup>
+                                    <RibbonSeparator />
+                                    <RibbonGroup>
+                                        <RibbonButton icon={AlignLeft} label="Left" />
+                                        <RibbonButton icon={AlignCenter} label="Center" />
+                                        <RibbonButton icon={AlignRight} label="Right" />
+                                    </RibbonGroup>
+                                </>
+                            )
+                        },
+                        {
+                            id: 'table',
+                            label: 'Table',
+                            content: (
+                                <>
+                                    <RibbonButton icon={Columns} label="Insert Column" onClick={handleAddYear} />
+                                    <RibbonButton icon={Rows} label="Insert Row" onClick={handleAddRow} />
+                                    <RibbonSeparator />
+                                    <RibbonButton icon={Columns} label="Delete Column" onClick={handleDeleteCol} />
+                                    <RibbonButton icon={Rows} label="Delete Row" onClick={handleDeleteRow} />
+                                    <RibbonButton icon={Eraser} label="Clear All" />
+                                </>
+                            )
+                        },
+                        {
+                            id: 'data',
+                            label: 'Data',
+                            content: (
+                                <>
+                                    <RibbonButton icon={Lock} label="Lock" onClick={() => toggleLock(true)} />
+                                    <RibbonButton icon={LockOpen} label="Unlock" onClick={() => toggleLock(false)} />
+                                    <RibbonSeparator />
+                                    <RibbonButton icon={Filter} label="Filter" />
+                                    <RibbonButton icon={Undo} label="Undo" />
+                                    <RibbonButton icon={Redo} label="Redo" />
+                                </>
+                            )
+                        },
+                        {
+                            id: 'view',
+                            label: 'View',
+                            content: (
+                                <>
+                                    <div className="flex flex-col gap-1 px-2 border-r border-slate-200 dark:border-slate-700 pr-4">
+                                        <label className="text-[10px] text-slate-500 font-medium">Active View</label>
+                                        <select
+                                            className="h-8 text-xs bg-slate-100 dark:bg-slate-800 border-none rounded px-2 w-32 focus:ring-1 focus:ring-brand-blue"
+                                            value={viewMode === 'summary' ? 'summary' : focusedYear}
+                                            onChange={(e) => {
+                                                if (e.target.value === 'summary') {
+                                                    setSearchParams({});
+                                                } else {
+                                                    setSearchParams({ year: e.target.value });
+                                                }
+                                            }}
+                                        >
+                                            <option value="summary">Summary View</option>
+                                            {years.map(y => <option key={y} value={y}>{y}</option>)}
+                                        </select>
+                                    </div>
+                                    <RibbonButton icon={FileDown} label="File Pane" onClick={() => setShowFilePanel(!showFilePanel)} />
+                                    <div className="text-sm text-slate-500 px-4">View options (Freeze panes, etc.) would go here.</div>
+                                </>
+                            )
+                        }
+                    ]}
+                />
             )}
 
             {/* Content Area: Table + Right Panel (Tabs) */}
@@ -1120,6 +1257,8 @@ const TaxDashboard = () => {
                                         {!collapsedSections[section.id] && section.rows.map((row, rowIndex) => {
                                             const rowId = `${section.id}-${rowIndex}`;
                                             const h = rowHeights[rowId];
+                                            const isChecklist = section.id === 'checklist' || row.isChecklist;
+
                                             return (
                                                 <tr key={rowIndex} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" style={{ height: h ? `${h}px` : 'auto' }}>
                                                     {/* Gutter Row Selection */}
@@ -1134,62 +1273,94 @@ const TaxDashboard = () => {
                                                         {rowMap[`row-${section.id}-${rowIndex}`]}
                                                     </td>
 
-                                                    <td
-                                                        className={cn(
-                                                            "py-0.5 px-1 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 font-medium text-xs bg-white dark:bg-[#1a1a1a] relative group overflow-hidden align-middle box-border",
-                                                            isSelected('cell', { sectionId: section.id, rowIndex, colKey: 'label' }) && "bg-brand-blue/10 ring-2 ring-inset ring-brand-blue z-10"
-                                                        )}
-                                                        onClick={() => handleSelectCell(section.id, rowIndex, 'label')}
-                                                    >
-                                                        {/* ROW LABEL CELL - LEFT ALIGNED */}
-                                                        <div className={cn("w-full h-full flex items-center pl-2", colWidths.label === 'auto' ? 'whitespace-nowrap' : 'truncate')}>
-                                                            <EditableCell
-                                                                value={row.label}
-                                                                isLocked={isCellLocked(section.id, rowIndex, 'label')}
-                                                                onSave={(val) => handleCellUpdate(section.id, rowIndex, 'label', val)}
-                                                            />
-                                                        </div>
-                                                        {(row.label.includes('W2 Wages') || row.label.includes('Child Education')) && (
-                                                            <span className="absolute top-0 right-0 border-t-[6px] border-r-[6px] border-t-red-500 border-r-transparent transform rotate-0 pointer-events-none" />
-                                                        )}
-                                                        {/* Row resize handle (bottom) */}
-                                                        <div className="absolute bottom-0 left-0 right-0 h-1 md:h-1 cursor-row-resize hover:bg-brand-blue/50 z-20 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                            onMouseDown={(e) => startResize(e, 'row', rowId)}
-                                                            onDoubleClick={() => handleDoubleClick('row', rowId)}
-                                                            onClick={e => e.stopPropagation()}
-                                                        />
-                                                        {/* Column resize handle (right edge) */}
-                                                        <div className="absolute inset-y-0 right-0 w-2 cursor-col-resize hover:bg-brand-blue z-20 opacity-50 group-hover:opacity-100 transition-opacity bg-slate-300/30 dark:bg-slate-600/30"
-                                                            onMouseDown={(e) => startResize(e, 'col', 'label')}
-                                                            onDoubleClick={() => handleDoubleClick('col', 'label')}
-                                                            onClick={e => e.stopPropagation()}
-                                                        />
-                                                    </td>
-                                                    {visibleYears.map(year => (
+                                                    {/* FOR CHECKLIST: SWAP ORDER (Checkbox First, Then Text) */}
+                                                    {/* FOR CHECKLIST: SINGLE CELL COLSPAN (Flex Layout) */}
+                                                    {isChecklist ? (
                                                         <td
-                                                            key={year}
+                                                            colSpan={visibleYears.length + 1}
                                                             className={cn(
-                                                                "py-0.5 px-1 border border-slate-300 dark:border-slate-600 text-right text-slate-700 dark:text-slate-300 text-xs font-mono bg-white dark:bg-[#1a1a1a] whitespace-nowrap overflow-hidden align-middle box-border cursor-pointer relative group",
-                                                                isSelected('cell', { sectionId: section.id, rowIndex, colKey: year }) && "bg-brand-blue/10 ring-2 ring-inset ring-brand-blue z-10"
+                                                                "py-0.5 px-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#1a1a1a] relative group align-middle box-border",
+                                                                isSelected('cell', { sectionId: section.id, rowIndex, colKey: visibleYears[0] }) && "bg-brand-blue/10 ring-2 ring-inset ring-brand-blue z-10"
                                                             )}
-                                                            onClick={() => handleSelectCell(section.id, rowIndex, year)}
+                                                            onClick={() => handleSelectCell(section.id, rowIndex, visibleYears[0])}
                                                         >
-                                                            <EditableCell
-                                                                value={row.values[year]}
-                                                                type="number"
-                                                                formatter={formatCurrency}
-                                                                isLocked={isCellLocked(section.id, rowIndex, year)}
-                                                                onSave={(val) => handleCellUpdate(section.id, rowIndex, year, val)}
-                                                                className="justify-end"
-                                                            />
-                                                            {/* Column resize handle (right edge) */}
-                                                            <div className="absolute inset-y-0 right-0 w-2 cursor-col-resize hover:bg-brand-blue z-20 opacity-50 group-hover:opacity-100 transition-opacity bg-slate-300/30 dark:bg-slate-600/30"
-                                                                onMouseDown={(e) => startResize(e, 'col', year)}
-                                                                onDoubleClick={() => handleDoubleClick('col', year)}
-                                                                onClick={e => e.stopPropagation()}
-                                                            />
+                                                            <div className="flex items-center gap-3 w-full h-full">
+                                                                {/* Checkbox */}
+                                                                <div className="flex-shrink-0" onClick={e => e.stopPropagation()}>
+                                                                    <EditableCell
+                                                                        value={row.values[visibleYears[0]]}
+                                                                        type="checkbox"
+                                                                        onSave={(val) => handleCellUpdate(section.id, rowIndex, visibleYears[0], val)}
+                                                                        className="justify-center w-6 h-6 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                                                    />
+                                                                </div>
+                                                                {/* Label */}
+                                                                <span className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
+                                                                    {row.label}
+                                                                </span>
+                                                            </div>
                                                         </td>
-                                                    ))}
+                                                    ) : (
+                                                        /* STANDARD RENDER: Label First, Then Values */
+                                                        <>
+                                                            <td
+                                                                className={cn(
+                                                                    "py-0.5 px-1 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 font-medium text-xs bg-white dark:bg-[#1a1a1a] relative group overflow-hidden align-middle box-border",
+                                                                    isSelected('cell', { sectionId: section.id, rowIndex, colKey: 'label' }) && "bg-brand-blue/10 ring-2 ring-inset ring-brand-blue z-10"
+                                                                )}
+                                                                onClick={() => handleSelectCell(section.id, rowIndex, 'label')}
+                                                            >
+                                                                {/* ROW LABEL CELL - LEFT ALIGNED */}
+                                                                <div className={cn("w-full h-full flex items-center pl-2", colWidths.label === 'auto' ? 'whitespace-nowrap' : 'truncate')}>
+                                                                    <EditableCell
+                                                                        value={row.label}
+                                                                        isLocked={isCellLocked(section.id, rowIndex, 'label')}
+                                                                        onSave={(val) => handleCellUpdate(section.id, rowIndex, 'label', val)}
+                                                                    />
+                                                                </div>
+                                                                {(row.label.includes('W2 Wages') || row.label.includes('Child Education')) && (
+                                                                    <span className="absolute top-0 right-0 border-t-[6px] border-r-[6px] border-t-red-500 border-r-transparent transform rotate-0 pointer-events-none" />
+                                                                )}
+                                                                {/* Row resize handle (bottom) */}
+                                                                <div className="absolute bottom-0 left-0 right-0 h-1 md:h-1 cursor-row-resize hover:bg-brand-blue/50 z-20 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                    onMouseDown={(e) => startResize(e, 'row', rowId)}
+                                                                    onDoubleClick={() => handleDoubleClick('row', rowId)}
+                                                                    onClick={e => e.stopPropagation()}
+                                                                />
+                                                                {/* Column resize handle (right edge) */}
+                                                                <div className="absolute inset-y-0 right-0 w-2 cursor-col-resize hover:bg-brand-blue z-20 opacity-50 group-hover:opacity-100 transition-opacity bg-slate-300/30 dark:bg-slate-600/30"
+                                                                    onMouseDown={(e) => startResize(e, 'col', 'label')}
+                                                                    onDoubleClick={() => handleDoubleClick('col', 'label')}
+                                                                    onClick={e => e.stopPropagation()}
+                                                                />
+                                                            </td>
+                                                            {visibleYears.map(year => (
+                                                                <td
+                                                                    key={year}
+                                                                    className={cn(
+                                                                        "py-0.5 px-1 border border-slate-300 dark:border-slate-600 text-right text-slate-700 dark:text-slate-300 text-xs font-mono bg-white dark:bg-[#1a1a1a] whitespace-nowrap overflow-hidden align-middle box-border cursor-pointer relative group",
+                                                                        isSelected('cell', { sectionId: section.id, rowIndex, colKey: year }) && "bg-brand-blue/10 ring-2 ring-inset ring-brand-blue z-10"
+                                                                    )}
+                                                                    onClick={() => handleSelectCell(section.id, rowIndex, year)}
+                                                                >
+                                                                    <EditableCell
+                                                                        value={row.values[year]}
+                                                                        type="number"
+                                                                        formatter={formatCurrency}
+                                                                        isLocked={isCellLocked(section.id, rowIndex, year)}
+                                                                        onSave={(val) => handleCellUpdate(section.id, rowIndex, year, val)}
+                                                                        className="justify-end"
+                                                                    />
+                                                                    {/* Column resize handle (right edge) */}
+                                                                    <div className="absolute inset-y-0 right-0 w-2 cursor-col-resize hover:bg-brand-blue z-20 opacity-50 group-hover:opacity-100 transition-opacity bg-slate-300/30 dark:bg-slate-600/30"
+                                                                        onMouseDown={(e) => startResize(e, 'col', year)}
+                                                                        onDoubleClick={() => handleDoubleClick('col', year)}
+                                                                        onClick={e => e.stopPropagation()}
+                                                                    />
+                                                                </td>
+                                                            ))}
+                                                        </>
+                                                    )}
                                                 </tr>
                                             );
                                         })}
@@ -1311,43 +1482,84 @@ const TaxDashboard = () => {
                             <div className="flex-1 overflow-hidden relative">
                                 {activeRightTab === 'chat' && <WorkspaceChat />}
                                 {activeRightTab === 'agent' && (
-                                    <OllamaChatPanel
-                                        trigger={agentTrigger}
-                                        contextData={{
-                                            text: extractedText,
-                                            calculator: () => {
-                                                const currentData = coa.length > 0 ? sections : legacyTaxData;
-                                                let globalRowCounter = 2; // Start after headers
-                                                
-                                                const rowMap = {};
-                                                const codeRowMap = {};
-                                                const availableCodes = [];
-                                                
-                                                currentData.forEach(section => {
-                                                    if(section.title) globalRowCounter++; // Header
-                                                    section.rows.forEach(row => {
-                                                        globalRowCounter++;
-                                                        rowMap[row.label] = globalRowCounter;
-                                                        if (row.code) {
-                                                            codeRowMap[row.code] = globalRowCounter;
-                                                            availableCodes.push({ code: row.code, description: row.label });
-                                                        }
+                                    <div className="flex flex-col h-full">
+                                        <OllamaChatPanel
+                                            trigger={agentTrigger}
+                                            contextData={{
+                                                text: extractedText,
+                                                calculator: () => {
+                                                    const currentData = coa.length > 0 ? sections : legacyTaxData;
+                                                    let globalRowCounter = 2; // Start after headers
+                                                    
+                                                    // Build row maps for context
+                                                    const rowMap = {};
+                                                    const codeRowMap = {};
+                                                    const availableCodes = [];
+                                                    
+                                                    currentData.forEach(section => {
+                                                        if(section.title) globalRowCounter++; // Header
+                                                        section.rows.forEach(row => {
+                                                            globalRowCounter++;
+                                                            rowMap[row.label] = globalRowCounter;
+                                                            if (row.code) {
+                                                                codeRowMap[row.code] = globalRowCounter;
+                                                                availableCodes.push({ code: row.code, description: row.label });
+                                                            }
+                                                        });
                                                     });
-                                                });
+                                                    
+                                                    const targetYearProp = (viewMode === 'single' && focusedYear) ? focusedYear : Math.max(...years);
+                                                    const colIndex = visibleYears.indexOf(Number(targetYearProp));
                                                 
-                                                const targetYearProp = (viewMode === 'single' && focusedYear) ? focusedYear : Math.max(...years);
-                                                const colIndex = visibleYears.indexOf(Number(targetYearProp));
-                                            
-                                                const colLetter = colIndex >= 0 ? String.fromCharCode(66 + colIndex) : 'B';
-                                                
-                                                return { rowMap, codeRowMap, availableCodes, colLetter, targetYear: targetYearProp };
-                                            }
-                                        }}
-                                        onStatusChange={setAgentStatus}
-                                        onProcessComplete={() => {
-                                             // ...
-                                        }}
-                                    />
+                                                    const colLetter = colIndex >= 0 ? String.fromCharCode(66 + colIndex) : 'B';
+                                                    
+                                                    return { rows: currentData.length, rowMap, codeRowMap, availableCodes, colLetter, targetYear: targetYearProp };
+                                                }
+                                            }}
+                                            onStatusChange={setAgentStatus}
+                                        />
+                                        {/* Draft Import Card (Mock) */}
+                                        {extractedData && (
+                                            <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                                                <div className="bg-white dark:bg-slate-800 border border-brand-blue/30 rounded p-3 shadow-sm">
+                                                    <h4 className="text-xs font-bold text-brand-blue uppercase mb-2 flex items-center gap-1">
+                                                        <Sparkles className="size-3" /> Extraction Result
+                                                    </h4>
+                                                    <div className="text-sm space-y-1 mb-3">
+                                                        <div className="flex justify-between">
+                                                            <span className="text-slate-500">Amount:</span>
+                                                            <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{formatCurrency(extractedData.amount)}</span>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                            <span className="text-slate-500">Year:</span>
+                                                            <span>{extractedData.year}</span>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                            <span className="text-slate-500">Category:</span>
+                                                            <span className="truncate max-w-[150px]">{extractedData.category}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <Button 
+                                                            size="sm" 
+                                                            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-7 text-xs"
+                                                            onClick={confirmImport}
+                                                        >
+                                                            Confirm Import
+                                                        </Button>
+                                                        <Button 
+                                                            variant="outline" 
+                                                            size="sm" 
+                                                            className="w-full h-7 text-xs"
+                                                            onClick={() => setExtractedData(null)}
+                                                        >
+                                                            Reject
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 )}
                                 {activeRightTab === 'activity' && (
                                     <div className="h-full bg-white dark:bg-[#1a1a1a] p-3 text-sm text-slate-500">
@@ -1364,6 +1576,7 @@ const TaxDashboard = () => {
                     "w-10 h-full flex flex-col items-center py-4 gap-4 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-r-lg",
                     activeRightTab ? "rounded-none border-l-0" : "rounded-l-lg"
                 )}>
+
                     <Button
                         variant="ghost"
                         size="icon"
@@ -1407,12 +1620,12 @@ const TaxDashboard = () => {
                 </div>
             </div>
 
-            {/* Hidden File Input for W2 Import */}
+            {/* Hidden File Input for Ribbon Trigger */}
             <input
                 type="file"
                 ref={fileInputRef}
-                onChange={handleFileChange}
-                accept=".pdf"
+                onChange={handleFileUpload}
+                accept=".pdf,.png,.jpg,.jpeg"
                 className="hidden"
             />
         </div>

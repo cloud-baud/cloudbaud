@@ -28,7 +28,7 @@ import {
     MoreHorizontal,
     Edit // Import Edit
 } from 'lucide-react';
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isSameMonth, isSameDay, addDays, parseISO, isToday } from 'date-fns';
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isSameMonth, isSameDay, addDays, parseISO, isToday, startOfDay, endOfDay } from 'date-fns';
 import { useAuth } from '@/context/AuthContext';
 import { CalendarService } from '@/services/calendarService'; // Use the new service
 import { cn } from '@/lib/utils';
@@ -55,6 +55,7 @@ const CalendarPage = () => {
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isAddEventOpen, setIsAddEventOpen] = useState(false);
+    const [activeEvent, setActiveEvent] = useState(null);
 
     // Form State
     const [newEvent, setNewEvent] = useState({
@@ -126,6 +127,7 @@ const CalendarPage = () => {
         if (!confirm('Delete this event?')) return;
         try {
              await CalendarService.deleteEvent(id);
+             setActiveEvent(null); // Clear selection
              fetchEvents();
         } catch (error) {
             console.error('Error deleting event:', error);
@@ -135,7 +137,7 @@ const CalendarPage = () => {
     // Calendar Grid Logic
     const renderHeader = () => {
         return (
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
                 <div className="flex items-center gap-4">
                     <h2 className="text-2xl font-bold text-foreground">
                         {format(currentMonth, 'MMMM yyyy')}
@@ -260,6 +262,123 @@ const CalendarPage = () => {
         );
     };
 
+    const renderSidePane = () => {
+        // Filter events for the selected date to show in the "Daily Agenda" view when no event is selected
+        const selectedDateEvents = events.filter(event => {
+            const eventStart = startOfDay(parseISO(event.start_time));
+            const eventEnd = endOfDay(parseISO(event.end_time));
+            return selectedDate >= eventStart && selectedDate <= eventEnd;
+        });
+
+        return (
+            <Card className="h-full border-border/50 flex flex-col">
+                <CardHeader className="pb-3 border-b border-border/50 bg-secondary/10">
+                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                        {activeEvent ? (
+                            <>
+                                <div className={cn("size-3 rounded-full", CATEGORY_COLORS[activeEvent.category] || 'bg-gray-500')} />
+                                Event Details
+                            </>
+                        ) : (
+                            <>
+                                <CalendarIcon className="size-5" />
+                                {format(selectedDate, 'MMMM do')}
+                            </>
+                        )}
+                    </CardTitle>
+                    <CardDescription>
+                        {activeEvent ? 'View and manage this event.' : 'Daily agenda and quick actions.'}
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+                    {activeEvent ? (
+                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+                            <div>
+                                <h3 className="text-xl font-bold text-foreground mb-1">{activeEvent.title}</h3>
+                                <Badge variant="outline" className="mb-2">{activeEvent.category}</Badge>
+                            </div>
+                            
+                            <div className="space-y-3 text-sm">
+                                <div className="flex items-start gap-3">
+                                    <Clock className="size-4 text-muted-foreground mt-0.5" />
+                                    <div>
+                                        <p className="font-medium">Time</p>
+                                        <p className="text-muted-foreground">
+                                            {format(parseISO(activeEvent.start_time), 'PPp')} - <br/>
+                                            {format(parseISO(activeEvent.end_time), 'PPp')}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                {activeEvent.description && (
+                                    <div className="flex items-start gap-3">
+                                        <div className="size-4 mt-0.5 flex items-center justify-center">
+                                            <span className="text-muted-foreground text-xs">A</span>
+                                        </div>
+                                        <div>
+                                            <p className="font-medium">Description</p>
+                                            <p className="text-muted-foreground whitespace-pre-wrap">
+                                                {activeEvent.description}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="pt-4 border-t border-border/50 flex flex-col gap-2">
+                                <Button variant="destructive" className="w-full gap-2" onClick={() => handleDeleteEvent(activeEvent.id)}>
+                                    <Trash2 className="size-4" />
+                                    Delete Event
+                                </Button>
+                                <Button variant="outline" className="w-full gap-2" onClick={() => setActiveEvent(null)}>
+                                    <X className="size-4" />
+                                    Close Details
+                                </Button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h4 className="font-medium text-sm text-muted-foreground">Schedule</h4>
+                                <Badge variant="secondary" className="text-xs">{selectedDateEvents.length} Events</Badge>
+                            </div>
+                            
+                            {selectedDateEvents.length > 0 ? (
+                                <div className="space-y-2">
+                                    {selectedDateEvents.map(evt => (
+                                        <div 
+                                            key={evt.id} 
+                                            className="p-3 rounded-lg border border-border/50 bg-secondary/20 hover:bg-secondary/40 transition-colors cursor-pointer group"
+                                            onClick={() => setActiveEvent(evt)}
+                                        >
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <div className={cn("size-2 rounded-full", CATEGORY_COLORS[evt.category] || 'bg-gray-500')} />
+                                                <span className="font-medium text-sm truncate">{evt.title}</span>
+                                            </div>
+                                            <div className="text-xs text-muted-foreground flex items-center justify-between">
+                                                <span>{format(parseISO(evt.start_time), 'h:mm a')}</span>
+                                                <ChevronRight className="size-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-8 text-muted-foreground bg-secondary/5 rounded-lg border border-dashed border-border/50">
+                                    <p>No events scheduled.</p>
+                                </div>
+                            )}
+
+                            <Button className="w-full bg-brand-blue gap-2" onClick={() => setIsAddEventOpen(true)}>
+                                <Plus className="size-4" />
+                                Add Event
+                            </Button>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+        );
+    };
+
     const renderDays = () => {
         const dateFormat = "EEEE";
         const days = [];
@@ -292,11 +411,23 @@ const CalendarPage = () => {
             for (let i = 0; i < 7; i++) {
                 formattedDate = format(day, dateFormat);
                 const cloneDay = day;
-                
-                // Get events for this day
-                const daysEvents = events.filter(event => 
-                    isSameDay(parseISO(event.start_time), day)
-                );
+                const cellDate = day;
+                // Get events filters
+                const daysEvents = events.filter(event => {
+                    const eventStart = startOfDay(parseISO(event.start_time));
+                    const eventEnd = endOfDay(parseISO(event.end_time));
+                    
+                    // 1. Show if it starts on this day
+                    if (isSameDay(cellDate, eventStart)) return true;
+                    
+                    // 2. Show on the 1st of the month if it's currently ongoing (spans over the 1st)
+                    // This ensures long events appear once in the month view without cluttering every day
+                    if (isSameDay(cellDate, startOfMonth(currentMonth))) {
+                        return cellDate > eventStart && cellDate <= eventEnd;
+                    }
+                    
+                    return false;
+                });
 
                 days.push(
                     <div
@@ -337,44 +468,24 @@ const CalendarPage = () => {
                         {/* Events List */}
                         <div className="flex flex-col gap-1 overflow-y-auto max-h-[80px] scrollbar-hide">
                             {daysEvents.map(event => (
-                                <DropdownMenu key={event.id}>
-                                    <DropdownMenuTrigger asChild>
-                                        <div 
-                                            className={cn(
-                                                "text-xs px-2 py-1 rounded truncate cursor-pointer text-white shadow-sm hover:brightness-110 transition-all active:scale-95 select-none",
-                                                CATEGORY_COLORS[event.category] || 'bg-slate-500'
-                                            )}
-                                        >
-                                            <span className="font-semibold mr-1">
-                                                {format(parseISO(event.start_time), 'h:mm a')}
-                                            </span>
-                                            {event.title}
-                                        </div>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="start" className="w-56 bg-card border-border text-foreground">
-                                        <div className="p-2 border-b border-border/50 bg-secondary/20">
-                                            <h4 className="font-semibold text-sm">{event.title}</h4>
-                                            <p className="text-xs text-muted-foreground">{event.category}</p>
-                                        </div>
-                                        <div className="p-2 text-sm">
-                                            <div className="flex items-center gap-2 mb-1 text-muted-foreground">
-                                                <Clock className="size-3" />
-                                                <span>{format(parseISO(event.start_time), 'h:mm a')} - {format(parseISO(event.end_time), 'h:mm a')}</span>
-                                            </div>
-                                            {event.description && <p className="text-muted-foreground mt-2 text-xs">{event.description}</p>}
-                                        </div>
-                                        <DropdownMenuItem 
-                                            className="text-red-500 focus:text-red-500 focus:bg-red-500/10 cursor-pointer"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDeleteEvent(event.id);
-                                            }}
-                                        >
-                                            <Trash2 className="size-4 mr-2" />
-                                            Delete Event
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                <div 
+                                    key={event.id}
+                                    className={cn(
+                                        "text-xs px-2 py-1 rounded truncate cursor-pointer shadow-sm hover:brightness-110 transition-all active:scale-95 select-none relative group/event",
+                                        CATEGORY_COLORS[event.category] || 'bg-slate-500 text-white',
+                                        // Highlight active event
+                                        activeEvent?.id === event.id ? "ring-2 ring-foreground ring-offset-1" : ""
+                                    )}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setActiveEvent(event);
+                                    }}
+                                >
+                                    <span className="font-semibold mr-1 opacity-80">
+                                        {format(parseISO(event.start_time), 'h:mm a')}
+                                    </span>
+                                    <span className="font-medium">{event.title}</span>
+                                </div>
                             ))}
                         </div>
                     </div>
@@ -393,10 +504,18 @@ const CalendarPage = () => {
 
     return (
         <PageShell title="Calendar" subtitle="Manage your schedule and upcoming events.">
-            <div className="h-full flex flex-col">
-                {renderHeader()}
-                {renderDays()}
-                {renderCells()}
+            <div className="flex flex-col lg:flex-row gap-6 h-full min-h-[600px]">
+                {/* Main Calendar Grid */}
+                <div className="flex-1 flex flex-col min-w-0">
+                    {renderHeader()}
+                    {renderDays()}
+                    {renderCells()}
+                </div>
+                
+                {/* Quick Action / Details Pane */}
+                <div className="w-full lg:w-80 flex-shrink-0 animate-in slide-in-from-right-8 duration-500">
+                    {renderSidePane()}
+                </div>
             </div>
         </PageShell>
     );

@@ -6,8 +6,9 @@ export const CalendarService = {
         const { data, error } = await supabase
             .from('calendar_events')
             .select('*')
-            .gte('start_time', startDate)
-            .lte('end_time', endDate);
+            // Find overlapping events: start <= range_end AND end >= range_start
+            .lte('start_time', endDate)
+            .gte('end_time', startDate);
         
         if (error) throw error;
         return data;

@@ -34,12 +34,24 @@ export const technicalCapabilities = [
                 slug: 'unity-catalog-governance',
                 text: 'Databricks governance',
                 title: 'Databricks Governance',
-                description: 'Unified data governance for data and AI assets on the Lakehouse, ensuring security and compliance.',
+                description: 'Unified data governance for AI and data assets, ensuring security and compliance (HIPAA/GDPR) via Unity Catalog.',
                 image: '/infographic-database.png',
                 features: [
-                    { title: 'Access Control', description: 'Fine-grained row and column level permissions across workspaces.' },
-                    { title: 'Data Lineage', description: 'Automated lineage tracking to understand data flow and impact.' },
-                    { title: 'Data Sharing', description: 'Secure sharing of live data sets without copying via Delta Sharing.' }
+                    { title: 'Access Control', description: 'Fine-grained row/column level permissions (ACLs) across workspaces.' },
+                    { title: 'Data Lineage', description: 'Automated end-to-end lineage tracking for audit and impact analysis.' },
+                    { title: 'Compliance Policies', description: 'Centralized policy enforcement for data discovery and access management.' }
+                ]
+            },
+            {
+                slug: 'healthcare-data-engineering',
+                text: 'Healthcare Data & FHIR',
+                title: 'Healthcare Data Engineering',
+                description: 'Ingesting and transforming mission-critical healthcare feeds (HL7, FHIR, CCDA) into a queryable Lakehouse.',
+                image: '/infographic-database.png',
+                features: [
+                    { title: 'HL7/FHIR Integration', description: 'Real-time ingestion of clinical data streams using PySpark and autoloader.' },
+                    { title: 'Medallion Architecture', description: 'Structuring raw Bronze data into Silver/Gold tables for analytics and AI.' },
+                    { title: 'PHI De-identification', description: 'Automated masking and tokenization of sensitive patient data at ingestion.' }
                 ]
             },
             {

@@ -7,14 +7,15 @@ import MarketingLayout from './portal/layout/MarketingLayout';
 import WorkspaceLayout from './collaboration/WorkspaceLayout';
 import PortalDashboard from './collaboration/PortalDashboard';
 import FabricDemo from './collaboration/sales/FabricDemo';
-import FinOpsDashboard from './collaboration/FinOpsDashboard';
+import FinOpsDashboard from './finance/dashboards/FinOpsDashboard';
 // import SettingsPage from './collaboration/settings/SettingsPage'; // OLD: Local version
 import { SettingsPage } from 'common-features/frontend/components/features/settings/SettingsPage'; // NEW: CommonFeatures master
 import PlaceholderPage from './collaboration/PlaceholderPage';
 import ContextLayout from './collaboration/ContextLayout';
-import TaxDashboard from './collaboration/finance/TaxDashboard';
-import AccountingDashboard from './collaboration/finance/AccountingDashboard';
-import BookkeepingDashboard from './collaboration/finance/BookkeepingDashboard';
+import TaxDashboard from './finance/dashboards/TaxDashboard';
+import AccountingDashboard from './finance/dashboards/AccountingDashboard';
+import BookkeepingDashboard from './finance/dashboards/BookkeepingDashboard';
+import AccountLedger from './finance/dashboards/AccountLedger';
 
 
 import HomePage from './portal/pages/HomePage';
@@ -102,6 +103,7 @@ function App() {
                             <Route path="taxes" element={<TaxDashboard />} />
                             <Route path="bookkeeping" element={<BookkeepingDashboard />} />
                             <Route path="accounting" element={<AccountingDashboard />} />
+                            <Route path="accounting/:accountId" element={<AccountLedger />} />
                             <Route path="investments" element={<PlaceholderPage />} />
                         </Route>
                     </Route>

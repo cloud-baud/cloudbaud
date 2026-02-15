@@ -11,7 +11,7 @@ import {
 } from "@/shared/ui/dropdown-menu";
 import { supabase } from '@/lib/supabase';
 
-import logo from '../../assets/images/cloudbaud_logo.png';
+
 
 
 import { useAuth } from '../../context/AuthContext';
@@ -102,17 +102,11 @@ const Header = () => {
                   style={{ maxHeight: '48px' }}
                 />
               ) : (
-                <img
-                  src={logo}
-                  alt="CloudBaud"
-                  className="h-full w-auto object-contain"
-                  style={{ mixBlendMode: 'screen' }}
-                />
+                <CloudBaudLogo className="h-full w-auto p-1" />
               )}
             </div>
-            <div className="flex flex-col whitespace-nowrap pt-1">
               <span className="text-xl md:text-2xl tracking-widest text-brand-blue font-bold">
-                {user?.user_metadata?.site_name || "Innovative Engineering"}
+                {user?.user_metadata?.site_name || "CloudBaud"}
               </span>
             </div>
           </Link>

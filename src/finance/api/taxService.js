@@ -69,6 +69,18 @@ export const getChartOfAccounts = async () => {
     }
 };
 
+export const populateChartOfAccounts = async () => {
+    try {
+        await getUser();
+        const { error } = await supabase.rpc('populate_default_coa');
+        if (error) throw error;
+        return true;
+    } catch (err) {
+        console.error("Error populating COA:", err);
+        throw err;
+    }
+};
+
 // 1b. Client Input Categories (Legacy Tax)
 export const getClientCategories = async () => {
     try {

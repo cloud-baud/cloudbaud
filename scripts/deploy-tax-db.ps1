@@ -3,17 +3,22 @@ $ErrorActionPreference = "Stop"
 
 $dbUrl = "postgresql://postgres.knhrygguhgfpimaogfkw:TxfgDqdaG49DCvGd@aws-1-ap-south-1.pooler.supabase.com:5432/postgres"
 $sqlFile = "src/data/tax_deploy_multi_schema.sql"
-$rpcFile = "src/data/tax_rpc_helpers.sql"
+$secureFile = "secure_finance_api.sql"
+$rpcFile = "src/data/tax_rpc_helpers.sql" 
+$popUserFunc = "src/data/populate_coa_func.sql"
 $seedFile = "src/data/seed_2017_data.sql"
 
-Write-Host "📊 Deploying Multi-Schema Tax Database to TEST DB..." -ForegroundColor Cyan
+Write-Host "📊 Deploying Complete Finance Stack to TEST DB..." -ForegroundColor Cyan
 Write-Host "🔗 Target: knhrygguhgfpimaogfkw.supabase.co" -ForegroundColor Yellow
 
 # Read SQL files
 $sql = Get-Content $sqlFile -Raw
+$secureSql = Get-Content $secureFile -Raw
 $rpcSql = Get-Content $rpcFile -Raw
+$popUserSql = Get-Content $popUserFunc -Raw
 $seedSql = Get-Content $seedFile -Raw
-$combinedSql = $sql + "`n`n-- ============================================================================`n-- RPC HELPER FUNCTIONS`n-- ============================================================================`n`n" + $rpcSql + "`n`n-- ============================================================================`n-- SEED 2017 DATA`n-- ============================================================================`n`n" + $seedSql
+
+$combinedSql = $sql + "`n`n-- SECURITY`n" + $secureSql + "`n`n-- POPULATE FUNC`n" + $popUserSql + "`n`n-- RPC`n" + $rpcSql + "`n`n-- SEED`n" + $seedSql
 
 Write-Host "📄 Schema SQL loaded ($($sql.Length) bytes)" -ForegroundColor Green
 Write-Host "📄 RPC Helpers loaded ($($rpcSql.Length) bytes)" -ForegroundColor Green
@@ -26,6 +31,8 @@ if ($psqlPath) {
     Write-Host "✅ Using psql to execute..." -ForegroundColor Green
     $env:PGPASSWORD = "TxfgDqdaG49DCvGd"
     psql -h "aws-1-ap-south-1.pooler.supabase.com" -p 5432 -U "postgres.knhrygguhgfpimaogfkw" -d "postgres" -f $sqlFile
+    psql -h "aws-1-ap-south-1.pooler.supabase.com" -p 5432 -U "postgres.knhrygguhgfpimaogfkw" -d "postgres" -f $secureFile
+    psql -h "aws-1-ap-south-1.pooler.supabase.com" -p 5432 -U "postgres.knhrygguhgfpimaogfkw" -d "postgres" -f $popUserFunc
     psql -h "aws-1-ap-south-1.pooler.supabase.com" -p 5432 -U "postgres.knhrygguhgfpimaogfkw" -d "postgres" -f $rpcFile
     psql -h "aws-1-ap-south-1.pooler.supabase.com" -p 5432 -U "postgres.knhrygguhgfpimaogfkw" -d "postgres" -f $seedFile
     Write-Host "✅ Schema and data deployed successfully!" -ForegroundColor Green
@@ -33,7 +40,7 @@ if ($psqlPath) {
 else {
     Write-Host "⚠️  psql not found. Opening Supabase SQL Editor..." -ForegroundColor Yellow
     Write-Host ""
-    Write-Host "📋 Combined SQL (Schema + RPC + 2017 Data) has been copied to clipboard!" -ForegroundColor Green
+    Write-Host "📋 Combined SQL (Full Finance Stack) has been copied to clipboard!" -ForegroundColor Green
     Write-Host "👉 Paste it into the Supabase SQL Editor and click RUN" -ForegroundColor Cyan
     
     # Copy combined SQL to clipboard
