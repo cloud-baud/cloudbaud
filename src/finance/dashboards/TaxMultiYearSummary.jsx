@@ -1,19 +1,18 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
     FileDown, Printer, Filter, Plus, Columns, Rows,
     Save, Undo, Redo, Eraser, Bold, Italic,
     AlignLeft, AlignCenter, AlignRight,
-    Lock, LockOpen, Upload, X, Activity, MessageSquare, Bot, Sparkles, FileText, ListTodo, Check
+    Lock, LockOpen, Upload, X, Activity, MessageSquare, Bot, Sparkles, FileText, ListTodo, Check, Paperclip
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/shared/ui/button';
 import { Separator } from '@/shared/ui/separator';
 
-// import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'; // Replaced by Ribbon
-import { Ribbon, RibbonButton, RibbonSeparator, RibbonGroup } from '../../components/layout/Ribbon';
+import TaxRibbon from '../components/TaxRibbon';
 import WorkspaceChat from '../../collaboration/WorkspaceChat';
 import OllamaChatPanel from '../../collaboration/OllamaChatPanel';
 import { 
@@ -29,25 +28,18 @@ const INITIAL_DATA = [
         title: 'Filing Checklist (Verify Per Year)',
         rows: [
 
-            { label: '2. Income: 1099-NEC (CloudBaud Consulting)', values: {} },
-            { label: '3. Income: 1099-B (Stock Sales/Cost Basis)', values: {} },
-            { label: '4. Income: 1099-INT/DIV (Interest/Dividends)', values: {} },
-            { label: '5. Biz: Contractor 1099s Issued (> $600)', values: {} },
-            { label: '6. Biz: Home Office Deduction (Utilities/Ins)', values: {} },
-            { label: '7. Biz: Equipment/Software (Section 179)', values: {} },
-            { label: '8. Biz: Vehicle Mileage Log', values: {} },
-            { label: '9. Personal: Mortgage Interest (1098)', values: {} },
-            { label: '10. Personal: RE/Sales Tax (Big Purchases)', values: {} },
-            { label: '11. Retirement: SEP-IRA/401k Maxed', values: {} },
         ]
     },
     {
         id: 'w2',
-        title: null,
+        title: 'INCOME',
         rows: [
-            { label: '1. Income: W-2 (Spouse/Employment)', values: {}, isChecklist: true },
             { code: 'w2_wages', label: 'W2 Wages', values: { 2024: 0, 2023: 0, 2022: 37995.76, 2021: 49793.32, 2020: 69549.66, 2019: 84444.89, 2018: 70399.57, 2017: 63132.46 } },
             { code: 'w2_withheld', label: 'Taxes Withheld', values: { 2024: 0, 2023: 0, 2022: 4063.44, 2021: 5834.02, 2020: 10423.75, 2019: 12386.28, 2018: 7675.56, 2017: 7909.36 } },
+            { label: '2. Income: 1099-NEC (CloudBaud Consulting)', values: {} },
+            { label: '3. Income: 1099-B (Stock Sales/Cost Basis)', values: {} },
+            { label: '4. Income: 1099-INT/DIV (Interest/Dividends)', values: {} },
+            { label: '5. Biz: Contractor 1099s Issued (> $600)', values: {} },
         ]
     },
     {
@@ -88,6 +80,12 @@ const INITIAL_DATA = [
             { label: 'Real Estate Interest Woodridge', values: { 2021: 10516.14, 2020: 16431.02, 2019: 18719.36, 2018: 13698.52, 2017: 17619.67 } },
             { label: 'Real Estate Interest Lake Hills', values: {} },
             { label: 'Real Estate Interest Olympic Court', values: {} },
+            { label: '6. Biz: Home Office Deduction (Utilities/Ins)', values: {} },
+            { label: '7. Biz: Equipment/Software (Section 179)', values: {} },
+            { label: '8. Biz: Vehicle Mileage Log', values: {} },
+            { label: '9. Personal: Mortgage Interest (1098)', values: {} },
+            { label: '10. Personal: RE/Sales Tax (Big Purchases)', values: {} },
+            { label: '11. Retirement: SEP-IRA/401k Maxed', values: {} },
         ]
     },
     {
@@ -102,6 +100,8 @@ const INITIAL_DATA = [
         ]
     }
 ];
+
+
 
 const formatCurrency = (amount) => {
     if (amount === undefined || amount === null) return <span className="text-muted-foreground/50">-</span>;
@@ -200,8 +200,9 @@ const EditableCell = ({ value, onSave, type = 'text', formatter, className, isLo
 
 
 
-const TaxDashboard = () => {
-    console.log("TaxDashboard: Mounting/Rendering");
+const TaxMultiYearSummary = () => {
+    console.log("TaxMultiYearSummary: Mounting/Rendering");
+    const navigate = useNavigate();
 
 
 
@@ -310,17 +311,47 @@ const TaxDashboard = () => {
             }
         }
 
+        // Merge checklist items from INITIAL_DATA into other sections (e.g., w2)
+        // This ensures UI-only checklist items remain visible even when COA loads
+        const initialW2Section = INITIAL_DATA.find(s => s.id === 'w2');
+        if (initialW2Section) {
+            initialW2Section.rows.forEach((row, i) => {
+                if (row.isChecklist || !row.code) {
+                    // This is a checklist item or label-only row, add it
+                    groups.w2.push({
+                        ...row,
+                        id: row.id || `w2-checklist-${i}`,
+                        values: row.values || {}
+                    });
+                }
+            });
+        }
+
+        // Merge checklist items from INITIAL_DATA into deductions section
+        const initialDeductionsSection = INITIAL_DATA.find(s => s.id === 'deductions');
+        if (initialDeductionsSection) {
+            initialDeductionsSection.rows.forEach((row, i) => {
+                if (!row.code) {
+                    // This is a checklist item or label-only row, add it
+                    groups.deductions.push({
+                        ...row,
+                        id: row.id || `deductions-checklist-${i}`,
+                        values: row.values || {}
+                    });
+                }
+            });
+        }
+
         // Convert groupsMap to Array format expected by Renderer
         return [
             // 0. Checklist (Only visible in Single Year View)
             { id: 'checklist', title: null, rows: checklistRows },
 
             // 1. Personal Basic
-            { id: 'w2', title: 'Personal Income (W2)', rows: groups.w2 },
+            { id: 'w2', title: 'INCOME', rows: groups.w2 },
             
             // 2. Business / Universal Structure
             { id: 'revenue', title: 'Consulting Revenue', rows: groups.revenue },
-            { id: 'biz', title: 'Business Structure (Legacy)', rows: groups.biz }, /* Keep for legacy mapping */
             { id: 'expense', title: 'Operating Expenses', rows: groups.expense },
             
             // 3. Investing / Assets
@@ -330,6 +361,9 @@ const TaxDashboard = () => {
             
             // 4. Deductions
             { id: 'deductions', title: 'Itemized Deductions', rows: groups.deductions },
+            
+            // 5. Legacy & Other
+            { id: 'biz', title: 'Business Structure (Legacy)', rows: groups.biz }, /* Keep for legacy mapping */
             { id: 'taxes', title: 'Taxes Paid', rows: groups.taxes },
             { id: 'liabilities', title: 'Liabilities', rows: groups.liabilities }
 
@@ -361,6 +395,7 @@ const TaxDashboard = () => {
     // --- Document Linking State ---
     const [cellLinks, setCellLinks] = useState({}); // Map: "section-row-col" -> { fileName, fileUrl, page }
     const [yearReturns, setYearReturns] = useState({}); // Map: "year" -> { fileName, fileUrl }
+    const [rowAttachments, setRowAttachments] = useState({}); // Map: "section-row" -> { fileName, fileUrl, docId }
     
     // --- Persistence for Links ---
     useEffect(() => {
@@ -372,6 +407,7 @@ const TaxDashboard = () => {
     const [activeRightTab, setActiveRightTab] = useState('agent'); // 'chat' | 'agent' | 'activity' | null
     const [showFilePanel, setShowFilePanel] = useState(false);
     const [filePreviewUrl, setFilePreviewUrl] = useState(null);
+    const [cpaChecklistOpen, setCpaChecklistOpen] = useState(false);
 
 
 
@@ -388,10 +424,13 @@ const TaxDashboard = () => {
             setIsLoading(true);
             try {
                 // 1. Fetch Chart of Accounts & Returns
-                const { getChartOfAccounts, getTaxEntries, getYearReturns } = await import('@/finance/api/taxService');
+                const { getChartOfAccounts, getTaxEntries, getYearReturns, getRowAttachments } = await import('@/finance/api/taxService');
                 const accounts = await getChartOfAccounts();
                 const returns = await getYearReturns();
+                const attachments = await getRowAttachments();
+                
                 setYearReturns(returns || {});
+                setRowAttachments(attachments || {});
                 
                 // 2. Fetch Entries
                 const entryData = await getTaxEntries();
@@ -441,6 +480,8 @@ const TaxDashboard = () => {
     // File Input Refs
     const returnInputRef = useRef(null);
     const supportingDocInputRef = useRef(null); // For linking supporting docs to cells
+    const attachmentInputRef = useRef(null); // For row attachments
+    const [pendingAttachmentRow, setPendingAttachmentRow] = useState(null); // {sectionId, rowIndex}
 
     // --- Panel Resizing State ---
     const [filePanelWidthPct, setFilePanelWidthPct] = useState(50);
@@ -549,6 +590,48 @@ const TaxDashboard = () => {
             }
 
             e.target.value = '';
+        }
+    };
+
+    // Handle attachment icon click - open file picker
+    const handleAttachmentClick = (sectionId, rowIndex) => {
+        setPendingAttachmentRow({ sectionId, rowIndex });
+        if (attachmentInputRef.current) attachmentInputRef.current.click();
+    };
+
+    // Handle attachment file selection
+    const handleAttachmentFileChange = async (e) => {
+        const file = e.target.files?.[0];
+        if (file && pendingAttachmentRow) {
+            const { sectionId, rowIndex } = pendingAttachmentRow;
+            const rowId = `${sectionId}-${rowIndex}`;
+            
+            // Optimistic Update
+            const url = URL.createObjectURL(file);
+            setRowAttachments(prev => ({
+                ...prev,
+                [rowId]: { fileName: file.name, fileUrl: url }
+            }));
+            
+            // Upload to Supabase
+            try {
+                const { uploadTaxDocument } = await import('@/finance/api/taxService');
+                const doc = await uploadTaxDocument(file, { type: 'ROW_ATTACHMENT', rowId });
+                
+                // Update with actual doc ID
+                setRowAttachments(prev => ({
+                    ...prev,
+                    [rowId]: { fileName: file.name, fileUrl: url, docId: doc.id }
+                }));
+                
+                console.log("Uploaded Row Attachment:", doc);
+            } catch (err) {
+                console.error("Attachment upload failed", err);
+                alert("Upload failed: " + err.message);
+            }
+            
+            e.target.value = '';
+            setPendingAttachmentRow(null);
         }
     };
 
@@ -974,6 +1057,7 @@ const TaxDashboard = () => {
             {/* Hidden Inputs for File Loading */}
             <input type="file" ref={returnInputRef} className="hidden" accept=".pdf" onChange={handleReturnFileChange} />
             <input type="file" ref={supportingDocInputRef} className="hidden" accept=".pdf,.png,.jpg" onChange={handleSupportingDocChange} />
+            <input type="file" ref={attachmentInputRef} className="hidden" accept=".pdf" onChange={handleAttachmentFileChange} />
 
             {/* Header / Actions - Modified to include Ribbon Toggle */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -1100,29 +1184,105 @@ const TaxDashboard = () => {
                         {
                             id: 'view',
                             label: 'View',
-                            content: (
-                                <>
-                                    <div className="flex flex-col gap-1 px-2 border-r border-slate-200 dark:border-slate-700 pr-4">
-                                        <label className="text-[10px] text-slate-500 font-medium">Active View</label>
-                                        <select
-                                            className="h-8 text-xs bg-slate-100 dark:bg-slate-800 border-none rounded px-2 w-32 focus:ring-1 focus:ring-brand-blue"
-                                            value={viewMode === 'summary' ? 'summary' : focusedYear}
-                                            onChange={(e) => {
-                                                if (e.target.value === 'summary') {
-                                                    setSearchParams({});
-                                                } else {
-                                                    setSearchParams({ year: e.target.value });
-                                                }
-                                            }}
-                                        >
-                                            <option value="summary">Summary View</option>
-                                            {years.map(y => <option key={y} value={y}>{y}</option>)}
-                                        </select>
-                                    </div>
-                                    <RibbonButton icon={FileDown} label="File Pane" onClick={() => setShowFilePanel(!showFilePanel)} />
-                                    <div className="text-sm text-slate-500 px-4">View options (Freeze panes, etc.) would go here.</div>
-                                </>
-                            )
+                            content: (() => {
+                                const activeYear = focusedYear || years[0] || 2017;
+                                const yearDocs = YEAR_DOCUMENTS[activeYear];
+                                return (
+                                    <>
+                                        {/* View Selector */}
+                                        <div className="flex flex-col gap-1 px-2 border-r border-slate-200 dark:border-slate-700 pr-4">
+                                            <label className="text-[10px] text-slate-500 font-medium">Active View</label>
+                                            <select
+                                                className="h-8 text-xs bg-slate-100 dark:bg-slate-800 border-none rounded px-2 w-32 focus:ring-1 focus:ring-brand-blue"
+                                                value={viewMode === 'summary' ? 'summary' : focusedYear}
+                                                onChange={(e) => {
+                                                    if (e.target.value === 'summary') {
+                                                        setSearchParams({});
+                                                    } else {
+                                                        setSearchParams({ year: e.target.value });
+                                                    }
+                                                }}
+                                            >
+                                                <option value="summary">Summary View</option>
+                                                {years.map(y => <option key={y} value={y}>{y}</option>)}
+                                            </select>
+                                        </div>
+                                        <RibbonSeparator />
+
+                                        {/* Consolidated Return - Prominent */}
+                                        {yearDocs?.consolidated && (
+                                            <button
+                                                className="flex flex-col items-center justify-center px-3 h-16 rounded-md transition-all hover:bg-brand-blue/10 border border-brand-blue/30 bg-brand-blue/5 gap-1 min-w-[72px]"
+                                                title={`Open ${activeYear} ${yearDocs.consolidated.label}`}
+                                                onClick={() => {
+                                                    setFilePreviewUrl(`${DOC_BASE}/${activeYear}/${yearDocs.consolidated.file}`);
+                                                    setShowFilePanel(true);
+                                                }}
+                                            >
+                                                <FileText className="size-5 text-brand-blue" />
+                                                <span className="text-[10px] font-bold text-brand-blue leading-none">{activeYear} Return</span>
+                                            </button>
+                                        )}
+                                        <RibbonSeparator />
+
+                                        {/* Source Documents - Two Rows */}
+                                        {yearDocs?.docs && (() => {
+                                            const tracked = yearDocs.docs.filter(d => d.status === 'tracked');
+                                            const rest = yearDocs.docs.filter(d => d.status !== 'tracked');
+                                            const renderChip = (doc) => (
+                                                <button
+                                                    key={doc.id}
+                                                    className={cn(
+                                                        "inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium border transition-all whitespace-nowrap",
+                                                        doc.status === 'tracked'
+                                                            ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40"
+                                                            : doc.status === 'empty'
+                                                            ? "bg-amber-50 dark:bg-amber-900/10 border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/30"
+                                                            : "bg-red-50 dark:bg-red-900/10 border-red-300 dark:border-red-700 text-red-800 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/30",
+                                                        doc.file ? "cursor-pointer" : "cursor-pointer opacity-75"
+                                                    )}
+                                                    title={`${doc.label}${doc.file ? ` — Click to preview ${doc.file}` : ' — No file yet'}`}
+                                                    onClick={() => {
+                                                        if (doc.file) {
+                                                            setFilePreviewUrl(`${DOC_BASE}/${activeYear}/${doc.file}`);
+                                                            setShowFilePanel(true);
+                                                        } else {
+                                                            navigate(`/collaboration/finance/taxes/year?year=${activeYear}`);
+                                                        }
+                                                    }}
+                                                >
+                                                    <span className={cn(
+                                                        "w-1.5 h-1.5 rounded-full shrink-0",
+                                                        doc.status === 'tracked' ? "bg-emerald-500"
+                                                            : doc.status === 'empty' ? "bg-amber-400"
+                                                            : "bg-red-500"
+                                                    )} />
+                                                    {doc.short}
+                                                </button>
+                                            );
+                                            return (
+                                                <div className="flex flex-col gap-1 h-16 justify-center px-1">
+                                                    {/* Top row: Tracked (green) */}
+                                                    <div className="flex gap-1 items-center">
+                                                        {tracked.map(renderChip)}
+                                                    </div>
+                                                    {/* Bottom row: Empty + Missing */}
+                                                    <div className="flex gap-1 items-center overflow-x-auto">
+                                                        {rest.map(renderChip)}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })()}
+
+                                        {/* Fallback when no docs for this year */}
+                                        {!yearDocs && (
+                                            <div className="flex items-center px-4 text-xs text-slate-400 italic">
+                                                No documents indexed for {activeYear}
+                                            </div>
+                                        )}
+                                    </>
+                                );
+                            })()
                         }
                     ]}
                 />
@@ -1150,7 +1310,31 @@ const TaxDashboard = () => {
                                     {/* Corner Cell */}
                                     <th className="w-[10px] min-w-[10px] max-w-[10px] h-5 min-h-[20px] max-h-[20px] bg-slate-100 dark:bg-slate-800 border-r border-b border-slate-300 dark:border-slate-700" style={{ width: '10px', minWidth: '10px', maxWidth: '10px', height: '20px', minHeight: '20px', maxHeight: '20px' }}></th>
 
-                                    {/* Label Column Handle (A) */}
+                                    {/* Checkbox Column Handle (A) - NEW */}
+                                    <th
+                                        className={cn(
+                                            "h-5 min-h-[20px] max-h-[20px] border-r border-b border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-[10px] text-slate-500 font-mono font-medium text-center relative group select-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 w-[40px]",
+                                            isSelected('col', 'checkbox') && "bg-brand-blue/20 text-brand-blue font-bold"
+                                        )}
+                                        style={{ width: '40px', minWidth: '40px', maxWidth: '40px', height: '20px', minHeight: '20px', maxHeight: '20px' }}
+                                        onClick={() => handleSelectCol('checkbox')}
+                                    >
+                                        A
+                                    </th>
+
+                                    {/* Attachment Column Handle (B) - NEW */}
+                                    <th
+                                        className={cn(
+                                            "h-5 min-h-[20px] max-h-[20px] border-r border-b border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-[10px] text-slate-500 font-mono font-medium text-center relative group select-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 w-[40px]",
+                                            isSelected('col', 'attachment') && "bg-brand-blue/20 text-brand-blue font-bold"
+                                        )}
+                                        style={{ width: '40px', minWidth: '40px', maxWidth: '40px', height: '20px', minHeight: '20px', maxHeight: '20px' }}
+                                        onClick={() => handleSelectCol('attachment')}
+                                    >
+                                        B
+                                    </th>
+
+                                    {/* Label Column Handle (C) - was B */}
                                     <th
                                         className={cn(
                                             "h-5 min-h-[20px] max-h-[20px] border-r border-b border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-[10px] text-slate-500 font-mono font-medium text-center relative group select-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800",
@@ -1159,10 +1343,10 @@ const TaxDashboard = () => {
                                         style={{ ...getColStyle('label'), height: '20px', minHeight: '20px', maxHeight: '20px' }}
                                         onClick={() => handleSelectCol('label')}
                                     >
-                                        A
+                                        C
                                     </th>
 
-                                    {/* Year Column Handles (B, C, D...) */}
+                                    {/* Year Column Handles (D, E, F...) - was C, D, E... */}
                                     {visibleYears.map((year, i) => (
                                         <th
                                             key={`handle-${year}`}
@@ -1173,7 +1357,7 @@ const TaxDashboard = () => {
                                             style={{ ...getColStyle(year), height: '20px', minHeight: '20px', maxHeight: '20px' }}
                                             onClick={() => handleSelectCol(year)}
                                         >
-                                            {String.fromCharCode(66 + i)}
+                                            {String.fromCharCode(68 + i)}
                                         </th>
                                     ))}
                                 </tr>
@@ -1183,6 +1367,28 @@ const TaxDashboard = () => {
                                     {/* Gutter Column Header - SHOW ROW 1 */}
                                     <th className="w-[10px] min-w-[10px] max-w-[10px] h-8 min-h-[32px] max-h-[32px] bg-slate-100 dark:bg-slate-800 border-r border-b border-slate-300 dark:border-slate-700 text-[10px] text-slate-400 font-normal font-mono" style={{ width: '10px', minWidth: '10px', maxWidth: '10px', height: '32px', minHeight: '32px', maxHeight: '32px' }}>
                                         {headerRowNumber}
+                                    </th>
+
+                                    {/* Checkbox Column Header - NEW */}
+                                    <th
+                                        className={cn(
+                                            "p-0 border border-slate-300 dark:border-slate-600 bg-[#0f2a4a] text-white relative group box-border h-8 min-h-[32px] max-h-[32px] select-none text-center text-xs w-[40px]",
+                                            isSelected('col', 'checkbox') && "ring-2 ring-inset ring-brand-aqua z-10"
+                                        )}
+                                        style={{ width: '40px', minWidth: '40px', maxWidth: '40px', height: '32px', minHeight: '32px', maxHeight: '32px' }}
+                                    >
+                                        <div className="flex items-center justify-center h-full w-full"><Check className="size-3" /></div>
+                                    </th>
+
+                                    {/* Attachment Column Header - NEW */}
+                                    <th
+                                        className={cn(
+                                            "p-0 border border-slate-300 dark:border-slate-600 bg-[#0f2a4a] text-white relative group box-border h-8 min-h-[32px] max-h-[32px] select-none text-center text-xs w-[40px]",
+                                            isSelected('col', 'attachment') && "ring-2 ring-inset ring-brand-aqua z-10"
+                                        )}
+                                        style={{ width: '40px', minWidth: '40px', maxWidth: '40px', height: '32px', minHeight: '32px', maxHeight: '32px' }}
+                                    >
+                                        <div className="flex items-center justify-center h-full w-full"><Paperclip className="size-3" /></div>
                                     </th>
 
                                     <th
@@ -1206,8 +1412,8 @@ const TaxDashboard = () => {
                                             <div className="flex items-center justify-center w-full h-full overflow-hidden gap-1">
                                                 <span
                                                     className="hover:text-brand-aqua hover:underline cursor-pointer transition-colors"
-                                                    onClick={() => setSearchParams({ year: year.toString() })}
-                                                    title="Click to focus this year"
+                                                    onClick={() => navigate(`/collaboration/finance/taxes/year?year=${year}`)}
+                                                    title="Click to view detailed 1040 breakdown"
                                                 >
                                                     {year}
                                                 </span>
@@ -1236,6 +1442,12 @@ const TaxDashboard = () => {
                                                 <td className="w-[10px] min-w-[10px] max-w-[10px] border-r border-b border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-[10px] text-center text-slate-400 font-mono" style={{ width: '10px', minWidth: '10px', maxWidth: '10px' }}>
                                                     {rowMap[`section-${section.id}`]}
                                                 </td>
+
+                                                {/* Empty Checkbox Cell for Section Header */}
+                                                <td className="border border-slate-300 dark:border-slate-600 bg-[#0f2a4a] w-[40px]" style={{ width: '40px', minWidth: '40px', maxWidth: '40px' }}></td>
+
+                                                {/* Empty Attachment Cell for Section Header */}
+                                                <td className="border border-slate-300 dark:border-slate-600 bg-[#0f2a4a] w-[40px]" style={{ width: '40px', minWidth: '40px', maxWidth: '40px' }}></td>
 
                                                 {/* SECTION HEADER - NOW CENTERED & COMPACT */}
                                                 <td className="py-1 px-2 border border-slate-300 dark:border-slate-600 bg-[#0f2a4a] text-white font-bold text-center text-sm overflow-hidden truncate">
@@ -1301,8 +1513,64 @@ const TaxDashboard = () => {
                                                             </div>
                                                         </td>
                                                     ) : (
-                                                        /* STANDARD RENDER: Label First, Then Values */
+                                                        /* STANDARD RENDER: Checkbox First, Then Label, Then Values */
                                                         <>
+                                                            {/* Checkbox Cell - NEW */}
+                                                            <td
+                                                                className={cn(
+                                                                    "py-0.5 px-1 border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#1a1a1a] relative group align-middle box-border text-center w-[40px]",
+                                                                    isSelected('cell', { sectionId: section.id, rowIndex, colKey: 'checkbox' }) && "bg-brand-blue/10 ring-2 ring-inset ring-brand-blue z-10"
+                                                                )}
+                                                                style={{ width: '40px', minWidth: '40px', maxWidth: '40px' }}
+                                                                onClick={() => handleSelectCell(section.id, rowIndex, 'checkbox')}
+                                                            >
+                                                                <EditableCell
+                                                                    value={row.values?.verified || 0}
+                                                                    type="checkbox"
+                                                                    onSave={(val) => handleCellUpdate(section.id, rowIndex, 'checkbox', val)}
+                                                                    className="justify-center w-full h-full"
+                                                                />
+                                                            </td>
+
+                                                            {/* Attachment Cell - Interactive */}
+                                                            <td
+                                                                className={cn(
+                                                                    "py-0.5 px-1 border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#1a1a1a] relative group align-middle box-border text-center w-[40px] cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors",
+                                                                    isSelected('cell', { sectionId: section.id, rowIndex, colKey: 'attachment' }) && "bg-brand-blue/10 ring-2 ring-inset ring-brand-blue z-10"
+                                                                )}
+                                                                style={{ width: '40px', minWidth: '40px', maxWidth: '40px' }}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    const rowId = `${section.id}-${rowIndex}`;
+                                                                    const attachment = rowAttachments[rowId];
+                                                                    if (attachment) {
+                                                                        // If attachment exists, show it in preview
+                                                                        setFilePreviewUrl(attachment.fileUrl);
+                                                                        setShowFilePanel(true);
+                                                                    } else {
+                                                                        // If no attachment, open file picker
+                                                                        handleAttachmentClick(section.id, rowIndex);
+                                                                    }
+                                                                }}
+                                                            >
+                                                                {(() => {
+                                                                    const rowId = `${section.id}-${rowIndex}`;
+                                                                    const hasAttachment = rowAttachments[rowId];
+                                                                    return (
+                                                                        <Paperclip 
+                                                                            className={cn(
+                                                                                "size-3 mx-auto transition-colors",
+                                                                                hasAttachment 
+                                                                                    ? "text-brand-blue hover:text-brand-aqua" 
+                                                                                    : "text-slate-300 dark:text-slate-700 hover:text-slate-400 dark:hover:text-slate-600"
+                                                                            )} 
+                                                                            title={hasAttachment ? `View: ${hasAttachment.fileName}` : "Attach document"}
+                                                                        />
+                                                                    );
+                                                                })()}
+                                                            </td>
+
+                                                            {/* Label Cell */}
                                                             <td
                                                                 className={cn(
                                                                     "py-0.5 px-1 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 font-medium text-xs bg-white dark:bg-[#1a1a1a] relative group overflow-hidden align-middle box-border",
@@ -1370,7 +1638,7 @@ const TaxDashboard = () => {
                                                 <td className="w-[10px] min-w-[10px] max-w-[10px] border-r border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-[10px] text-center text-slate-400 font-mono" style={{ width: '10px', minWidth: '10px', maxWidth: '10px' }}>
                                                     {rowMap[`spacer-${section.id}`]}
                                                 </td>
-                                                <td colSpan={visibleYears.length + 1} className="h-6 border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#1a1a1a]"></td>
+                                                <td colSpan={visibleYears.length + 3} className="h-6 border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#1a1a1a]"></td>
                                             </tr>
                                         )}
                                     </React.Fragment>
@@ -1644,14 +1912,14 @@ class ErrorBoundary extends React.Component {
 
     componentDidCatch(error, errorInfo) {
         this.setState({ error, errorInfo });
-        console.error("TaxDashboard Error Boundary Caught:", error, errorInfo);
+        console.error("TaxMultiYearSummary Error Boundary Caught:", error, errorInfo);
     }
 
     render() {
         if (this.state.hasError) {
             return (
                 <div className="p-4 bg-red-50 text-red-800 border border-red-200 rounded m-4">
-                    <h2 className="text-lg font-bold mb-2">Something went wrong in TaxDashboard</h2>
+                    <h2 className="text-lg font-bold mb-2">Something went wrong in TaxMultiYearSummary</h2>
                     <details className="whitespace-pre-wrap font-mono text-xs">
                         {this.state.error && this.state.error.toString()}
                         <br />
@@ -1664,10 +1932,10 @@ class ErrorBoundary extends React.Component {
     }
 }
 
-const TaxDashboardWithBoundary = (props) => (
+const TaxMultiYearSummaryWithBoundary = (props) => (
     <ErrorBoundary>
-        <TaxDashboard {...props} />
+        <TaxMultiYearSummary {...props} />
     </ErrorBoundary>
 );
 
-export default TaxDashboardWithBoundary;
+export default TaxMultiYearSummaryWithBoundary;

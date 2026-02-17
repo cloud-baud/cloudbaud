@@ -147,8 +147,10 @@ const WorkspaceLayout = () => {
             console.error("Failed to parse nav", e);
         }
         return [
-            { id: '2', label: 'Documents', href: '/collaboration/sites/consulting/docs', icon: 'FileText' },
-            { id: '3', label: 'Team', href: '/collaboration/sites/consulting/team', icon: 'Users' }
+            { id: 'consulting', label: 'Consulting', href: '/collaboration/consulting', icon: 'Briefcase' },
+            { id: 'teaching', label: 'Teaching', href: '/collaboration/teaching', icon: 'FileText' },
+            { id: 'realestate', label: 'Real Estate', href: '/collaboration/realestate', icon: 'Home' },
+            { id: 'products', label: 'Products', href: '/collaboration/products', icon: 'Layers' }
         ];
     });
 

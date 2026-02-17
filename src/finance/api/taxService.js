@@ -147,7 +147,14 @@ export const uploadTaxDocument = async (file, meta = {}) => {
     try {
         const user = await getUser();
         // const fileExt = file.name.split('.').pop();
-        const fileName = `${user.id}/${meta.year || 'general'}/${Date.now()}_${file.name}`;
+        let fileName;
+        
+        // For row attachments, include rowId in the filename
+        if (meta.type === 'ROW_ATTACHMENT' && meta.rowId) {
+            fileName = `${user.id}/general/${Date.now()}_${meta.rowId}_${file.name}`;
+        } else {
+            fileName = `${user.id}/${meta.year || 'general'}/${Date.now()}_${file.name}`;
+        }
         
         // 1. Upload to Storage
         const { data: uploadData, error: uploadError } = await supabase.storage
@@ -267,6 +274,45 @@ export const getYearReturns = async () => {
         return returnMap;
     } catch (err) {
         console.error("Error fetching year returns:", err);
+        return {};
+    }
+};
+
+// Retrieve Row Attachments
+export const getRowAttachments = async () => {
+    try {
+        await getUser();
+        const { data, error } = await supabase.rpc('api_get_row_attachments');
+
+        if (error) throw error;
+
+        // Transform to map: "section-row" -> { fileName, fileUrl, docId }
+        const attachmentMap = {};
+        data.forEach(doc => {
+            // Extract row ID from storage path or metadata
+            // For now, we'll use a simple pattern extraction from storage_path
+            // Expected format: userId/general/timestamp_rowId_filename.pdf
+            // or we can store rowId in a metadata field (better approach)
+            
+            // Parse rowId from storage path (temporary solution)
+            const pathParts = doc.storage_path.split('/');
+            const filenamePart = pathParts[pathParts.length - 1];
+            // Extract rowId from filename pattern: timestamp_rowId_filename.pdf
+            const match = filenamePart.match(/_([^_]+)_/);
+            if (match) {
+                const rowId = match[1];
+                const { data: { publicUrl } } = supabase.storage.from('tax-docs').getPublicUrl(doc.storage_path);
+                
+                attachmentMap[rowId] = {
+                    fileName: doc.filename,
+                    fileUrl: publicUrl,
+                    docId: doc.id
+                };
+            }
+        });
+        return attachmentMap;
+    } catch (err) {
+        console.error("Error fetching row attachments:", err);
         return {};
     }
 };

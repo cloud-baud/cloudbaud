@@ -167,13 +167,13 @@ const ContextLayout = () => {
             {/* Main Content Area - Renders the specific page */}
             <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 relative">
                 {isCollapsed && (
-                    <div className="absolute top-6 left-6 z-10 transition-opacity duration-300 animate-in fade-in slide-in-from-left-2">
+                    <div className="absolute top-2 left-0 z-10 transition-opacity duration-300 animate-in fade-in slide-in-from-left-2">
                         <button
                             onClick={() => setIsCollapsed(false)}
-                            className="p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors group"
+                            className="p-1.5 bg-white dark:bg-slate-800 border border-l-0 border-slate-200 dark:border-slate-700 shadow-sm rounded-r-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors group"
                             title="Expand Menu"
                         >
-                            <PanelLeftOpen className="size-5 text-slate-500 group-hover:text-brand-blue" />
+                            <PanelLeftOpen className="size-4 text-slate-500 group-hover:text-brand-blue" />
                         </button>
                     </div>
                 )}

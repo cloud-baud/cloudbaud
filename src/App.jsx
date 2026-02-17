@@ -12,7 +12,8 @@ import FinOpsDashboard from './finance/dashboards/FinOpsDashboard';
 import { SettingsPage } from 'common-features/frontend/components/features/settings/SettingsPage'; // CommonFeatures master
 import PlaceholderPage from './collaboration/PlaceholderPage';
 import ContextLayout from './collaboration/ContextLayout';
-import TaxDashboard from './finance/dashboards/TaxDashboard';
+import TaxMultiYearSummary from './finance/dashboards/TaxMultiYearSummary';
+import TaxSingleYear from './finance/dashboards/TaxSingleYear';
 import AccountingDashboard from './finance/dashboards/AccountingDashboard';
 import BookkeepingDashboard from './finance/dashboards/BookkeepingDashboard';
 import AccountLedger from './finance/dashboards/AccountLedger';
@@ -101,7 +102,8 @@ function App() {
                     <Route element={<FinanceGuard />}>
                         <Route path="finance" element={<ContextLayout />}>
                             <Route index element={<FinOpsDashboard />} />
-                            <Route path="taxes" element={<TaxDashboard />} />
+                            <Route path="taxes" element={<TaxMultiYearSummary />} />
+                            <Route path="taxes/year" element={<TaxSingleYear />} />
                             <Route path="bookkeeping" element={<BookkeepingDashboard />} />
                             <Route path="accounting" element={<AccountingDashboard />} />
                             <Route path="accounting/:accountId" element={<AccountLedger />} />
