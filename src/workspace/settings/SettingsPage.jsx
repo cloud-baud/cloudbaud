@@ -109,8 +109,8 @@ const SettingsPage = () => {
         // We sync with Supabase in useEffect once user is loaded
         const saved = localStorage.getItem('portal_nav_active');
         return saved ? JSON.parse(saved) : [
-            { id: '2', label: 'Documents', href: '/collaboration/sites/consulting/docs' },
-            { id: '3', label: 'Team', href: '/collaboration/sites/consulting/team' }
+            { id: '2', label: 'Documents', href: '/workspace/sites/consulting/docs' },
+            { id: '3', label: 'Team', href: '/workspace/sites/consulting/team' }
         ];
     });
 
@@ -134,8 +134,8 @@ const SettingsPage = () => {
     const [availableLinks, setAvailableLinks] = useState(() => {
         const saved = localStorage.getItem('portal_nav_available');
         return saved ? JSON.parse(saved) : [
-            { id: '4', label: 'Analytics', href: '/collaboration/sites/analytics' },
-            { id: '5', label: 'Sales', href: '/collaboration/sites/sales' },
+            { id: '4', label: 'Analytics', href: '/workspace/sites/analytics' },
+            { id: '5', label: 'Sales', href: '/workspace/sites/sales' },
             { id: '6', label: 'OneDrive', href: '/onedrive' },
             { id: '7', label: 'Outlook', href: '/outlook' }
         ];

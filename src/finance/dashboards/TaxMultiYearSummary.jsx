@@ -13,8 +13,8 @@ import { Button } from '@/shared/ui/button';
 import { Separator } from '@/shared/ui/separator';
 
 import TaxRibbon from '../components/TaxRibbon';
-import WorkspaceChat from '../../collaboration/WorkspaceChat';
-import OllamaChatPanel from '../../collaboration/OllamaChatPanel';
+import WorkspaceChat from '../../workspace/WorkspaceChat';
+import OllamaChatPanel from '../../workspace/OllamaChatPanel';
 import { 
     updateTaxCell, 
 } from '../api/taxService';
@@ -1247,7 +1247,7 @@ const TaxMultiYearSummary = () => {
                                                             setFilePreviewUrl(`${DOC_BASE}/${activeYear}/${doc.file}`);
                                                             setShowFilePanel(true);
                                                         } else {
-                                                            navigate(`/collaboration/finance/taxes/year?year=${activeYear}`);
+                                                            navigate(`/workspace/finance/taxes/year?year=${activeYear}`);
                                                         }
                                                     }}
                                                 >
@@ -1412,7 +1412,7 @@ const TaxMultiYearSummary = () => {
                                             <div className="flex items-center justify-center w-full h-full overflow-hidden gap-1">
                                                 <span
                                                     className="hover:text-brand-aqua hover:underline cursor-pointer transition-colors"
-                                                    onClick={() => navigate(`/collaboration/finance/taxes/year?year=${year}`)}
+                                                    onClick={() => navigate(`/workspace/finance/taxes/year?year=${year}`)}
                                                     title="Click to view detailed 1040 breakdown"
                                                 >
                                                     {year}

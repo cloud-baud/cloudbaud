@@ -4,14 +4,14 @@ import './App.css';
 import { ThemeProvider } from 'next-themes';
 import DynamicMsalProvider from './components/auth/DynamicMsalProvider';
 import MarketingLayout from './portal/layout/MarketingLayout';
-import WorkspaceLayout from './collaboration/WorkspaceLayout';
-import PortalDashboard from './collaboration/PortalDashboard';
-import FabricDemo from './collaboration/sales/FabricDemo';
+import WorkspaceLayout from './workspace/WorkspaceLayout';
+import PortalDashboard from './workspace/PortalDashboard';
+import FabricDemo from './workspace/sales/FabricDemo';
 import FinOpsDashboard from './finance/dashboards/FinOpsDashboard';
-// import SettingsPage from './collaboration/settings/SettingsPage'; // Local version (deprecated)
+// import SettingsPage from './workspace/settings/SettingsPage'; // Local version (deprecated)
 import { SettingsPage } from 'common-features/frontend/components/features/settings/SettingsPage'; // CommonFeatures master
-import PlaceholderPage from './collaboration/PlaceholderPage';
-import ContextLayout from './collaboration/ContextLayout';
+import PlaceholderPage from './workspace/PlaceholderPage';
+import ContextLayout from './workspace/ContextLayout';
 import TaxMultiYearSummary from './finance/dashboards/TaxMultiYearSummary';
 import TaxSingleYear from './finance/dashboards/TaxSingleYear';
 import AccountingDashboard from './finance/dashboards/AccountingDashboard';
@@ -51,21 +51,21 @@ import CompetencyLandingPage from './portal/pages/competencies/CompetencyLanding
 
 import { AuthProvider } from './context/AuthContext';
 import { ContentProvider } from './context/ContentContext';
-import ContentControl from './collaboration/ContentControl';
-import ConsultingDashboard from './collaboration/consulting/ConsultingDashboard';
+import ContentControl from './workspace/ContentControl';
+import ConsultingDashboard from './workspace/consulting/ConsultingDashboard';
 
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import FinanceGuard from './components/auth/FinanceGuard'; // NEW: Finance Guard
 import DevPersonaSwitcher from './components/auth/DevPersonaSwitcher';
 
 
-import CrmDashboard from './collaboration/crm/CrmDashboard';
-import SalesDashboard from './collaboration/sales/SalesDashboard';
-import MarketingDashboard from './collaboration/marketing/MarketingDashboard';
+import CrmDashboard from './workspace/crm/CrmDashboard';
+import SalesDashboard from './workspace/sales/SalesDashboard';
+import MarketingDashboard from './workspace/marketing/MarketingDashboard';
 import SystemStatus from './pages/SystemStatus';
-import AccessManagement from './collaboration/admin/AccessManagement';
-import CmdbDashboard from './collaboration/it/CmdbDashboard';
-import CalendarPage from './collaboration/productivity/CalendarPage';
+import AccessManagement from './workspace/admin/AccessManagement';
+import CmdbDashboard from './workspace/it/CmdbDashboard';
+import CalendarPage from './workspace/productivity/CalendarPage';
 import BookingPage from './pages/BookingPage';
 import { Toaster } from './shared/ui/sonner';
 
@@ -84,8 +84,8 @@ function App() {
 
                 {/* Protected Portal Routes */}
                 <Route element={<ProtectedRoute />}>
-        <Route path="/portal" element={<Navigate to="/collaboration" replace />} />
-                  <Route path="/collaboration" element={<WorkspaceLayout />}>
+        <Route path="/portal" element={<Navigate to="/workspace" replace />} />
+                  <Route path="/workspace" element={<WorkspaceLayout />}>
                     <Route index element={<PortalDashboard />} />
                     <Route path="settings" element={<SettingsPage />} />
                     <Route path="fabric-demo" element={<FabricDemo />} />
@@ -108,13 +108,13 @@ function App() {
                             <Route path="accounting" element={<AccountingDashboard />} />
                             <Route path="accounting/:accountId" element={<AccountLedger />} />
                             <Route path="investments" element={<PlaceholderPage />} />
+                            <Route path="consulting" element={<ConsultingDashboard />} />
                         </Route>
                     </Route>
                     <Route path="support" element={<PlaceholderPage />} />
                     <Route path="crm" element={<CrmDashboard />} />
                     <Route path="sales" element={<SalesDashboard />} />
                     <Route path="marketing" element={<MarketingDashboard />} />
-                    <Route path="consulting" element={<ConsultingDashboard />} />
                     <Route path="system-status" element={<SystemStatus />} />
 
                     {/* IT Routes */}

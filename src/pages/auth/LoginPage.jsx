@@ -118,7 +118,7 @@ const LoginPage = () => {
                                     email: 'dev@example.com', 
                                     role: 'client' 
                                 });
-                                navigate('/collaboration');
+                                navigate('/workspace');
                                 toast.success("Bypassed Login (Dev Mode)");
                             }}
                             className="w-full border-dashed border-amber-500 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950 dark:text-amber-500"

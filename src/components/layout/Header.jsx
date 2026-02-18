@@ -154,7 +154,7 @@ const Header = () => {
             <ThemeToggle />
             {user ? (
                <Button asChild className="bg-brand-blue hover:bg-brand-blue/90 text-white rounded-lg px-6 font-bold shadow-lg shadow-brand-blue/20">
-                 <Link to="/collaboration">Go to App</Link>
+                 <Link to="/workspace">Go to App</Link>
                </Button>
             ) : (
                 <Button asChild className="bg-brand-blue hover:bg-brand-blue/90 text-white rounded-lg px-6 font-bold shadow-lg shadow-brand-blue/20">

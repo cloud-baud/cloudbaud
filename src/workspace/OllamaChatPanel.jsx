@@ -1,23 +1,55 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Bot, User, Sparkles, RefreshCw, AlertCircle, Settings, ChevronDown, Plus } from 'lucide-react';
+import { X, Send, Bot, User, Sparkles, RefreshCw, AlertCircle, Settings, ChevronDown, Plus, Paperclip, FileIcon } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { cn } from '@/lib/utils';
-import ReactMarkdown from 'react-markdown'; // Assuming react-markdown is available, if not fallback to plain text
+import ReactMarkdown from 'react-markdown';
+import AiControlPlane from './AiControlPlane';
+import { createContact } from './crm/contactsService';
 
-const BRIDGE_ENDPOINT = 'http://localhost:3001/api'; // Our new bridge
+const OLLAMA_BASE = 'http://localhost:11434';
+const BRIDGE_ENDPOINT = 'http://localhost:4001';
+
+const SYSTEM_PROMPT = {
+    role: 'system',
+    content: `You are a helpful AI assistant embedded in CloudBaud, a professional workspace application.
+
+WHAT YOU CAN DO:
+- Answer questions about code, business, finance, and general topics
+- Help extract structured data from text (e.g. contact info from a business card)
+- Explain concepts and provide guidance
+
+CRITICAL RULES - WHAT YOU CANNOT DO:
+- You CANNOT see the user's screen, UI, or any panels
+- You CANNOT read from or query any database
+- You CANNOT verify whether data was saved or exists
+- You CANNOT check, browse, or inspect any CRM, contact list, or dashboard
+- You CANNOT perform any action in the application — you can only generate text responses
+- NEVER claim to have checked, verified, looked at, or confirmed anything in the application
+- NEVER fabricate or simulate UI interactions, database lookups, or status checks
+- If the user asks you to verify something was saved, tell them to check the CRM Contacts tab themselves
+
+When the user provides contact details and asks you to save/enter/add them, the application will handle saving automatically. Just acknowledge the request naturally — do NOT pretend to perform the save yourself.
+
+Be concise, honest, and helpful. If you don't know something, say so.`
+};
 
 const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger, contextData, onProcessComplete, onStatusChange }) => {
     // Read config from Settings
     const [config, setConfig] = useState({
-        endpoint: localStorage.getItem('ai_endpoint') || 'http://localhost:11434/api/chat',
+        endpoint: localStorage.getItem('ai_endpoint') || `${OLLAMA_BASE}/api/chat`,
         model: localStorage.getItem('ai_model') || 'llama3.1:8b',
         provider: localStorage.getItem('ai_provider') || 'ollama'
     });
 
-    const [messages, setMessages] = useState([
-        { role: 'assistant', content: `Hello! I am using **${config.model}** via **${config.provider}**. \n\n**Try this:**\n\`/edit src/components/portal/PortalDashboard.jsx Change the rocket icon to a star\`` }
-    ]);
+    const defaultGreeting = `Hello! I am using **${config.model}** via **${config.provider}**.\n\nType \`/help\` to see all available slash commands.`;
+    const [messages, setMessages] = useState(() => {
+        try {
+            const saved = localStorage.getItem('ai_chat_messages');
+            if (saved) return JSON.parse(saved);
+        } catch {}
+        return [{ role: 'assistant', content: defaultGreeting }];
+    });
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [status, setStatus] = useState('Ready'); // For granular status updates
@@ -26,6 +58,13 @@ const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger
     const [availableModels, setAvailableModels] = useState([]);
     const [showSettings, setShowSettings] = useState(false);
     const scrollRef = useRef(null);
+    const fileInputRef = useRef(null);
+    const [attachedFile, setAttachedFile] = useState(null); // { name, type, content, size }
+
+    // Persist messages to localStorage
+    useEffect(() => {
+        try { localStorage.setItem('ai_chat_messages', JSON.stringify(messages)); } catch {}
+    }, [messages]);
 
     // --- FETCH MODELS ---
     useEffect(() => {
@@ -251,8 +290,39 @@ const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger
         setStatus('Thinking...');
         setError(null);
 
+        // If a file is attached, prepend its content to the message
+        let fullInput = originalInput;
+        if (attachedFile) {
+            const fileContext = attachedFile.content.length > 8000
+                ? attachedFile.content.substring(0, 8000) + '\n... [truncated]'
+                : attachedFile.content;
+            fullInput = `[Attached file: ${attachedFile.name}]\n\n${fileContext}\n\nUser message: ${originalInput}`;
+            setAttachedFile(null); // Clear after use
+        }
+
         try {
+            // --- SLASH COMMAND REGISTRY ---
+            const SLASH_COMMANDS = [
+                { cmd: '/help', args: '', desc: 'Show this command reference' },
+                { cmd: '/edit', args: '<file> <instruction>', desc: 'Edit a source file via AI' },
+                { cmd: '/contact', args: '<business card text>', desc: 'Extract & save a contact to CRM' },
+            ];
+
             // --- AGENTIC LOGIC ---
+            // 0. Check for /help command
+            if (originalInput.trim() === '/help' || originalInput.trim() === '/?') {
+                const helpTable = SLASH_COMMANDS.map(c => 
+                    `| \`${c.cmd}\` | ${c.args ? `\`${c.args}\`` : ''} | ${c.desc} |`
+                ).join('\n');
+                setMessages(prev => [...prev, { 
+                    role: 'assistant', 
+                    content: `**📖 Slash Commands**\n\n| Command | Arguments | Description |\n|---------|-----------|-------------|\n${helpTable}\n\n**Examples:**\n\`\`\`\n/contact David Rumsey CPA, david@email.com, 360-651-8640\n/edit src/App.jsx Change the title to "My App"\n\`\`\`\n\n_You can also type naturally — e.g. "enter this contact for me: ..."_`
+                }]);
+                setIsLoading(false);
+                setStatus('Ready');
+                return;
+            }
+
             // 1. Check for /edit command
             if (originalInput.startsWith('/edit')) {
                 const parts = originalInput.split(' ');
@@ -341,6 +411,92 @@ const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger
                  return;
             }
 
+            // 3. Check for contact entry request
+            // Approach: /contact command OR broad keyword match OR data heuristic
+            const lower = originalInput.toLowerCase();
+            const isContactCommand = originalInput.startsWith('/contact');
+            const hasContactKeyword = lower.includes('contact') || lower.includes('business card') || lower.includes('add to crm');
+            const hasContactAction = /(enter|add|create|save|import|scan|put|store|record|register)/i.test(lower);
+            const hasContactData = /[\w.-]+@[\w.-]+|(\d{3}[\s.-]?\d{3}[\s.-]?\d{4})/i.test(originalInput);
+            const contactMatch = isContactCommand || (hasContactKeyword && hasContactAction) || (hasContactKeyword && hasContactData) || (hasContactAction && hasContactData);
+
+            if (contactMatch) {
+                // Strip the /contact prefix if present
+                const contactText = isContactCommand ? originalInput.replace(/^\/contact\s*/i, '') : originalInput;
+
+                if (!contactText.trim()) {
+                    setMessages(prev => [...prev, { role: 'assistant', content: '**Usage:** `/contact David Rumsey CPA, david@example.com, 555-123-4567`\n\nPaste any business card text after `/contact` and I\'ll extract and save it to your CRM.' }]);
+                    setIsLoading(false);
+                    setStatus('Ready');
+                    return;
+                }
+
+                setStatus('Extracting contact info...');
+                const extractPrompt = `Extract the contact information from the following text. Return ONLY a valid JSON object with these exact keys: name, company, title, email, phone, address, website, category, notes.
+For category, choose from: "business", "tax-prep", "career", "personal". Default to "business".
+For address, include full street address, city, state, zip.
+For website, include any URL or web address.
+For notes, include any remaining info not captured by other fields.
+If a field is not found, use "".
+
+Text:
+---
+${contactText}
+---
+
+Return ONLY the JSON object, no markdown, no explanation.`;
+
+                const extractRes = await fetch(config.endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: config.model,
+                        messages: [SYSTEM_PROMPT, { role: 'user', content: extractPrompt }],
+                        stream: false,
+                    }),
+                });
+
+                if (!extractRes.ok) throw new Error('Ollama error during contact extraction');
+                const extractData = await extractRes.json();
+                let content = extractData.message?.content || '';
+                content = content.replace(/```json?\s*/gi, '').replace(/```/g, '').trim();
+
+                try {
+                    const parsed = JSON.parse(content);
+                    const contactData = {
+                        name: parsed.name || '',
+                        company: parsed.company || '',
+                        title: parsed.title || '',
+                        email: parsed.email || '',
+                        phone: parsed.phone || '',
+                        address: parsed.address || '',
+                        website: parsed.website || '',
+                        category: ['business', 'tax-prep', 'career', 'personal'].includes(parsed.category) ? parsed.category : 'business',
+                        tags: [],
+                        notes: parsed.notes || '',
+                    };
+
+                    if (!contactData.name) {
+                        setMessages(prev => [...prev, { role: 'assistant', content: '⚠️ **Could not extract a name** from the text. Please include the contact\'s name and try again.' }]);
+                        setIsLoading(false);
+                        setStatus('Ready');
+                        return;
+                    }
+
+                    // Actually save to Supabase
+                    setStatus('Saving to CRM...');
+                    const saved = await createContact(contactData);
+
+                    const contactCard = `✅ **Contact Saved to CRM!**\n\n| Field | Value |\n|-------|-------|\n| **Name** | ${saved.name || '-'} |\n| **Company** | ${saved.company || '-'} |\n| **Title** | ${saved.title || '-'} |\n| **Email** | ${saved.email || '-'} |\n| **Phone** | ${saved.phone || '-'} |\n| **Address** | ${saved.address || '-'} |\n| **Website** | ${saved.website || '-'} |\n| **Category** | ${saved.category || '-'} |\n\n_Contact has been saved. Click the 🔄 Refresh button in CRM to see it._`;
+                    setMessages(prev => [...prev, { role: 'assistant', content: contactCard }]);
+                } catch (parseErr) {
+                    setMessages(prev => [...prev, { role: 'assistant', content: `⚠️ **Could not save contact:** ${parseErr.message}\n\nTry the **Scan Card** button in CRM → New instead.` }]);
+                }
+                setIsLoading(false);
+                setStatus('Ready');
+                return;
+            }
+
             // --- STANDARD CHAT FALLBACK ---
             // Create a placeholder for the bot's response
             setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
@@ -350,7 +506,7 @@ const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     model: config.model,
-                    messages: [...messages, userMessage].map(m => ({ role: m.role, content: m.content })),
+                    messages: [SYSTEM_PROMPT, ...messages, { role: 'user', content: fullInput }].map(m => ({ role: m.role, content: m.content })),
                     stream: true
                 })
             });
@@ -428,6 +584,25 @@ const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger
     }, [status, error, isLoading, onStatusChange]);
 
     if (!isOpen) return null;
+
+    // If settings is open, show full control plane
+    if (showSettings) {
+        return (
+            <div className={variant === 'overlay'
+                ? "fixed top-16 right-0 bottom-0 w-[400px] bg-background border-l border-border shadow-2xl z-40 flex flex-col animate-in slide-in-from-right duration-300"
+                : "h-full flex flex-col bg-background"
+            }>
+                <AiControlPlane
+                    activeModel={config.model}
+                    onModelChange={(newModel) => {
+                        handleModelChange(newModel);
+                        setShowSettings(false);
+                    }}
+                    onClose={() => setShowSettings(false)}
+                />
+            </div>
+        );
+    }
 
     const containerClasses = variant === 'overlay'
         ? "fixed top-16 right-0 bottom-0 w-[400px] bg-background border-l border-border shadow-2xl z-40 flex flex-col animate-in slide-in-from-right duration-300"
@@ -515,54 +690,45 @@ const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger
                 )}
             </div>
 
-            {/* Settings Overlay */}
-            {showSettings && (
-                <div className="absolute inset-0 bg-background/95 z-50 flex flex-col p-6 animate-in fade-in duration-200">
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className="font-semibold text-lg flex items-center gap-2">
-                            <Settings className="size-5" />
-                            AI Configuration
-                        </h3>
-                        <Button variant="ghost" size="icon" onClick={() => setShowSettings(false)}>
-                            <X className="size-5" />
-                        </Button>
-                    </div>
-
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">Select Local Model</label>
-                            <div className="grid grid-cols-1 gap-2">
-                                {availableModels.length > 0 ? (
-                                    availableModels.map(m => (
-                                        <button
-                                            key={m.name}
-                                            onClick={() => handleModelChange(m.name)}
-                                            className={cn(
-                                                "flex items-center justify-between px-4 py-3 rounded-lg border text-sm transition-all",
-                                                config.model === m.name 
-                                                    ? "bg-brand-blue/10 border-brand-blue text-brand-blue font-medium" 
-                                                    : "bg-card hover:bg-accent hover:text-accent-foreground"
-                                            )}
-                                        >
-                                            <span className="truncate">{m.name}</span>
-                                            {config.model === m.name && <div className="size-2 rounded-full bg-brand-blue" />}
-                                        </button>
-                                    ))
-                                ) : (
-                                    <div className="p-4 rounded-lg bg-amber-50 text-amber-800 text-sm border border-amber-200">
-                                        No models found or Ollama is not running. 
-                                        <br/>
-                                        Ensure <code>ollama serve</code> is running.
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Settings overlay replaced by AiControlPlane rendered above */}
 
             {/* Input Area */}
             <div className="p-4 border-t border-border bg-background">
+                {/* Attached File Chip */}
+                {attachedFile && (
+                    <div className="flex items-center gap-2 mb-2 px-1">
+                        <div className="flex items-center gap-1.5 bg-brand-blue/10 border border-brand-blue/20 rounded-lg px-2.5 py-1.5 text-xs max-w-full">
+                            <FileIcon className="size-3.5 text-brand-blue shrink-0" />
+                            <span className="truncate text-brand-blue font-medium">{attachedFile.name}</span>
+                            <span className="text-muted-foreground shrink-0">({(attachedFile.size / 1024).toFixed(1)} KB)</span>
+                            <button onClick={() => setAttachedFile(null)} className="ml-1 text-muted-foreground hover:text-destructive shrink-0">
+                                <X className="size-3" />
+                            </button>
+                        </div>
+                    </div>
+                )}
+                {/* Hidden File Input */}
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".txt,.md,.csv,.json,.js,.jsx,.ts,.tsx,.py,.sql,.html,.css,.xml,.yaml,.yml,.log,.pdf"
+                    className="hidden"
+                    onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                            setAttachedFile({
+                                name: file.name,
+                                type: file.type,
+                                size: file.size,
+                                content: ev.target.result,
+                            });
+                        };
+                        reader.readAsText(file);
+                        e.target.value = ''; // Reset so same file can be re-selected
+                    }}
+                />
                 <form
                     onSubmit={(e) => { e.preventDefault(); handleSend(); }}
                     className="relative"
@@ -580,10 +746,23 @@ const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger
                             size="icon"
                             variant="ghost"
                             className="h-8 w-8 text-muted-foreground hover:text-brand-blue hover:bg-brand-blue/10"
+                            onClick={() => fileInputRef.current?.click()}
+                            title="Attach File"
+                        >
+                            <Paperclip className="size-4" />
+                        </Button>
+                        <Button
+                            type="button"
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 text-muted-foreground hover:text-brand-blue hover:bg-brand-blue/10"
                             onClick={() => {
-                                setMessages([{ role: 'assistant', content: `Hello! I am using **${config.model}** via **${config.provider}**. \n\n**Try this:**\n\`/edit src/components/portal/PortalDashboard.jsx Change the rocket icon to a star\`` }]);
+                                const greeting = [{ role: 'assistant', content: defaultGreeting }];
+                                setMessages(greeting);
                                 setSuggestedAction(null);
                                 setError(null);
+                                setAttachedFile(null);
+                                localStorage.setItem('ai_chat_messages', JSON.stringify(greeting));
                             }}
                             title="New Conversation"
                         >
@@ -596,13 +775,14 @@ const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger
                             className="h-8 w-8 text-muted-foreground hover:text-foreground"
                             onClick={() => setShowSettings(!showSettings)}
                             title="Configure Model"
+                            data-ai-settings="true"
                         >
                             <Settings className="size-4" />
                         </Button>
                         <Button
                             type="submit"
                             size="icon"
-                            disabled={isLoading || !input.trim()}
+                            disabled={isLoading || (!input.trim() && !attachedFile)}
                             className="h-8 w-8 rounded-md"
                         >
                             {isLoading ? <RefreshCw className="size-4 animate-spin" /> : <Send className="size-4" />}

@@ -129,7 +129,7 @@ const PortalDashboard = () => {
                         <Bell className="size-5" />
                         <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-background"></span>
                     </button>
-                    <button onClick={() => navigate('/collaboration/settings')} className="p-2 hover:bg-accent rounded-full transition-colors">
+                    <button onClick={() => navigate('/workspace/settings')} className="p-2 hover:bg-accent rounded-full transition-colors">
                         <Settings className="size-5" />
                     </button>
                     <button className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">
@@ -165,7 +165,7 @@ const PortalDashboard = () => {
                                 <ContentCard 
                                     key={doc.id}
                                     {...doc}
-                                    onClick={() => navigate(`/collaboration/docs/${doc.id}`)}
+                                    onClick={() => navigate(`/workspace/docs/${doc.id}`)}
                                 />
                             ))}
                         </div>
@@ -181,37 +181,37 @@ const PortalDashboard = () => {
                                 icon={FileText} 
                                 label="New Document" 
                                 sublabel="Create content" 
-                                onClick={() => navigate('/collaboration/docs/new')}
+                                onClick={() => navigate('/workspace/docs/new')}
                             />
                             <QuickAction 
                                 icon={Users} 
                                 label="Add Member" 
                                 sublabel="Team management" 
-                                onClick={() => navigate('/collaboration/admin/access')}
+                                onClick={() => navigate('/workspace/admin/access')}
                             />
                             <QuickAction 
                                 icon={LayoutTemplate} 
                                 label="Create Board" 
                                 sublabel="Project tracking" 
-                                onClick={() => navigate('/collaboration/projects/new')}
+                                onClick={() => navigate('/workspace/projects/new')}
                             />
                              <QuickAction 
                                 icon={Activity} 
                                 label="System Status" 
                                 sublabel="View health" 
-                                onClick={() => navigate('/collaboration/system-status')}
+                                onClick={() => navigate('/workspace/system-status')}
                             />
                              <QuickAction 
                                 icon={LayoutTemplate} 
                                 label="Fabric Demo" 
                                 sublabel="Sales tool" 
-                                onClick={() => navigate('/collaboration/fabric-demo')}
+                                onClick={() => navigate('/workspace/fabric-demo')}
                             />
                              <QuickAction 
                                 icon={Star} 
                                 label="Favorites" 
                                 sublabel="Access saved" 
-                                onClick={() => navigate('/collaboration/favorites')}
+                                onClick={() => navigate('/workspace/favorites')}
                             />
                         </div>
                     </div>

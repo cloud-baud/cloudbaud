@@ -12,7 +12,7 @@ import { Ribbon, RibbonButton, RibbonSeparator, RibbonGroup, RibbonFontSizeSelec
 import DocumentPreviewPanel from '../components/DocumentPreviewPanel';
 import HighlightablePdfViewer from '../components/HighlightablePdfViewer';
 import SpreadsheetPreview from '../components/SpreadsheetPreview';
-import OllamaChatPanel from '../../collaboration/OllamaChatPanel';
+import OllamaChatPanel from '../../workspace/OllamaChatPanel';
 import { buildTaxSystemPrompt } from '../ai/taxTrainingData';
 
 // ──────────────────────────────────────────────────────────────
@@ -676,7 +676,7 @@ const TaxSingleYear = () => {
                 <div className="text-center">
                     <p className="text-lg font-medium">No detailed data for {year}</p>
                     <p className="text-sm mt-2">Detailed 1040 breakdown is currently available for 2017.</p>
-                    <Button variant="outline" className="mt-4" onClick={() => navigate('/collaboration/finance/taxes')}>
+                    <Button variant="outline" className="mt-4" onClick={() => navigate('/workspace/finance/taxes')}>
                         <ChevronLeft className="size-4 mr-2" /> Back to Tax Grid
                     </Button>
                 </div>

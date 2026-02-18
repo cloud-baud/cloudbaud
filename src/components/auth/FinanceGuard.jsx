@@ -31,7 +31,7 @@ const FinanceGuard = () => {
                     Your account <strong>{user?.email}</strong> is not authorized to view Financial Data.
                 </p>
                 <div className="flex gap-4">
-                    <a href="/collaboration" className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+                    <a href="/workspace" className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
                         Return to Dashboard
                     </a>
                 </div>

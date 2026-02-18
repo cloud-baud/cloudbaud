@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Outlet, NavLink, Link } from 'react-router-dom';
 import {
     Home,
@@ -43,7 +43,8 @@ import {
 } from '@/shared/ui/dropdown-menu';
 import ThemeToggle from '@/components/layout/ThemeToggle';
 import OllamaChatPanel from './OllamaChatPanel';
-import { Sparkles } from 'lucide-react'; 
+import WorkspaceChat from './WorkspaceChat';
+import { Sparkles, MessageCircle } from 'lucide-react'; 
 import { isFinanceAuthorized } from '@/components/auth/FinanceGuard'; // Import permission check
 
 // Icon Mapping for Dynamic Navigation
@@ -65,8 +66,8 @@ const ICON_MAP = {
 // Mock Data for Sidebar
 // Mock Data for Sidebar
 const favorites = [
-    { icon: FileText, label: 'My tasks', href: '/collaboration/tasks' },
-    { icon: Users, label: 'Pitch Deck (Series A)', href: '/collaboration/deck' },
+    { icon: FileText, label: 'My tasks', href: '/workspace/tasks' },
+    { icon: Users, label: 'Pitch Deck (Series A)', href: '/workspace/deck' },
 ];
 
 const people = [
@@ -76,51 +77,116 @@ const people = [
 ];
 
 const suggested = [
-    { icon: Calendar, label: 'Interview Cara Bina', href: '/collaboration/interview' },
-    { icon: Briefcase, label: 'Fundraising', href: '/collaboration/fundraising' },
-    { icon: Settings, label: 'Engineering', href: '/collaboration/engineering' },
+    { icon: Calendar, label: 'Interview Cara Bina', href: '/workspace/interview' },
+    { icon: Briefcase, label: 'Fundraising', href: '/workspace/fundraising' },
+    { icon: Settings, label: 'Engineering', href: '/workspace/engineering' },
 ];
 
 const operationsApps = [
     {
-        icon: Briefcase,
-        label: 'Consulting',
-        href: '/collaboration/consulting'
-    },
-    {
         icon: PieChart,
         label: 'Finance',
-        href: '/collaboration/finance'
+        href: '/workspace/finance'
     },
     {
         icon: Megaphone,
         label: 'Marketing',
-        href: '/collaboration/marketing'
+        href: '/workspace/marketing'
     },
     {
         icon: Rocket,
         label: 'Sales',
-        href: '/collaboration/sales'
+        href: '/workspace/sales'
+    },
+    {
+        icon: LayoutDashboard,
+        label: 'CRM',
+        href: '/workspace/crm'
+    },
+    {
+        icon: LifeBuoy,
+        label: 'Support',
+        href: '/workspace/support'
     },
     {
         icon: Users, // Using Users for HR
         label: 'HR',
-        href: '/collaboration/hr'
+        href: '/workspace/hr'
     },
     {
         icon: Server, // Using Server for IT
         label: 'IT',
-        href: '/collaboration/it',
+        href: '/workspace/it',
         children: [
-            { label: 'CMDB', href: '/collaboration/it/cmdb' },
-            { label: 'Trusted Domains', href: '/collaboration/admin/access' }
+            { label: 'CMDB', href: '/workspace/it/cmdb' },
+            { label: 'Trusted Domains', href: '/workspace/admin/access' }
         ]
     }
 ];
 
+const RIGHT_PANEL_TABS = [
+    { id: 'ai-chat', label: 'AI Chat', icon: Sparkles },
+    { id: 'people', label: 'People', icon: MessageCircle },
+    { id: 'resources', label: 'Resources', icon: FileText },
+];
+
 const WorkspaceLayout = () => {
     const { user, signOut } = useAuth();
-    const [isChatOpen, setIsChatOpen] = useState(false); // State for chat panel
+    const [isRightPanelOpen, setIsRightPanelOpen] = useState(false);
+    const [rightPanelTab, setRightPanelTab] = useState('ai-chat');
+    const [ollamaOnline, setOllamaOnline] = useState(null); // null=checking, true=online, false=offline
+
+    // Resizable pane widths with persistence
+    const [sidebarWidth, setSidebarWidth] = useState(() => {
+        return parseInt(localStorage.getItem('sidebar_width')) || 280;
+    });
+    const [rightPanelWidth, setRightPanelWidth] = useState(() => {
+        return parseInt(localStorage.getItem('right_panel_width')) || 340;
+    });
+    const isResizingRef = useRef(null); // 'sidebar' | 'right-panel' | null
+
+    // Drag-to-resize handler
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            if (!isResizingRef.current) return;
+            e.preventDefault();
+            if (isResizingRef.current === 'sidebar') {
+                const newWidth = Math.max(200, Math.min(500, e.clientX));
+                setSidebarWidth(newWidth);
+                localStorage.setItem('sidebar_width', newWidth);
+            } else if (isResizingRef.current === 'right-panel') {
+                const newWidth = Math.max(280, Math.min(600, window.innerWidth - e.clientX - 40)); // 40 = handle strip
+                setRightPanelWidth(newWidth);
+                localStorage.setItem('right_panel_width', newWidth);
+            }
+        };
+        const handleMouseUp = () => {
+            isResizingRef.current = null;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        };
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, []);
+
+    // Ollama health check
+    useEffect(() => {
+        const check = async () => {
+            try {
+                const res = await fetch('http://localhost:11434/api/tags', { signal: AbortSignal.timeout(3000) });
+                setOllamaOnline(res.ok);
+            } catch {
+                setOllamaOnline(false);
+            }
+        };
+        check();
+        const interval = setInterval(check, 15000);
+        return () => clearInterval(interval);
+    }, []);
 
     // Sidebar collapse state with persistence
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
@@ -147,10 +213,10 @@ const WorkspaceLayout = () => {
             console.error("Failed to parse nav", e);
         }
         return [
-            { id: 'consulting', label: 'Consulting', href: '/collaboration/consulting', icon: 'Briefcase' },
-            { id: 'teaching', label: 'Teaching', href: '/collaboration/teaching', icon: 'FileText' },
-            { id: 'realestate', label: 'Real Estate', href: '/collaboration/realestate', icon: 'Home' },
-            { id: 'products', label: 'Products', href: '/collaboration/products', icon: 'Layers' }
+            { id: 'consulting', label: 'Consulting', href: '/workspace/consulting', icon: 'Briefcase' },
+            { id: 'teaching', label: 'Teaching', href: '/workspace/teaching', icon: 'FileText' },
+            { id: 'realestate', label: 'Real Estate', href: '/workspace/realestate', icon: 'Home' },
+            { id: 'products', label: 'Products', href: '/workspace/products', icon: 'Layers' }
         ];
     });
 
@@ -258,16 +324,28 @@ const WorkspaceLayout = () => {
 
                     {/* AI Assistant Toggle */}
                     <button
-                        onClick={() => setIsChatOpen(!isChatOpen)}
+                        onClick={() => {
+                            if (isRightPanelOpen && rightPanelTab === 'ai-chat') {
+                                setIsRightPanelOpen(false);
+                            } else {
+                                setRightPanelTab('ai-chat');
+                                setIsRightPanelOpen(true);
+                            }
+                        }}
                         className={cn(
                             "w-9 h-9 rounded-lg flex items-center justify-center transition-colors relative",
-                            isChatOpen
+                            isRightPanelOpen && rightPanelTab === 'ai-chat'
                                 ? "bg-brand-blue text-white shadow-lg shadow-brand-blue/20"
                                 : "hover:bg-white/10 text-slate-400 hover:text-white"
                         )}
                         title="Toggle AI Assistant"
                     >
                         <Sparkles className="size-4" />
+                        <span className={cn(
+                            "absolute bottom-1 right-1 size-2 rounded-full border-2 border-[#0f0f0f]",
+                            ollamaOnline === null ? "bg-amber-500 animate-pulse" :
+                            ollamaOnline ? "bg-emerald-500" : "bg-red-500"
+                        )} />
                     </button>
 
                     {/* Notifications Bell */}
@@ -311,7 +389,7 @@ const WorkspaceLayout = () => {
                             <DropdownMenuLabel>My Account</DropdownMenuLabel>
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem onClick={() => window.location.href = '/collaboration/settings'}>
+                            <DropdownMenuItem onClick={() => window.location.href = '/workspace/settings'}>
                                 <Settings className="mr-2 h-4 w-4" />
                                 <span>Settings</span>
                             </DropdownMenuItem>
@@ -330,9 +408,10 @@ const WorkspaceLayout = () => {
                 {/* Secondary Sidebar (Contextual) */}
                 <aside
                     className={cn(
-                        "flex-shrink-0 flex flex-col pt-6 pb-4 pl-4 lg:pl-6 bg-transparent h-full transition-all duration-300 ease-in-out overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]",
-                        isSidebarCollapsed ? "w-[88px]" : "w-[280px]"
+                        "flex-shrink-0 flex flex-col pt-6 pb-4 pl-4 lg:pl-6 bg-transparent h-full transition-all duration-300 ease-in-out overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] relative",
+                        isSidebarCollapsed && "!w-[88px]"
                     )}
+                    style={!isSidebarCollapsed ? { width: sidebarWidth } : undefined}
                 >
                     {/* Card 1: Navigation & Actions */}
                     <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden mb-4 mr-2 flex flex-col shrink-0">
@@ -346,9 +425,8 @@ const WorkspaceLayout = () => {
                             </button>
 
                             {!isSidebarCollapsed ? (
-                                <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-brand-blue hover:bg-brand-blue/90 rounded-lg shadow-sm shadow-brand-blue/20 transition-all group">
-                                    <Plus className="size-4" />
-                                    <span>Create New</span>
+                                <button className="w-10 h-10 flex items-center justify-center text-white bg-brand-blue hover:bg-brand-blue/90 rounded-lg shadow-sm shadow-brand-blue/20 transition-all" title="Create New">
+                                    <Plus className="size-5" />
                                 </button>
                             ) : (
                                 <button className="w-10 h-10 flex items-center justify-center text-white bg-brand-blue hover:bg-brand-blue/90 rounded-lg shadow-sm shadow-brand-blue/20 transition-all">
@@ -360,7 +438,7 @@ const WorkspaceLayout = () => {
                         <div className="px-2 pb-4 pt-2 space-y-6">
                             <Section title="Overview" collapsed={isSidebarCollapsed}>
                                 <SidebarLink icon={FileText} label="My Feed" href="/portal" active collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
-                                <SidebarLink icon={Calendar} label="Calendar" href="/collaboration/calendar" collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
+                                <SidebarLink icon={Calendar} label="Calendar" href="/workspace/calendar" collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
                                 <SidebarLink icon={Users} label="My Network" href="/portal/network" collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
                             </Section>
 
@@ -382,38 +460,122 @@ const WorkspaceLayout = () => {
                                     <SidebarLink key={item.label} {...item} collapsed={isSidebarCollapsed} />
                                 ))}
                             </Section>
-
-                            <Section title="People" collapsed={isSidebarCollapsed}>
-                                {people.map((person) => (
-                                    <div key={person.name} className={cn(
-                                        "flex items-center gap-3 py-2 px-3 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white rounded-lg cursor-pointer transition-all duration-200 group",
-                                        isSidebarCollapsed && "justify-center px-1"
-                                    )}>
-                                        <div className="size-7 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 group-hover:border-brand-blue/50 transition-colors shrink-0">
-                                            <img src={person.avatar} alt={person.name} className="h-full w-full object-cover" />
-                                        </div>
-                                        {!isSidebarCollapsed && <span className="truncate font-medium">{person.name}</span>}
-                                    </div>
-                                ))}
-                            </Section>
-
-                            <Section title="Suggested" collapsed={isSidebarCollapsed}>
-                                {suggested.map((item) => (
-                                    <SidebarLink key={item.label} {...item} collapsed={isSidebarCollapsed} />
-                                ))}
-                            </Section>
                         </div>
                     </div>
+                    {/* Sidebar Resize Handle */}
+                    {!isSidebarCollapsed && (
+                        <div
+                            className="absolute top-0 right-0 w-1 h-full cursor-col-resize group z-10 hover:bg-brand-blue/30 transition-colors"
+                            onMouseDown={(e) => {
+                                e.preventDefault();
+                                isResizingRef.current = 'sidebar';
+                                document.body.style.cursor = 'col-resize';
+                                document.body.style.userSelect = 'none';
+                            }}
+                        >
+                            <div className="absolute top-1/2 -translate-y-1/2 left-0 w-1 h-8 rounded-full bg-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                    )}
                 </aside>
 
                 {/* Page Content */}
                 <main className="flex-1 flex flex-col overflow-auto relative p-4 lg:p-6">
                     <div className="flex-1 bg-card rounded-xl border border-border shadow-sm overflow-hidden flex flex-col relative">
                         <Outlet />
-                        {/* Ollama Chat Panel Overlay */}
-                        <OllamaChatPanel isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} variant="overlay" />
                     </div>
                 </main>
+
+                {/* Right Panel - Always-visible handle */}
+                <div className="flex flex-shrink-0 h-full">
+                    {/* Expanded Panel */}
+                    <div
+                        className={cn(
+                            "flex flex-col border-l border-border bg-card transition-all duration-300 ease-in-out overflow-hidden relative",
+                            !isRightPanelOpen && "!w-0 opacity-0"
+                        )}
+                        style={isRightPanelOpen ? { width: rightPanelWidth, opacity: 1 } : undefined}
+                    >
+                        {/* Right Panel Resize Handle */}
+                        <div
+                            className="absolute top-0 left-0 w-1 h-full cursor-col-resize group z-10 hover:bg-brand-blue/30 transition-colors"
+                            onMouseDown={(e) => {
+                                e.preventDefault();
+                                isResizingRef.current = 'right-panel';
+                                document.body.style.cursor = 'col-resize';
+                                document.body.style.userSelect = 'none';
+                            }}
+                        >
+                            <div className="absolute top-1/2 -translate-y-1/2 left-0 w-1 h-8 rounded-full bg-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                        {/* Panel Content */}
+                        <div className="flex-1 overflow-hidden flex flex-col">
+                            {rightPanelTab === 'ai-chat' && (
+                                <OllamaChatPanel isOpen={true} onClose={() => setIsRightPanelOpen(false)} variant="embedded" />
+                            )}
+                            {rightPanelTab === 'people' && (
+                                <WorkspaceChat
+                                    className="flex-1"
+                                    workspaceId={(() => {
+                                        const seg = window.location.pathname.split('/').filter(Boolean);
+                                        return seg[1] || 'finance';
+                                    })()}
+                                />
+                            )}
+                            {rightPanelTab === 'resources' && (
+                                <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+                                    <FileText className="size-10 text-slate-500 mb-3" />
+                                    <h3 className="text-sm font-semibold text-slate-300 mb-1">Resources</h3>
+                                    <p className="text-xs text-slate-500">Pinned docs, links, and reference materials will appear here.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Handle - Always Visible */}
+                    <div className="flex flex-col items-center py-4 gap-3 w-10 bg-background border-l border-border shrink-0">
+                        {RIGHT_PANEL_TABS.map(tab => (
+                            <button
+                                key={tab.id}
+                                onClick={() => {
+                                    if (isRightPanelOpen && rightPanelTab === tab.id) {
+                                        setIsRightPanelOpen(false);
+                                    } else {
+                                        setRightPanelTab(tab.id);
+                                        setIsRightPanelOpen(true);
+                                    }
+                                }}
+                                className={cn(
+                                    "w-8 h-8 rounded-lg flex items-center justify-center transition-colors",
+                                    isRightPanelOpen && rightPanelTab === tab.id
+                                        ? "bg-brand-blue text-white shadow-lg shadow-brand-blue/20"
+                                        : "text-slate-500 hover:text-slate-200 hover:bg-white/10"
+                                )}
+                                title={tab.label}
+                            >
+                                <tab.icon className="size-4" />
+                            </button>
+                        ))}
+
+                        {/* Spacer */}
+                        <div className="flex-1" />
+
+                        {/* Gear → opens AI Control Plane */}
+                        <button
+                            onClick={() => {
+                                setRightPanelTab('ai-chat');
+                                setIsRightPanelOpen(true);
+                                // Trigger settings inside OllamaChatPanel via a tiny delay
+                                setTimeout(() => {
+                                    document.querySelector('[data-ai-settings]')?.click();
+                                }, 100);
+                            }}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-200 hover:bg-white/10 transition-colors"
+                            title="AI Settings"
+                        >
+                            <Settings className="size-4" />
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );

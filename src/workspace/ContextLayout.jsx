@@ -7,6 +7,7 @@ import {
     BookOpen,
     Landmark,
     TrendingUp,
+    Briefcase,
     PanelLeftClose,
     PanelLeftOpen,
     ChevronDown,
@@ -19,22 +20,23 @@ const SUB_NAVS = {
     'finance': [
         {
             label: 'Taxes',
-            href: '/collaboration/finance/taxes',
+            href: '/workspace/finance/taxes',
             icon: Calculator,
             children: [
-                { label: '2024', href: '/collaboration/finance/taxes?year=2024' },
-                { label: '2023', href: '/collaboration/finance/taxes?year=2023' },
-                { label: '2022', href: '/collaboration/finance/taxes?year=2022' },
-                { label: '2021', href: '/collaboration/finance/taxes?year=2021' },
-                { label: '2020', href: '/collaboration/finance/taxes?year=2020' },
-                { label: '2019', href: '/collaboration/finance/taxes?year=2019' },
-                { label: '2018', href: '/collaboration/finance/taxes?year=2018' },
-                { label: '2017', href: '/collaboration/finance/taxes?year=2017' }
+                { label: '2024', href: '/workspace/finance/taxes?year=2024' },
+                { label: '2023', href: '/workspace/finance/taxes?year=2023' },
+                { label: '2022', href: '/workspace/finance/taxes?year=2022' },
+                { label: '2021', href: '/workspace/finance/taxes?year=2021' },
+                { label: '2020', href: '/workspace/finance/taxes?year=2020' },
+                { label: '2019', href: '/workspace/finance/taxes?year=2019' },
+                { label: '2018', href: '/workspace/finance/taxes?year=2018' },
+                { label: '2017', href: '/workspace/finance/taxes?year=2017' }
             ]
         },
-        { label: 'Bookkeeping', href: '/collaboration/finance/bookkeeping', icon: BookOpen },
-        { label: 'Accounting', href: '/collaboration/finance/accounting', icon: PieChart },
-        { label: 'Investments', href: '/collaboration/finance/investments', icon: TrendingUp },
+        { label: 'Bookkeeping', href: '/workspace/finance/bookkeeping', icon: BookOpen },
+        { label: 'Accounting', href: '/workspace/finance/accounting', icon: PieChart },
+        { label: 'Consulting', href: '/workspace/finance/consulting', icon: Briefcase },
+        { label: 'Investments', href: '/workspace/finance/investments', icon: TrendingUp },
     ],
     // Add other contexts here as needed (e.g. 'crm', 'sales')
 };
@@ -47,7 +49,7 @@ const ContextLink = ({ href, label, icon: Icon, children }) => {
 
     // Normalize paths ensuring no trailing slash issues or query param mismatches
     // Active if current path starts with href (parent) OR matches exactly
-    // For Taxes: href=/collaboration/finance. location=/collaboration/finance?year=2024. Match.
+    // For Taxes: href=/workspace/finance. location=/workspace/finance?year=2024. Match.
     const isParentActive = location.pathname === href.split('?')[0];
     const isChildActive = children && children.some(child => (location.pathname + location.search) === child.href);
 
@@ -122,7 +124,7 @@ const ContextLayout = () => {
 
     // Determine current context based on path
     let activeContext = null;
-    if (location.pathname.includes('/collaboration/finance')) {
+    if (location.pathname.includes('/workspace/finance')) {
         activeContext = 'finance';
     }
     // Add other checks here

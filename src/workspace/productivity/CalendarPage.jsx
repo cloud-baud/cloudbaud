@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import PageShell from '@/collaboration/PageShell';
+import PageShell from '@/workspace/PageShell';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';

@@ -4,8 +4,8 @@ import { ArrowLeft, ArrowRight, CheckCircle, Code, Server, Shield, Zap, Lock, Ch
 import { Button } from '@/shared/ui/button';
 import SEO from '@/components/common/SEO';
 import { technicalCapabilities } from '@/data/capabilities';
-import FabricDemo from '@/collaboration/sales/FabricDemo';
-import FinOpsDashboard from '@/collaboration/FinOpsDashboard';
+import FabricDemo from '@/workspace/sales/FabricDemo';
+import FinOpsDashboard from '@/workspace/FinOpsDashboard';
 import FabricDiscoveryWizard from '@/components/discovery/FabricDiscoveryWizard';
 import GenericDiscoveryWizard from '@/components/discovery/GenericDiscoveryWizard';
 import { getAssessmentComponent } from '@/components/assessments/index.jsx';

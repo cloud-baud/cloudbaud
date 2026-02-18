@@ -201,7 +201,7 @@ const FinOpsDashboard = () => {
                                                             </TableCell>
                                                             <TableCell 
                                                                 className="font-medium text-slate-700 dark:text-slate-200 cursor-pointer hover:text-blue-600 hover:underline"
-                                                                onClick={() => navigate(`/collaboration/finance/accounting/${account.id}`)}
+                                                                onClick={() => navigate(`/workspace/finance/accounting/${account.id}`)}
                                                             >
                                                                 {account.name}
                                                             </TableCell>
