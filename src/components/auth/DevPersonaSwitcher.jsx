@@ -79,7 +79,7 @@ const DevPersonaSwitcher = () => {
             ) : (
                 <Button
                     onClick={() => setIsOpen(true)}
-                    className="rounded-full w-12 h-12 bg-purple-600 hover:bg-purple-700 shadow-lg border-2 border-purple-400 flex items-center justify-center p-0"
+                    className="rounded-full w-12 h-12 bg-brand-blue hover:bg-brand-blue shadow-lg border-2 border-brand-aqua flex items-center justify-center p-0"
                     title="Switch Persona (Dev Only)"
                 >
                     <User className="w-6 h-6 text-white" />

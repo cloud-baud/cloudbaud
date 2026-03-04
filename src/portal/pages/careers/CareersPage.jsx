@@ -30,7 +30,7 @@ const CareersPage = () => {
                 <div className="max-w-7xl mx-auto text-center">
                     <h1 className="text-5xl md:text-6xl font-bold mb-6">
                         Join Our{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                             Team
                         </span>
                     </h1>
@@ -65,7 +65,7 @@ const CareersPage = () => {
                             </div>
                         </div>
                         <div className="relative">
-                            <div className="aspect-square bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-3xl border border-slate-700" />
+                            <div className="aspect-square bg-gradient-to-br from-brand-blue/20 to-brand-aqua/20 rounded-3xl border border-slate-700" />
                         </div>
                     </div>
                 </div>
@@ -77,7 +77,7 @@ const CareersPage = () => {
                     <div className="text-center mb-16">
                         <h2 className="text-4xl font-bold mb-6">
                             Benefits &{' '}
-                            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                            <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                                 Perks
                             </span>
                         </h2>
@@ -94,7 +94,7 @@ const CareersPage = () => {
                                     key={index}
                                     className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6 hover:border-blue-500 transition-all duration-300"
                                 >
-                                    <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center mb-4">
+                                    <div className="w-12 h-12 bg-gradient-to-r from-brand-blue to-brand-aqua rounded-lg flex items-center justify-center mb-4">
                                         <Icon className="h-6 w-6 text-white" />
                                     </div>
                                     <h3 className="text-xl font-semibold text-white mb-3">
@@ -116,7 +116,7 @@ const CareersPage = () => {
                     <div className="text-center mb-16">
                         <h2 className="text-4xl font-bold mb-6">
                             Open{' '}
-                            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                            <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                                 Positions
                             </span>
                         </h2>
@@ -149,7 +149,7 @@ const CareersPage = () => {
                                     </div>
                                     <Button
                                         asChild
-                                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                                        className="bg-gradient-to-r from-brand-blue to-brand-aqua hover:from-brand-blue hover:to-brand-aqua text-white"
                                     >
                                         <Link to={`/contact?position=${encodeURIComponent(position.title)}`}>
                                             Apply Now
@@ -214,7 +214,7 @@ const CareersPage = () => {
                     <div className="text-center mb-16">
                         <h2 className="text-4xl font-bold mb-6">
                             Our Hiring{' '}
-                            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                            <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                                 Process
                             </span>
                         </h2>
@@ -229,7 +229,7 @@ const CareersPage = () => {
                                 key={step.step}
                                 className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6 relative"
                             >
-                                <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center mb-4">
+                                <div className="w-12 h-12 bg-gradient-to-r from-brand-blue to-brand-aqua rounded-lg flex items-center justify-center mb-4">
                                     <span className="text-white font-bold text-xl">{step.step}</span>
                                 </div>
                                 <h3 className="text-lg font-semibold text-white mb-2">
@@ -252,7 +252,7 @@ const CareersPage = () => {
                 <div className="max-w-4xl mx-auto text-center">
                     <h2 className="text-4xl md:text-5xl font-bold mb-6">
                         Ready to{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                             join us
                         </span>
                         ?
@@ -264,7 +264,7 @@ const CareersPage = () => {
                     <Button
                         asChild
                         size="lg"
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full"
+                        className="bg-gradient-to-r from-brand-blue to-brand-aqua hover:from-brand-blue hover:to-brand-aqua text-white px-8 py-3 rounded-full"
                     >
                         <Link to="/contact">
                             Get in Touch

@@ -70,7 +70,7 @@ const BlogPost = () => {
                     {/* Author Card */}
                     <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 mb-8">
                         <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                            <div className="w-14 h-14 bg-gradient-to-br from-brand-blue to-brand-aqua rounded-full flex items-center justify-center">
                                 <span className="text-white font-bold text-lg">
                                     {post.author.split(' ').map(n => n[0]).join('')}
                                 </span>
@@ -87,7 +87,7 @@ const BlogPost = () => {
             {/* Featured Image */}
             <section className="py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-4xl mx-auto">
-                    <div className="aspect-video bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-2xl border border-slate-700" />
+                    <div className="aspect-video bg-gradient-to-br from-brand-blue/20 to-brand-aqua/20 rounded-2xl border border-slate-700" />
                 </div>
             </section>
 
@@ -147,7 +147,7 @@ const BlogPost = () => {
                     <div className="max-w-7xl mx-auto">
                         <h2 className="text-3xl font-bold mb-8 text-center">
                             Related{' '}
-                            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                            <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                                 Articles
                             </span>
                         </h2>
@@ -183,7 +183,7 @@ const BlogPost = () => {
                 <div className="max-w-4xl mx-auto text-center">
                     <h2 className="text-3xl font-bold mb-6">
                         Need help with{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                             implementation
                         </span>
                         ?
@@ -194,7 +194,7 @@ const BlogPost = () => {
                     <Button
                         asChild
                         size="lg"
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full"
+                        className="bg-gradient-to-r from-brand-blue to-brand-aqua hover:from-brand-blue hover:to-brand-aqua text-white px-8 py-3 rounded-full"
                     >
                         <Link to="/contact">Schedule a Consultation</Link>
                     </Button>

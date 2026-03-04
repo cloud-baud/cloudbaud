@@ -101,7 +101,7 @@ const Header = () => {
                 <CloudBaudLogo className="h-full w-auto p-1" />
               )}
             </div>
-            <span className="text-xl md:text-2xl tracking-widest text-brand-blue font-bold">
+            <span className="tracking-tight font-semibold text-lg hover:opacity-90 transition-opacity text-white">
               {user?.user_metadata?.site_name || "CloudBaud"}
             </span>
           </Link>

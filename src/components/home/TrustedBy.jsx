@@ -25,19 +25,19 @@ const TrustedBy = ({ title = "Trusted by Industry Leaders" }) => {
                 {/* Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
                     <div className="text-center">
-                        <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                        <div className="text-3xl font-bold bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent mb-2">
                             13+
                         </div>
                         <div className="text-sm text-gray-400">Major Clients</div>
                     </div>
                     <div className="text-center">
-                        <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                        <div className="text-3xl font-bold bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent mb-2">
                             5
                         </div>
                         <div className="text-sm text-gray-400">Government Agencies</div>
                     </div>
                     <div className="text-center">
-                        <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                        <div className="text-3xl font-bold bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent mb-2">
                             8
                         </div>
                         <div className="text-sm text-gray-400">Industries Served</div>

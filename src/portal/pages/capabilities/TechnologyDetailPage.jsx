@@ -133,7 +133,7 @@ const TechnologyDetailPage = () => {
             {
                 technology.slug === 'microsoft-fabric' && (
                     <section id="assessment-wizard" className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-950 border-b border-slate-900 relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950/50 to-slate-950 pointer-events-none" />
+                        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brand-blue/20 via-slate-950/50 to-slate-950 pointer-events-none" />
                         <div className="max-w-4xl mx-auto relative z-10 text-center mb-12">
                             <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-blue to-brand-aqua mb-4">
                                 Ready to modernize with Fabric?
@@ -232,7 +232,7 @@ const TechnologyDetailPage = () => {
             {/* Assessment Wizard for other technologies */}
             {techSlug !== 'microsoft-fabric' && (
                 <section id="assessment-wizard" className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-950 border-t border-slate-900 relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950/50 to-slate-950 pointer-events-none" />
+                    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brand-blue/20 via-slate-950/50 to-slate-950 pointer-events-none" />
                     <div className="max-w-4xl mx-auto relative z-10 text-center mb-12">
                         <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-blue to-brand-aqua mb-4">
                             Start your {technology.text} Journey

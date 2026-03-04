@@ -62,7 +62,7 @@ const SalesPage = () => {
                         {/* Contact */}
                         <div>
                             <h2 className="text-2xl font-bold mb-4 flex items-center gap-3">
-                                <Mail className="w-6 h-6 text-purple-500" />
+                                <Mail className="w-6 h-6 text-brand-aqua" />
                                 Billing Inquiries
                             </h2>
                             <p className="text-slate-600 dark:text-slate-300 mb-4">

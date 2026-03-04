@@ -20,7 +20,7 @@ const AgentCard = ({ agent, featured = false }) => {
             {/* Header */}
             <div className="p-8 relative">
                 {/* Icon */}
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-16 h-16 bg-gradient-to-r from-brand-blue to-brand-aqua rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                     <Icon className="h-8 w-8 text-white" />
                 </div>
 
@@ -36,7 +36,7 @@ const AgentCard = ({ agent, featured = false }) => {
 
                 {/* Primary Metric */}
                 <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-4 mb-6">
-                    <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-1">
+                    <div className="text-4xl font-bold bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent mb-1">
                         {agent.metrics.primary.value}
                     </div>
                     <div className="text-sm text-gray-400">{agent.metrics.primary.label}</div>
@@ -55,7 +55,7 @@ const AgentCard = ({ agent, featured = false }) => {
                 {/* CTA */}
                 <Button
                     asChild
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                    className="w-full bg-gradient-to-r from-brand-blue to-brand-aqua hover:from-brand-blue hover:to-brand-aqua text-white"
                 >
                     <Link to={`/agents/${agent.slug}`}>
                         Learn More

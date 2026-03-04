@@ -185,7 +185,7 @@ const HomePage = () => {
                       <div className="text-xs text-slate-500">Current Throughput</div>
                       <div className="text-xl font-bold text-white">4.2 GB/s</div>
                     </div>
-                    <div className="h-8 w-24 bg-gradient-to-t from-blue-500/20 to-transparent relative overflow-hidden">
+                    <div className="h-8 w-24 bg-gradient-to-t from-brand-blue/20 to-transparent relative overflow-hidden">
                       <div className="absolute bottom-0 left-0 right-0 h-[60%] bg-brand-blue/40 animate-pulse" />
                     </div>
                   </div>
@@ -202,7 +202,7 @@ const HomePage = () => {
           <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay"></div>
           <div className="max-w-7xl mx-auto relative z-10 flex flex-col md:flex-row items-center gap-12">
             <div className="flex-1 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-semibold mb-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-blue/10 border border-brand-blue/20 text-brand-blue text-sm font-semibold mb-2">
                 <Brain className="w-4 h-4" />
                 <span>{content.aiShowcase.highlight || "New Capability"}</span>
               </div>
@@ -213,7 +213,7 @@ const HomePage = () => {
                 {content.aiShowcase.description}
               </p>
               <div className="flex gap-4 pt-4">
-                <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white font-bold h-12 px-8">
+                <Button asChild className="bg-brand-blue hover:bg-brand-blue/80 text-black font-bold h-12 px-8">
                   <Link to="/ai-engineering">
                     Explore AI Agents
                     <ArrowRight className="ml-2 w-4 h-4" />
@@ -224,12 +224,12 @@ const HomePage = () => {
             {/* Visual Representation of Agentic Workflow */}
             <div className="flex-1 w-full relative">
               <div className="relative aspect-video bg-slate-900 rounded-xl border border-slate-800 p-6 overflow-hidden shadow-2xl group">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-blue-500"></div>
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-blue to-brand-aqua"></div>
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
-                        <Bot className="w-4 h-4 text-purple-400" />
+                      <div className="w-8 h-8 rounded-full bg-brand-blue/20 flex items-center justify-center">
+                        <Bot className="w-4 h-4 text-brand-blue" />
                       </div>
                       <span className="font-mono text-sm text-slate-400">Agent_Orchestrator_v2</span>
                     </div>
@@ -238,7 +238,7 @@ const HomePage = () => {
                   <div className="space-y-3 font-mono text-xs md:text-sm">
                     <div className="flex gap-3 items-center text-slate-300">
                       <span className="text-slate-600">INPUT:</span>
-                      <span className="bg-slate-800 px-2 py-1 rounded text-purple-300">"Analyze tax implications for 2024 hiring plan"</span>
+                      <span className="bg-slate-800 px-2 py-1 rounded text-brand-aqua">"Analyze tax implications for 2024 hiring plan"</span>
                     </div>
                     <div className="flex gap-3 items-start text-slate-300">
                       <span className="text-slate-600 mt-1">PLAN:</span>

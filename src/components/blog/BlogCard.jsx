@@ -7,7 +7,7 @@ const BlogCard = ({ post }) => {
     return (
         <article className="group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl overflow-hidden hover:border-blue-500 transition-all duration-300">
             {/* Image */}
-            <div className="relative h-48 bg-gradient-to-br from-blue-600/20 to-purple-600/20 overflow-hidden">
+            <div className="relative h-48 bg-gradient-to-br from-brand-blue/20 to-brand-aqua/20 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-60" />
                 <div className="absolute bottom-4 left-4">
                     <span className="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">

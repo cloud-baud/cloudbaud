@@ -23,7 +23,7 @@ const BlogPage = () => {
                 <div className="max-w-7xl mx-auto text-center">
                     <h1 className="text-5xl md:text-6xl font-bold mb-6">
                         Insights &{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                             Articles
                         </span>
                     </h1>
@@ -63,7 +63,7 @@ const BlogPage = () => {
                                 key={category}
                                 onClick={() => setSelectedCategory(category)}
                                 className={`px-4 py-2 rounded-full font-medium transition-all duration-300 ${selectedCategory === category
-                                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                                        ? 'bg-gradient-to-r from-brand-blue to-brand-aqua text-white'
                                         : 'bg-slate-800 text-gray-300 hover:bg-slate-700'
                                     }`}
                             >
@@ -113,7 +113,7 @@ const BlogPage = () => {
                 <div className="max-w-4xl mx-auto text-center">
                     <h2 className="text-4xl font-bold mb-6">
                         Stay{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                             Updated
                         </span>
                     </h2>
@@ -128,7 +128,7 @@ const BlogPage = () => {
                         />
                         <button
                             type="submit"
-                            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-lg transition-all duration-300"
+                            className="px-6 py-3 bg-gradient-to-r from-brand-blue to-brand-aqua hover:from-brand-blue hover:to-brand-aqua text-white font-medium rounded-lg transition-all duration-300"
                         >
                             Subscribe
                         </button>
