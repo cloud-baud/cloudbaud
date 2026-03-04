@@ -5,7 +5,7 @@ import { Badge } from '@/shared/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 
 import { RefreshCw, ChevronRight, Save, FileDown, Printer, Filter, Plus, Pencil, Trash2, SlidersHorizontal } from 'lucide-react';
-import { Ribbon, RibbonButton, RibbonSeparator, RibbonGroup } from '../../components/layout/Ribbon'; // Import Ribbon
+import { Ribbon, RibbonButton, RibbonSeparator, RibbonGroup } from 'synolic.core'; // Import Ribbon
 import { Button } from '@/shared/ui/button'; // Import Button for toggle
 import { getChartOfAccounts } from '../api/taxService';
 

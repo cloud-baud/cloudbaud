@@ -12,7 +12,8 @@ import { supabase } from '@/lib/supabase';
 import { Button } from '@/shared/ui/button';
 import { Separator } from '@/shared/ui/separator';
 
-import TaxRibbon from '../components/TaxRibbon';
+import { Ribbon, RibbonButton, RibbonSeparator, RibbonGroup } from 'synolic.core';
+import TaxRibbon, { YEAR_DOCUMENTS, DOC_BASE } from '../components/TaxRibbon';
 import WorkspaceChat from '../../workspace/WorkspaceChat';
 import OllamaChatPanel from '../../workspace/OllamaChatPanel';
 import { 
@@ -407,7 +408,7 @@ const TaxMultiYearSummary = () => {
     const [activeRightTab, setActiveRightTab] = useState('agent'); // 'chat' | 'agent' | 'activity' | null
     const [showFilePanel, setShowFilePanel] = useState(false);
     const [filePreviewUrl, setFilePreviewUrl] = useState(null);
-    const [cpaChecklistOpen, setCpaChecklistOpen] = useState(false);
+
 
 
 

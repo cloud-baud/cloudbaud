@@ -1,5 +1,5 @@
 import React from 'react';
-import cbLogo from '../../assets/images/CB_logo.png';
+import cbLogo from '../../assets/images/CB_logo_transparent.png';
 
 const CloudBaudLogo = ({ className }) => {
     return (

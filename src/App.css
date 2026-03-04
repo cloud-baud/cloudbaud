@@ -41,7 +41,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   /* Brand Colors - Updated to match Logo Highlight and Metallic Steel */
-  --color-brand-blue: #00d2ff;
+  --color-brand-blue: var(--brand-primary, #00d2ff);
   /* Neon Blue match */
   --color-brand-magenta: #e11d48;
   /* High-contrast crimson highlight */
@@ -69,7 +69,7 @@
   --card-foreground: #0f172a;
   --popover: #ffffff;
   --popover-foreground: #0f172a;
-  --primary: #00d2ff;
+  --primary: var(--brand-primary, #00d2ff);
   --primary-foreground: #000000;
   --secondary: #64748b;
   --secondary-foreground: #ffffff;
@@ -110,7 +110,7 @@
   --card-foreground: #f8fafc;
   --popover: #0f172a;
   --popover-foreground: #f8fafc;
-  --primary: #00d2ff;
+  --primary: var(--brand-primary, #00d2ff);
   /* Matches Neon Blue Highlight */
   --primary-foreground: #000000;
   --secondary: #1e293b;

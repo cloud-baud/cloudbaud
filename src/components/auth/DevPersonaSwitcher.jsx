@@ -14,7 +14,7 @@ const DevPersonaSwitcher = () => {
 
     // 2. Define Personas
     const personas = [
-        { id: 'client', name: 'Client (CTO)', icon: Briefcase, role: 'client', email: 'client@example.com' },
+        { id: 'client', name: 'Client (CTO)', icon: Briefcase, role: 'client-admin', email: 'client@example.com' },
         { id: 'recruiter', name: 'Recruiter', icon: Users, role: 'recruiter', email: 'recruiter@example.com' },
         { id: 'cpa', name: 'CPA/Finance', icon: Calculator, role: 'cpa', email: 'cpa@example.com' },
         { id: 'spouse', name: 'Spouse/Family', icon: Heart, role: 'family', email: 'spouse@example.com' }

@@ -7,7 +7,7 @@ import {
     Lock, LockOpen, Filter, Undo, Redo,
     FileText, ChevronLeft
 } from 'lucide-react';
-import { Ribbon, RibbonButton, RibbonSeparator, RibbonGroup } from '@/components/layout/Ribbon';
+import { Ribbon, RibbonButton, RibbonSeparator, RibbonGroup } from 'synolic.core';
 
 // ── Document Index by Year ──
 const DOC_BASE = '/src/data/Documents - Taxes';

@@ -15,17 +15,16 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         let mounted = true;
 
-        // Check for auth callback parameters in URL
-        const isAuthCallback = window.location.hash.includes('access_token') || 
-                              window.location.hash.includes('type=magiclink') || 
-                              window.location.search.includes('code=');
-
         // Check for error in URL (OAuth failures)
         const urlParams = new URLSearchParams(window.location.search);
         const error = urlParams.get('error');
         const errorDesc = urlParams.get('error_description');
+        const code = urlParams.get('code');
+        
+        console.log('[Auth] Initializing. URL:', window.location.pathname, { hasCode: !!code, hasError: !!error });
+
         if (error) {
-            console.error('Auth Callback Error:', error, errorDesc);
+            console.error('[Auth] Callback Error:', error, errorDesc);
             // Delay toast slightly to ensure Toaster is mounted
             setTimeout(() => {
                 toast.error(`Login Failed: ${errorDesc || error}`, {
@@ -35,53 +34,117 @@ export const AuthProvider = ({ children }) => {
             }, 500);
         }
 
+        async function fetchProfile(userId) {
+            try {
+                // Use maybeSingle to avoid 406 errors on missing profiles
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', userId)
+                    .maybeSingle();
+                
+                if (error) {
+                    console.warn('[Auth] Profile fetch error:', error.message);
+                    return null;
+                }
+                return data;
+            } catch (err) {
+                console.warn('[Auth] Unexpected error fetching profile:', err);
+                return null;
+            }
+        }
+
         async function getSession() {
             try {
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { session: currentSession } } = await supabase.auth.getSession();
                 if (mounted) {
-                    setSession(session);
-                    setUser(session?.user ?? null);
-                    // Only stop loading if we aren't waiting for a callback redirect
-                    // OR if we already have a session (callback matched)
-                    if (!isAuthCallback || session) {
+                    setSession(currentSession);
+                    
+                    if (currentSession?.user) {
+                        // 1. SET USER IMMEDIATELY from session to unblock Redirector
+                        setUser(currentSession.user);
+                        setLoading(false);
+                        
+                        // 2. Fetch profile in background and augment user data
+                        try {
+                            const profilePromise = fetchProfile(currentSession.user.id);
+                            const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 2500));
+                            
+                            const profile = await Promise.race([profilePromise, timeoutPromise]);
+                            if (profile) {
+                                setUser(prev => ({ ...prev, ...profile }));
+                            }
+                        } catch (profileErr) {
+                            console.warn('[Auth] Background profile fetch failed:', profileErr);
+                        }
+                    } else {
+                        setUser(null);
                         setLoading(false);
                     }
                 }
             } catch (err) {
-                console.error('Session error:', err);
+                console.error('[Auth] Session error:', err);
                 if (mounted) setLoading(false);
             }
         }
 
         getSession();
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+            console.log('[Auth] State Change:', _event, { hasUser: !!session?.user });
             if (mounted) {
-                // If we are impersonating, DO NOT overwrite the mock user with the real session update
-                // unless it is a SIGN_OUT event
                 setSession(session);
 
-                // If not impersonating, sync user
-                setUser((prev) => {
-                    if (prev?.isImpersonating && _event !== 'SIGNED_OUT') return prev;
-                    return session?.user ?? null;
-                });
-
-                // Always stop loading on auth state change (success or fail)
-                setLoading(false);
+                if (_event === 'SIGNED_OUT') {
+                    setUser(null);
+                    setLoading(false);
+                } else if (session?.user) {
+                    // Set user immediately to unblock UI
+                    setUser(session.user);
+                    setLoading(false);
+                    
+                    // Sync user with profile data in background
+                    try {
+                        const profilePromise = fetchProfile(session.user.id);
+                        const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 2500));
+                        
+                        const profile = await Promise.race([profilePromise, timeoutPromise]);
+                        if (profile) {
+                            setUser(prev => {
+                                if (prev?.isImpersonating && _event !== 'SIGNED_OUT') return prev;
+                                return { ...session.user, ...profile };
+                            });
+                        }
+                    } catch (syncErr) {
+                        console.warn('[Auth] Background profile sync failed:', syncErr);
+                    }
+                } else {
+                    setLoading(false);
+                }
             }
         });
         
-        // Safety timeout: If url looked like auth but nothing happened, stop loading eventually
-        if (isAuthCallback) {
-            setTimeout(() => {
-                 if (mounted) setLoading((l) => l ? false : l);
-            }, 5000);
-        }
+        // Safety timeout: Ensure loading always stops eventually
+        // Increased to 15s for OAuth handshakes which can be slow on cold starts
+        const safetyTimer = setTimeout(() => {
+            if (mounted) {
+                setLoading((l) => {
+                    if (l) {
+                        console.warn('[Auth] Loading timed out after 15s - forcing UI unblock');
+                        const urlParams = new URLSearchParams(window.location.search);
+                        if (urlParams.has('code')) {
+                            toast.error("Auth Timeout: We detected a login code from LinkedIn/Microsoft, but LinkedIn's server is taking too long to respond. Please try again or check your internet connection.");
+                        }
+                    }
+                    return false;
+                });
+            }
+        }, 15000);
 
         return () => {
             mounted = false;
             subscription.unsubscribe();
+            clearTimeout(safetyTimer);
         };
     }, []);
 
@@ -102,7 +165,7 @@ export const AuthProvider = ({ children }) => {
                 return pattern.startsWith('@') 
                     ? emailLower.endsWith(pattern) 
                     : emailLower === pattern;
-            });
+            }) || emailLower === 'admin@shiftleft.digital'; // Hardcoded admin bypass
 
             if (!isAllowed) {
                 throw new Error('Access Restricted: Your email is not on the allowed list.');
@@ -179,7 +242,7 @@ export const AuthProvider = ({ children }) => {
     // --- DEV ONLY: Persona Impersonation Logic ---
     const impersonateUser = (persona) => {
         // Double check checks
-        const isDev = import.meta.env.DEV || process.env.NODE_ENV === 'development';
+        const isDev = import.meta.env.DEV || import.meta.env.MODE === 'development';
         if (!isDev) return;
 
         // Backup real user if not already backed up

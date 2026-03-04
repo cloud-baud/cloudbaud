@@ -8,8 +8,8 @@ import WorkspaceLayout from './workspace/WorkspaceLayout';
 import PortalDashboard from './workspace/PortalDashboard';
 import FabricDemo from './workspace/sales/FabricDemo';
 import FinOpsDashboard from './finance/dashboards/FinOpsDashboard';
-// import SettingsPage from './workspace/settings/SettingsPage'; // Local version (deprecated)
-import { SettingsPage } from 'common-features/frontend/components/features/settings/SettingsPage'; // CommonFeatures master
+// import { SettingsPage } from 'synolic.core/frontend/components/features/settings/SettingsPage'; // DEPRECATED Legcay
+import SettingsPage from './workspace/settings/UniversalSettingsPage'; // New Universal Standard
 import PlaceholderPage from './workspace/PlaceholderPage';
 import ContextLayout from './workspace/ContextLayout';
 import TaxMultiYearSummary from './finance/dashboards/TaxMultiYearSummary';
@@ -85,9 +85,10 @@ function App() {
                 {/* Protected Portal Routes */}
                 <Route element={<ProtectedRoute />}>
         <Route path="/portal" element={<Navigate to="/workspace" replace />} />
+                  <Route path="/workspace/settings" element={<SettingsPage />} />
                   <Route path="/workspace" element={<WorkspaceLayout />}>
                     <Route index element={<PortalDashboard />} />
-                    <Route path="settings" element={<SettingsPage />} />
+                    
                     <Route path="fabric-demo" element={<FabricDemo />} />
 
                     {/* Placeholder Routes for Sidebar Items */}

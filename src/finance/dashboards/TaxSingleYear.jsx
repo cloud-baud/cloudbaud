@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
@@ -8,7 +8,7 @@ import {
     ZoomIn, ZoomOut, Sparkles, MessageSquare, Bot, Activity
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
-import { Ribbon, RibbonButton, RibbonSeparator, RibbonGroup, RibbonFontSizeSelector, RibbonColorPicker } from '@/components/layout/Ribbon';
+import { Ribbon, RibbonButton, RibbonSeparator, RibbonGroup, RibbonFontSizeSelector, RibbonColorPicker } from 'synolic.core';
 import DocumentPreviewPanel from '../components/DocumentPreviewPanel';
 import HighlightablePdfViewer from '../components/HighlightablePdfViewer';
 import SpreadsheetPreview from '../components/SpreadsheetPreview';
@@ -961,13 +961,11 @@ const TaxSingleYear = () => {
                         id: 'view',
                         label: 'View',
                         content: (() => {
-                            const yearDocs = yearData;
                             const allDocNames = new Set();
                             sections.forEach(s => s.items.forEach(i => {
                                 i.docs?.forEach(d => allDocNames.add(d));
                                 i.children?.forEach(c => c.docs?.forEach(d => allDocNames.add(d)));
                             }));
-                            const trackedDocs = Array.from(allDocNames).sort();
                             
                             // Build chip data from items
                             const chipData = sections.flatMap(s => s.items).map(item => ({

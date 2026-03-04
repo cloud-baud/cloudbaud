@@ -43,8 +43,12 @@ const LoginPage = () => {
             setCooldown(60); // 60 second cooldown to prevent spam/link invalidation
         } catch (error) {
             console.error("Login Error:", error);
+            // Handle Supabase 500 error specifically for email rate limits
             if (error.status === 500 || error.message?.includes("500")) {
-                toast.error("Service Error: Sending failed. You may have hit the email rate limit (3/hour on free tier). Please wait or check Supabase logs.");
+                const devHint = isDev ? " (Use the Bypass button below instead!)" : "";
+                toast.error(`Service Error: Sending failed. You may have hit the email rate limit (3/hour on free tier).${devHint} Please wait or check Supabase logs.`, {
+                    duration: 10000,
+                });
             } else {
                 toast.error(error.message || 'Failed to send magic link');
             }
@@ -116,7 +120,7 @@ const LoginPage = () => {
                                     id: 'dev-bypass', 
                                     name: 'Dev User', 
                                     email: 'dev@example.com', 
-                                    role: 'client' 
+                                    role: 'tenant-admin' 
                                 });
                                 navigate('/workspace');
                                 toast.success("Bypassed Login (Dev Mode)");

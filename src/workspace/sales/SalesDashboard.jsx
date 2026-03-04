@@ -13,8 +13,10 @@ import {
   Settings, 
   Filter, 
   Users,
-  DollarSign
+  DollarSign,
+  GitMerge
 } from 'lucide-react';
+import SalesPipelineView from './SalesPipelineView';
 import { 
   BarChart, 
   Bar, 
@@ -34,6 +36,7 @@ import { Badge } from '@/shared/ui/badge';
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+  { id: 'pipeline', label: 'Pipeline', icon: GitMerge, highlight: true },
   { id: 'opportunities', label: 'Opportunities', icon: Briefcase },
   { id: 'tasks', label: 'My Tasks', icon: CheckCircle },
   { id: 'calls', label: 'Calls', icon: Phone },
@@ -69,7 +72,7 @@ const SalesDashboard = () => {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    "flex items-center gap-2 px-3 h-full border-b-2 text-sm font-medium transition-all whitespace-nowrap",
+                    "flex items-center gap-2 px-3 h-full border-b-2 text-sm font-medium transition-all whitespace-nowrap relative",
                     isActive 
                       ? "border-emerald-600 text-emerald-600" 
                       : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5"
@@ -77,6 +80,9 @@ const SalesDashboard = () => {
                 >
                   <Icon className={cn("w-4 h-4", isActive ? "text-emerald-600" : "text-slate-400")} />
                   {tab.label}
+                  {tab.highlight && !isActive && (
+                    <span className="absolute top-1.5 right-1 w-1.5 h-1.5 bg-amber-400 rounded-full" />
+                  )}
                 </button>
               );
             })}
@@ -101,11 +107,15 @@ const SalesDashboard = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-auto p-4 lg:p-6 bg-slate-50 dark:bg-[#0f0f0f]">
+      <div className={cn(
+        "flex-1 overflow-auto bg-slate-50 dark:bg-[#0f0f0f]",
+        activeTab === 'pipeline' ? '' : 'p-4 lg:p-6'
+      )}>
         {activeTab === 'overview' && <SalesOverview />}
+        {activeTab === 'pipeline' && <SalesPipelineView />}
         {activeTab === 'opportunities' && <OpportunitiesView />}
         {activeTab === 'forecast' && <ForecastView />}
-        {activeTab !== 'overview' && activeTab !== 'opportunities' && activeTab !== 'forecast' && (
+        {activeTab !== 'overview' && activeTab !== 'pipeline' && activeTab !== 'opportunities' && activeTab !== 'forecast' && (
           <div className="flex flex-col items-center justify-center h-[400px] text-slate-500">
             <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
               <Settings className="w-8 h-8 opacity-50" />

@@ -24,7 +24,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "common-features": path.resolve(__dirname, "../CommonFeatures"),
+      "synolic.core": path.resolve(__dirname, "../synolic.core"),
+      "@synolic.core": path.resolve(__dirname, "../synolic.core/frontend/components/features"),
       "react": path.resolve(__dirname, "./node_modules/react"),
       "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
     },

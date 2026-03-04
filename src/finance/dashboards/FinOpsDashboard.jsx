@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useContent } from '../../context/ContentContext';
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
@@ -159,7 +159,7 @@ const FinOpsDashboard = () => {
                                         <Table>
                                             <TableHeader>
                                                 <TableRow className="bg-slate-50 dark:bg-slate-900/50">
-                                                    <TableHead className="w-[80px]"></TableHead> {/* Actions */}
+                                                    <TableHead className="w-[80px]" />
                                                     <TableHead className="w-[100px]">Code</TableHead>
                                                     <TableHead>Account Name</TableHead>
                                                     <TableHead className="w-[120px]">Type</TableHead>

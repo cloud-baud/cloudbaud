@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import {
     User, Bell, Shield, Palette, Globe, Layers, Users as UsersIcon, LayoutGrid, PaintBucket, Lock,
     ChevronRight, ChevronDown, Check, Plus, MoveVertical, Puzzle, ZoomIn, X, Trash2, Pencil, Type,
-    Image as ImageIcon, Sparkles
+    Image as ImageIcon, Sparkles, Search
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
@@ -222,6 +222,7 @@ const SettingsPage = () => {
     const [fontFamily, setFontFamily] = useState(user?.user_metadata?.font_family || 'Inter');
     const [customLogo, setCustomLogo] = useState(user?.user_metadata?.custom_logo_url || '');
     const [siteName, setSiteName] = useState(user?.user_metadata?.site_name || 'CloudBaud');
+    const [searchboxBg, setSearchboxBg] = useState(user?.user_metadata?.searchbox_bg || '');
 
     // Sync Appearance from User Metadata when User loads (fix for reload issue)
     React.useEffect(() => {
@@ -230,6 +231,7 @@ const SettingsPage = () => {
             setFontFamily(user.user_metadata.font_family || 'Inter');
             setCustomLogo(user.user_metadata.custom_logo_url || '');
             setSiteName(user.user_metadata.site_name || 'CloudBaud');
+            setSearchboxBg(user.user_metadata.searchbox_bg || '');
             
             // Capture initial state for dirty tracking
             setInitialState({
@@ -237,6 +239,7 @@ const SettingsPage = () => {
                 fontFamily: user.user_metadata.font_family || 'Inter',
                 customLogo: user.user_metadata.custom_logo_url || '',
                 siteName: user.user_metadata.site_name || 'CloudBaud',
+                searchboxBg: user.user_metadata.searchbox_bg || '',
                 navItems: user.user_metadata.portal_nav_active || navItems,
                 aiConfig: {
                     provider: localStorage.getItem('ai_provider') || 'ollama',
@@ -421,6 +424,13 @@ const SettingsPage = () => {
         const root = document.documentElement;
         if (themeColor) root.style.setProperty('--color-primary', themeColor);
 
+        // SearchBox background color
+        if (searchboxBg) {
+            root.style.setProperty('--searchbox-bg', searchboxBg);
+        } else {
+            root.style.removeProperty('--searchbox-bg');
+        }
+
         switch (fontFamily) {
             case 'Inter':
                 root.style.setProperty('--font-sans', '"Inter", sans-serif');
@@ -444,7 +454,7 @@ const SettingsPage = () => {
             default:
                 root.style.setProperty('--font-sans', '"Inter", sans-serif');
         }
-    }, [themeColor, fontFamily]);
+    }, [themeColor, fontFamily, searchboxBg]);
 
     const handleSaveAppearance = async () => {
         const { error } = await supabase.auth.updateUser({
@@ -452,7 +462,8 @@ const SettingsPage = () => {
                 theme_color: themeColor,
                 font_family: fontFamily,
                 custom_logo_url: customLogo,
-                site_name: siteName
+                site_name: siteName,
+                searchbox_bg: searchboxBg
             }
         });
         if (error) toast.error("Failed to save appearance");
@@ -471,6 +482,7 @@ const SettingsPage = () => {
             fontFamily !== initialState.fontFamily ||
             customLogo !== initialState.customLogo ||
             siteName !== initialState.siteName ||
+            searchboxBg !== initialState.searchboxBg ||
             JSON.stringify(navItems) !== JSON.stringify(initialState.navItems) ||
             aiConfig.provider !== initialState.aiConfig.provider ||
             aiConfig.model !== initialState.aiConfig.model ||
@@ -478,7 +490,7 @@ const SettingsPage = () => {
             aiConfig.sdk !== initialState.aiConfig.sdk;
         
         setHasUnsavedChanges(hasChanges);
-    }, [themeColor, fontFamily, customLogo, siteName, navItems, aiConfig, initialState]);
+    }, [themeColor, fontFamily, customLogo, siteName, searchboxBg, navItems, aiConfig, initialState]);
 
     // Global Save All Changes
     const handleSaveAllChanges = async () => {
@@ -490,6 +502,7 @@ const SettingsPage = () => {
                     font_family: fontFamily,
                     custom_logo_url: customLogo,
                     site_name: siteName,
+                    searchbox_bg: searchboxBg,
                     portal_nav_active: navItems
                 }
             });
@@ -506,6 +519,7 @@ const SettingsPage = () => {
                 fontFamily,
                 customLogo,
                 siteName,
+                searchboxBg,
                 navItems,
                 aiConfig
             });
@@ -529,6 +543,7 @@ const SettingsPage = () => {
         setFontFamily(initialState.fontFamily);
         setCustomLogo(initialState.customLogo);
         setSiteName(initialState.siteName);
+        setSearchboxBg(initialState.searchboxBg);
         setNavItems(initialState.navItems);
         setAiConfig(initialState.aiConfig);
         
@@ -1047,6 +1062,64 @@ const SettingsPage = () => {
                                                     />
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <Separator />
+
+                                {/* SearchBox Background Color */}
+                                <div>
+                                    <label className="text-sm font-medium mb-3 flex items-center gap-2">
+                                        <Search className="size-4" /> Search Bar Background
+                                    </label>
+                                    <p className="text-xs text-muted-foreground mb-3">
+                                        Override the search bar background color. Leave empty to use the default theme color.
+                                    </p>
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex items-center gap-3">
+                                            <div
+                                                className="w-10 h-10 rounded-lg border-2 border-input overflow-hidden relative cursor-pointer hover:ring-2 hover:ring-primary transition-all"
+                                                style={{ background: searchboxBg || 'hsl(220 14% 20% / 0.5)' }}
+                                            >
+                                                <input
+                                                    type="color"
+                                                    value={searchboxBg || '#1e293b'}
+                                                    onChange={(e) => setSearchboxBg(e.target.value)}
+                                                    className="w-full h-full opacity-0 absolute cursor-pointer top-0 left-0"
+                                                />
+                                            </div>
+                                            <Input
+                                                value={searchboxBg}
+                                                onChange={(e) => setSearchboxBg(e.target.value)}
+                                                placeholder="e.g. #1e293b or rgba(0,0,0,0.3)"
+                                                className="w-64 font-mono text-xs"
+                                            />
+                                        </div>
+                                        {searchboxBg && (
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-red-500 hover:bg-red-50"
+                                                onClick={() => setSearchboxBg('')}
+                                            >
+                                                Reset
+                                            </Button>
+                                        )}
+                                    </div>
+                                    {/* Live Preview */}
+                                    <div className="mt-3 p-3 rounded-lg border border-border bg-slate-900/80">
+                                        <p className="text-[10px] text-slate-400 mb-2">Preview</p>
+                                        <div className="relative w-64">
+                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                                            <input
+                                                type="text"
+                                                disabled
+                                                placeholder="Search..."
+                                                className="w-full rounded-md pl-10 pr-4 py-2 text-sm text-white border border-slate-700 placeholder:text-slate-400"
+                                                style={{ background: searchboxBg || 'hsl(220 14% 20% / 0.5)' }}
+                                            />
                                         </div>
                                     </div>
                                 </div>

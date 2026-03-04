@@ -1,20 +1,29 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { toast } from 'sonner';
 
 const AuthRedirector = () => {
     const { user, loading } = useAuth();
     const navigate = useNavigate();
 
-    // Capture the initial URL immediately when component mounts
-    // before Supabase has a chance to strip parameters
-    const initialUrlRef = useRef(window.location.href);
+    const redirectedRef = useRef(false);
+    const callbackDetectedToastRef = useRef(false);
 
     useEffect(() => {
-        if (loading || !user) return;
+        // Log URL on mount for debugging
+        const urlP = new URL(window.location.href);
+        const hasCode = urlP.searchParams.has('code') || urlP.hash.includes('access_token');
+        
+        if (hasCode && !callbackDetectedToastRef.current) {
+            callbackDetectedToastRef.current = true;
+            console.log('[AuthRedirector] OAuth callback detected in URL. Waiting for session...');
+            toast.info("Verifying LinkedIn session... Please wait.", { id: 'auth-callback-toast' });
+        }
+
+        if (loading || !user || redirectedRef.current) return;
 
         try {
-            const urlP = new URL(initialUrlRef.current);
             const hash = urlP.hash;
             const params = urlP.searchParams;
 
@@ -26,7 +35,13 @@ const AuthRedirector = () => {
                 hash.includes('type=invite') ||
                 params.has('code');
 
+            console.log('[AuthRedirector] Checking callback:', { isAuthCallback, hash: !!hash, hasCode: params.has('code') });
+
             if (isAuthCallback) {
+                redirectedRef.current = true;
+                console.log('[AuthRedirector] Detected callback! Redirecting to /workspace...');
+                toast.dismiss('auth-callback-toast');
+                toast.success("Login successful! Welcome back.");
                 // Redirect to portal if we detected an auth callback
                 navigate('/workspace', { replace: true });
             }

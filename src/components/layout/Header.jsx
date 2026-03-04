@@ -81,11 +81,7 @@ const Header = () => {
     <header
       className="border-b border-[#222] sticky top-0 z-50 h-[70px] flex items-center px-4 sm:px-6 lg:px-8"
       style={{
-        backgroundColor: '#0f0f0f',
-        backgroundImage: `
-          linear-gradient(90deg, rgba(255,255,255,0.01) 0%, rgba(0,0,0,0) 50%, rgba(255,255,255,0.01) 100%),
-          repeating-linear-gradient(90deg, #111 0px, #111 1px, #161616 2px, #111 3px)
-        `,
+        backgroundColor: '#0a0a0a',
         boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
       }}
     >
@@ -111,12 +107,12 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden xl:flex items-center space-x-6">
+          <nav className="hidden lg:flex items-center space-x-4 xl:space-x-6">
             {services.map((service) => (
               <Link
                 key={service.name}
                 to={service.href}
-                className="text-sm font-semibold uppercase tracking-widest transition-all duration-300 ease-in-out whitespace-nowrap"
+                className="text-[11px] xl:text-sm font-semibold uppercase tracking-widest transition-all duration-300 ease-in-out whitespace-nowrap"
                 style={linkStyles}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
@@ -127,7 +123,7 @@ const Header = () => {
 
             {/* Industries Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="outline-none flex items-center gap-1 text-sm font-semibold uppercase tracking-widest transition-all duration-300 ease-in-out whitespace-nowrap cursor-pointer"
+              <DropdownMenuTrigger className="outline-none flex items-center gap-1 text-[11px] xl:text-sm font-semibold uppercase tracking-widest transition-all duration-300 ease-in-out whitespace-nowrap cursor-pointer"
                 style={linkStyles}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
@@ -149,27 +145,29 @@ const Header = () => {
             </DropdownMenu>
           </nav>
           
-          {/* Mobile Menu Logic continues... */}
-          <div className="hidden md:flex items-center space-x-4">
-            <ThemeToggle />
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="hidden sm:block">
+              <ThemeToggle />
+            </div>
             {user ? (
-               <Button asChild className="bg-brand-blue hover:bg-brand-blue/90 text-white rounded-lg px-6 font-bold shadow-lg shadow-brand-blue/20">
+               <Button asChild className="hidden sm:flex bg-brand-blue hover:bg-brand-blue/90 text-white rounded-lg px-4 lg:px-6 font-bold shadow-lg shadow-brand-blue/20 h-10">
                  <Link to="/workspace">Go to App</Link>
                </Button>
             ) : (
-                <Button asChild className="bg-brand-blue hover:bg-brand-blue/90 text-white rounded-lg px-6 font-bold shadow-lg shadow-brand-blue/20">
+                <Button asChild className="hidden sm:flex bg-brand-blue hover:bg-brand-blue/90 text-white rounded-lg px-4 lg:px-6 font-bold shadow-lg shadow-brand-blue/20 h-10">
                   <Link to="/login">Login</Link>
                 </Button>
             )}
-          </div>
 
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden p-2 text-slate-300 hover:text-white transition-colors"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+            {/* Mobile menu button */}
+            <button
+              className="lg:hidden p-2 text-slate-300 hover:text-white transition-colors"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}

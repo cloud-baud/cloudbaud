@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, NavLink, Link } from 'react-router-dom';
 import {
     Home,
-    Search,
     Bell,
     Plus,
     FileText,
@@ -24,9 +23,12 @@ import {
     LayoutDashboard,
     Megaphone,
     Rocket,
-    Server
+    Server,
+    Zap,
+    Shield,
+    Globe
 } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import { Separator } from '@radix-ui/react-separator';
@@ -42,6 +44,7 @@ import {
     DropdownMenuTrigger
 } from '@/shared/ui/dropdown-menu';
 import ThemeToggle from '@/components/layout/ThemeToggle';
+import { SearchBox } from '@synolic.core/search';
 import OllamaChatPanel from './OllamaChatPanel';
 import WorkspaceChat from './WorkspaceChat';
 import { Sparkles, MessageCircle } from 'lucide-react'; 
@@ -60,6 +63,14 @@ const ICON_MAP = {
     Bell,
     User,
     Megaphone,
+    Rocket,
+    LayoutDashboard,
+    LifeBuoy,
+    Server,
+    TrendingUp,
+    Zap,
+    Shield,
+    Globe,
     Layer: MoreHorizontal // Fallback/Generic
 };
 
@@ -68,18 +79,6 @@ const ICON_MAP = {
 const favorites = [
     { icon: FileText, label: 'My tasks', href: '/workspace/tasks' },
     { icon: Users, label: 'Pitch Deck (Series A)', href: '/workspace/deck' },
-];
-
-const people = [
-    { name: 'Matt R. Horn', avatar: 'https://i.pravatar.cc/150?u=matt' },
-    { name: 'Mason and Elle', avatar: 'https://i.pravatar.cc/150?u=mason' },
-    { name: 'Cliff Weathers', avatar: 'https://i.pravatar.cc/150?u=cliff' },
-];
-
-const suggested = [
-    { icon: Calendar, label: 'Interview Cara Bina', href: '/workspace/interview' },
-    { icon: Briefcase, label: 'Fundraising', href: '/workspace/fundraising' },
-    { icon: Settings, label: 'Engineering', href: '/workspace/engineering' },
 ];
 
 const operationsApps = [
@@ -132,9 +131,11 @@ const RIGHT_PANEL_TABS = [
 
 const WorkspaceLayout = () => {
     const { user, signOut } = useAuth();
+    const navigate = useNavigate();
     const [isRightPanelOpen, setIsRightPanelOpen] = useState(false);
     const [rightPanelTab, setRightPanelTab] = useState('ai-chat');
     const [ollamaOnline, setOllamaOnline] = useState(null); // null=checking, true=online, false=offline
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
     // Resizable pane widths with persistence
     const [sidebarWidth, setSidebarWidth] = useState(() => {
@@ -187,6 +188,8 @@ const WorkspaceLayout = () => {
         const interval = setInterval(check, 15000);
         return () => clearInterval(interval);
     }, []);
+
+    // Searchbox background is now standardized to White (Always-White Searchbox Standard)
 
     // Sidebar collapse state with persistence
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
@@ -247,30 +250,35 @@ const WorkspaceLayout = () => {
 
     return (
         <div className="flex flex-col h-screen font-sans text-foreground overflow-hidden">
-            {/* Top Navigation Bar - Full Width, Persistent Dark Mode */}
+            {/* Top Navigation Bar - Full Width, Persistent Dark Mode (DARK GLOBAL ANCHOR) */}
             <header
-                className="relative flex-none h-[70px] flex items-center justify-between px-4 lg:px-8 border-b border-border z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+                className="relative flex-none h-[70px] flex items-center justify-between px-4 lg:px-6 border-b border-neutral-800 z-50 bg-neutral-950"
             >
-                {/* Left: Brand + Search */}
-                <div className="flex items-center gap-6">
-                    <Link to="/portal" className="flex items-center gap-3 font-semibold text-xl hover:opacity-90 transition-opacity text-white shrink-0">
+                {/* Left: Brand + Search (Mobile Menu Toggle on the far left) */}
+                <div className="flex items-center gap-2 lg:gap-6">
+                    <button
+                        onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+                        className="lg:hidden p-2 text-slate-400 hover:text-white"
+                        title="Menu"
+                    >
+                        <PanelLeftOpen className="size-5" />
+                    </button>
+
+                    <Link to="/workspace" className="flex items-center gap-4 lg:gap-6 font-semibold text-lg hover:opacity-90 transition-opacity text-white shrink-0">
                         {user?.user_metadata?.custom_logo_url ? (
-                            <img src={user.user_metadata.custom_logo_url} alt="Logo" className="h-8 w-auto object-contain" />
+                            <img src={user.user_metadata.custom_logo_url} alt="Logo" className="h-16 w-auto object-contain" />
                         ) : (
-                            <CloudBaudLogo className="size-8 text-brand-blue" />
+                            <CloudBaudLogo className="h-12 w-auto object-contain shrink-0" />
                         )}
                         <span className="tracking-tight hidden xl:block">{user?.user_metadata?.site_name || 'CloudBaud'}</span>
                     </Link>
 
                     {/* Prominent Search Bar (Next to Logo) */}
-                    <div className="relative w-64 hidden md:block">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            className="w-full bg-secondary/50 border border-border rounded-md pl-10 pr-4 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all placeholder:text-muted-foreground"
-                        />
-                    </div>
+                    <SearchBox
+                        placeholder="Search..."
+                        variant="inset"
+                        className="w-64 hidden md:block"
+                    />
                 </div>
 
                 {/* Center: Global Navigation Links */}
@@ -319,7 +327,7 @@ const WorkspaceLayout = () => {
                         to="/" 
                         className="text-slate-400 hover:text-white font-medium text-sm transition-colors border border-slate-700 px-3 py-1.5 rounded-md hover:border-slate-500"
                     >
-                        Public Website
+                        Portal Site
                     </Link>
 
                     {/* AI Assistant Toggle */}
@@ -389,7 +397,7 @@ const WorkspaceLayout = () => {
                             <DropdownMenuLabel>My Account</DropdownMenuLabel>
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem onClick={() => window.location.href = '/workspace/settings'}>
+                            <DropdownMenuItem onClick={() => navigate('/workspace/settings')}>
                                 <Settings className="mr-2 h-4 w-4" />
                                 <span>Settings</span>
                             </DropdownMenuItem>
@@ -406,17 +414,25 @@ const WorkspaceLayout = () => {
             {/* Main Content Area: Sidebar + Page */}
             <div className="flex-1 flex overflow-hidden">
                 {/* Secondary Sidebar (Contextual) */}
+                {isMobileSidebarOpen && (
+                    <div 
+                        className="fixed inset-0 bg-black/60 z-[60] lg:hidden backdrop-blur-sm animate-in fade-in transition-all"
+                        onClick={() => setIsMobileSidebarOpen(false)}
+                    />
+                )}
+
                 <aside
                     className={cn(
-                        "flex-shrink-0 flex flex-col pt-6 pb-4 pl-4 lg:pl-6 bg-transparent h-full transition-all duration-300 ease-in-out overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] relative",
-                        isSidebarCollapsed && "!w-[88px]"
+                        "flex-shrink-0 flex flex-col pt-6 pb-4 pl-4 lg:pl-6 bg-transparent h-full transition-all duration-300 ease-in-out lg:relative fixed inset-y-0 left-0 z-[70] lg:z-10 bg-background lg:bg-transparent overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]",
+                        isSidebarCollapsed && "lg:!w-[88px]",
+                        !isMobileSidebarOpen && "-translate-x-full lg:translate-x-0"
                     )}
                     style={!isSidebarCollapsed ? { width: sidebarWidth } : undefined}
                 >
                     {/* Card 1: Navigation & Actions */}
                     <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden mb-4 mr-2 flex flex-col shrink-0">
                         {/* Header: Collapse + Create */}
-                        <div className={cn("p-4 pb-2 flex items-center gap-2", isSidebarCollapsed && "flex-col-reverse px-2")}>
+                        <div className={cn("p-4 pb-2 flex items-center gap-2", isSidebarCollapsed && "flex-col px-2")}>
                             <button
                                 onClick={toggleSidebar}
                                 className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors"
@@ -425,11 +441,12 @@ const WorkspaceLayout = () => {
                             </button>
 
                             {!isSidebarCollapsed ? (
-                                <button className="w-10 h-10 flex items-center justify-center text-white bg-brand-blue hover:bg-brand-blue/90 rounded-lg shadow-sm shadow-brand-blue/20 transition-all" title="Create New">
-                                    <Plus className="size-5" />
+                                <button className="h-10 px-3 flex items-center justify-center gap-2 text-white bg-brand-blue hover:bg-brand-blue/90 rounded-lg shadow-sm shadow-brand-blue/20 transition-all font-medium" title="New">
+                                    <Plus className="size-4" />
+                                    <span className="text-sm">New</span>
                                 </button>
                             ) : (
-                                <button className="w-10 h-10 flex items-center justify-center text-white bg-brand-blue hover:bg-brand-blue/90 rounded-lg shadow-sm shadow-brand-blue/20 transition-all">
+                                <button className="w-10 h-10 flex items-center justify-center text-white bg-brand-blue hover:bg-brand-blue/90 rounded-lg shadow-sm shadow-brand-blue/20 transition-all" title="New">
                                     <Plus className="size-5" />
                                 </button>
                             )}
@@ -479,8 +496,8 @@ const WorkspaceLayout = () => {
                 </aside>
 
                 {/* Page Content */}
-                <main className="flex-1 flex flex-col overflow-auto relative p-4 lg:p-6">
-                    <div className="flex-1 bg-card rounded-xl border border-border shadow-sm overflow-hidden flex flex-col relative">
+                <main className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden relative p-2 md:p-4 lg:p-6">
+                    <div className="flex-1 bg-card rounded-xl border border-border shadow-sm overflow-hidden flex flex-col relative w-full">
                         <Outlet />
                     </div>
                 </main>
@@ -490,10 +507,11 @@ const WorkspaceLayout = () => {
                     {/* Expanded Panel */}
                     <div
                         className={cn(
-                            "flex flex-col border-l border-border bg-card transition-all duration-300 ease-in-out overflow-hidden relative",
-                            !isRightPanelOpen && "!w-0 opacity-0"
+                            "flex flex-col border-l border-border bg-card transition-all duration-300 ease-in-out overflow-hidden lg:relative fixed inset-y-0 right-0 z-[70] lg:z-10",
+                            !isRightPanelOpen && "!w-0 opacity-0 lg:hidden",
+                            isRightPanelOpen && "w-full sm:w-[340px] md:w-[400px] lg:w-auto"
                         )}
-                        style={isRightPanelOpen ? { width: rightPanelWidth, opacity: 1 } : undefined}
+                        style={(isRightPanelOpen && window.innerWidth >= 1024) ? { width: rightPanelWidth, opacity: 1 } : undefined}
                     >
                         {/* Right Panel Resize Handle */}
                         <div
@@ -531,8 +549,8 @@ const WorkspaceLayout = () => {
                         </div>
                     </div>
 
-                    {/* Handle - Always Visible */}
-                    <div className="flex flex-col items-center py-4 gap-3 w-10 bg-background border-l border-border shrink-0">
+                    {/* Handle - Always Visible (Hidden on small mobile) */}
+                    <div className="hidden sm:flex flex-col items-center py-4 gap-3 w-10 bg-background border-l border-border shrink-0">
                         {RIGHT_PANEL_TABS.map(tab => (
                             <button
                                 key={tab.id}
@@ -577,33 +595,69 @@ const WorkspaceLayout = () => {
                     </div>
                 </div>
             </div>
+            {/* Productivity Footer Standard */}
+            <footer className="h-7 bg-neutral-950 border-t border-neutral-800 flex items-center justify-between px-3 text-[10px] text-neutral-400 shrink-0 z-50">
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1.5">
+                        <div className={cn(
+                            "w-2 h-2 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]",
+                            ollamaOnline === null ? "bg-amber-500" :
+                            ollamaOnline ? "bg-emerald-500" : "bg-red-500"
+                        )} />
+                        <span className="font-medium text-neutral-300 uppercase">
+                            {ollamaOnline === null ? 'Checking AI...' : ollamaOnline ? 'AI Connected' : 'AI Offline'}
+                        </span>
+                    </div>
+                    <div className="h-3 w-px bg-neutral-800" />
+                    <div className="flex items-center gap-1 text-neutral-500">
+                        <span className="uppercase tracking-widest font-bold text-brand-blue/80">CloudBaud</span>
+                        <span className="opacity-50">v2.0.1</span>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                        <span className="px-1.5 py-0.5 rounded bg-neutral-800 border border-neutral-700 text-neutral-300 font-mono">DEV_SERVER</span>
+                        <span className="text-neutral-500">Port: 17117</span>
+                    </div>
+                    <div className="h-3 w-px bg-neutral-800" />
+                    <div className="flex items-center gap-1.5 text-neutral-300">
+                        <User className="size-3" />
+                        <span className="uppercase">{user?.user_metadata?.name || 'Local User'}</span>
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 };
 
 // Helper Components
-const TopNavItem = ({ to, icon: Icon, label, exact }) => (
-    <NavLink
-        to={to}
-        end={exact}
-        className={({ isActive }) =>
-            cn(
-                "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 group min-w-[70px] h-full min-h-[58px]",
-                isActive
-                    ? "text-white bg-white/5 shadow-sm shadow-white/5"
-                    : "text-slate-400 hover:text-white hover:bg-white/10"
-            )
-        }
-    >
-        {({ isActive }) => (
-            <>
-                <Icon className={cn("size-5 mb-0.5 transition-colors", isActive ? "text-brand-blue" : "text-slate-400 group-hover:text-white")} />
-                <span className="whitespace-nowrap">{label}</span>
-                {isActive && <div className="absolute bottom-0 h-0.5 w-[20px] bg-brand-blue rounded-t-full opacity-80" />}
-            </>
-        )}
-    </NavLink>
-);
+const TopNavItem = ({ to, icon, label, exact }) => {
+    const Icon = icon;
+    if (!Icon) return null;
+    return (
+        <NavLink
+            to={to}
+            end={exact}
+            className={({ isActive }) =>
+                cn(
+                    "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 group min-w-[70px] h-full min-h-[58px]",
+                    isActive
+                        ? "text-white bg-white/5 shadow-sm shadow-white/5"
+                        : "text-slate-400 hover:text-white hover:bg-white/10"
+                )
+            }
+        >
+            {({ isActive }) => (
+                <>
+                    <Icon className={cn("size-5 mb-0.5 transition-colors", isActive ? "text-brand-blue" : "text-slate-400 group-hover:text-white")} />
+                    <span className="whitespace-nowrap">{label}</span>
+                    {isActive && <div className="absolute bottom-0 h-0.5 w-[20px] bg-brand-blue rounded-t-full opacity-80" />}
+                </>
+            )}
+        </NavLink>
+    );
+};
 
 const SidebarLink = ({ icon: Icon, label, href, active, collapsed, children, onExpand }) => {
     const location = useLocation();
