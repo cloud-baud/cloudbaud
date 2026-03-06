@@ -26,7 +26,8 @@ import {
     Server,
     Zap,
     Shield,
-    Globe
+    Globe,
+    Scale
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
@@ -111,6 +112,15 @@ const operationsApps = [
         icon: Users, // Using Users for HR
         label: 'HR',
         href: '/workspace/hr'
+    },
+    {
+        icon: Scale,
+        label: 'Legal',
+        href: '/workspace/legal',
+        children: [
+            { label: 'Provisional Patents', href: '/workspace/legal/patents' },
+            { label: 'Contracts', href: '/workspace/legal/contracts' }
+        ]
     },
     {
         icon: Server, // Using Server for IT

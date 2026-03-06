@@ -17,7 +17,10 @@ import {
     LayoutList,
     LayoutGrid,
     ArrowUpDown,
-    RefreshCw
+    RefreshCw,
+    X,
+    Save,
+    Check
 } from 'lucide-react';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
@@ -77,12 +80,28 @@ const NETLIFY_METADATA = {
 
 const CmdbDashboard = () => {
     const { user } = useAuth();
-    const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState('card'); // Default to Card view for visual appeal
     const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
     const [apps, setApps] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [selectedApp, setSelectedApp] = useState(null);
+    const [editForm, setEditForm] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
+
+    // Column Visibility State
+    const [visibleColumns, setVisibleColumns] = useState({
+        appName: true,
+        appId: true,
+        domain: true,
+        hosting: true,
+        repo: true,
+        status: true,
+        tier: false,
+        lastDeploy: false,
+        buildStatus: false,
+        siteId: false
+    });
     
     // New App Form State
     const [newApp, setNewApp] = useState({
@@ -131,6 +150,43 @@ const CmdbDashboard = () => {
     useEffect(() => {
         fetchApps();
     }, [fetchApps]);
+
+    const handleSelectApp = (app) => {
+        setSelectedApp(app);
+        setEditForm({ ...app });
+    };
+
+    const handleClosePanel = () => {
+        setSelectedApp(null);
+        setEditForm(null);
+    };
+
+    const handleSaveApp = async () => {
+        if (!editForm || !editForm.id) return;
+        setIsSaving(true);
+        try {
+            await CmdbService.updateApp(editForm.id, {
+                name: editForm.name,
+                domain: editForm.domain,
+                hosting: editForm.hosting,
+                github_repo: editForm.github_repo,
+                status: editForm.status,
+                tier: editForm.tier,
+                app_id: editForm.app_id
+            });
+            await fetchApps();
+            // Re-select app from fetched list so metadata updates
+            // (done via a side-effect effectively by fetchApps changing apps list, 
+            // but we can just leave it selected if they want to keep editing)
+            alert('Application updated successfully!');
+            handleClosePanel();
+        } catch(e) {
+            console.error(e);
+            alert('Failed to update application details.');
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
 
 
@@ -214,10 +270,7 @@ const CmdbDashboard = () => {
         }
     };
 
-    const filteredApps = apps.filter(app => 
-        app.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        (app.domain && app.domain.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    const filteredApps = apps;
 
     const sortedApps = [...filteredApps].sort((a, b) => {
         const aValue = a[sortConfig.key]?.toString().toLowerCase() || '';
@@ -235,16 +288,7 @@ const CmdbDashboard = () => {
             maxWidth="max-w-full"
             actions={
                 <div className="flex items-center gap-3">
-                    {/* 1. Search Input */}
-                    <div className="relative">
-                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                        <Input 
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Search apps..." 
-                            className="w-64 pl-9 bg-card"
-                        />
-                    </div>
+                    {/* Removed redundant Search Input */}
 
 
                     {/* 2. Filter Button */}
@@ -299,6 +343,35 @@ const CmdbDashboard = () => {
                             <LayoutGrid className="size-4" />
                         </Button>
                     </div>
+
+                    {/* 4.5 Columns Toggle */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="gap-2 bg-card ml-1">
+                                <LayoutList className="size-3.5" />
+                                Columns
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-56">
+                            <DropdownMenuLabel>Toggle Columns</DropdownMenuLabel>
+                            {Object.keys(visibleColumns).map(col => (
+                                <DropdownMenuItem 
+                                    key={col} 
+                                    onSelect={(e) => {
+                                        e.preventDefault();
+                                        setVisibleColumns(prev => ({...prev, [col]: !prev[col]}));
+                                    }}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <div className={`w-4 h-4 rounded border flex items-center justify-center ${visibleColumns[col] ? 'bg-brand-blue border-brand-blue text-black' : 'border-slate-500'}`}>
+                                            {visibleColumns[col] && <Check className="size-3" />}
+                                        </div>
+                                        {col.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                    </div>
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
                     {/* 5. Actions (Admin Only) */}
                     {isAdmin && (
@@ -411,19 +484,25 @@ const CmdbDashboard = () => {
             </div>
 
             {/* Main Content (Grid or Table) */}
-            <Card className="bg-transparent border-none shadow-none">
-                <CardContent className="p-0">
+            <div className="flex flex-col xl:flex-row gap-6 items-start h-full pb-10">
+                <div className={`flex-1 min-w-0 transition-all ${selectedApp ? 'hidden xl:block' : 'w-full'}`}>
+                    <Card className="bg-transparent border-none shadow-none">
+                        <CardContent className="p-0">
                     {viewMode === 'list' ? (
                         <div className="rounded-md border border-border overflow-hidden bg-card">
                             <table className="w-full text-sm text-left">
                                 <thead className="bg-muted/50 text-muted-foreground font-medium uppercase text-xs">
                                     <tr>
-                                        <th className="px-4 py-3">App Name</th>
-                                        <th className="px-4 py-3">App ID</th>
-                                        <th className="px-4 py-3">Domain</th>
-                                        <th className="px-4 py-3">Hosting</th>
-                                        <th className="px-4 py-3">Repo</th>
-                                        <th className="px-4 py-3">Status</th>
+                                        {visibleColumns.appName && <th className="px-4 py-3 whitespace-nowrap">App Name</th>}
+                                        {visibleColumns.appId && <th className="px-4 py-3 whitespace-nowrap">App ID</th>}
+                                        {visibleColumns.domain && <th className="px-4 py-3 whitespace-nowrap">Domain</th>}
+                                        {visibleColumns.hosting && <th className="px-4 py-3 whitespace-nowrap">Hosting</th>}
+                                        {visibleColumns.repo && <th className="px-4 py-3 whitespace-nowrap">Repo</th>}
+                                        {visibleColumns.status && <th className="px-4 py-3 whitespace-nowrap">Status</th>}
+                                        {visibleColumns.tier && <th className="px-4 py-3 whitespace-nowrap">Tier</th>}
+                                        {visibleColumns.lastDeploy && <th className="px-4 py-3 whitespace-nowrap">Last Deploy</th>}
+                                        {visibleColumns.buildStatus && <th className="px-4 py-3 whitespace-nowrap">Build Status</th>}
+                                        {visibleColumns.siteId && <th className="px-4 py-3 whitespace-nowrap">Site ID</th>}
                                         <th className="px-4 py-3 text-right">Actions</th>
                                     </tr>
                                 </thead>
@@ -443,43 +522,78 @@ const CmdbDashboard = () => {
                                         </tr>
                                     ) : (
                                         sortedApps.map((app) => (
-                                            <tr key={app.id} className="hover:bg-muted/30 transition-colors group">
-                                                <td className="px-4 py-3 font-medium text-foreground flex items-center gap-2">
-                                                    <div className="size-8 rounded bg-brand-blue/10 flex items-center justify-center text-brand-blue border border-brand-blue/20">
-                                                        {app.name.charAt(0)}
-                                                    </div>
-                                                    {app.name}
-                                                </td>
-                                                <td className="px-4 py-3 text-muted-foreground font-mono text-xs">{app.app_id}</td>
-                                                <td className="px-4 py-3">
-                                                    <a 
-                                                        href={`https://${app.domain}`} 
-                                                        target="_blank" 
-                                                        rel="noopener noreferrer"
-                                                        className="text-blue-400 hover:underline flex items-center gap-1"
-                                                    >
-                                                        {app.domain}
-                                                        <ExternalLink className="size-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                    </a>
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <div className="flex items-center gap-1.5">
-                                                        {app.hosting === 'Netlify' ? <Cloud className="size-3 text-teal-400" /> : <Server className="size-3 text-slate-400" />}
-                                                        {app.hosting}
-                                                    </div>
-                                                </td>
-                                                <td className="px-4 py-3 text-muted-foreground flex items-center gap-1">
-                                                    <Github className="size-3" />
-                                                    {app.github_repo}
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <Badge variant={app.status === 'Active' ? 'success' : 'secondary'} className={
-                                                        app.status === 'Active' ? 'bg-emerald-500/15 text-emerald-500 hover:bg-emerald-500/25 border-emerald-500/20' : 
-                                                        app.status === 'Development' ? 'bg-amber-500/15 text-amber-500 hover:bg-amber-500/25 border-amber-500/20' : ''
-                                                    }>
-                                                        {app.status}
-                                                    </Badge>
-                                                </td>
+                                            <tr key={app.id} onClick={() => handleSelectApp(app)} className={`hover:bg-muted/30 transition-colors group cursor-pointer ${selectedApp?.id === app.id ? "bg-brand-blue/5 border-l-2 border-l-brand-blue" : ""}`}>
+                                                {visibleColumns.appName && (
+                                                    <td className="px-4 py-3 font-medium text-foreground">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="size-8 rounded bg-brand-blue/10 flex items-center justify-center text-brand-blue border border-brand-blue/20 shrink-0">
+                                                                {app.name.charAt(0)}
+                                                            </div>
+                                                            <div className="truncate min-w-0">{app.name}</div>
+                                                        </div>
+                                                    </td>
+                                                )}
+                                                {visibleColumns.appId && <td className="px-4 py-3 text-muted-foreground font-mono text-xs">{app.app_id}</td>}
+                                                {visibleColumns.domain && (
+                                                    <td className="px-4 py-3">
+                                                        <a 
+                                                            href={`https://${app.domain}`} 
+                                                            target="_blank" 
+                                                            rel="noopener noreferrer"
+                                                            className="text-blue-400 hover:underline flex items-center gap-1 max-w-[200px] truncate"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
+                                                            <span className="truncate">{app.domain}</span>
+                                                            <ExternalLink className="size-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                                                        </a>
+                                                    </td>
+                                                )}
+                                                {visibleColumns.hosting && (
+                                                    <td className="px-4 py-3">
+                                                        <div className="flex items-center gap-1.5 whitespace-nowrap">
+                                                            {app.hosting === 'Netlify' ? <Cloud className="size-3 text-teal-400" /> : <Server className="size-3 text-slate-400" />}
+                                                            {app.hosting}
+                                                        </div>
+                                                    </td>
+                                                )}
+                                                {visibleColumns.repo && (
+                                                    <td className="px-4 py-3 text-muted-foreground">
+                                                        <div className="flex items-center gap-1 max-w-[150px] truncate">
+                                                            <Github className="size-3 shrink-0" />
+                                                            <span className="truncate">{app.github_repo}</span>
+                                                        </div>
+                                                    </td>
+                                                )}
+                                                {visibleColumns.status && (
+                                                    <td className="px-4 py-3">
+                                                        <Badge variant={app.status === 'Active' ? 'success' : 'secondary'} className={`whitespace-nowrap ${
+                                                            app.status === 'Active' ? 'bg-emerald-500/15 text-emerald-500 hover:bg-emerald-500/25 border-emerald-500/20' : 
+                                                            app.status === 'Development' ? 'bg-amber-500/15 text-amber-500 hover:bg-amber-500/25 border-amber-500/20' : ''
+                                                        }`}>
+                                                            {app.status}
+                                                        </Badge>
+                                                    </td>
+                                                )}
+                                                {visibleColumns.tier && (
+                                                    <td className="px-4 py-3 text-muted-foreground text-xs whitespace-nowrap">
+                                                        {app.tier || '-'}
+                                                    </td>
+                                                )}
+                                                {visibleColumns.lastDeploy && (
+                                                    <td className="px-4 py-3 text-muted-foreground text-xs whitespace-nowrap">
+                                                        {app.lastDeploy ? new Date(app.lastDeploy).toLocaleString() : '-'}
+                                                    </td>
+                                                )}
+                                                {visibleColumns.buildStatus && (
+                                                    <td className="px-4 py-3 text-muted-foreground text-xs whitespace-nowrap">
+                                                        {app.buildStatus || '-'}
+                                                    </td>
+                                                )}
+                                                {visibleColumns.siteId && (
+                                                    <td className="px-4 py-3 text-muted-foreground font-mono text-xs max-w-[150px] truncate">
+                                                        {app.siteId || '-'}
+                                                    </td>
+                                                )}
                                                 <td className="px-4 py-3 text-right">
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
@@ -489,7 +603,7 @@ const CmdbDashboard = () => {
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                            <DropdownMenuItem>View Details</DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => handleSelectApp(app)}>View Details</DropdownMenuItem>
                                                             {isAdmin && (
                                                                 <>
                                                                     <DropdownMenuItem>Edit Configuration</DropdownMenuItem>
@@ -524,7 +638,7 @@ const CmdbDashboard = () => {
                                 </div>
                             ) : (
                                 sortedApps.map((app) => (
-                                    <div key={app.id} className="group relative bg-card border border-border rounded-xl p-5 hover:shadow-lg hover:border-brand-blue/30 transition-all duration-300 flex flex-col h-full">
+                                    <div key={app.id} className={`group relative bg-card border ${selectedApp?.id === app.id ? 'border-brand-blue ring-1 ring-brand-blue' : 'border-border'} rounded-xl p-5 hover:shadow-lg hover:border-brand-blue/30 transition-all duration-300 flex flex-col h-full cursor-pointer`} onClick={() => handleSelectApp(app)}>
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex items-center gap-3">
                                                 <div className="size-16 rounded-lg bg-slate-100 dark:bg-slate-800 border border-border shadow-sm relative overflow-hidden shrink-0 group-hover:border-brand-blue/50 transition-colors">
@@ -569,7 +683,7 @@ const CmdbDashboard = () => {
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem>View Details</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleSelectApp(app); }}>View Details</DropdownMenuItem>
                                                     {app.adminUrl && (
                                                         <DropdownMenuItem asChild>
                                                             <a href={app.adminUrl} target="_blank" rel="noopener noreferrer" className="flex items-center">
@@ -639,7 +753,87 @@ const CmdbDashboard = () => {
                     )}
                 </CardContent>
             </Card>
-        </PageShell>
+        </div>
+
+        {/* Right Panel Detail Editor */}
+        {selectedApp && editForm && (
+            <div className="w-full xl:w-[400px] bg-card border border-border shadow-md rounded-xl p-5 flex flex-col gap-4 shrink-0 overflow-y-auto max-h-[85vh] sticky top-4">
+                <div className="flex items-center justify-between border-b border-border pb-3">
+                    <h3 className="font-bold text-lg text-foreground truncate pl-1">Edit {selectedApp?.name}</h3>
+                    <Button variant="ghost" size="icon" onClick={handleClosePanel} className="h-8 w-8 text-muted-foreground hover:text-white shrink-0">
+                        <X className="size-4" />
+                    </Button>
+                </div>
+                
+                <div className="space-y-4 flex-1">
+                    <div>
+                        <Label className="text-xs text-muted-foreground font-semibold">App Name</Label>
+                        <Input value={editForm.name || ''} onChange={(e) => setEditForm({...editForm, name: e.target.value})} className="mt-1 bg-background" />
+                    </div>
+                    <div>
+                        <Label className="text-xs text-muted-foreground font-semibold">App ID</Label>
+                        <Input value={editForm.app_id || ''} onChange={(e) => setEditForm({...editForm, app_id: e.target.value})} className="mt-1 bg-background" />
+                    </div>
+                    <div>
+                        <Label className="text-xs text-muted-foreground font-semibold">Domain / Namespace</Label>
+                        <Input value={editForm.domain || ''} onChange={(e) => setEditForm({...editForm, domain: e.target.value})} className="mt-1 bg-background" />
+                    </div>
+                    <div>
+                        <Label className="text-xs text-muted-foreground font-semibold">Hosting Provider</Label>
+                        <Input value={editForm.hosting || ''} onChange={(e) => setEditForm({...editForm, hosting: e.target.value})} className="mt-1 bg-background" />
+                    </div>
+                    <div>
+                        <Label className="text-xs text-muted-foreground font-semibold">Source Repository</Label>
+                        <Input value={editForm.github_repo || ''} onChange={(e) => setEditForm({...editForm, github_repo: e.target.value})} className="mt-1 bg-background" />
+                    </div>
+                    <div>
+                        <Label className="text-xs text-muted-foreground font-semibold">Operational Status</Label>
+                        <select 
+                            className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+                            value={editForm.status || ''}
+                            onChange={(e) => setEditForm({...editForm, status: e.target.value})}
+                        >
+                            <option value="Active">Active</option>
+                            <option value="Development">Development</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="In Development">In Development</option>
+                        </select>
+                    </div>
+                    <div>
+                        <Label className="text-xs text-muted-foreground font-semibold">Service Tier</Label>
+                        <select 
+                            className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+                            value={editForm.tier || ''}
+                            onChange={(e) => setEditForm({...editForm, tier: e.target.value})}
+                        >
+                            <option value="Production">Production</option>
+                            <option value="Staging">Staging</option>
+                            <option value="Development">Development</option>
+                        </select>
+                    </div>
+                    
+                    {/* Read Only Meta */}
+                    {(editForm.siteId || editForm.buildStatus || editForm.lastDeploy) && (
+                        <div className="bg-muted/30 border border-border/50 p-3 rounded-lg mt-4 space-y-2">
+                            <div className="text-xs text-muted-foreground uppercase font-bold flex items-center gap-1.5 pb-1"><Globe className="size-3" /> External Agent Metadata</div>
+                            {editForm.siteId && <div className="text-sm"><span className="text-muted-foreground">Origin ID:</span> <span className="font-mono text-xs text-foreground bg-black/20 px-1 rounded ml-1">{editForm.siteId}</span></div>}
+                            {editForm.buildStatus && <div className="text-sm flex items-center gap-1.5"><span className="text-muted-foreground">Build Pipeline:</span> <Badge variant="secondary" className="bg-black/30 text-xs px-1.5 py-0 font-mono text-emerald-400 border-none">{editForm.buildStatus}</Badge></div>}
+                            {editForm.lastDeploy && <div className="text-sm"><span className="text-muted-foreground">Last Telemetry:</span> <span className="text-foreground ml-1">{new Date(editForm.lastDeploy).toLocaleString()}</span></div>}
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex items-center gap-3 pt-4 mt-4 border-t border-border sticky bottom-0 bg-card py-2">
+                    <Button variant="outline" className="flex-1" onClick={handleClosePanel}>Discard</Button>
+                    <Button className="flex-1 bg-brand-blue hover:bg-brand-blue/90 text-black font-bold gap-2" onClick={handleSaveApp} disabled={isSaving}>
+                        {isSaving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+                        Commit Change
+                    </Button>
+                </div>
+            </div>
+        )}
+    </div>
+</PageShell>
     );
 };
 
