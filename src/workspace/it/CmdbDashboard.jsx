@@ -43,6 +43,135 @@ import {
 import { CmdbService } from '@/services/cmdbService';
 import { useAuth } from '@/context/AuthContext';
 
+const SEED_METADATA = {
+    'jishnunath.com': {
+        app_id: 'APP-001',
+        name: 'Jishnunath',
+        status: 'Active',
+        tier: 'Production',
+        hosting: 'Netlify'
+    },
+    'cloudbaud.com': {
+        app_id: 'APP-002',
+        name: 'Cloudbaud',
+        status: 'Active',
+        tier: 'Production',
+        hosting: 'Netlify'
+    },
+    'rudrajabrahmins.org': {
+        app_id: 'APP-003',
+        name: 'Rudrajabrahmins',
+        status: 'Active',
+        tier: 'Production',
+        hosting: 'Netlify'
+    },
+    'legalbench.in': {
+        app_id: 'APP-004',
+        name: 'Legalbench',
+        status: 'Active',
+        tier: 'Production',
+        hosting: 'Netlify'
+    },
+    'mergers365.in': {
+        app_id: 'APP-005',
+        name: 'Mergers365',
+        status: 'Development',
+        tier: 'Staging',
+        hosting: 'Netlify'
+    },
+    'systemsdesign.tech': {
+        app_id: 'APP-006',
+        name: 'Systemsdesign',
+        status: 'Development',
+        tier: 'Staging',
+        hosting: 'Netlify'
+    },
+    'synolic.tech': {
+        app_id: 'APP-007',
+        name: 'Synolic',
+        status: 'Development',
+        tier: 'Staging',
+        hosting: 'Netlify'
+    },
+    'sqlhealth.pro': {
+        app_id: 'APP-008',
+        name: 'Sqlhealth',
+        status: 'Development',
+        tier: 'Staging',
+        hosting: 'Netlify'
+    },
+    'seattletechnical.com': {
+        app_id: 'APP-009',
+        name: 'Seattletechnical',
+        status: 'Development',
+        tier: 'Staging',
+        hosting: 'Netlify'
+    },
+    'rudinsholding.com': {
+        app_id: 'APP-010',
+        name: 'Rudinsholding',
+        status: 'Development',
+        tier: 'Staging',
+        hosting: 'Netlify'
+    },
+    'rudinsacademy.com': {
+        app_id: 'APP-011',
+        name: 'Rudinsacademy',
+        status: 'Development',
+        tier: 'Staging',
+        hosting: 'Netlify'
+    },
+    'rudinsstart.com': {
+        app_id: 'APP-012',
+        name: 'Rudinsstart',
+        status: 'Development',
+        tier: 'Staging',
+        hosting: 'Netlify'
+    },
+    'rudinsreach.com': {
+        app_id: 'APP-013',
+        name: 'Rudinsreach',
+        status: 'Development',
+        tier: 'Staging',
+        hosting: 'Netlify'
+    },
+    'fifasocial.live': {
+        app_id: 'APP-014',
+        name: 'Fifasocial',
+        status: 'Development',
+        tier: 'Staging',
+        hosting: 'Netlify'
+    },
+    'ageless.lifestyle': {
+        app_id: 'APP-015',
+        name: 'Ageless',
+        status: 'Development',
+        tier: 'Staging',
+        hosting: 'Netlify'
+    },
+    'famloop.com': {
+        app_id: 'APP-016',
+        name: 'Famloop',
+        status: 'Development',
+        tier: 'Staging',
+        hosting: 'Netlify'
+    },
+    'usjobs.tech': {
+        app_id: 'APP-017',
+        name: 'Usjobs',
+        status: 'Development',
+        tier: 'Staging',
+        hosting: 'Netlify'
+    },
+    'NRIEssentials.com': {
+        app_id: 'APP-018',
+        name: 'NRIEssentials',
+        status: 'Development',
+        tier: 'Staging',
+        hosting: 'Netlify'
+    },
+};
+
 const NETLIFY_METADATA = {
     'cloudbaud.com': {
         siteId: '54b07907-6ac7-4209-8e9a-b6df1a3457f6',
@@ -198,21 +327,20 @@ const CmdbDashboard = () => {
             let updateCount = 0;
             
             // Iterate over hardcoded metadata and upsert to DB
-            for (const [domain, meta] of Object.entries(NETLIFY_METADATA)) {
-                // Find existing app by domain to get other fields if needed, or just upsert known fields
-                // We'll trust upsertAppByDomain to handle the merge/creation
-                
-                // Map component fields to DB snake_case
+            for (const [domain, meta] of Object.entries({...SEED_METADATA, ...NETLIFY_METADATA})) {
                 const dbPayload = {
                     domain: domain,
-                    // If creating new, we might need name etc, but for now we assume these apps exist or we are just updating metadata
-                    // Ideally we should match existing apps.
-                    screenshot_url: meta.screenshot,
-                    admin_url: meta.adminUrl,
-                    site_id: meta.siteId,
-                    last_deploy_at: meta.lastDeploy,
-                    build_status: meta.buildStatus,
-                    github_repo: meta.repoUrl
+                    ...(meta.name && { name: meta.name }),
+                    ...(meta.app_id && { app_id: meta.app_id }),
+                    ...(meta.status && { status: meta.status }),
+                    ...(meta.tier && { tier: meta.tier }),
+                    ...(meta.hosting && { hosting: meta.hosting }),
+                    ...(meta.screenshot && { screenshot_url: meta.screenshot }),
+                    ...(meta.adminUrl && { admin_url: meta.adminUrl }),
+                    ...(meta.siteId && { site_id: meta.siteId }),
+                    ...(meta.lastDeploy && { last_deploy_at: meta.lastDeploy }),
+                    ...(meta.buildStatus && { build_status: meta.buildStatus }),
+                    ...(meta.repoUrl && { github_repo: meta.repoUrl })
                 };
 
                 await CmdbService.upsertAppByDomain(domain, dbPayload);

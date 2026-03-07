@@ -1,40 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/shared/ui/card';
-import { FileText, Lightbulb, Clock, CheckCircle2, Plus, Search } from 'lucide-react';
+import { FileText, Lightbulb, Clock, CheckCircle2, Plus, Search, Loader2 } from 'lucide-react';
 import PriorArtSearch from './PriorArtSearch'; // Import the new search component
-
-const mockPatents = [
-    {
-        id: 1,
-        title: 'Dynamic Tenant Routing Architecture',
-        status: 'Draft generated',
-        date: 'Oct 15, 2026',
-        description: 'System for dynamically routing tenant database requests without predefined schemas.',
-        claims: 12,
-        tier: 'Deterministic'
-    },
-    {
-        id: 2,
-        title: 'Context-Aware AI Document Processor',
-        status: 'In Review',
-        date: 'Sep 22, 2026',
-        description: 'Method for extracting and caching structural data from tax documents with temporal awareness.',
-        claims: 8,
-        tier: 'Probabilistic'
-    },
-    {
-        id: 3,
-        title: 'Resilient Edge Compute Sync',
-        status: 'Filed Provisional',
-        date: 'Aug 05, 2026',
-        description: 'Protocol for synchronizing volatile edge cache data back to central DBs using robust queues.',
-        claims: 21,
-        tier: 'Deterministic'
-    }
-];
+import { supabase } from '@/lib/supabase';
 
 const ProvisionalPatentsDashboard = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
+    const [patents, setPatents] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPatents = async () => {
+            if (activeTab !== 'dashboard') return;
+            setLoading(true);
+            try {
+                const { data, error } = await supabase
+                    .from('provisional_patents')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error("Error fetching patents:", error);
+                } else if (data) {
+                    setPatents(data);
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchPatents();
+    }, [activeTab]);
+
+    const totalDrafts = patents.length;
+    const pendingReview = patents.filter(p => p.status === 'In Review').length;
+    const filedCount = patents.filter(p => p.status === 'Filed Provisional').length;
 
     return (
         <div className="p-6 h-full flex flex-col space-y-6 overflow-y-auto w-full max-w-[1200px] mx-auto">
@@ -96,8 +97,8 @@ const ProvisionalPatentsDashboard = () => {
                                 <FileText className="size-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold">14</div>
-                                <p className="text-xs text-muted-foreground mt-1">+2 this month</p>
+                                <div className="text-2xl font-bold">{totalDrafts}</div>
+                                <p className="text-xs text-muted-foreground mt-1">Stored in database</p>
                             </CardContent>
                         </Card>
                         <Card>
@@ -106,7 +107,7 @@ const ProvisionalPatentsDashboard = () => {
                                 <Clock className="size-4 text-amber-500" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold">3</div>
+                                <div className="text-2xl font-bold">{pendingReview}</div>
                                 <p className="text-xs text-muted-foreground mt-1">Awaiting legal review</p>
                             </CardContent>
                         </Card>
@@ -116,7 +117,7 @@ const ProvisionalPatentsDashboard = () => {
                                 <CheckCircle2 className="size-4 text-emerald-500" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold">5</div>
+                                <div className="text-2xl font-bold">{filedCount}</div>
                                 <p className="text-xs text-muted-foreground mt-1">Pending full utility</p>
                             </CardContent>
                         </Card>
@@ -126,36 +127,48 @@ const ProvisionalPatentsDashboard = () => {
                     <div className="space-y-4 flex-1">
                         <h3 className="text-lg font-semibold tracking-tight">Recent Applications</h3>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {mockPatents.map((patent) => (
-                                <Card key={patent.id} className="flex flex-col h-full hover:border-brand-blue/50 transition-colors cursor-pointer group">
-                                    <CardHeader className="pb-3 flex-1">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <span className={`text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap
-                                                ${patent.status === 'Draft generated' ? 'bg-slate-500/10 text-slate-500' :
-                                                patent.status === 'In Review' ? 'bg-amber-500/10 text-amber-500' :
-                                                'bg-emerald-500/10 text-emerald-500'}`}
-                                            >
-                                                {patent.status}
+                        {loading ? (
+                            <div className="flex items-center justify-center p-12">
+                                <Loader2 className="size-8 text-brand-blue animate-spin" />
+                            </div>
+                        ) : patents.length === 0 ? (
+                            <div className="p-8 text-center bg-secondary/20 rounded-lg border border-border border-dashed">
+                                <p className="text-muted-foreground">No patent drafts found. Use the AI chat to generate one!</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {patents.map((patent) => (
+                                    <Card key={patent.id} className="flex flex-col h-full hover:border-brand-blue/50 transition-colors cursor-pointer group">
+                                        <CardHeader className="pb-3 flex-1">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className={`text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap
+                                                    ${patent.status === 'Draft generated' ? 'bg-slate-500/10 text-slate-500' :
+                                                    patent.status === 'In Review' ? 'bg-amber-500/10 text-amber-500' :
+                                                    'bg-emerald-500/10 text-emerald-500'}`}
+                                                >
+                                                    {patent.status}
+                                                </span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {new Date(patent.created_at).toLocaleDateString()}
+                                                </span>
+                                            </div>
+                                            <CardTitle className="text-base leading-tight group-hover:text-brand-blue transition-colors">
+                                                {patent.title}
+                                            </CardTitle>
+                                            <CardDescription className="text-sm mt-3 line-clamp-3">
+                                                {patent.description}
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardFooter className="pt-3 border-t border-border mt-auto flex justify-between text-xs text-muted-foreground bg-secondary/20">
+                                            <span>{patent.claims_count} Claims</span>
+                                            <span className="flex items-center gap-1 font-mono uppercase">
+                                                {patent.security_tier}
                                             </span>
-                                            <span className="text-xs text-muted-foreground">{patent.date}</span>
-                                        </div>
-                                        <CardTitle className="text-base leading-tight group-hover:text-brand-blue transition-colors">
-                                            {patent.title}
-                                        </CardTitle>
-                                        <CardDescription className="text-sm mt-3 line-clamp-3">
-                                            {patent.description}
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardFooter className="pt-3 border-t border-border mt-auto flex justify-between text-xs text-muted-foreground bg-secondary/20">
-                                        <span>{patent.claims} Claims</span>
-                                        <span className="flex items-center gap-1 font-mono uppercase">
-                                            {patent.tier}
-                                        </span>
-                                    </CardFooter>
-                                </Card>
-                            ))}
-                        </div>
+                                        </CardFooter>
+                                    </Card>
+                                ))}
+                            </div>
+                        )}
                     </div>
                     
                     <div className="rounded-lg border border-border bg-card overflow-hidden mt-4">
