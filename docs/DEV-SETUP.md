@@ -3,7 +3,7 @@
 ## Quick Start
 
 ### Option 1: Double-Click (Easiest)
-Simply double-click `start-dev.bat` in the project root.
+Simply double-click `scripts/start-dev.bat`.
 
 ### Option 2: PowerShell
 ```powershell
@@ -60,7 +60,7 @@ Visit http://localhost:17117/collaboration/system-status to check the health of 
 
 ## Development Workflow
 
-1. **Start**: Run `start-dev.bat` or `.\scripts\start-dev.ps1`
+1. **Start**: Run `scripts/start-dev.bat` or `.\scripts\start-dev.ps1`
 2. **Develop**: Make changes, Vite will hot-reload automatically
 3. **Test**: Use the System Status page to verify all services
 4. **Stop**: Press `Ctrl+C` in the terminal

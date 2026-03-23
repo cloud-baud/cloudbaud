@@ -70,6 +70,7 @@ import BookingPage from './pages/BookingPage';
 import { Toaster } from './shared/ui/sonner';
 import LegalDashboard from './workspace/legal/LegalDashboard';
 import ProvisionalPatentsDashboard from './workspace/legal/ProvisionalPatentsDashboard';
+import NdaForm from './workspace/legal/NdaForm';
 
 function App() {
   console.log('App: Rendering...');
@@ -123,7 +124,7 @@ function App() {
                     {/* Legal Routes */}
                     <Route path="legal" element={<LegalDashboard />} />
                     <Route path="legal/patents" element={<ProvisionalPatentsDashboard />} />
-                    <Route path="legal/contracts" element={<PlaceholderPage />} />
+                    <Route path="legal/contracts" element={<NdaForm />} />
                     <Route path="legal/compliance" element={<PlaceholderPage />} />
 
                     {/* IT Routes */}

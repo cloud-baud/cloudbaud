@@ -8,6 +8,7 @@ import os
 import uuid
 from datetime import datetime, timedelta
 import re
+from pathlib import Path
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -272,18 +273,24 @@ if __name__ == "__main__":
     print("\n--- HACKATHON SCOUT & CALENDAR SYNC ---")
     agent = HackathonScoutAgent(themes=["Databases", "AI"])
     hackathons = agent.scan_hackathons()
+
+    repo_root = Path(__file__).resolve().parents[3]
+    data_dir = repo_root / "data"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    hackathons_json_file = data_dir / "hackathons.json"
+    hackathons_ics_file = data_dir / "hackathons.ics"
     
     print(f"\n✅ Found {len(hackathons)} Hackathons:")
     for hack in hackathons:
         print(f" - {hack['name']} ({hack['date_info']})")
     
     # 1. Save JSON
-    with open("hackathons.json", "w") as f:
+    with open(hackathons_json_file, "w", encoding="utf-8") as f:
         json.dump(hackathons, f, indent=2)
-    print("\n💾 Saved to hackathons.json")
+    print(f"\n💾 Saved to {hackathons_json_file}")
     
     # 2. Generate ICS
-    agent.calendar.generate_ics(hackathons)
+    agent.calendar.generate_ics(hackathons, filename=str(hackathons_ics_file))
     
     # 3. Sync to DB
     agent.calendar.sync_to_supabase(hackathons)

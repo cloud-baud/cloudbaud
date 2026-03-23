@@ -29,7 +29,7 @@ Write-Host "Deploying tax storage setup to TEST database..." -ForegroundColor Cy
 Write-Host "Supabase URL: $supabaseUrl" -ForegroundColor Gray
 
 # Read the SQL file
-$sqlFile = Join-Path $PSScriptRoot ".." "supabase_tax_storage_setup.sql"
+$sqlFile = Join-Path $PSScriptRoot ".." "supabase\sql\supabase_tax_storage_setup.sql"
 $sqlContent = Get-Content $sqlFile -Raw
 
 # Execute SQL using Supabase REST API

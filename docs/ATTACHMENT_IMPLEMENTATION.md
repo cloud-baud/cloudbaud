@@ -41,7 +41,7 @@ This document describes the implementation of the PDF attachment functionality f
 
 ## API Functions Created
 
-### File: `tax_document_api.sql`
+### File: `supabase/sql/tax_document_api.sql`
 
 1. **`api_register_tax_document()`** - Register document after upload
    - Parameters: `p_filename`, `p_storage_path`, `p_year`, `p_doc_type`
@@ -101,7 +101,7 @@ const attachmentInputRef = useRef(null)
 ### 1. Deploy SQL Functions to Supabase
 ```bash
 # Run the following in Supabase SQL Editor:
-# Execute: tax_document_api.sql
+# Execute: supabase/sql/tax_document_api.sql
 ```
 
 ### 2. Verify Storage Bucket Exists
@@ -123,8 +123,10 @@ Ensure the `tax-docs` storage bucket exists with proper policies:
 ## File Structure
 ```
 d:\repos\cloudbaud.com\
-├── tax_document_api.sql                    # SQL API functions (NEW)
-├── supabase_tax_storage_setup.sql          # Storage bucket setup (existing)
+├── supabase\
+│   └── sql\
+│       ├── tax_document_api.sql            # SQL API functions (NEW)
+│       └── supabase_tax_storage_setup.sql  # Storage bucket setup (existing)
 ├── src/
 │   ├── finance/
 │   │   ├── api/
@@ -136,7 +138,7 @@ d:\repos\cloudbaud.com\
 
 ## Testing Checklist
 
-- [ ] Deploy `tax_document_api.sql` to Supabase
+- [ ] Deploy `supabase/sql/tax_document_api.sql` to Supabase
 - [ ] Verify `tax-docs` storage bucket exists
 - [ ] Test attachment upload from UI
 - [ ] Verify file in Supabase Storage

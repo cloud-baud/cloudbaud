@@ -17,7 +17,7 @@ The Supabase storage bucket `tax-docs` needs to be created. Follow these steps:
 
 ## Step 2: Run the Setup Script
 
-1. Open the file: `supabase_tax_storage_setup.sql` (in the root of this project)
+1. Open the file: `supabase/sql/supabase_tax_storage_setup.sql`
 2. Copy the entire contents
 3. Paste into the Supabase SQL Editor
 4. Click **Run** (or press Ctrl+Enter)
