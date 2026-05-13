@@ -1,15 +1,14 @@
 
 import pg from 'pg';
 import path from 'path';
-import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import process from 'process';
+import { loadRootEnv } from './loadRootEnv.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load .env from root
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+loadRootEnv();
 
 const testUrl = process.env.DIRECT_URL_TEST;
 const prodUrl = process.env.VITE_SUPABASE_URL_PROD;

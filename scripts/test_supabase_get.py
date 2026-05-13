@@ -1,9 +1,9 @@
 
 import os
 import requests
-from dotenv import load_dotenv
+from load_local_env import load_local_env
 
-load_dotenv()
+load_local_env()
 
 SUPABASE_URL = os.getenv("VITE_SUPABASE_URL")
 SUPABASE_KEY = os.getenv("VITE_SUPABASE_ANON_KEY")

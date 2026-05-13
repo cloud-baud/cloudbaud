@@ -1,16 +1,25 @@
 import urllib.request
 import json
 import sys
+import os
 import pandas as pd
+from pathlib import Path
 from dotenv import dotenv_values
 
-env_vars = dotenv_values('.env')
-supabase_url = env_vars.get('VITE_SUPABASE_URL')
+_root = Path(__file__).resolve().parent.parent
+env_vars = {}
+if os.environ.get("NETLIFY") != "true":
+    for _name in (".env.test", ".env"):
+        _p = _root / _name
+        if _p.is_file():
+            env_vars = dotenv_values(_p)
+            break
+supabase_url = env_vars.get('VITE_SUPABASE_URL') or os.environ.get('VITE_SUPABASE_URL')
 # USE SERVICE ROLE KEY!
-supabase_key = env_vars.get('SUPABASE_SERVICE_ROLE_KEY')
+supabase_key = env_vars.get('SUPABASE_SERVICE_ROLE_KEY') or os.environ.get('SUPABASE_SERVICE_ROLE_KEY')
 
 if not supabase_url or not supabase_key:
-    print("Could not find supabase service role key in .env")
+    print("Could not find supabase service role key in .env.test or .env")
     sys.exit(1)
 
 df = pd.read_excel('docs/CloudBaud_CMDB.xlsx', header=None)

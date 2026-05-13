@@ -1,20 +1,20 @@
 
 import pg from 'pg';
-import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import process from 'process';
+import { loadRootEnv } from './loadRootEnv.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+loadRootEnv();
 
 const testUrl = process.env.DIRECT_URL_TEST;
 const TARGET_EMAIL = 'jish.nath@cloudbaud.com'; // The user to seed for
 
 if (!testUrl) {
-    console.error('Missing DIRECT_URL_TEST in .env');
+    console.error('Missing DIRECT_URL_TEST in .env.test (or .env)');
     process.exit(1);
 }
 

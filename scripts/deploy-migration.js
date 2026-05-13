@@ -2,20 +2,19 @@
 import pg from 'pg';
 import fs from 'fs';
 import path from 'path';
-import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import process from 'process';
+import { loadRootEnv } from './loadRootEnv.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load .env from root
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+loadRootEnv();
 
 const connectionString = process.env.DIRECT_URL_TEST;
 
 if (!connectionString) {
-    console.error('Error: DIRECT_URL_TEST is not defined in .env');
+    console.error('Error: DIRECT_URL_TEST is not defined in .env.test (or .env)');
     process.exit(1);
 }
 

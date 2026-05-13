@@ -3,9 +3,9 @@ import os
 import requests
 import json
 from collections import defaultdict
-from dotenv import load_dotenv
+from load_local_env import load_local_env
 
-load_dotenv()
+load_local_env()
 
 SUPABASE_URL = os.getenv("VITE_SUPABASE_URL_TEST") or os.getenv("VITE_SUPABASE_URL")
 SUPABASE_KEY = os.getenv("VITE_SUPABASE_SERVICE_ROLE_KEY_TEST") or os.getenv("VITE_SUPABASE_SERVICE_ROLE_KEY_PROD") or os.getenv("VITE_SUPABASE_ANON_KEY_TEST")

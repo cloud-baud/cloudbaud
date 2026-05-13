@@ -11,6 +11,7 @@ import FinOpsDashboard from './finance/dashboards/FinOpsDashboard';
 // import { SettingsPage } from 'synolic.core/frontend/components/features/settings/SettingsPage'; // DEPRECATED Legcay
 import SettingsPage from './workspace/settings/UniversalSettingsPage'; // New Universal Standard
 import PlaceholderPage from './workspace/PlaceholderPage';
+import PitchDeckPage from './workspace/PitchDeckPage';
 import ContextLayout from './workspace/ContextLayout';
 import TaxMultiYearSummary from './finance/dashboards/TaxMultiYearSummary';
 import TaxSingleYear from './finance/dashboards/TaxSingleYear';
@@ -65,6 +66,7 @@ import MarketingDashboard from './workspace/marketing/MarketingDashboard';
 import SystemStatus from './pages/SystemStatus';
 import AccessManagement from './workspace/admin/AccessManagement';
 import CmdbDashboard from './workspace/it/CmdbDashboard';
+import CmdbDashboardPreview from './workspace/it/CmdbDashboardPreview';
 import CalendarPage from './workspace/productivity/CalendarPage';
 import BookingPage from './pages/BookingPage';
 import { Toaster } from './shared/ui/sonner';
@@ -96,7 +98,7 @@ function App() {
 
                     {/* Placeholder Routes for Sidebar Items */}
                     <Route path="tasks" element={<PlaceholderPage />} />
-                    <Route path="deck" element={<PlaceholderPage />} />
+                    <Route path="deck" element={<PitchDeckPage />} />
                     <Route path="interview" element={<PlaceholderPage />} />
                     <Route path="fundraising" element={<PlaceholderPage />} />
                     <Route path="engineering" element={<PlaceholderPage />} />
@@ -129,6 +131,9 @@ function App() {
 
                     {/* IT Routes */}
                     <Route path="it/cmdb" element={<CmdbDashboard />} />
+                    {import.meta.env?.DEV && (
+                      <Route path="it/cmdb-preview" element={<CmdbDashboardPreview />} />
+                    )}
                     <Route path="it" element={<Navigate to="it/cmdb" replace />} />
 
                     {/* Admin Routes */}

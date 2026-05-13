@@ -20,12 +20,13 @@ create policy "Authenticated read access"
 on public.cmdb_applications for select
 using (auth.role() = 'authenticated');
 
--- Policy: Admin write access (Jishnu only for now, or via role)
+-- Policy: Authenticated users can perform full CRUD
 drop policy if exists "Admin write access" on public.cmdb_applications;
-create policy "Admin write access"
+drop policy if exists "Authenticated write access" on public.cmdb_applications;
+create policy "Authenticated write access"
 on public.cmdb_applications for all
-using (auth.jwt() ->> 'email' = 'jish.nath@cloudbaud.com')
-with check (auth.jwt() ->> 'email' = 'jish.nath@cloudbaud.com');
+using (auth.role() = 'authenticated')
+with check (auth.role() = 'authenticated');
 
 
 -- Initial Seed Data

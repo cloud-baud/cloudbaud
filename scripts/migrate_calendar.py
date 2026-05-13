@@ -1,10 +1,10 @@
 
 import os
 import psycopg2
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+from load_local_env import load_local_env
+
+load_local_env()
 
 # Check for production/fallback first, then test/dev
 # We want to enable this for the *running* environment, which seems to be TEST/DEV locally.
@@ -13,7 +13,7 @@ load_dotenv()
 
 DB_URL = os.getenv("DIRECT_URL_TEST")
 if not DB_URL:
-    print("DIRECT_URL_TEST not found in .env via load_dotenv (or it's commented out in a way python-dotenv doesn't catch perfectly).") 
+    print("DIRECT_URL_TEST not found in .env.test / .env via load_local_env.") 
     # Fallback: maybe manually parse the .env if os.getenv fails due to parsing issues (unlikely with load_dotenv)
     # But wait, line 26 showed `DIRECT_URL_TEST="..."`.
     pass

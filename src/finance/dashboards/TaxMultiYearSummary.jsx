@@ -1471,6 +1471,7 @@ const TaxMultiYearSummary = () => {
                                             const rowId = `${section.id}-${rowIndex}`;
                                             const h = rowHeights[rowId];
                                             const isChecklist = section.id === 'checklist' || row.isChecklist;
+                                            const rowLabel = typeof row.label === 'string' ? row.label : '';
 
                                             return (
                                                 <tr key={rowIndex} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" style={{ height: h ? `${h}px` : 'auto' }}>
@@ -1509,7 +1510,7 @@ const TaxMultiYearSummary = () => {
                                                                 </div>
                                                                 {/* Label */}
                                                                 <span className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
-                                                                    {row.label}
+                                                                    {rowLabel}
                                                                 </span>
                                                             </div>
                                                         </td>
@@ -1582,12 +1583,12 @@ const TaxMultiYearSummary = () => {
                                                                 {/* ROW LABEL CELL - LEFT ALIGNED */}
                                                                 <div className={cn("w-full h-full flex items-center pl-2", colWidths.label === 'auto' ? 'whitespace-nowrap' : 'truncate')}>
                                                                     <EditableCell
-                                                                        value={row.label}
+                                                                        value={rowLabel}
                                                                         isLocked={isCellLocked(section.id, rowIndex, 'label')}
                                                                         onSave={(val) => handleCellUpdate(section.id, rowIndex, 'label', val)}
                                                                     />
                                                                 </div>
-                                                                {(row.label.includes('W2 Wages') || row.label.includes('Child Education')) && (
+                                                                {(rowLabel.includes('W2 Wages') || rowLabel.includes('Child Education')) && (
                                                                     <span className="absolute top-0 right-0 border-t-[6px] border-r-[6px] border-t-red-500 border-r-transparent transform rotate-0 pointer-events-none" />
                                                                 )}
                                                                 {/* Row resize handle (bottom) */}

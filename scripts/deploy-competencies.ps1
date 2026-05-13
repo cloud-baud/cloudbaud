@@ -18,14 +18,27 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 # Load environment variables
-$envFile = if ($Environment -eq 'production') { '.env.production' } else { '.env' }
-Write-Host "[INFO] Loading environment from: $envFile" -ForegroundColor Blue
+$root = Resolve-Path (Join-Path $PSScriptRoot "..")
+if ($Environment -eq 'production') {
+    $candidates = @((Join-Path $root '.env.production'))
+} else {
+    $candidates = @((Join-Path $root '.env.test'), (Join-Path $root '.env'))
+}
+$envFile = $null
+foreach ($c in $candidates) {
+    if (Test-Path $c) { $envFile = $c; break }
+}
 
-if (!(Test-Path $envFile)) {
-    Write-Host "[ERROR] Environment file not found: $envFile" -ForegroundColor Red
+if (-not $envFile) {
+    if ($Environment -eq 'production') {
+        Write-Host "[ERROR] No .env.production at repo root. Production deploys use Netlify env; for local prod runs create .env.production or set variables in this shell." -ForegroundColor Red
+    } else {
+        Write-Host "[ERROR] No .env.test or .env at repo root. Copy .env.example to .env.test and fill values." -ForegroundColor Red
+    }
     exit 1
 }
 
+Write-Host "[INFO] Loading environment from: $envFile" -ForegroundColor Blue
 # Read Supabase credentials from .env
 $envVars = Get-Content $envFile | ForEach-Object {
     if ($_ -match '^VITE_SUPABASE_URL=(.+)$') {

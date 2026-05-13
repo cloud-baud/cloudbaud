@@ -1,11 +1,11 @@
-import dotenv from 'dotenv';
 import pg from 'pg';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import process from 'process';
+import { loadRootEnv } from './loadRootEnv.js';
 
-dotenv.config();
+loadRootEnv();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,7 +17,7 @@ const deployFunction = async () => {
     const connectionString = process.env.DIRECT_URL_TEST || process.env.DIRECT_URL || process.env.DATABASE_URL;
     
     if (!connectionString) {
-        console.error('No DIRECT_URL or DATABASE_URL found in .env');
+        console.error('No DIRECT_URL or DATABASE_URL found in .env.test (or .env)');
         process.exit(1);
     }
 

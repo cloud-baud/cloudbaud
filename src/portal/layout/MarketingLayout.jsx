@@ -5,7 +5,7 @@ import Footer from '@/components/layout/Footer';
 
 const MarketingLayout = () => {
     return (
-        <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+        <div className="min-h-screen bg-background text-foreground transition-colors duration-300 overflow-hidden">
             <Header />
             <main>
                 <Outlet />

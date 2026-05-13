@@ -1,10 +1,10 @@
-import dotenv from 'dotenv';
 import pg from 'pg';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import process from 'process';
+import { loadRootEnv } from './loadRootEnv.js';
 
-dotenv.config();
+loadRootEnv();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,7 +19,7 @@ const resetCOA = async () => {
     const dbPassword = env.VITE_SUPABASE_DB_PASSWORD_TEST || env.VITE_SUPABASE_DB_PASSWORD_PROD;
 
     if (!projectUrl || !dbPassword) {
-        console.error("❌ Missing Supabase credentials in .env");
+        console.error("❌ Missing Supabase credentials in .env.test (or .env)");
         process.exit(1);
     }
 

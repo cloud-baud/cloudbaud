@@ -4,10 +4,11 @@
   "version": "0.0.2",
   "type": "module",
   "scripts": {
-    "dev": "npx --yes kill-port 17117 && vite",
+    "dev": "npx --yes kill-port 17117 && vite --mode test",
     "build": "vite build",
+    "build:local": "vite build --mode test",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview --mode test"
   },
   "dependencies": {
     "@azure/msal-browser": "^5.1.0",

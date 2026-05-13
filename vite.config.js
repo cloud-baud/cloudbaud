@@ -14,6 +14,8 @@ const packageJson = JSON.parse(
   readFileSync(new URL('./package.json', import.meta.url))
 );
 
+// Local dev & preview load `.env.test` via `--mode test` (see package.json).
+// Netlify production builds use `vite build` (production mode) + dashboard env only.
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
@@ -24,6 +26,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@common": path.resolve(__dirname, "../Synolic.Core/frontend/components"),
       "synolic.core": path.resolve(__dirname, "../synolic.core"),
       "@synolic.core": path.resolve(__dirname, "../synolic.core/frontend/components/features"),
       "react": path.resolve(__dirname, "./node_modules/react"),

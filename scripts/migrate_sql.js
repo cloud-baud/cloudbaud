@@ -1,22 +1,13 @@
 import pg from 'pg';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { loadRootEnv } from './loadRootEnv.js';
+
+loadRootEnv();
 
 const { Client } = pg;
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
-// Load Env
-const envPath = path.resolve(process.cwd(), '.env');
-const env = {};
-if (fs.existsSync(envPath)) {
-    fs.readFileSync(envPath, 'utf-8').split('\n').forEach(line => {
-        if (!line || line.startsWith('#')) return;
-        const [k, v] = line.split('=');
-        if (k && v) env[k.trim()] = v.trim().replace(/^["']|["']$/g, '');
-    });
-}
+const env = process.env;
 
 // Args
 const args = process.argv.slice(2);
@@ -32,7 +23,7 @@ let connectionString = isDev && env.DIRECT_URL_TEST
     : `postgres://postgres:${DB_PASSWORD}@db.${PROJECT_REF}.supabase.co:5432/postgres`;
 
 if (!DB_PASSWORD && !env.DIRECT_URL_TEST) {
-    console.error('Missing DB Password in .env');
+    console.error('Missing DB Password in .env.test (or .env)');
     process.exit(1);
 }
 // Updated to use direct connection string format: db.[ref].supabase.co
