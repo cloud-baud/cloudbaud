@@ -47,7 +47,15 @@ const Header = () => {
         ]);
 
         if (navRes.data) {
-          setServices(navRes.data.map(item => ({ name: item.label, href: item.path })));
+          const filteredNav = navRes.data.filter((item) => {
+            const label = (item.label || '').toLowerCase();
+            const path = (item.path || '').toLowerCase();
+
+            // Remove Methodology/Metholody and Resource links from homepage nav.
+            return !label.includes('methodology') && !label.includes('metholody') && !label.includes('resource') && !path.includes('resource');
+          });
+
+          setServices(filteredNav.map(item => ({ name: item.label, href: item.path })));
         }
         
         if (indRes.data) {

@@ -1,59 +1,49 @@
-# Supabase Email Configuration (Zoho Mail)
+# Supabase Email Configuration (Resend)
 
-This guide details how to configure Zoho Mail as the custom SMTP provider for Supabase to send Magic Links and other transactional emails.
+This guide describes how to use **Resend** as the custom SMTP provider for Supabase (magic links, confirmations, and other auth email). DNS and sending domain should be **verified in the Resend dashboard** before relying on production deliverability.
 
-## 1. Zoho Mail SMTP Settings
+## 1. Resend SMTP settings (Supabase)
 
-Go to your **[Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/smtp)** > **Settings** > **Authentication** > **SMTP Settings**.
+Go to **[Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/smtp)** → **Project Settings** → **Authentication** → **SMTP Settings**.
 
-Enable **Custom SMTP** and use the following settings:
+Enable **Custom SMTP** and use:
 
 | Setting | Value | Notes |
 | :--- | :--- | :--- |
-| **Sender Email** | `your-email@yourdomain.com` | Must match your Zoho login email. |
-| **Sender Name** | `CloudBaud` | The name users will see in their inbox. |
-| **Host** | `smtppro.zoho.com` | Use this for **paid/domain-based** accounts. |
-| **Host (Alternative)**| `smtp.zoho.com` | Use this **ONLY** for free personal accounts (@zoho.com). |
-| **Port** | `465` | Recommended for SSL. |
-| **Minimum TLS Version** | `default` | Leave as default. |
-| **Username** | `your-email@yourdomain.com` | Your full email address. |
-| **Password** | `YOUR_APP_PASSWORD` | **Do not use your login password** (see below). |
+| **Sender email** | `noreply@yourdomain.com` (or your chosen address) | Must use a domain you added and verified in Resend. |
+| **Sender name** | `CloudBaud` | Shown in the inbox. |
+| **Host** | `smtp.resend.com` | Resend SMTP endpoint. |
+| **Port** | `465` | SSL (recommended). Alternatively `587` with STARTTLS per Resend docs. |
+| **Minimum TLS version** | default | Leave as default unless your org requires otherwise. |
+| **Username** | `resend` | Literal string `resend` (Resend SMTP auth). |
+| **Password** | Your **Resend API key** | Create under [Resend API Keys](https://resend.com/api-keys). Treat like a secret; rotate if exposed. |
 
-## 2. Generating an App Password (Required)
+Official reference: [Send emails using Supabase with SMTP](https://resend.com/docs/send-with-supabase-smtp).
 
-If you have Two-Factor Authentication (2FA) enabled on Zoho (which is highly recommended), your regular login password **will not work**. You must generate an Application-Specific Password.
+## 2. API key and environments
 
-1. Log in to your [Zoho Accounts](https://accounts.zoho.com/) panel.
-2. Navigate to **Security** in the sidebar.
-3. Click on **App Passwords**.
-4. Click **Generate New Password**.
-5. Enter an app name (e.g., "Supabase" or "CloudBaud").
-6. Copy the generated password (without spaces) and paste it into the **Password** field in Supabase.
+- **Supabase SMTP “password”** is the Resend API key used only in the Supabase dashboard (not in the front-end bundle).
+- For **Netlify** or other automation that calls Resend over HTTP, store the same key as a **server-side** env var (never `VITE_*`).
 
-## 3. Configuring Redirect URLs
+## 3. Configuring redirect URLs
 
-To ensure Magic Links work correctly in both development and production, you must whitelist your Redirect URLs.
+Go to **Authentication** → **URL Configuration** → **Redirect URLs** in Supabase.
 
-Go to **Authentication** > **URL Configuration** > **Redirect URLs** in Supabase.
+Examples (match your real URLs):
 
-Add the following (ensure they match your usage exactly):
-
-* **Development**:
-  * `http://localhost:17117/*` (Note: Zoho/Supabase might require HTTPS, see troubleshooting below)
-  * `https://localhost:17117/*` (If using SSL via local proxy)
+* **Local dev** (this app’s Vite port):
+  * `http://localhost:17117/*`
+  * `https://localhost:17117/*` (if you terminate TLS locally)
 * **Production**:
   * `https://your-production-domain.com/*`
 
-## 4. Customizing the Email Template
+## 4. Customizing the email template
 
-To brand your emails:
+1. **Authentication** → **Email Templates** → e.g. **Magic Link**.
+2. Use HTML/CSS as needed.
+3. Include **`{{ .ConfirmationURL }}`** or **`{{ .Token }}`** so sign-in links work.
 
-1. Go to **Authentication** > **Email Templates**.
-2. Select **Magic Link**.
-3. You can use standard HTML/CSS.
-4. **Crucial Variable**: You **MUST** include `{{ .ConfirmationURL }}` or `{{ .Token }}` in the body so users can log in.
-
-### Example Template Snippet
+### Example snippet
 
 ```html
 <h2>Login to CloudBaud</h2>
@@ -63,7 +53,12 @@ To brand your emails:
 </a>
 ```
 
-## Troubleshooting
+## 5. Troubleshooting
 
-* **"Redirect URL not allowed"**: Ensure the URL in your browser (`http` vs `https`) exactly matches one of the entries in your "Redirect URLs" list.
-* **Emails going to Spam**: Ensure your domain has proper **DKIM** and **SPF** records set up in your DNS settings (managed in Zoho Mail Control Panel).
+* **“Redirect URL not allowed”**: The browser URL must exactly match an allowed redirect entry (`http` vs `https`, path, port).
+* **Spam or bounces**: In Resend, confirm **domain** and **DNS** (SPF/DKIM) show verified; add any records Resend still asks for. Supabase “from” address must match that domain.
+* **SMTP auth errors**: Username must be `resend`; password is the API key, not your Resend account password.
+
+---
+
+*Previously this project documented Zoho Mail for the same Supabase SMTP screen; that path is superseded once Resend is verified and configured as above.*

@@ -56,7 +56,9 @@ const UniversalSettingsPage = () => {
         data: {
           full_name: data.fullName,
           job_title: data.jobTitle,
-          bio: data.bio
+          bio: data.bio,
+          website: data.website,
+          avatar_url: data.avatarUrl
         }
       });
       if (authError) throw authError;
@@ -74,6 +76,24 @@ const UniversalSettingsPage = () => {
       if (profileError) console.error('Failed to sync profile to DB:', profileError);
       
       toast.success('Profile updated successfully');
+    },
+
+    onUploadAvatar: async (file) => {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}_${Date.now()}.${fileExt}`;
+      const filePath = `avatars/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('assets')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('assets')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
     },
     
     onSaveAppearance: async (data) => {

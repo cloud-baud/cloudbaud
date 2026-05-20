@@ -8,7 +8,6 @@ import { useTheme } from 'next-themes';
 import { useContent } from '@/context/ContentContext';
 import SEO from '@/components/common/SEO';
 import TechnologyStack from '@/components/common/TechnologyStack';
-import ProcessTimeline from '@/components/home/ProcessTimeline';
 import TrustedBy from '@/components/home/TrustedBy';
 import PlatformDashboard from '@/components/home/PlatformDashboard';
 
@@ -327,15 +326,6 @@ const HomePage = () => {
           <TechnologyStack />
         </div>
       </section>
-
-      {/* Process Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-background transition-colors">
-        <div className="max-w-7xl mx-auto">
-          <ProcessTimeline />
-        </div>
-      </section>
-
-
 
       {/* CTA Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-950 overflow-hidden relative border-t border-slate-100 dark:border-slate-900 transition-colors">
