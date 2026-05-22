@@ -11,6 +11,7 @@
     "build:finance": "vite build --config vite.finance.config.js",
     "build:all": "npm run build && npm run build:finance",
     "build:local": "vite build --mode test",
+    "deploy": "npm run build:all && npx netlify deploy --prod",
     "lint": "eslint .",
     "preview": "vite preview --mode test",
     "resend:list": "node scripts/import_resend_inbox.js list",
