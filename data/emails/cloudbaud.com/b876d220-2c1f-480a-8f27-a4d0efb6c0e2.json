@@ -1,0 +1,56 @@
+{
+  "fetchedAt": "2026-05-22T17:44:49.774Z",
+  "targetDomain": "cloudbaud.com",
+  "message": {
+    "object": "email",
+    "id": "b876d220-2c1f-480a-8f27-a4d0efb6c0e2",
+    "to": [
+      "jish.nath@cloudbaud.com"
+    ],
+    "from": "robert.john@devsorb.tech",
+    "created_at": "2026-05-22 16:32:30.801877+00",
+    "subject": "Jishnu, quick question",
+    "message_id": "<GTBg2000000000000000000000000000000000000000000000TFG5Y400GQtOOdnAQTOsFSp5OEI6mQ@sfdc.net>",
+    "bcc": [],
+    "cc": [],
+    "reply_to": [],
+    "html": "<html>\n<head>\n\t<title></title>\n\t<meta content=\"no-referrer\" name=\"referrer\" />\n</head>\n<body>Hi Jishnu,<br />\n<br />\nWhen new software needs come up at CloudBaud, LLC., what usually drives the decision... speed, cost, control, or something else?<br />\n<br />\nDo you tend to build fully in-house, or bring in external teams when things spike?<br />\n<br />\nCurious how you think about it.<br />\n<br />\nRobert<br />\n<br />\nIf you&#39;d prefer not to receive future emails, just reply with &quot;unsub.&quot;<img alt=\"\" src=\"https://page-data-1828.my.salesforce.com/servlet/servlet.ImageServer?oid=00DKY000001qP1o&esid=018Vb00000eZHKA&from=ext\"></body>\n</html>",
+    "text": "Hi Jishnu,\n\nWhen new software needs come up at CloudBaud, LLC., what usually drives the decision... speed, cost, control, or something else?\n\nDo you tend to build fully in-house, or bring in external teams when things spike?\n\nCurious how you think about it.\n\nRobert\n\nIf you'd prefer not to receive future emails, just reply with \"unsub.\"",
+    "headers": {
+      "return-path": "[{\"value\":[{\"address\":\"robert.john=devsorb.tech__3l3ytzmjuia4nqfn.gplzfv5x1k9iqy9j@jktd8l6lnthwskwf.5dmjp.ky-1qp1o2ae.usa714.bnc.salesforce.com\",\"name\":\"\"}],\"html\":\"<span class=\\\"mp_address_group\\\"><a href=\\\"mailto:robert.john=devsorb.tech__3l3ytzmjuia4nqfn.gplzfv5x1k9iqy9j@jktd8l6lnthwskwf.5dmjp.ky-1qp1o2ae.usa714.bnc.salesforce.com\\\" class=\\\"mp_address_email\\\">robert.john=devsorb.tech__3l3ytzmjuia4nqfn.gplzfv5x1k9iqy9j@jktd8l6lnthwskwf.5dmjp.ky-1qp1o2ae.usa714.bnc.salesforce.com</a></span>\",\"text\":\"robert.john=devsorb.tech__3l3ytzmjuia4nqfn.gplzfv5x1k9iqy9j@jktd8l6lnthwskwf.5dmjp.ky-1qp1o2ae.usa714.bnc.salesforce.com\"},{\"value\":[{\"address\":\"robert.john=devsorb.tech__3l3ytzmjuia4nqfn.gplzfv5x1k9iqy9j@jktd8l6lnthwskwf.5dmjp.ky-1qp1o2ae.usa714.bnc.salesforce.com\",\"name\":\"\"}],\"html\":\"<span class=\\\"mp_address_group\\\"><a href=\\\"mailto:robert.john=devsorb.tech__3l3ytzmjuia4nqfn.gplzfv5x1k9iqy9j@jktd8l6lnthwskwf.5dmjp.ky-1qp1o2ae.usa714.bnc.salesforce.com\\\" class=\\\"mp_address_email\\\">robert.john=devsorb.tech__3l3ytzmjuia4nqfn.gplzfv5x1k9iqy9j@jktd8l6lnthwskwf.5dmjp.ky-1qp1o2ae.usa714.bnc.salesforce.com</a></span>\",\"text\":\"robert.john=devsorb.tech__3l3ytzmjuia4nqfn.gplzfv5x1k9iqy9j@jktd8l6lnthwskwf.5dmjp.ky-1qp1o2ae.usa714.bnc.salesforce.com\"}]",
+      "received": "[\"from smtp-097025fe519d34b87.core1.sfdc-8tgtt5.mta.salesforce.com (smtp-097025fe519d34b87.core1.sfdc-8tgtt5.mta.salesforce.com [18.189.138.59]) by inbound-smtp.us-east-1.amazonaws.com with SMTP id dnphpietbc78kg5i2vngmm533vv5p0uf49fcpsg1 for jish.nath@cloudbaud.com; Fri, 22 May 2026 16:32:30 +0000 (UTC)\",\"from [127.0.0.1] ([127.0.0.1:37946] helo=eaas-43.eaas.emailinfra.svc.cluster.local) by mx1.core1.sfdc-8tgtt5.mta.salesforce.com (envelope-from <robert.john=devsorb.tech__3l3ytzmjuia4nqfn.gplzfv5x1k9iqy9j@jktd8l6lnthwskwf.5dmjp.ky-1qp1o2ae.usa714.bnc.salesforce.com>) (ecelerity 4.7.0.20112 r(msys-ecelerity:salesforce/4.7/sb1)) with ESMTP id 65/53-01180-D15801A6; Fri, 22 May 2026 16:32:29 +0000\",\"from 127.0.0.1 (localhost. [127.0.0.1]) by eaas-43 (EaaS) id <GTBg2000000000000000000000000000000000000000000000TFG5Y400GQtOOdnAQTOsFSp5OEI6mQ@sfdc.net> for <\\\"jish.nath@cloudbaud.com\\\" <jish.nath@cloudbaud.com>> Fri, 22 May 2026 16:32:29 GMT (GMT)\"]",
+      "x-ses-spam-verdict": "PASS",
+      "x-ses-virus-verdict": "PASS",
+      "received-spf": "pass (spfCheck: domain of jktd8l6lnthwskwf.5dmjp.ky-1qp1o2ae.usa714.bnc.salesforce.com designates 18.189.138.59 as permitted sender) client-ip=18.189.138.59; envelope-from=robert.john=devsorb.tech__3l3ytzmjuia4nqfn.gplzfv5x1k9iqy9j@jktd8l6lnthwskwf.5dmjp.ky-1qp1o2ae.usa714.bnc.salesforce.com; helo=smtp-097025fe519d34b87.core1.sfdc-8tgtt5.mta.salesforce.com;",
+      "authentication-results": "amazonses.com; spf=pass (spfCheck: domain of jktd8l6lnthwskwf.5dmjp.ky-1qp1o2ae.usa714.bnc.salesforce.com designates 18.189.138.59 as permitted sender) client-ip=18.189.138.59; envelope-from=robert.john=devsorb.tech__3l3ytzmjuia4nqfn.gplzfv5x1k9iqy9j@jktd8l6lnthwskwf.5dmjp.ky-1qp1o2ae.usa714.bnc.salesforce.com; helo=smtp-097025fe519d34b87.core1.sfdc-8tgtt5.mta.salesforce.com; dkim=pass header.i=@devsorb.tech; dmarc=pass header.from=devsorb.tech;",
+      "x-ses-receipt": "AEFBQUFBQUFBQUFIeUlUU20waVlhSEIwbElhVmxVN2t5SWxMSXgvM01INUpWM2pSRjY1S29PR0xzb3JDY2Fyb3VUN1A3KzFsOWQySmV3dlgwamJsYTVrNmhld3hTdHlDT0tGWUNEaVFmUmh0aE9sWGNybXRJd1dyZ0FKR21LcG0wM2pneUJjajN2WC9VaTZUenhqU1NxSm1vSDV5QkVLYmw5RllIeVcyeXFOVk9oNUY0VGx1OC84b3dNNUNISEI3dUdjTittenByZU1kRzNvM29pakdtazVCVUIyeEYvRjRHT0xTMFY1akpMMm5LSCtLNXh0Mmp6WUw0U3pGRW9lZE1BN3VWZ1Z0a2ZLK3h6QUV2RTZNS3M2NGtMNUZVRG51cVJROXRvSjliY1JHT0pFWTE4dWZMTHhpM2pQbjBkTEI4cGlQVU1hNEk0RFZGQUxVUXVra0luenZJQlFGRDI2OFZGUytJUkF6bERpdkxrVTZjenNYd2xKZFFwZ0VaYUNsMm1zUWtyRm4zSVFCME90czJxVEpDQmt4bGM3a2FONjF3OXhnU3MyZnMrMnZSVXNudkVmMGgvZz09",
+      "x-ses-dkim-signature": "a=rsa-sha256; q=dns/txt; b=UE4CXCs4myHOguPTE2aWvUTYyV2HAMfTrVDHAR2Ihppvs8ut8TguxejYAV7QUl4PHLInA/pkdmJBaeEFZoyUpKzaJT6/WygK/KJC1isHAN7Cyrlft5Wc13emnuXOiFDOpj0PdTHvxrbebnzsRrm5NkXZb4JKmyVurFyxGLzF0PI=; c=relaxed/simple; s=224i4yxa5dv7c2xz3womw6peuasteono; d=amazonses.com; t=1779467550; v=1; bh=gpWT1YeRga+ycSCvS2ODTegrDfsvdWjpfiBFyCgbPf4=; h=From:To:Cc:Bcc:Subject:Date:Message-ID:MIME-Version:Content-Type:X-SES-RECEIPT;",
+      "dkim-signature": "v=1",
+      "date": "\"2026-05-22T16:32:29.000Z\"",
+      "from": "\"Robert John\" <robert.john@devsorb.tech>",
+      "to": "jish.nath@cloudbaud.com",
+      "message-id": "<GTBg2000000000000000000000000000000000000000000000TFG5Y400GQtOOdnAQTOsFSp5OEI6mQ@sfdc.net>",
+      "subject": "Jishnu, quick question",
+      "mime-version": "1.0",
+      "content-type": "multipart/alternative",
+      "priority": "normal",
+      "x-sfdc-lk": "00DKY000001qP1o",
+      "x-sfdc-user": "005KY000001KDBO",
+      "x-sender": "postmaster@salesforce.com",
+      "x-mail_abuse_inquiries": "https://www.salesforce.com/company/legal/abuse",
+      "x-sfdc-orgtype": "ACTIVE",
+      "x-sfdc-tls-norelay": "1",
+      "x-sfdc-correlation-id": "0000fkgihxng7dpy",
+      "x-sfdc-binding": "iCBT705cy8bBFz3B",
+      "x-sfdc-app": "coreapp",
+      "x-sfdc-emailcategory": "apiMassMail",
+      "x-sfdc-entityid": "00QVb00000X1rM2",
+      "x-sfdc-interface": "internal"
+    },
+    "raw": {
+      "download_url": "https://cdn.resend.app/receiving/raw/dnphpietbc78kg5i2vngmm533vv5p0uf49fcpsg1?response-content-disposition=attachment%3B+filename%3D%22dnphpietbc78kg5i2vngmm533vv5p0uf49fcpsg1%22&Expires=1779475490&Key-Pair-Id=K1EE1EYO2ZO8UR&Signature=F9b1siG-mfRi~Gj1Jrf06yT2m3-6UPiiovlk-QdHkVfJb8xp4h9LI181HPhEF6Oo2UdP8C~qjE6bKEmeyGvhTtPoXfVSsw7ylM5MFQxlnjD7LlI0H-Ml0CUaBvTXx9eJRFHQTNu8WVIW2ZKMcqc4aCgtNRW8x7GJK7oxteBH5hwpfAheQOApp~IWMzOFnpPlnRqrfF8c3NWX7unkPeLjydXAGBW1AJGrtQoTOq8~AhqnCnL2FsyZrYOcPxpX-NZvBwY-nKlBJoT0cDFQPtZ5DCBVOlpdqMKS4YU-307jJ1xX0qC6UU3CaLWkHruqkNMg6Pc8iik0bnVQrNz3uQ2ypA__",
+      "expires_at": "2026-05-22T18:44:49.654Z"
+    },
+    "attachments": []
+  }
+}

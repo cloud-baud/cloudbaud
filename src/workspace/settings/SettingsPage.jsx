@@ -1436,23 +1436,20 @@ const SettingsPage = () => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium">AI Provider</label>
-                                            <select
-                                                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                                                value={aiConfig.provider}
-                                                onChange={(e) => setAiConfig({ ...aiConfig, provider: e.target.value })}
-                                            >
-                                                <option value="ollama">Ollama (Local)</option>
-                                                <option value="openai">OpenAI (Cloud)</option>
-                                                <option value="anthropic">Anthropic (Cloud)</option>
-                                            </select>
-                                            <p className="text-xs text-muted-foreground">The "Brain" that processes your requests.</p>
+                                            {/* Locked to Ollama — no cloud LLM providers are used in this project */}
+                                            <div className="flex h-9 w-full items-center gap-2 rounded-md border border-input bg-muted/50 px-3 py-1 text-sm cursor-not-allowed select-none">
+                                                <span className="size-2 rounded-full bg-emerald-500 shrink-0" />
+                                                <span className="font-medium">Ollama (Local)</span>
+                                                <span className="ml-auto text-[10px] font-bold uppercase tracking-widest text-muted-foreground bg-muted px-1.5 py-0.5 rounded">Locked</span>
+                                            </div>
+                                            <p className="text-xs text-muted-foreground">All AI inference runs locally via Ollama. No cloud providers are used.</p>
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium">Model Name</label>
                                             <Input
                                                 value={aiConfig.model}
                                                 onChange={(e) => setAiConfig({ ...aiConfig, model: e.target.value })}
-                                                placeholder="e.g. llama3, gpt-4"
+                                                placeholder="e.g. llama3.2:3b, qwen2.5:7b, phi3.5:3.8b"
                                             />
                                         </div>
                                         <div className="space-y-2">

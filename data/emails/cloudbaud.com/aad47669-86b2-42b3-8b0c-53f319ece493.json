@@ -1,0 +1,49 @@
+{
+  "fetchedAt": "2026-05-22T17:44:49.495Z",
+  "targetDomain": "cloudbaud.com",
+  "message": {
+    "object": "email",
+    "id": "aad47669-86b2-42b3-8b0c-53f319ece493",
+    "to": [
+      "jish.nath@cloudbaud.com"
+    ],
+    "from": "derek.jackson@targetmomentum.info",
+    "created_at": "2026-05-22 16:40:29.308652+00",
+    "subject": "RE: Coffee Break in Bellevue",
+    "message_id": "<6a4878fe-c291-sl91-4171-984b-08dd45b5aad5@targetmomentum.info>",
+    "bcc": [],
+    "cc": [],
+    "reply_to": [],
+    "html": "<!DOCTYPE html>\n  <html>\n  <head>\n    <title>RE: Coffee Break in Bellevue </title>\n    <meta charset=\"utf-8\"></meta>\n     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n      </meta>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></meta>\n  </head>\n  \n  <body>\n  <div style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\" fr-original-style=\"\">Jishnu, would you like it if I bring some lunch up to your neck of the woods? What's the best food joint around your neighborhood?</div><br><br><div>Derek Jackson</div><div>Head of Growth</div><div>Key Outreach</div><br><div class=\"gmail_quote\">\n    <div>\n      On Wed, May 20, 2026 at 03:26 PM UTC Derek Jackson <<a href=\"derek.jackson@targetmomentum.info\">derek.jackson@targetmomentum.info</a>>  wrote:<br>\n    </div>\n    <blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex; border-left:1px solid rgb(204,204,204); padding-left:1ex\"><div>Greetings Jishnu - My team will be in the Bellevue area June 10 to June 12 to start our remote office with me. We'll also be visiting our partners at Tagger Media to celebrate their $140M acquisition.</div><div><br></div><div>During the last 5 years, we delivered over 45 weekly meetings for their sales team, accounting for more than 50% of their current client base, including brands like Samsung, Intel, and Ralph Lauren.</div><div><br></div><div>Would love to chat about doing something similar for Cloudbaud.</div><div><br></div><div>Coffee catch-up?</div><br><br><div>Derek Jackson</div><div>Head of Growth</div><div>Key Outreach</div></blockquote>\n    </div>\n  </body>\n  \n  </html>",
+    "text": "Jishnu, would you like it if I bring some lunch up to your neck of the woods? What's the best food joint around your neighborhood?\n\n\nDerek Jackson\nHead of Growth\nKey Outreach\n\nOn Wed, May 20, 2026 at 03:26 PM UTC Derek Jackson <derek.jackson@targetmomentum.info> wrote:\n\n> Greetings Jishnu - My team will be in the Bellevue area June 10 to June 12 to start our remote office with me. We'll also be visiting our partners at Tagger Media to celebrate their $140M acquisition.\n> \n> \n> During the last 5 years, we delivered over 45 weekly meetings for their sales team, accounting for more than 50% of their current client base, including brands like Samsung, Intel, and Ralph Lauren.\n> \n> \n> Would love to chat about doing something similar for Cloudbaud.\n> \n> \n> Coffee catch-up?\n> \n> \n> Derek Jackson\n> Head of Growth\n> Key Outreach",
+    "headers": {
+      "return-path": "[{\"value\":[{\"address\":\"derek.jackson@targetmomentum.info\",\"name\":\"\"}],\"html\":\"<span class=\\\"mp_address_group\\\"><a href=\\\"mailto:derek.jackson@targetmomentum.info\\\" class=\\\"mp_address_email\\\">derek.jackson@targetmomentum.info</a></span>\",\"text\":\"derek.jackson@targetmomentum.info\"},{\"value\":[{\"address\":\"derek.jackson@targetmomentum.info\",\"name\":\"\"}],\"html\":\"<span class=\\\"mp_address_group\\\"><a href=\\\"mailto:derek.jackson@targetmomentum.info\\\" class=\\\"mp_address_email\\\">derek.jackson@targetmomentum.info</a></span>\",\"text\":\"derek.jackson@targetmomentum.info\"}]",
+      "received": "[\"from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170]) by inbound-smtp.us-east-1.amazonaws.com with SMTP id n5s9fonmq8nuqdiblo9l6msih5kck5ah137lqoo1 for jish.nath@cloudbaud.com; Fri, 22 May 2026 16:40:28 +0000 (UTC)\",\"by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-837dfccd950so3612713b3a.0 for <jish.nath@cloudbaud.com>; Fri, 22 May 2026 09:40:28 -0700 (PDT)\",\"from ip-172-31-7-84.ap-southeast-2.compute.internal (ec2-52-64-146-229.ap-southeast-2.compute.amazonaws.com. [52.64.146.229]) by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84164e9e7e3sm2839348b3a.30.2026.05.22.09.40.25 for <jish.nath@cloudbaud.com> (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256); Fri, 22 May 2026 09:40:26 -0700 (PDT)\"]",
+      "x-ses-spam-verdict": "PASS",
+      "x-ses-virus-verdict": "PASS",
+      "received-spf": "pass (spfCheck: domain of targetmomentum.info designates 209.85.210.170 as permitted sender) client-ip=209.85.210.170; envelope-from=derek.jackson@targetmomentum.info; helo=mail-pf1-f170.google.com;",
+      "authentication-results": "amazonses.com; spf=pass (spfCheck: domain of targetmomentum.info designates 209.85.210.170 as permitted sender) client-ip=209.85.210.170; envelope-from=derek.jackson@targetmomentum.info; helo=mail-pf1-f170.google.com; dkim=pass header.i=@targetmomentum.info; dmarc=pass header.from=targetmomentum.info;",
+      "x-ses-receipt": "AEFBQUFBQUFBQUFHRWRnTlBSSm8yQXlncVlSYlhiOGlneE5TNVo0U3NBc1RsVFpHdjZWT1FwVGc2MlNVVWc3V080Yk13NTNkb0ZhRldFOXNkYjArZUNLbXR0ZW9zRWo1R2N4WlladXovakFOTG12VnFxTHY3SVJXak5JRmlZR1owSnorRXVaT2x0MzZpd1ZvOUN4THllTFRzNjhsZzZuMnAycEVNeWpSMm9Eemw2emd3SE5mekdNTlRpZko1MlBKY2NjbEVyY2J1RitIWW0xSEc2aElxOEJob0RPa3B2MXpxclNWMFdVb05LVnVyVlhBZ0c4bnpOSlRVazAzcVhmWDZxRnN6QUF6QU1MSXlQWFhFaE84dEhTdW90TWh0ZFZXa0ZLMkJjRml1LzBpbGFCdVdDOE9HRTN2Yjc5ZU1wdjFkaFZaKzdvMUZKcWc9",
+      "x-ses-dkim-signature": "a=rsa-sha256; q=dns/txt; b=S1+sRuLll9UZi+4EbcpO5IcEFcJnY+Srs2A1GwuZAl2lEuvx8j6qRQ0LP4Z6fwyZwENkv186q04bbaKJGNOVzsswf8lUtlNDMm05tyKMgIUkb7100Oq9KmILaOL869S9BsxjTASPsGynoNyQUBsy9/2JIgNoW+hi3WUvVXQ7Nqo=; c=relaxed/simple; s=224i4yxa5dv7c2xz3womw6peuasteono; d=amazonses.com; t=1779468029; v=1; bh=oDurSe31pCGnTb8iAtc/S5EvOGEGGyZf8etfDwAKuTQ=; h=From:To:Cc:Bcc:Subject:Date:Message-ID:MIME-Version:Content-Type:X-SES-RECEIPT;",
+      "dkim-signature": "v=1",
+      "x-google-dkim-signature": "v=1; a=rsa-sha256; c=relaxed/relaxed; d=1e100.net; s=20251104; t=1779468027; x=1780072827; h=mime-version:date:message-id:subject:references:in-reply-to:to:from :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id :reply-to; bh=Kvf5QST+B+07n5E8mCe6IHUewPiHGKbHR+Q6IpmuB6s=; b=jvlEqr2q9oQIkHLFiAnZImogZpfMspeTwR7sIwvVMUdC6vW3+JQUANdUvV1pK7tbcc +yMiZ6iA+rNjgXLOD95U2R8MppWN3Ab/dyiU37fO6jFAURZGTYCr5fSA5Q3v0md3mcMB bPwPIq12fQWWU7HFyGlZQQ7ExTjwNPScRNcRd9c7d0ULl/77w9NDDIml5MFdn9WVUvyi kCjdEyhCLhDM6kD6q1hqKv54ZPRjNHb95eeYAmpmitLqbEjmt2w6mf5rIHOI4qA0TTb7 wq+yDjzOBk2rJLHXa2bhC9aH6y+JDpDddtqElemFbxCuwsRjScQ8HPXyBhWX05DFgk1i s7kw==",
+      "x-gm-message-state": "AOJu0YwksolIzUb23Xi7UQkrXJjCF5/XO9xkXNFrF4dqR11NPMLTljbb HyMsFERYpGP3gK36+N2XGLPaaMMDQbNjURTZnG0wDDoGsxaVKNdVafaTMvgCG56/n+Yc6QcGHoA RXnIBtQ==",
+      "x-gm-gg": "Acq92OEAbKwRgw/LAXRHWai6iOj1I1d4m3PPVsohdsymtO4duMP393CYXrTcxc5VwOC 5/igWGS51GuDE492U9FrfYBGdf9PWI6Kre5D9GONJYt7xfs7OKMizUKVv6T6Btenys//+zsisKv z8owNpjigy1RxssVu9tTsYRl032bgdu5wGRjLeLG5ELyrTvMVOsG8pBO6cdydhwEspA65cDhJAX VCAHcK844EaYTx9hYYSxyP6rTbT/f+e7f2xj9t4Fm3kz4QFPaxf54sso73I1GPvnFXx0zKAcvyQ W6teC3JuCTJh0jdSelgGQashUeAaS1Knd+/njzrZ1/OOPWyg47m00dlOg7WL1abkU21jaF8ZjfO UOz8zqF4tR69/H183K424MAFxs3Fga0VcVABfdvlwFRDGjv0eR6N05XPlFqx7d6UBq1h8yIHQc3 EREfFrde6mzw5X7/hCNxLDF9SJ6kNTuX0irIRDabnhT0kyhgg+xJAv0r2l2zfMnpH3g1WK6/yAE GLMQEC4Kf4tlUvy+cjtPgaLV/sAAx1qoTYrlLa6su/M5gJHh5tHukt8YIzYBDvXxz642DjRrjzc xNXXp/4RRdkunOwM+RgXUDnc",
+      "x-received": "by 2002:a05:6a00:438b:b0:82c:9f7e:518c with SMTP id d2e1a72fcca58-8415f32e17amr4419597b3a.25.1779468026916; Fri, 22 May 2026 09:40:26 -0700 (PDT)",
+      "from": "\"Derek Jackson\" <derek.jackson@targetmomentum.info>",
+      "to": "jish.nath@cloudbaud.com",
+      "in-reply-to": "<f3311766-d3c3-sl84-4d27-9adc-51628f1c3470@targetmomentum.info>",
+      "references": "<f3311766-d3c3-sl84-4d27-9adc-51628f1c3470@targetmomentum.info>",
+      "subject": "RE: Coffee Break in Bellevue",
+      "message-id": "<6a4878fe-c291-sl91-4171-984b-08dd45b5aad5@targetmomentum.info>",
+      "date": "\"2026-05-22T16:40:23.000Z\"",
+      "mime-version": "1.0",
+      "content-type": "multipart/alternative"
+    },
+    "raw": {
+      "download_url": "https://cdn.resend.app/receiving/raw/n5s9fonmq8nuqdiblo9l6msih5kck5ah137lqoo1?response-content-disposition=attachment%3B+filename%3D%22n5s9fonmq8nuqdiblo9l6msih5kck5ah137lqoo1%22&Expires=1779475489&Key-Pair-Id=K1EE1EYO2ZO8UR&Signature=rJnEiXoGZ4GcDYGt3N~HlM4t0xwi8Gkisg6E1Kg0k4JJfnGogLZ3RINJ~Rt79y29CUxLYyvSbuynLJoNQwFihGvLfpss9ydh96YDbu5gL~2G5km~Osog9gcruYMWwtw6ck76xhs~XJ1sz0zTaE0-MyzYLPuHMqocy2KzDX80N2WhX0YSTPApT~w~~XhGhUGtdt36PFoGuT09EbsJbDZIbcIYsASE2CunKqOMTLahx~T~onj-rRzL~tOma83DlXXxSF-6XtvLE2i1hov3Iwv651l1qpiY2CVHuSF7QzB3K8mOQOjlJWhiFDzNjyKMuDd8jgSmlWQI8h-iBPFzO8LCNw__",
+      "expires_at": "2026-05-22T18:44:49.328Z"
+    },
+    "attachments": []
+  }
+}

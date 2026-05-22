@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { StandardInbox } from 'synolic.core';
+import { StandardInbox, StandardRibbon } from 'synolic.core';
+import { User, FileText, Paperclip, Tag, Send, Mail, Flag, AlertTriangle, Plus, Layers, Inbox, Search, Wrench, XSquare } from 'lucide-react';
 
 const INBOX_LIST_PATH = '/data/emails/cloudbaud.com/inbox-list.json';
 
@@ -72,6 +73,19 @@ export default function InboxViewerPage() {
   const [error, setError] = useState('');
   const [messages, setMessages] = useState([]);
   const [selectedMessageId, setSelectedMessageId] = useState('');
+
+  // Outlook Ribbon active states
+  const [activeRibbonTab, setActiveRibbonTab] = useState('Search');
+  const [onlyHasAttachments, setOnlyHasAttachments] = useState(false);
+  const [unreadOnly, setUnreadOnly] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [scopeFilter, setScopeFilter] = useState('current_mailbox');
+  const [flaggedOnly, setFlaggedOnly] = useState(false);
+  const [importantOnly, setImportantOnly] = useState(false);
+  const [subjectFilterActive, setSubjectFilterActive] = useState(false);
+  const [senderFilterActive, setSenderFilterActive] = useState(false);
+  const [ribbonSearchQuery, setRibbonSearchQuery] = useState('');
+
 
   async function loadInboxList() {
     setLoading(true);
@@ -170,6 +184,326 @@ export default function InboxViewerPage() {
 
   const folders = useMemo(() => toFolderCounts(messages), [messages]);
 
+  // Ribbon filtering layer
+  const processedMessages = useMemo(() => {
+    let list = messages;
+
+    // 1. Attachment Filter
+    if (onlyHasAttachments) {
+      list = list.filter((m) => m.attachments && m.attachments.length > 0);
+    }
+
+    // 2. Unread Filter
+    if (unreadOnly) {
+      list = list.filter((m) => m.unread);
+    }
+
+    // 3. Category Filter
+    if (categoryFilter !== 'all') {
+      list = list.filter((m) => String(m.category || 'General').toLowerCase() === categoryFilter.toLowerCase());
+    }
+
+    // 4. Flagged & Important Filters
+    if (flaggedOnly) {
+      list = list.filter((m) => /(invoice|payment|tax|w2|billing|receipt|bank|payroll|finance|action|urgent|verify|flag|todo|please)/i.test(m.subject + ' ' + m.body));
+    }
+    if (importantOnly) {
+      list = list.filter((m) => m.category === 'Security' || m.category === 'Finance');
+    }
+
+    // 5. Scope filter simulation
+    if (scopeFilter === 'current_folder') {
+      list = list.filter((m) => m.folderId === 'inbox');
+    }
+
+    return list;
+  }, [messages, onlyHasAttachments, unreadOnly, categoryFilter, flaggedOnly, importantOnly, scopeFilter]);
+
+  // High-fidelity Office-like Ribbon Config
+  const searchRibbonConfig = useMemo(() => {
+    return [
+      { id: 'File', label: 'File', groups: [] },
+      { id: 'Home', label: 'Home', groups: [] },
+      { id: 'Send / Receive', label: 'Send / Receive', groups: [] },
+      { id: 'Folder', label: 'Folder', groups: [] },
+      { id: 'View', label: 'View', groups: [] },
+      { id: 'Developer', label: 'Developer', groups: [] },
+      { id: 'Help', label: 'Help', groups: [] },
+      {
+        id: 'Search',
+        label: 'Search',
+        groups: [
+          {
+            id: 'Refine',
+            label: 'Refine',
+            columns: [
+              {
+                id: 'RefineCol1',
+                items: [
+                  {
+                    id: 'from_filter',
+                    label: 'From',
+                    size: 'large',
+                    icon: User,
+                    active: senderFilterActive,
+                    onClick: () => {
+                      const input = window.prompt("Enter sender name or email keyword to search:");
+                      if (input !== null) {
+                        setRibbonSearchQuery(input);
+                        setSenderFilterActive(!!input);
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                id: 'RefineCol2',
+                items: [
+                  {
+                    id: 'subject_filter',
+                    label: 'Subject',
+                    size: 'large',
+                    icon: FileText,
+                    active: subjectFilterActive,
+                    onClick: () => {
+                      const input = window.prompt("Enter subject keyword to search:");
+                      if (input !== null) {
+                        setRibbonSearchQuery(input);
+                        setSubjectFilterActive(!!input);
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                id: 'RefineCol3',
+                items: [
+                  {
+                    id: 'attachments_filter',
+                    label: 'Has Attachments',
+                    size: 'large',
+                    icon: Paperclip,
+                    active: onlyHasAttachments,
+                    onClick: () => setOnlyHasAttachments(prev => !prev)
+                  }
+                ]
+              },
+              {
+                id: 'RefineCol4',
+                items: [
+                  {
+                    id: 'categorized_filter',
+                    label: 'Categorized',
+                    type: 'dropdown',
+                    size: 'large',
+                    icon: Tag,
+                    active: categoryFilter !== 'all',
+                    dropdownItems: [
+                      { id: 'cat_all', label: 'All Categories', active: categoryFilter === 'all', onClick: () => setCategoryFilter('all') },
+                      { id: 'cat_fin', label: 'Finance', active: categoryFilter === 'Finance', onClick: () => setCategoryFilter('Finance') },
+                      { id: 'cat_rec', label: 'Recruiting', active: categoryFilter === 'Recruiting', onClick: () => setCategoryFilter('Recruiting') },
+                      { id: 'cat_sec', label: 'Security', active: categoryFilter === 'Security', onClick: () => setCategoryFilter('Security') },
+                      { id: 'cat_sal', label: 'Sales', active: categoryFilter === 'Sales', onClick: () => setCategoryFilter('Sales') },
+                      { id: 'cat_per', label: 'Personal', active: categoryFilter === 'Personal', onClick: () => setCategoryFilter('Personal') },
+                      { id: 'cat_gen', label: 'General', active: categoryFilter === 'General', onClick: () => setCategoryFilter('General') },
+                    ]
+                  }
+                ]
+              },
+              {
+                id: 'RefineCol5',
+                items: [
+                  {
+                    id: 'sent_to_filter',
+                    label: 'Sent To',
+                    type: 'dropdown',
+                    size: 'small',
+                    icon: Send,
+                    dropdownItems: [
+                      { id: 'st_me', label: 'Sent to Me', onClick: () => setRibbonSearchQuery('to:me') },
+                      { id: 'st_not_me', label: 'Not Sent to Me', onClick: () => setRibbonSearchQuery('to:others') },
+                    ]
+                  },
+                  {
+                    id: 'unread_filter',
+                    label: 'Unread',
+                    type: 'button',
+                    size: 'small',
+                    icon: Mail,
+                    active: unreadOnly,
+                    onClick: () => setUnreadOnly(prev => !prev)
+                  }
+                ]
+              },
+              {
+                id: 'RefineCol6',
+                items: [
+                  {
+                    id: 'flagged_filter',
+                    label: 'Flagged',
+                    type: 'button',
+                    size: 'small',
+                    icon: Flag,
+                    active: flaggedOnly,
+                    onClick: () => setFlaggedOnly(prev => !prev)
+                  },
+                  {
+                    id: 'important_filter',
+                    label: 'Important',
+                    type: 'button',
+                    size: 'small',
+                    icon: AlertTriangle,
+                    active: importantOnly,
+                    onClick: () => setImportantOnly(prev => !prev)
+                  },
+                  {
+                    id: 'more_filter',
+                    label: 'More',
+                    type: 'dropdown',
+                    size: 'small',
+                    icon: Plus,
+                    dropdownItems: [
+                      { id: 'more_cc', label: 'CC\'d to Me', onClick: () => setRibbonSearchQuery('cc:me') },
+                      { id: 'more_bcc', label: 'BCC\'d to Me', onClick: () => setRibbonSearchQuery('bcc:me') },
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'Scope',
+            label: 'Scope',
+            columns: [
+              {
+                id: 'ScopeCol1',
+                items: [
+                  {
+                    id: 'all_mailboxes',
+                    label: 'All Mailboxes',
+                    size: 'large',
+                    icon: Layers,
+                    active: scopeFilter === 'all_mailboxes',
+                    onClick: () => setScopeFilter('all_mailboxes')
+                  }
+                ]
+              },
+              {
+                id: 'ScopeCol2',
+                items: [
+                  {
+                    id: 'current_mailbox',
+                    label: 'Current Mailbox',
+                    size: 'large',
+                    icon: Inbox,
+                    active: scopeFilter === 'current_mailbox',
+                    onClick: () => setScopeFilter('current_mailbox')
+                  }
+                ]
+              },
+              {
+                id: 'ScopeCol3',
+                items: [
+                  {
+                    id: 'scope_curr_folder',
+                    label: 'Current Folder',
+                    type: 'radio',
+                    size: 'small',
+                    checked: scopeFilter === 'current_folder',
+                    onClick: () => setScopeFilter('current_folder')
+                  },
+                  {
+                    id: 'scope_subfolders',
+                    label: 'Subfolders',
+                    type: 'radio',
+                    size: 'small',
+                    checked: scopeFilter === 'subfolders',
+                    onClick: () => setScopeFilter('subfolders')
+                  },
+                  {
+                    id: 'scope_all_items',
+                    label: 'All Outlook Items',
+                    type: 'radio',
+                    size: 'small',
+                    checked: scopeFilter === 'all_outlook',
+                    onClick: () => setScopeFilter('all_outlook')
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'Options',
+            label: 'Options',
+            columns: [
+              {
+                id: 'OptionsCol1',
+                items: [
+                  {
+                    id: 'recent_searches',
+                    label: 'Recent Searches',
+                    type: 'dropdown',
+                    size: 'large',
+                    icon: Search,
+                    dropdownItems: [
+                      { id: 'rec_1', label: 'Tax invoices', onClick: () => setRibbonSearchQuery('invoice') },
+                      { id: 'rec_2', label: 'LinkedIn updates', onClick: () => setRibbonSearchQuery('linkedin') },
+                      { id: 'rec_3', label: 'Resend integration', onClick: () => setRibbonSearchQuery('resend') },
+                    ]
+                  }
+                ]
+              },
+              {
+                id: 'OptionsCol2',
+                items: [
+                  {
+                    id: 'search_tools',
+                    label: 'Search Tools',
+                    type: 'dropdown',
+                    size: 'large',
+                    icon: Wrench,
+                    dropdownItems: [
+                      { id: 'st_advanced', label: 'Advanced Find...', onClick: () => alert('Advanced Search dialog activated') },
+                      { id: 'st_options', label: 'Search Options...', onClick: () => alert('Search settings opened') },
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'Close',
+            label: 'Close',
+            columns: [
+              {
+                id: 'CloseCol1',
+                items: [
+                  {
+                    id: 'close_search',
+                    label: 'Close Search',
+                    size: 'large',
+                    icon: XSquare,
+                    onClick: () => {
+                      setOnlyHasAttachments(false);
+                      setUnreadOnly(false);
+                      setCategoryFilter('all');
+                      setScopeFilter('current_mailbox');
+                      setFlaggedOnly(false);
+                      setImportantOnly(false);
+                      setSubjectFilterActive(false);
+                      setSenderFilterActive(false);
+                      setRibbonSearchQuery('');
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ];
+  }, [senderFilterActive, subjectFilterActive, onlyHasAttachments, categoryFilter, unreadOnly, flaggedOnly, importantOnly, scopeFilter]);
+
   function handleReply(message) {
     const cmd = `npm run resend:reply -- ${message.id} \"Thanks for your email.\"`;
     navigator.clipboard?.writeText(cmd);
@@ -210,23 +544,33 @@ export default function InboxViewerPage() {
   }
 
   return (
-    <StandardInbox
-      className="h-full"
-      messages={messages}
-      selectedMessageId={selectedMessageId}
-      folders={folders}
-      externalSearchQuery={workspaceSearchQuery}
-      hideSearchBox
-      onSelectMessage={(message) => {
-        setSelectedMessageId(message.id);
-        loadMessageDetails(message.id);
-      }}
-      onRefresh={loadInboxList}
-      onReply={handleReply}
-      onReplyAll={handleReplyAll}
-      onForward={handleForward}
-      onMarkSpam={handleMarkSpam}
-      emptyText="No emails in this mailbox yet."
-    />
+    <div className="flex h-full flex-col overflow-hidden bg-neutral-100 dark:bg-neutral-900">
+      <StandardRibbon
+        tabs={searchRibbonConfig}
+        activeTabId={activeRibbonTab}
+        onTabChange={setActiveRibbonTab}
+      />
+      <div className="flex-1 min-h-0">
+        <StandardInbox
+          className="h-full"
+          messages={processedMessages}
+          selectedMessageId={selectedMessageId}
+          folders={folders}
+          externalSearchQuery={ribbonSearchQuery || workspaceSearchQuery}
+          hideSearchBox
+          onSelectMessage={(message) => {
+            setSelectedMessageId(message.id);
+            loadMessageDetails(message.id);
+          }}
+          onRefresh={loadInboxList}
+          onReply={handleReply}
+          onReplyAll={handleReplyAll}
+          onForward={handleForward}
+          onMarkSpam={handleMarkSpam}
+          emptyText="No emails matched your active Ribbon filters."
+        />
+      </div>
+    </div>
   );
+
 }

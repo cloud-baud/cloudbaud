@@ -1,0 +1,45 @@
+{
+  "fetchedAt": "2026-05-22T17:44:48.587Z",
+  "targetDomain": "cloudbaud.com",
+  "message": {
+    "object": "email",
+    "id": "b1b7100a-8865-4af2-8874-6c9ede38d8a8",
+    "to": [
+      "jish.nath@cloudbaud.com"
+    ],
+    "from": "noreply@cloudbaud.com",
+    "created_at": "2026-05-22 17:29:01.301864+00",
+    "subject": "Your Magic Link",
+    "message_id": "<0100019e50bbb786-8a2f4ee0-d41d-4c7c-bb2b-c7553d768a3f-000000@email.amazonses.com>",
+    "bcc": [],
+    "cc": [],
+    "reply_to": [],
+    "html": "<h2>Login to CloudBaud</h2>\n<p>To prevent security scanners in your email app from invalidating your one-time link, please click the button below to complete your secure login:</p>\n\n<a href=\"http://localhost:17117/auth/confirm?token_hash=fce6e82a46766e63c5f5c3a604ffcc6cd76a57d18ef2e15e4f6b864d&type=magiclink\" \n   style=\"display: inline-block; padding: 12px 24px; background: linear-gradient(to right, #2563EB, #4F46E5); color: white; font-weight: bold; text-decoration: none; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);\">\n  Verify & Sign In\n</a>\n\n<p style=\"margin-top: 20px; font-size: 12px; color: #64748B;\">\n  If the button above does not work, copy and paste the following URL into your browser:<br>\n  http://localhost:17117/auth/confirm?token_hash=fce6e82a46766e63c5f5c3a604ffcc6cd76a57d18ef2e15e4f6b864d&type=magiclink\n</p>\n",
+    "text": "LOGIN TO CLOUDBAUD\n\nTo prevent security scanners in your email app from invalidating your one-time\nlink, please click the button below to complete your secure login:\n\nVerify & Sign In\n[http://localhost:17117/auth/confirm?token_hash=fce6e82a46766e63c5f5c3a604ffcc6cd76a57d18ef2e15e4f6b864d&type=magiclink]\n\nIf the button above does not work, copy and paste the following URL into your\nbrowser:\nhttp://localhost:17117/auth/confirm?token_hash=fce6e82a46766e63c5f5c3a604ffcc6cd76a57d18ef2e15e4f6b864d&type=magiclink",
+    "headers": {
+      "return-path": "0100019e50bbb786-8a2f4ee0-d41d-4c7c-bb2b-c7553d768a3f-000000@send.cloudbaud.com",
+      "received": "from a9-32.smtp-out.amazonses.com (a9-32.smtp-out.amazonses.com [54.240.9.32]) by inbound-smtp.us-east-1.amazonaws.com with SMTP id ccotrhd1ghovua24jmbggndo5n66tce1d1hv3jo1 for jish.nath@cloudbaud.com; Fri, 22 May 2026 17:29:00 +0000 (UTC)",
+      "x-ses-spam-verdict": "PASS",
+      "x-ses-virus-verdict": "PASS",
+      "received-spf": "pass (spfCheck: domain of send.cloudbaud.com designates 54.240.9.32 as permitted sender) client-ip=54.240.9.32; envelope-from=0100019e50bbb786-8a2f4ee0-d41d-4c7c-bb2b-c7553d768a3f-000000@send.cloudbaud.com; helo=a9-32.smtp-out.amazonses.com;",
+      "authentication-results": "amazonses.com; spf=pass (spfCheck: domain of send.cloudbaud.com designates 54.240.9.32 as permitted sender) client-ip=54.240.9.32; envelope-from=0100019e50bbb786-8a2f4ee0-d41d-4c7c-bb2b-c7553d768a3f-000000@send.cloudbaud.com; helo=a9-32.smtp-out.amazonses.com; dkim=pass header.i=@cloudbaud.com; dkim=pass header.i=@amazonses.com; dmarc=pass header.from=cloudbaud.com;",
+      "x-ses-receipt": "AEFBQUFBQUFBQUFIMzRSZWpaNmVRTDYva3ZBV0l0NE5ON0M2Z3lBWWdqU0RTMzlkNzNKTGZhMGFZdll3cmdSS25BZDVGcWpNdFFBL2w5NGZQNkpZUmN3emNpRG1kNitzYzVZOUYwbnNiL1Q5d09PN2VIakxiY1A5NEZ2VndBQmdYNGlsMWxqc1N0WHhGeUNOelc3TjFVRFJmWGlDK01rRDZKNm1UVm5EbmNxSUF4ZkxyOXpvSVJoekVkVStXR1FDbC84bXJIeG54U0ovM1VCSVFIOGRXVEU5VXYxdTU4NlZPNmJxanBtZlphTy9ITzUvOWh0VC96WlZKaXdBWnZrZEhJRTVwV3RsRjkwYkVabWJreS9nQTZBSXZ5SS9MTWVORGh6alhUYWRRUG1Lc3h5QlBZMTl4VjFISitPSG95Q2ttQXBUVFNyM3lZMGhyc0hqdWxObjhPM3pTWllHWlNyaWZOMGRtRzBjMVlqZk8yQTIzRzFMR2ZBbWdLMnoxWE1QajJHU2tzeTZjekk0PQ==",
+      "x-ses-dkim-signature": "a=rsa-sha256; q=dns/txt; b=Th8nR6uqFOUnWGXQ/nvVrnDRARmI2UYtTRey7FSBqCm8HqowWKrUr2qa94kXYcAHgja2UDqvtvueCtxHRfNxPO48ibLTZIp+U520wQF5f8g5cwcbaT4Rv3Wm+jMoeOMg9C6t6zUzpJeIWeSnlSF/M7uDt8ahy8Rj5NFwdewjbIo=; c=relaxed/simple; s=224i4yxa5dv7c2xz3womw6peuasteono; d=amazonses.com; t=1779470941; v=1; bh=nxcDqeZlL6Y6jOsrOHdz5D7gd7+7C205KtVH1VGDWfU=; h=From:To:Cc:Bcc:Subject:Date:Message-ID:MIME-Version:Content-Type:X-SES-RECEIPT;",
+      "dkim-signature": "[{\"value\":\"v=1\",\"params\":{\"a\":\"rsa-sha256\",\"q\":\"dns/txt\",\"c\":\"relaxed/simple\",\"s\":\"resend\",\"d\":\"cloudbaud.com\",\"t\":\"1779470940\",\"h\":\"From:To:Subject:Message-ID:Date:MIME-Version:Content-Type\",\"bh\":\"nxcDqeZlL6Y6jOsrOHdz5D7gd7+7C205KtVH1VGDWfU=\",\"b\":\"K17OYH7vgzhZJchbK4hJ0bpxu3m8+2+BA6CMQb5JaPYovWmG40FqHdCeT+pOHmF4 nVG+7HvoSKKnJ+qh9kY6pK+2ERygHlzcrelvcVzsi+4h6tfa9cDzyRCPpfrgp+0M1wt UIGf0Ss7wmIInNuGv0N3QPHiuvxOld/daJm0By0Y=\"}},{\"value\":\"v=1\",\"params\":{\"a\":\"rsa-sha256\",\"q\":\"dns/txt\",\"c\":\"relaxed/simple\",\"s\":\"224i4yxa5dv7c2xz3womw6peuasteono\",\"d\":\"amazonses.com\",\"t\":\"1779470940\",\"h\":\"From:To:Subject:Message-ID:Date:MIME-Version:Content-Type:Feedback-ID\",\"bh\":\"nxcDqeZlL6Y6jOsrOHdz5D7gd7+7C205KtVH1VGDWfU=\",\"b\":\"s7OeG0Xo9YLA/5MBU13YyqhqrZvrgPsflUhRLP7CYR8txgEM+RIbvKifuFuJ0K5Y IcDA9jpzJowLj49YXmAzt/Us2Skop3ooSXDIEAPpK9fg69EpDeCknc8SfMkT3MFKVcw A/TxoIGhXT9p61rZPQIKhC8MiHb4w2mbdlIO+p38=\"}}]",
+      "from": "\"CloudBaud\" <noreply@cloudbaud.com>",
+      "to": "jish.nath@cloudbaud.com",
+      "subject": "Your Magic Link",
+      "message-id": "<0100019e50bbb786-8a2f4ee0-d41d-4c7c-bb2b-c7553d768a3f-000000@email.amazonses.com>",
+      "date": "\"2026-05-22T17:29:00.000Z\"",
+      "mime-version": "1.0",
+      "content-type": "multipart/alternative",
+      "feedback-id": ":1.us-east-1.f/s2MMwClSYH/Sh4hbhqxCMBQRUx/d3ANDebAfUfi6aLWmVH44fTTa9YJynlFduqqMSHggAIqOdd0lVjCUTk51jsjf7uIeDrr1PP2s4cqrf1pPJ5wVXjCEKcu4AwwruKFhhUeUP0Qyr02+wQOaHZBDoKWNf0DwNjDkjPg6TO+So=:1.us-east-1.pAEstvQcjyhQNKGKcgSlzI7SVR8ZSG5wSmKwiz/A8Dg=:AmazonSES",
+      "x-ses-outgoing": "2026.05.22-54.240.9.32"
+    },
+    "raw": {
+      "download_url": "https://cdn.resend.app/receiving/raw/ccotrhd1ghovua24jmbggndo5n66tce1d1hv3jo1?response-content-disposition=attachment%3B+filename%3D%22ccotrhd1ghovua24jmbggndo5n66tce1d1hv3jo1%22&Expires=1779475489&Key-Pair-Id=K1EE1EYO2ZO8UR&Signature=oR0-rsyE9GpR8SNs5~4VU3hb02~DVyw1kb~g4bJfVaPpoZPCB11rVdLtS3E7tXev6AvfTjOCrvk0fYasHeCY1nYIW774BqcK~2C3TJdmQip66vQbAcMRqIFOBhVp~95uwq3ZMsWLang60XvOcNczl440pZTP~xrKOmFwsBn~bvTdGGWLWQXllWkV02Xh~FituWpGLfXGh71koGsugDk1HqWirJlodt3gnMOv6ppTuezLlBuZPYGOMxVEX4SvSyDwKyAIRvFjeHl5mmU5hf-9RDM1mvYFf6v5zcp8D9KY32ClL~-zT51-x-wyfSs~bJ4LHxN6Ur2adIHuTyemUiYb0g__",
+      "expires_at": "2026-05-22T18:44:48.518Z"
+    },
+    "attachments": []
+  }
+}

@@ -11,7 +11,22 @@ const attachmentIdArg = process.argv[4];
 const commandArgs = process.argv.slice(3);
 const domain = (process.env.RESEND_TARGET_DOMAIN || 'cloudbaud.com').toLowerCase();
 const outputDir = process.env.RESEND_INBOX_OUTPUT_DIR || path.join(repoRoot, 'data', 'emails', domain);
-const defaultReplyFrom = process.env.RESEND_REPLY_FROM || `info@${domain}`;
+
+/**
+ * Canonical sender addresses for each outbound role.
+ * Each can be overridden individually via env vars.
+ * Falls back to role@<domain>, then info@<domain> if unset.
+ */
+const senders = {
+  support:  process.env.RESEND_FROM_SUPPORT  || `support@${domain}`,
+  sales:    process.env.RESEND_FROM_SALES    || `sales@${domain}`,
+  alerts:   process.env.RESEND_FROM_ALERTS   || `alerts@${domain}`,
+  billing:  process.env.RESEND_FROM_BILLING  || `billing@${domain}`,
+  noreply:  process.env.RESEND_FROM_NOREPLY  || `noreply@${domain}`,
+};
+
+// Legacy single-address fallback — kept for back-compat but superseded by senders map above.
+const defaultReplyFrom = process.env.RESEND_REPLY_FROM || senders.support;
 
 function usage() {
   console.log('Usage:');
@@ -25,11 +40,22 @@ function usage() {
   console.log('  npm run resend:forward -- <message_id> <to_email>');
   console.log('');
   console.log('Required env vars:');
-  console.log('  RESEND_API_KEY=<re_...>');
+  console.log('  RESEND_API_KEY=<re_...');
   console.log('Optional env vars:');
-  console.log('  RESEND_TARGET_DOMAIN=cloudbaud.com');
-  console.log('  RESEND_INBOX_OUTPUT_DIR=<absolute_or_relative_path>');
-  console.log('  RESEND_REPLY_FROM=info@cloudbaud.com');
+  console.log('  RESEND_TARGET_DOMAIN=cloudbaud.com         # domain for inbox filtering');
+  console.log('  RESEND_INBOX_OUTPUT_DIR=<path>             # where to save synced emails');
+  console.log('');
+  console.log('Sender address overrides (all default to role@<domain>):');
+  console.log('  RESEND_FROM_SUPPORT=support@cloudbaud.com  # reply / reply-all');
+  console.log('  RESEND_FROM_SALES=sales@cloudbaud.com      # sales outreach');
+  console.log('  RESEND_FROM_ALERTS=alerts@cloudbaud.com    # system alerts');
+  console.log('  RESEND_FROM_BILLING=billing@cloudbaud.com  # billing notices');
+  console.log('  RESEND_FROM_NOREPLY=noreply@cloudbaud.com  # forwards / automated sends');
+  console.log('');
+  console.log('Active senders:');
+  Object.entries(senders).forEach(([role, addr]) => {
+    console.log(`  ${role.padEnd(10)} ${addr}`);
+  });
 }
 
 function ensureApiKey() {
@@ -281,7 +307,8 @@ async function replyToMessage(resend, messageId, replyText, includeAllRecipients
   }
 
   const inbound = await fetchInboundMessage(resend, messageId);
-  const fromAddress = parseEmailAddress(defaultReplyFrom);
+  // Replies always come from the support address so customers reach the right inbox.
+  const fromAddress = parseEmailAddress(senders.support);
   const targetSender = parseEmailAddress(inbound?.from);
 
   if (!targetSender) {
@@ -342,7 +369,8 @@ async function forwardMessage(resend, messageId, toEmail) {
     throw new Error('A valid destination email is required for forward.');
   }
 
-  const fromAddress = parseEmailAddress(defaultReplyFrom);
+  // Forwards use noreply so they don't invite replies to a monitored inbox.
+  const fromAddress = parseEmailAddress(senders.noreply);
   const inbound = await fetchInboundMessage(resend, messageId);
   const { data, error } = await resend.emails.receiving.forward({
     emailId: messageId,

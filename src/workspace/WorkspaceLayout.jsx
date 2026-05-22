@@ -621,7 +621,7 @@ const WorkspaceLayout = () => {
                                 <SidebarLink icon={FileText} label="My Feed" href={resolveLink("/portal")} active={!isFinanceConsole && location.pathname === "/portal"} collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
                                 <SidebarLink icon={Calendar} label="Calendar" href={resolveLink("/workspace/calendar")} collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
                                 <SidebarLink icon={MessageSquare} label="Inbox" href={resolveLink("/workspace/inbox")} collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
-                                <SidebarLink icon={Users} label="My Network" href={resolveLink("/portal/network")} collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
+                                <SidebarLink icon={Users} label="My Network" href={resolveLink("/workspace/network")} collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
                             </Section>
 
                              <Section title="Operations" collapsed={isSidebarCollapsed}>

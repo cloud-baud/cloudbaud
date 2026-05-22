@@ -9,7 +9,7 @@
     "dev": "npx --yes concurrently --kill-others --names \"portal,finance\" --prefix-colors \"blue,magenta\" \"npm run dev:main\" \"npm run dev:finance\"",
     "build": "vite build",
     "build:finance": "vite build --config vite.finance.config.js",
-    "build:all": "npm run build && npm run build:finance && node scripts/combine_dist.js",
+    "build:all": "npm run build && npm run build:finance",
     "build:local": "vite build --mode test",
     "lint": "eslint .",
     "preview": "vite preview --mode test",

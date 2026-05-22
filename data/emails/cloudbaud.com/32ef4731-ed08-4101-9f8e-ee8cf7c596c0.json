@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-05-22T17:44:50.650Z",
+  "targetDomain": "cloudbaud.com",
+  "message": {
+    "object": "email",
+    "id": "32ef4731-ed08-4101-9f8e-ee8cf7c596c0",
+    "to": [
+      "jishnu.nath@cloudbaud.com"
+    ],
+    "from": "zoe.hansen@mycarbidesecureagency.com",
+    "created_at": "2026-05-22 16:04:45.372207+00",
+    "subject": "Covered?",
+    "message_id": "<8d13dc54-a372-0976-3d98-1247e7596b91@mycarbidesecureagency.com>",
+    "bcc": [],
+    "cc": [],
+    "reply_to": [],
+    "html": null,
+    "text": "Hi Jishnu,\n\nIs your penetration testing covered?\n\nWe run both manual and automated tests based on OWASP standards as part of supporting ongoing compliance with security frameworks such as SOC 2, ISO 27001, and others.\n\nWould it be helpful to share a quick cost overview for benchmarking?\n\nWith zero trust,\nZoe with Carbide Secure\n \nReply ‘stop’ if you’d rather not hear from me.\n",
+    "headers": {
+      "return-path": "zoe.hansen@mycarbidesecureagency.com",
+      "received": "from avenue40.mymailsystem.com (avenue40.mymailsystem.com [74.48.73.101]) by inbound-smtp.us-east-1.amazonaws.com with SMTP id l4n8pi3ku4k3jt17tqgrsre18uj09mruvtjvbio1 for jishnu.nath@cloudbaud.com; Fri, 22 May 2026 16:04:44 +0000 (UTC)",
+      "x-ses-spam-verdict": "PASS",
+      "x-ses-virus-verdict": "PASS",
+      "received-spf": "pass (spfCheck: domain of mycarbidesecureagency.com designates 74.48.73.101 as permitted sender) client-ip=74.48.73.101; envelope-from=zoe.hansen@mycarbidesecureagency.com; helo=avenue40.mymailsystem.com;",
+      "authentication-results": "amazonses.com; spf=pass (spfCheck: domain of mycarbidesecureagency.com designates 74.48.73.101 as permitted sender) client-ip=74.48.73.101; envelope-from=zoe.hansen@mycarbidesecureagency.com; helo=avenue40.mymailsystem.com; dkim=pass header.i=@mycarbidesecureagency.com; dmarc=pass header.from=mycarbidesecureagency.com;",
+      "x-ses-receipt": "AEFBQUFBQUFBQUFIRnpBTUtaWmR5UWJybEU4ME8wYUlkZGRKNzc0S201empHMktNVkNaTS9DT3FRcW5QSURTdzNmeFFkeGx3eDRzdlc2Y2ZwNnpZVXNzd2dkNmhvclpZQkFtdEE3a2xOa1Rxam9kVElsVVhRVjcwb1dlUnMydXp1cTdEYUZDczlYbDY3cCtsUkltb1NWNmRJWlVqWHQ1elg1eFE3cndmOHhncnJobnlSREhGSlltVEx5bSs3ZHlvNHNURDFNRzNQSmtwL1IxUSt4b2grSHBZTEFvbmh1NnNVZThacTBIQVlZN1NLK0ozUkNWekcrOSt2ZXRBMVdJUzByR1g4dDlFWmRaNS9PR2g2Q1Y1UVhHbFhvLy96VjNmV0N4eW9lRVE1dWoxZkZGdjFoWGI1cGtGdVc0Q0lxVm9QazZpYkNFL21rVzA9",
+      "x-ses-dkim-signature": "a=rsa-sha256; q=dns/txt; b=DSIi2N7/zMKwtyJz6ZaiBeVZA1kvDo5D2nwVHWdW2gh7G5Jpb8jm8jznUsaVs+bEhuF1msU2C3G1FRSvBrd0E9vdvytT8V7+cBH4KEXAVEAAi1wBeO9U0Bs78TwrOysPmGuurPtbWyE1C53oWChgyz/PuwNeM+IqrsQ7xAknTSI=; c=relaxed/simple; s=224i4yxa5dv7c2xz3womw6peuasteono; d=amazonses.com; t=1779465885; v=1; bh=Q91eG41HeWAfXaPFrAC3Zbe+dp4/sxNqoZH+NfjJVQI=; h=From:To:Cc:Bcc:Subject:Date:Message-ID:MIME-Version:Content-Type:X-SES-RECEIPT;",
+      "dkim-signature": "v=1",
+      "from": "\"Zoe Hansen\" <zoe.hansen@mycarbidesecureagency.com>",
+      "to": "jishnu.nath@cloudbaud.com",
+      "subject": "Covered?",
+      "message-id": "<8d13dc54-a372-0976-3d98-1247e7596b91@mycarbidesecureagency.com>",
+      "content-transfer-encoding": "quoted-printable",
+      "date": "\"2026-05-22T15:36:42.000Z\"",
+      "mime-version": "1.0",
+      "content-type": "text/plain"
+    },
+    "raw": {
+      "download_url": "https://cdn.resend.app/receiving/raw/l4n8pi3ku4k3jt17tqgrsre18uj09mruvtjvbio1?response-content-disposition=attachment%3B+filename%3D%22l4n8pi3ku4k3jt17tqgrsre18uj09mruvtjvbio1%22&Expires=1779475491&Key-Pair-Id=K1EE1EYO2ZO8UR&Signature=ObrkF-0kzmL229888Gr~kgRGgyl5nDbauceiq5mXJJlWZ2UEWS4KnX-Uga~NqdcqjMa2b3mJDlZ6yRRh~xPW-KVS5HeQdA7YgsaKMOhiXHedGdNw1maGIu4IG7LtJymTMbHLV77Hg1sB5rn9e6~eBYSdueCNh5-1wg8aCYSe8pu762~eAYHb3tqPnSYdR1DZZyKS3V5Lq5r9jf0295AOdt2Hp0i~1Y56IkrutvFHy7zYArTeMy7-wGfcA3pqVpj1c5TEXMwsNhvFVs1ZGe5kEfCsT~CO15biCdFQm9HWgSlZz8X5BnYh~6pmyuwwZlHiOHSJJdhT7TMmjA9LwYPZvQ__",
+      "expires_at": "2026-05-22T18:44:50.580Z"
+    },
+    "attachments": []
+  }
+}
