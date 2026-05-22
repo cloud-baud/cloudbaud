@@ -1,0 +1,47 @@
+{
+  "fetchedAt": "2026-05-20T18:59:17.664Z",
+  "targetDomain": "cloudbaud.com",
+  "message": {
+    "object": "email",
+    "id": "dfe1fe93-31c9-424a-9bca-64f0abe91474",
+    "to": [
+      "jish.nath@cloudbaud.com"
+    ],
+    "from": "derek.jackson@targetmomentum.info",
+    "created_at": "2026-05-20 15:26:40.571277+00",
+    "subject": "Coffee Break in Bellevue",
+    "message_id": "<f3311766-d3c3-sl84-4d27-9adc-51628f1c3470@targetmomentum.info>",
+    "bcc": [],
+    "cc": [],
+    "reply_to": [],
+    "html": "<!DOCTYPE html>\n  <html>\n  <head>\n    <title>Coffee Break in Bellevue </title>\n    <meta charset=\"utf-8\"></meta>\n     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n      </meta>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></meta>\n  </head>\n  \n  <body>\n  <div>Greetings Jishnu - My team will be in the Bellevue area June 10 to June 12 to start our remote office with me. We'll also be visiting our partners at Tagger Media to celebrate their $140M acquisition.</div><div><br></div><div>During the last 5 years, we delivered over 45 weekly meetings for their sales team, accounting for more than 50% of their current client base, including brands like Samsung, Intel, and Ralph Lauren.</div><div><br></div><div>Would love to chat about doing something similar for Cloudbaud.</div><div><br></div><div>Coffee catch-up?</div><br><br><div>Derek Jackson</div><div>Head of Growth</div><div>Key Outreach</div>\n  </body>\n  \n  </html>",
+    "text": "Greetings Jishnu - My team will be in the Bellevue area June 10 to June 12 to start our remote office with me. We'll also be visiting our partners at Tagger Media to celebrate their $140M acquisition.\n\n\nDuring the last 5 years, we delivered over 45 weekly meetings for their sales team, accounting for more than 50% of their current client base, including brands like Samsung, Intel, and Ralph Lauren.\n\n\nWould love to chat about doing something similar for Cloudbaud.\n\n\nCoffee catch-up?\n\n\nDerek Jackson\nHead of Growth\nKey Outreach",
+    "headers": {
+      "return-path": "[{\"value\":[{\"address\":\"derek.jackson@targetmomentum.info\",\"name\":\"\"}],\"html\":\"<span class=\\\"mp_address_group\\\"><a href=\\\"mailto:derek.jackson@targetmomentum.info\\\" class=\\\"mp_address_email\\\">derek.jackson@targetmomentum.info</a></span>\",\"text\":\"derek.jackson@targetmomentum.info\"},{\"value\":[{\"address\":\"derek.jackson@targetmomentum.info\",\"name\":\"\"}],\"html\":\"<span class=\\\"mp_address_group\\\"><a href=\\\"mailto:derek.jackson@targetmomentum.info\\\" class=\\\"mp_address_email\\\">derek.jackson@targetmomentum.info</a></span>\",\"text\":\"derek.jackson@targetmomentum.info\"}]",
+      "received": "[\"from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173]) by inbound-smtp.us-east-1.amazonaws.com with SMTP id gk98e6def0vgaco92raq445k3vv5p5l39ptehlg1 for jish.nath@cloudbaud.com; Wed, 20 May 2026 15:26:39 +0000 (UTC)\",\"by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-82fa8d6425bso2272677b3a.0 for <jish.nath@cloudbaud.com>; Wed, 20 May 2026 08:26:39 -0700 (PDT)\",\"from ip-172-31-43-121.ap-southeast-2.compute.internal (ec2-13-239-83-146.ap-southeast-2.compute.amazonaws.com. [13.239.83.146]) by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83f19c7ed3fsm21265168b3a.45.2026.05.20.08.26.36 for <jish.nath@cloudbaud.com> (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256); Wed, 20 May 2026 08:26:37 -0700 (PDT)\"]",
+      "x-ses-spam-verdict": "PASS",
+      "x-ses-virus-verdict": "PASS",
+      "received-spf": "pass (spfCheck: domain of targetmomentum.info designates 209.85.210.173 as permitted sender) client-ip=209.85.210.173; envelope-from=derek.jackson@targetmomentum.info; helo=mail-pf1-f173.google.com;",
+      "authentication-results": "amazonses.com; spf=pass (spfCheck: domain of targetmomentum.info designates 209.85.210.173 as permitted sender) client-ip=209.85.210.173; envelope-from=derek.jackson@targetmomentum.info; helo=mail-pf1-f173.google.com; dkim=pass header.i=@targetmomentum.info; dmarc=pass header.from=targetmomentum.info;",
+      "x-ses-receipt": "AEFBQUFBQUFBQUFHa0VXakVSY0ZhWkI3Z2FEd0dJT1pjMW5UUzFEQTM5cDV1T2FsaUsxcEJ1NUJkTkRTS3NybnJkNzE5a0pTYWZSVmtLTUR4akU5b3JQd0hiK0xSYUhxK3Q3MGZzNnN5M3k1c3hiNWp0bFVnSnBqNDFJcUNoc1lCa1RXeFlMNFhwQnJqUm40eFNqdnByQ3o1RlVEdGtKOGUvZ3pPVElCR2plREF1d2pFRUJrZlMxNjRQbHlBZVJ4V250M2FPYjUzM3MyQjk0YU9lODVMSDI0eGZ5eGZXNWFQbTRleFl1OGdXQU5NNGpjblVJWEcvT1ZNak1zM0RZd1U5RDc0eUlPRHF3QWNhYTJuTk5mSmRBTkxxbGQrN2V5azBReXN4UlBiWWtmaFdma2ZDWTlSVm4ybWhvZS9EcVlDVHl5dFJKMTlpMHc9",
+      "x-ses-dkim-signature": "a=rsa-sha256; q=dns/txt; b=EZo0aTTM7tYLqzHPm8fP4/Ag4Jhwh4okmqxlVflnb17uW22LC/Eb6t9srrrnZeTVu6isGZ/US6DJUaNAT1vW9rYIlRB8aOHFTlqf62nZTZ4iPFZ/2rQnYn1byqa7mGMn3nz3NijiciPjKILFt7179VnCmzTdlqZDkJ/utYFITEM=; c=relaxed/simple; s=224i4yxa5dv7c2xz3womw6peuasteono; d=amazonses.com; t=1779290800; v=1; bh=vg1N59Zw+0qinT84t7ROtCW82O/4bUZH9xikQ7A+Jz8=; h=From:To:Cc:Bcc:Subject:Date:Message-ID:MIME-Version:Content-Type:X-SES-RECEIPT;",
+      "dkim-signature": "v=1",
+      "x-google-dkim-signature": "v=1; a=rsa-sha256; c=relaxed/relaxed; d=1e100.net; s=20251104; t=1779290798; x=1779895598; h=mime-version:date:message-id:subject:to:from:x-gm-gg :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to; bh=CCUsr4pw+HxRw/Vlj3BnP0X+A6K1JN6ZHvNalM7ONjM=; b=An+5e0YsEeIshFQdG8Urae8pSC+IB7JcERcnbI8INXqZBbUGUiTQTJ9p0uFaPMALpT wbmn9uvSSq3gWUR2dJaTxaCmf0uYD3SxbPBqTBmnvTNhaomBaIahzdlUnG1gFu3KubUt AzzYXN0D8wRiBUZ65WNupMfBWDB/zXOBfmdfXQsbSbpl5G1Y6qLnYhQtDUFaWjoY/wXg aW5WjqbooXXPwbJSu9wN/D58oMBSdTHMLqOW01jLRs968x/ztibOq2eGC4Mj3/Bi+zQv 5irF9QhF0w+GCMdntHOL35AxutIi0vv+T6T1yt3wswkqwi88jUv4U0l9+OVkJYuHGnTH 8CEw==",
+      "x-gm-message-state": "AOJu0Yz6Np0SbHagm3DnFGBxZ5aS3ju8lU8SNU7gN0n/EvapK1GFuIrY vR4bQgCVZVgLEgYoK+/DbRhNMzupMcmLlm9UTalzZOYBEPm76ByE4PpvEm6A1EgV81yy0WL1Kvw U+Josnm6t",
+      "x-gm-gg": "Acq92OFkfpr65fR/knG8ue2UMqr+0gUSpCQ0ndtNIZJU0QcOoLF7nUNXrEq6Swy/0On rPK+rsLE1utQaskiJWuMs5ESB+udmZ8wgK6GxM7Q7Mm6r93e6C3cVvVEoNSTEss1Sg1PcBz3jCf wzELyp17oQ89H9mXwyoeLo1T02wXjG1GMB8fLOf/cv9mVYVx/b2/9RFgkDfcPr9f1FFwFjwxmcM yVYMDH8vnFWLeSlzbjT6Gl5NIik805KpQPm6P2qJcMDHiB7KaenNWfBJ8P8h29W8PuwYowFGFr+ HObimdNmD4hg5vPr8N0gKMDQ3O+WvHwCod9HDSvSuw5QCe/Co78+HuvEFCPFFo5TP+rwmQtWb5A u7xV+Xdwqh25ZvvduD2CH+wnU+RPD0S82OJtuvvm+DarOZQNvM4vgejmWLoTDy904sFk/MEBWhT /Q/Pvq8Zfy7051Xnew7FwVtiCYWZLhFOGrK/yycJXwXqU8e1Fh346qfsx/3gkBaRiLePuf+e9hH e02qO9w/HrCEGzynLaXh7wDrxPPHhafMAdjNpW6n0v61kS63CNFWkfbnRqDMuJOchvjwqFKULQS nfLZqTxtdODtjgrp",
+      "x-received": "by 2002:aa7:8882:0:b0:82a:6f69:7f72 with SMTP id d2e1a72fcca58-83f33f0fddcmr25071675b3a.47.1779290797704; Wed, 20 May 2026 08:26:37 -0700 (PDT)",
+      "from": "\"Derek Jackson\" <derek.jackson@targetmomentum.info>",
+      "to": "jish.nath@cloudbaud.com",
+      "subject": "Coffee Break in Bellevue",
+      "message-id": "<f3311766-d3c3-sl84-4d27-9adc-51628f1c3470@targetmomentum.info>",
+      "date": "\"2026-05-20T15:26:34.000Z\"",
+      "mime-version": "1.0",
+      "content-type": "multipart/alternative"
+    },
+    "raw": {
+      "download_url": "https://cdn.resend.app/receiving/raw/gk98e6def0vgaco92raq445k3vv5p5l39ptehlg1?response-content-disposition=attachment%3B+filename%3D%22gk98e6def0vgaco92raq445k3vv5p5l39ptehlg1%22&Expires=1779307158&Key-Pair-Id=K1EE1EYO2ZO8UR&Signature=vcKotB02rF0OLi2utYcSWgZONR7w~UmG6RAT1ul6QUbxHfKes9FWVhRviAtlWtDJiBDtuNNHPsoLofFgfBiKMNnZCfBQTzTBnwaI-zYX7NbVMRZJnOl58vpEWXMcwk8N7SnoMzz-yWs2jaPHnPRlzNojrMoUoB28PJkcV7KOwQQAfkCoiuGoSGdr22Yw9Vbhh9POaf3imkVAFzhRTEPc7udCfOOem~MYu2EV8~pQElbydJZg8Uiwcxt5oC3kxTyKpUVotFhNPOwYHyMhQ6WeNwnuaxlEri3FE7lpjCRfvoVsXllU3tMO8T-ahhaBH8DyKBQNmE5pdwxbkvZG3acAWQ__",
+      "expires_at": "2026-05-20T19:59:17.690Z"
+    },
+    "attachments": []
+  }
+}

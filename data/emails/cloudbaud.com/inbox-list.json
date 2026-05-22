@@ -1,0 +1,442 @@
+{
+  "fetchedAt": "2026-05-20T18:59:10.484Z",
+  "targetDomain": "cloudbaud.com",
+  "total": 20,
+  "matched": 20,
+  "messages": [
+    {
+      "id": "85055041-0784-4de3-a311-3017335d072c",
+      "to": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "from": "cloud9baud@gmail.com",
+      "created_at": "2026-05-20 18:37:12.978867+00",
+      "subject": "RE: Rate confirmation",
+      "bcc": [],
+      "cc": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "reply_to": [],
+      "message_id": "<008f01dce887$a9c7e0f0$fd57a2d0$@gmail.com>",
+      "attachments": [
+        {
+          "filename": "image001.jpg",
+          "content_type": "image/jpeg",
+          "content_id": "<image001.jpg@01DCE84C.FC4DD4F0>",
+          "content_disposition": null,
+          "id": "ce80c9bf-1df4-49f0-af97-b3ba2c397649",
+          "size": 62525
+        },
+        {
+          "filename": "image002.png",
+          "content_type": "image/png",
+          "content_id": "<image002.png@01DCE84C.FC4DD4F0>",
+          "content_disposition": null,
+          "id": "ca7105f8-e270-4810-ae12-8b0b16886099",
+          "size": 93716
+        },
+        {
+          "filename": "image005.png",
+          "content_type": "image/png",
+          "content_id": "<image005.png@01DCE84C.FC4DD4F0>",
+          "content_disposition": null,
+          "id": "b2d0b2f4-c805-4400-b7a2-15554323ed05",
+          "size": 170
+        },
+        {
+          "filename": "image006.jpg",
+          "content_type": "image/jpeg",
+          "content_id": "<image006.jpg@01DCE84C.FC4DD4F0>",
+          "content_disposition": null,
+          "id": "b8c0a76b-1ff6-4611-85d2-58aa781267f2",
+          "size": 60025
+        },
+        {
+          "filename": "Senior Technical Solutions Lead Resume of Jishnu Nath.pdf",
+          "content_type": "application/pdf",
+          "content_id": null,
+          "content_disposition": "attachment",
+          "id": "a75184d3-df62-4a1f-b1c4-017c539462bc",
+          "size": 281618
+        }
+      ]
+    },
+    {
+      "id": "60572d78-1266-4ff3-b020-4e86f8d3a42f",
+      "to": [
+        "info@cloudbaud.com"
+      ],
+      "from": "kabir@nativeappsdeveloper.com",
+      "created_at": "2026-05-20 18:36:15.6478+00",
+      "subject": "Apps Proposal 20 May 2026",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [],
+      "message_id": "<70cbf01dce887$869b5cb0$93d21610$@com>",
+      "attachments": []
+    },
+    {
+      "id": "3f1d61eb-7604-47c1-9fd2-a730f5ca6e37",
+      "to": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "from": "hello@otava.com",
+      "created_at": "2026-05-20 17:50:13.442482+00",
+      "subject": "Hey Jishnu, How does your Multi-Cloud strategy look?",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [
+        "no-reply@otava.com"
+      ],
+      "message_id": "<b2917980-be05-421a-bdeb-005057701f96@iad4s13mta912.xt.local>",
+      "attachments": []
+    },
+    {
+      "id": "bcb75cd0-2b1e-4bfe-81f8-c74dc37c3492",
+      "to": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "from": "arunselvan758@gmail.com",
+      "created_at": "2026-05-20 17:49:48.516007+00",
+      "subject": "Opening for Database Engineer in CA",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [],
+      "message_id": "<c4d2a20e-e12d-4c9a-9a96-705b969ef5e6n@googlegroups.com>",
+      "attachments": []
+    },
+    {
+      "id": "df4dfa28-a010-403c-ad72-ddde4bfb8c1c",
+      "to": [
+        "info@cloudbaud.com"
+      ],
+      "from": "ryan.salas@nobleusapoint.co",
+      "created_at": "2026-05-20 17:49:18.521158+00",
+      "subject": "Vaping",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [],
+      "message_id": "<019e4681-8b45-78e1-908f-10de62720c12@nobleusapoint.co>",
+      "attachments": []
+    },
+    {
+      "id": "84fa581b-3688-4787-a1ce-36da918de51c",
+      "to": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "from": "cloud9baud@gmail.com",
+      "created_at": "2026-05-20 17:48:28.554796+00",
+      "subject": "Rate confirmation",
+      "bcc": [],
+      "cc": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "reply_to": [],
+      "message_id": "<008201dce880$db3eb4d0$91bc1e70$@gmail.com>",
+      "attachments": [
+        {
+          "filename": "image001.jpg",
+          "content_type": "image/jpeg",
+          "content_id": "<image001.jpg@01DCE846.267A0D40>",
+          "content_disposition": null,
+          "id": "e3c065a0-b80b-4407-afb8-9eebc2ae829a",
+          "size": 62525
+        },
+        {
+          "filename": "image002.png",
+          "content_type": "image/png",
+          "content_id": "<image002.png@01DCE846.267A0D40>",
+          "content_disposition": null,
+          "id": "29aafbd9-3de0-43e3-a663-3954c42fe446",
+          "size": 93716
+        },
+        {
+          "filename": "image003.png",
+          "content_type": "image/png",
+          "content_id": "<image003.png@01DCE846.267A0D40>",
+          "content_disposition": null,
+          "id": "20363164-3335-4ab5-b85a-1f036379ce12",
+          "size": 170
+        },
+        {
+          "filename": "image004.jpg",
+          "content_type": "image/jpeg",
+          "content_id": "<image004.jpg@01DCE846.267A0D40>",
+          "content_disposition": null,
+          "id": "e8bdd844-5d8a-4de5-88a2-169d0b864d38",
+          "size": 60025
+        }
+      ]
+    },
+    {
+      "id": "98a8ff27-d3ac-4e56-a9ea-cd9e1423a996",
+      "to": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "from": "info@email.cohere.com",
+      "created_at": "2026-05-20 17:46:14.937816+00",
+      "subject": "Introducing Command A+: delivering sovereign agentic AI capabilities to all",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [
+        "noreply@email.cohere.com"
+      ],
+      "message_id": "<1082500359.345558.1779299166952@marketo-platform--email-sender-prod-batch-cluster-7946d574xdtzd>",
+      "attachments": []
+    },
+    {
+      "id": "7b87b70a-7ce2-421b-bdab-f97aa87039c8",
+      "to": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "from": "davidvickers854@gmail.com",
+      "created_at": "2026-05-20 17:29:41.078624+00",
+      "subject": "Jish, 30 Days Trial",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [],
+      "message_id": "<177929817746.254755.5281987864431148321@gmail.com>",
+      "attachments": []
+    },
+    {
+      "id": "54285084-687c-4f88-b078-dd155dd31ef1",
+      "to": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "from": "ababhishek4333@googlegroups.com",
+      "created_at": "2026-05-20 17:25:53.09455+00",
+      "subject": "Onsite interview - Local to Bay Area CA- Direct Client - Junior C#ASP.NET Development with SharePoint  - Onsite at San Jose CA",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [
+        "Chetan.Ghediya@cyberThink.com"
+      ],
+      "message_id": "<SJ0PR07MB8696C1F07D60320673D74C11EE012@SJ0PR07MB8696.namprd07.prod.outlook.com>",
+      "attachments": [
+        {
+          "filename": "image001.png",
+          "content_type": "image/png",
+          "content_id": "<image001.png@01DCE7A4.158B0F40>",
+          "content_disposition": "inline",
+          "id": "78144e24-08d3-4c50-b1ba-699d3d7f185e",
+          "size": 720
+        },
+        {
+          "filename": "image002.png",
+          "content_type": "image/png",
+          "content_id": "<image002.png@01DCE7A4.158B0F40>",
+          "content_disposition": "inline",
+          "id": "f1b02412-ef09-4447-8a99-e4f1d1d5ad62",
+          "size": 6483
+        },
+        {
+          "filename": "image003.png",
+          "content_type": "image/png",
+          "content_id": "<image003.png@01DCE7A4.158B0F40>",
+          "content_disposition": "inline",
+          "id": "eaf99ad9-7daf-4b11-b137-c5f4966d8445",
+          "size": 9312
+        },
+        {
+          "filename": "image004.png",
+          "content_type": "image/png",
+          "content_id": "<image004.png@01DCE7A4.158B0F40>",
+          "content_disposition": "inline",
+          "id": "fcbcbf60-b369-4fd7-bcce-15ed518e9ce3",
+          "size": 3930
+        }
+      ]
+    },
+    {
+      "id": "e8ab954e-c1c4-4c90-bee3-2165378e7e44",
+      "to": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "from": "membersuccess@alignable.com",
+      "created_at": "2026-05-20 17:06:48.254111+00",
+      "subject": "Jishnu, you're invited to a virtual networking event",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [],
+      "message_id": "<oCiGMJZbRD-KXPETrf2AdA@geopod-ismtpd-43>",
+      "attachments": []
+    },
+    {
+      "id": "1dbc8ce2-2e29-4031-9fa6-531291655750",
+      "to": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "from": "noreply@email.apple.com",
+      "created_at": "2026-05-20 16:48:44.445345+00",
+      "subject": "Your iCloud storage is full.",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [],
+      "message_id": "<1396830211.18572797.1779295710416@email.apple.com>",
+      "attachments": []
+    },
+    {
+      "id": "7ed0ba23-94e2-47f7-a848-2a84b0f642db",
+      "to": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "from": "vijay.a@contus.in",
+      "created_at": "2026-05-20 16:28:27.459174+00",
+      "subject": "Start Building a Binge-Ready Microdrama Streaming App - Under Your Brand",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [
+        "marketing@vplayed.com"
+      ],
+      "message_id": "<1779294505128.6a876542-f2f8-4025-a83a-d15b9848f5a9@bf07x.hubspotemail.net>",
+      "attachments": []
+    },
+    {
+      "id": "22841c73-554a-4fb5-b177-fb0a91d1563b",
+      "to": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "from": "replyto@email.microsoft.com",
+      "created_at": "2026-05-20 16:19:45.564533+00",
+      "subject": "Microsoft Build’s Session Scheduler is live. Plus, .NET 11 Preview 4",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [
+        "replyto@microsoft.com"
+      ],
+      "message_id": "<742440821.68283837.1779293983337@mlm-mktmail-batch-0001-a-006.prod.ca13.marketo.org>",
+      "attachments": []
+    },
+    {
+      "id": "d13a0207-86e1-45a9-b331-372d6fee7834",
+      "to": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "from": "quest@quest.com",
+      "created_at": "2026-05-20 16:01:07.585052+00",
+      "subject": "Last chance: A new approach to data modeling",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [
+        "quest@quest.com"
+      ],
+      "message_id": "<5639f56fe9fc48d3b74d5e1b42654d72@1009272243>",
+      "attachments": []
+    },
+    {
+      "id": "fedc925a-6795-48df-b1a7-ed4c81f76dee",
+      "to": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "from": "news@nvidia.com",
+      "created_at": "2026-05-20 15:51:49.96671+00",
+      "subject": "Catch the NVIDIA GTC Taipei 2026 keynote livestream",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [
+        "news@nvidia.com"
+      ],
+      "message_id": "<133672861.67551399.1779292306766@mlm-mktmail-batch-0001-a-006.prod.ca13.marketo.org>",
+      "attachments": []
+    },
+    {
+      "id": "e0f643ac-d56d-4b6e-865c-06813552e4c4",
+      "to": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "from": "lenny@substack.com",
+      "created_at": "2026-05-20 15:50:45.124685+00",
+      "subject": "10 Job-Search Rules That Just Broke",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [
+        "reply+3a86wm&o7bw9&&8ce27828e0846e78fe242732dd1e1112a00fdc71c3f35ea55f308389873be72c@mg1.substack.com"
+      ],
+      "message_id": "<20260520154014.3.e83ea5b7616d489d@mg-d1.substack.com>",
+      "attachments": []
+    },
+    {
+      "id": "fa2cbaef-e7a9-4f7d-95db-19383294d9c3",
+      "to": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "from": "Danish.Sayyed@narwal.ai",
+      "created_at": "2026-05-20 15:49:51.081823+00",
+      "subject": "Right to Represent - Senior Technical Solutions Lead - Remote",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [],
+      "message_id": "<PN3P287MB1540098F3C52660DE94D2ACBFF012@PN3P287MB1540.INDP287.PROD.OUTLOOK.COM>",
+      "attachments": [
+        {
+          "filename": "image001.jpg",
+          "content_type": "image/jpeg",
+          "content_id": "<image001.jpg@01DCCDB9.7B059700>",
+          "content_disposition": "inline",
+          "id": "c7303899-5e04-4485-909b-527213b1f9ab",
+          "size": 62525
+        },
+        {
+          "filename": "image002.png",
+          "content_type": "image/png",
+          "content_id": "<image002.png@01DCCDB9.7B059700>",
+          "content_disposition": "inline",
+          "id": "3aa902bb-c252-493a-a74f-055b6fb5d1c6",
+          "size": 93716
+        },
+        {
+          "filename": "image003.jpg",
+          "content_type": "image/jpeg",
+          "content_id": "<image003.jpg@01DCCDB9.7B059700>",
+          "content_disposition": "inline",
+          "id": "5bd8c5f5-d9da-4266-a969-f27d755fb6b6",
+          "size": 60025
+        }
+      ]
+    },
+    {
+      "id": "152e91d9-e760-48b6-9af3-5ef805ce1046",
+      "to": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "from": "bytebytego@substack.com",
+      "created_at": "2026-05-20 15:45:07.552012+00",
+      "subject": "How Netflix is Using Multimodal AI to Power Video Search",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [
+        "reply+39ruq3&o7bw9&&11cdb4a84e38ce334939b0d9df6dcb584ec46910809545cbd396adcdaa449878@mg1.substack.com"
+      ],
+      "message_id": "<20260520153107.3.5e39ebb25180ce1f@mg2.substack.com>",
+      "attachments": []
+    },
+    {
+      "id": "dfe1fe93-31c9-424a-9bca-64f0abe91474",
+      "to": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "from": "derek.jackson@targetmomentum.info",
+      "created_at": "2026-05-20 15:26:40.571277+00",
+      "subject": "Coffee Break in Bellevue",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [],
+      "message_id": "<f3311766-d3c3-sl84-4d27-9adc-51628f1c3470@targetmomentum.info>",
+      "attachments": []
+    },
+    {
+      "id": "4f563934-eec7-4958-8a93-da0704c26405",
+      "to": [
+        "jish.nath@cloudbaud.com"
+      ],
+      "from": "join@stack.expert",
+      "created_at": "2026-05-20 15:17:28.434208+00",
+      "subject": "Free Webinar: Stop working for others. Start your AI Consulting Business",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [],
+      "message_id": "<20260520151726.a87c7bdcbdc3df67@cio127641.stack.expert>",
+      "attachments": []
+    }
+  ]
+}

@@ -8,17 +8,10 @@ import MarketingLayout from './portal/layout/MarketingLayout';
 import WorkspaceLayout from './workspace/WorkspaceLayout';
 import PortalDashboard from './workspace/PortalDashboard';
 import FabricDemo from './workspace/sales/FabricDemo';
-import FinOpsDashboard from './finance/dashboards/FinOpsDashboard';
-// import { SettingsPage } from 'synolic.core/frontend/components/features/settings/SettingsPage'; // DEPRECATED Legcay
 import SettingsPage from './workspace/settings/UniversalSettingsPage'; // New Universal Standard
 import PlaceholderPage from './workspace/PlaceholderPage';
 import PitchDeckPage from './workspace/PitchDeckPage';
 import ContextLayout from './workspace/ContextLayout';
-import TaxMultiYearSummary from './finance/dashboards/TaxMultiYearSummary';
-import TaxSingleYear from './finance/dashboards/TaxSingleYear';
-import AccountingDashboard from './finance/dashboards/AccountingDashboard';
-import BookkeepingDashboard from './finance/dashboards/BookkeepingDashboard';
-import AccountLedger from './finance/dashboards/AccountLedger';
 
 
 import HomePage from './portal/pages/HomePage';
@@ -47,6 +40,7 @@ import SiteMapPage from './pages/legal/SiteMapPage';
 
 import SignupPage from './pages/auth/SignupPage';
 import LoginPage from './pages/auth/LoginPage';
+import ConfirmPage from './pages/auth/ConfirmPage';
 import RedirectHandler from './components/auth/RedirectHandler';
 import AuthRedirector from './components/auth/AuthRedirector';
 import AiEngineeringPage from './portal/pages/engineering/AiEngineeringPage';
@@ -58,7 +52,7 @@ import ContentControl from './workspace/ContentControl';
 import ConsultingDashboard from './workspace/consulting/ConsultingDashboard';
 
 import ProtectedRoute from './components/auth/ProtectedRoute';
-import FinanceGuard from './components/auth/FinanceGuard'; // NEW: Finance Guard
+import FinanceGuard, { isFinanceAuthorized } from './components/auth/FinanceGuard'; // NEW: Finance Guard
 import DevPersonaSwitcher from './components/auth/DevPersonaSwitcher';
 
 
@@ -70,11 +64,93 @@ import AccessManagement from './workspace/admin/AccessManagement';
 import CmdbDashboard from './workspace/it/CmdbDashboard';
 import CmdbDashboardPreview from './workspace/it/CmdbDashboardPreview';
 import CalendarPage from './workspace/productivity/CalendarPage';
+import InboxViewerPage from './workspace/InboxViewerPage';
 import BookingPage from './pages/BookingPage';
 import { Toaster } from './shared/ui/sonner';
 import LegalDashboard from './workspace/legal/LegalDashboard';
 import ProvisionalPatentsDashboard from './workspace/legal/ProvisionalPatentsDashboard';
 import NdaForm from './workspace/legal/NdaForm';
+import { ShieldCheck, ArrowRight } from 'lucide-react';
+import { useAuth } from './context/AuthContext';
+
+const AirGappedFinanceRedirect = () => {
+    const { user, session, aal } = useAuth();
+    const isAuthorized = isFinanceAuthorized(user);
+
+    const handleRedirect = () => {
+        const financeOrigin = window.location.hostname.includes('localhost') || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:17118'
+            : 'https://finance.cloudbaud.com';
+
+        if (isAuthorized && session?.access_token) {
+            // One-time secure session hand-off redirect
+            window.location.href = `${financeOrigin}/auth/handoff?access_token=${encodeURIComponent(session.access_token)}&refresh_token=${encodeURIComponent(session.refresh_token)}`;
+        } else {
+            window.location.href = `${financeOrigin}/workspace/finance`;
+        }
+    };
+
+    // Verify if account has set up multi-factor authenticator enrollment (reaches assurance level 2)
+    const isMfaConfigured = aal?.nextLevel === 'aal2';
+
+    return (
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8 animate-in fade-in zoom-in duration-500">
+            <div className="bg-blue-100 dark:bg-blue-900/30 p-5 rounded-full mb-6 relative">
+                <div className="absolute inset-0 rounded-full border border-blue-500/30 animate-ping duration-1000" />
+                <ShieldCheck className="h-12 w-12 text-blue-600 dark:text-blue-400" />
+            </div>
+            <h1 className="text-3xl font-extrabold tracking-tight mb-3 text-slate-900 dark:text-white">
+                Air-Gapped Finance Console
+            </h1>
+            <p className="text-slate-600 dark:text-slate-400 max-w-lg mb-8 leading-relaxed text-sm">
+                To guarantee zero database and JavaScript bundle spillover, financial operations have been physically isolated to a dedicated secure subdomain under compliance audit guidelines.
+            </p>
+            {!isAuthorized ? (
+                <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-xl p-6 max-w-md w-full mb-8">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-950/50 text-red-800 dark:text-red-400 border border-red-200 dark:border-red-900/30 mb-3">
+                        Access Restricted
+                    </span>
+                    <p className="text-xs text-red-600 dark:text-red-400">
+                        Your account <strong>{user?.email}</strong> is not listed on the authorized credentials list for financial access.
+                    </p>
+                </div>
+            ) : !isMfaConfigured ? (
+                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl p-6 max-w-md w-full mb-8 space-y-4">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-900/30">
+                        MFA Enrollment Required
+                    </span>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                        Although your identity is verified, <strong>compliance security guidelines</strong> require that you enable Multi-Factor Authentication (2FA) before entering the sensitive Finance Vault.
+                    </p>
+                    <a
+                        href="/workspace/settings?tab=security"
+                        className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold shadow-md shadow-amber-500/10 hover:shadow-amber-500/20 active:scale-[0.98] transition-all cursor-pointer text-sm"
+                    >
+                        Enable Authenticator App <ArrowRight className="w-4 h-4" />
+                    </a>
+                </div>
+            ) : (
+                <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6 max-w-md w-full mb-8">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/30 mb-3">
+                        Identity Verified
+                    </span>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+                        Account <strong>{user?.email}</strong> is fully authorized for financial access. Click below to transfer session and open the isolated console.
+                    </p>
+                    <button
+                        onClick={handleRedirect}
+                        className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-md shadow-blue-500/10 hover:shadow-blue-500/20 active:scale-[0.98] transition-all cursor-pointer"
+                    >
+                        Enter Finance Vault <ArrowRight className="w-4 h-4" />
+                    </button>
+                </div>
+            )}
+            <a href="/workspace" className="text-sm font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
+                Return to standard workspace
+            </a>
+        </div>
+    );
+};
 
 function App() {
   console.log('App: Rendering...');
@@ -108,18 +184,8 @@ function App() {
                     <Route path="network" element={<PlaceholderPage />} />
 
                     {/* Business Apps Routes */}
-                    <Route element={<FinanceGuard />}>
-                        <Route path="finance" element={<ContextLayout />}>
-                            <Route index element={<FinOpsDashboard />} />
-                            <Route path="taxes" element={<TaxMultiYearSummary />} />
-                            <Route path="taxes/year" element={<TaxSingleYear />} />
-                            <Route path="bookkeeping" element={<BookkeepingDashboard />} />
-                            <Route path="accounting" element={<AccountingDashboard />} />
-                            <Route path="accounting/:accountId" element={<AccountLedger />} />
-                            <Route path="investments" element={<PlaceholderPage />} />
-                            <Route path="consulting" element={<ConsultingDashboard />} />
-                        </Route>
-                    </Route>
+                    {/* Secure Isolated Finance Redirection */}
+                    <Route path="finance" element={<AirGappedFinanceRedirect />} />
                     <Route path="support" element={<PlaceholderPage />} />
                     <Route path="crm" element={<CrmDashboard />} />
                     <Route path="sales" element={<SalesDashboard />} />
@@ -144,6 +210,7 @@ function App() {
 
                     {/* Productivity Routes */}
                     <Route path="calendar" element={<CalendarPage />} />
+                    <Route path="inbox" element={<InboxViewerPage />} />
 
                     {/* Catch-all for sub-sites like /sites/consulting to use portal layout */}
                     <Route path="sites/*" element={<PortalDashboard />} />
@@ -208,6 +275,7 @@ function App() {
                   <Route path="/site-map" element={<SiteMapPage />} />
                   <Route path="/signup" element={<SignupPage />} />
                   <Route path="/login" element={<LoginPage />} />
+                  <Route path="/auth/confirm" element={<ConfirmPage />} />
                   <Route path="/logout" element={<RedirectHandler to="/" />} />
                 </Route>
                 </Routes>

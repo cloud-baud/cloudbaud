@@ -29,3 +29,12 @@ with check (auth.jwt() ->> 'email' = 'jish.nath@cloudbaud.com');
 insert into public.allowed_access (email_pattern, description)
 select '@cloudbaud.com', 'Primary Domain'
 where not exists (select 1 from public.allowed_access where email_pattern = '@cloudbaud.com');
+
+-- Seed: Allow the CPA emails
+insert into public.allowed_access (email_pattern, description)
+select 'davidr8415@gmail.com', 'David Rumsey CPA (Google)'
+where not exists (select 1 from public.allowed_access where email_pattern = 'davidr8415@gmail.com');
+
+insert into public.allowed_access (email_pattern, description)
+select 'taxprep@davidrumseycpa.com', 'David Rumsey CPA (Business)'
+where not exists (select 1 from public.allowed_access where email_pattern = 'taxprep@davidrumseycpa.com');

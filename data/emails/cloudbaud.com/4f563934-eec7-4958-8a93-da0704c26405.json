@@ -1,0 +1,53 @@
+{
+  "fetchedAt": "2026-05-20T18:59:17.923Z",
+  "targetDomain": "cloudbaud.com",
+  "message": {
+    "object": "email",
+    "id": "4f563934-eec7-4958-8a93-da0704c26405",
+    "to": [
+      "jish.nath@cloudbaud.com"
+    ],
+    "from": "join@stack.expert",
+    "created_at": "2026-05-20 15:17:28.434208+00",
+    "subject": "Free Webinar: Stop working for others. Start your AI Consulting Business",
+    "message_id": "<20260520151726.a87c7bdcbdc3df67@cio127641.stack.expert>",
+    "bcc": [],
+    "cc": [],
+    "reply_to": [],
+    "html": "<!DOCTYPE html><html><head>\n  </head>\n  <body>\n    <!-- We'll replace this content tag with whatever you write in your email  -->\n    <p>Hey Jishnu,</p>\n<p>The people who are quietly building six-figure consulting businesses right now aren't AI researchers. They're domain experts - in finance, operations, healthcare, marketing, law, HR - who learned how to pair what they already know with AI tools.</p>\n<p>As an expert in your field, you can do the same.</p>\n<p><b>On Wednesday, May 27 at 3:00 PM Eastern, Stack is hosting a free live panel with Stack Certified AI Consultants:</b></p>\n<p><img width=\"650\" alt=\"\" src=\"https://userimg-assets.customeriomail.com/images/client-env-187819/01KS2YA045W89XEM3MPCBG2D9D.png\" title=\"Image: https://userimg-assets.customeriomail.com/images/client-env-187819/01KS2YA045W89XEM3MPCBG2D9D.png\"/></p>\n<p><b>What we'll cover:</b><br/>→ How to identify the highest-value AI use cases in your specific domain<br/>→ How to position yourself as an AI consultant regardless of your background<br/>→ How to land your first clients<br/>→ The exact path from employee or freelancer to independent AI consultant</p>\n<p>This is a live conversation with people doing this work — not a pitch deck.</p>\n<p><a target=\"_blank\" href=\"http://email.stack.expert/e/c/eyJlbWFpbF9pZCI6ImRnU3J1d3NEQUlRN2d6c0Jua1gyYlFGb0xTS0w5WWNVVUxyeiIsImhyZWYiOiJodHRwczovL2x1bWEuY29tL2FoMDR1NG1iP3V0bV9zb3VyY2U9ZW1haWwiLCJpbnRlcm5hbCI6ImFiYmIwYjAwODMzYjg0M2IiLCJsaW5rX2lkIjo2OTV9/bcb1d097b4cba28368bf387b6990de6dfe04aad369177e8f045718a22a2daab5\">👉 Reserve your free spot</a></p>\n<p>Spots are limited. This is a live session — not a recorded course.</p>\n<p>🎁 One live attendee will be chosen to win a free 6-month membership to Stack, a $1500 value!</p>\n<p>See you on May 27 at 3 PM ET.</p>\n<p>- The Stack Team<br/></p>\n<p><a target=\"_blank\" href=\"http://email.stack.expert/unsubscribe/dgSruwsDAIQ7gzsBnkX2bQFoLSKL9YcUULrz\" style=\"color: rgb(178, 178, 178) !important; font-size: 11px !important;\">Unsubscribe</a></p>\n\n  \n<img src=\"http://email.stack.expert/e/o/eyJlbWFpbF9pZCI6ImRnU3J1d3NEQUlRN2d6c0Jua1gyYlFGb0xTS0w5WWNVVUxyeiJ9\" style=\"height: 1px !important; max-height: 1px !important; max-width: 1px !important; width: 1px !important; display: none !important;\" alt=\"\"/></body></html>",
+    "text": "Hey Jishnu,\n\nThe people who are quietly building six-figure consulting businesses right now aren't AI researchers. They're domain experts - in finance, operations, healthcare, marketing, law, HR - who learned how to pair what they already know with AI tools.\n\nAs an expert in your field, you can do the same.\n\nOn Wednesday, May 27 at 3:00 PM Eastern, Stack is hosting a free live panel with Stack Certified AI Consultants:\n\nWhat we'll cover:\n→ How to identify the highest-value AI use cases in your specific domain\n→ How to position yourself as an AI consultant regardless of your background\n→ How to land your first clients\n→ The exact path from employee or freelancer to independent AI consultant\n\nThis is a live conversation with people doing this work — not a pitch deck.\n\n👉 Reserve your free spot ( https://luma.com/ah04u4mb?utm_source=email )\n\nSpots are limited. This is a live session — not a recorded course.\n\n🎁 One live attendee will be chosen to win a free 6-month membership to Stack, a $1500 value!\n\nSee you on May 27 at 3 PM ET.\n\n- The Stack Team\n\nUnsubscribe ( https://track.customer.io/unsubscribe/dgSruwsDAIQ7gzsBnkX2bQFoLSKL9YcUULrz )",
+    "headers": {
+      "return-path": "postmaster@cio127641.stack.expert",
+      "received": "[\"from v598.v5c4dda55.use4.send.mailgun.net (v598.v5c4dda55.use4.send.mailgun.net [159.112.241.98]) by inbound-smtp.us-east-1.amazonaws.com with SMTP id 2tlle1jihil9visa4jtkjfb1vgeruta8p63haao1 for jish.nath@cloudbaud.com; Wed, 20 May 2026 15:17:27 +0000 (UTC)\",\"by 0578a3643d7d4d8f3ce915653bec2b4c2792f659cbd53f26640ebe3126eec154 with HTTP id 6a0dd08697aadcc98f04cd8a; Wed, 20 May 2026 15:17:26 GMT\"]",
+      "x-ses-spam-verdict": "PASS",
+      "x-ses-virus-verdict": "PASS",
+      "received-spf": "none (spfCheck: 159.112.241.98 is neither permitted nor denied by domain of cio127641.stack.expert) client-ip=159.112.241.98; envelope-from=postmaster@cio127641.stack.expert; helo=v598.v5c4dda55.use4.send.mailgun.net;",
+      "authentication-results": "amazonses.com; spf=none (spfCheck: 159.112.241.98 is neither permitted nor denied by domain of cio127641.stack.expert) client-ip=159.112.241.98; envelope-from=postmaster@cio127641.stack.expert; helo=v598.v5c4dda55.use4.send.mailgun.net; dkim=pass header.i=@cio127641.stack.expert; dmarc=pass header.from=stack.expert;",
+      "x-ses-receipt": "AEFBQUFBQUFBQUFGL3g4QnRNdWxBejhuZDdIRlpQNkJCemg2VG5rbXV4dEhaNGo2RDdrWDBESVVPU3FNUXJtQTQySDQ3a0poS3hhYWFXTUJmanFFVW92ZXMwMkZrNXhpTTlvdEtkSWlPK2FNZkt2VWh6MjNnVVROelptRktlWFJ5Sk50aGViYlBqZCtrNmhYYXVXRW5RS2dOYnpCbExPaW1CV21seVRTSnVtWCtQOG40ZjgrNjZ1THBGeVpwcGthQjZmZEZ0aGo1T1N0YlF6UGtMSzdKQmYvNlQ4Z1JuVVBDalA5cmM1andWMEYxSGozdjdFTkpFZ05BdGJoVWljWDE2eFFnK2RIbWxBZEFraUFmVmtUQUJ1WW0rRkhnWHpCdUdRQ0hMdlppbjI3Q3VSU3RMbjdOL2M2OGdkSDhaZUNTSXUxdm1XeGp6NWM9",
+      "x-ses-dkim-signature": "a=rsa-sha256; q=dns/txt; b=MsqsUH/oGe4gX3leoDOjl1lLPHnScU+ABCDnHvCi+s/5E+9lddaZNB044IDgczBhhJdtRkZyOslIu+L/D3Gmjg7aYfM3TFrgl3Awot7QjJYqQn+BproVXpHS4GC+YLFV4ibcXXCQx2prptlg3TKFl9XyP1Xhn9S3yW+NA+CQl1k=; c=relaxed/simple; s=224i4yxa5dv7c2xz3womw6peuasteono; d=amazonses.com; t=1779290248; v=1; bh=Zr7OxctrPXDFsg+b103VsHIbwFa5fjkMlOZ7HrorH+0=; h=From:To:Cc:Bcc:Subject:Date:Message-ID:MIME-Version:Content-Type:X-SES-RECEIPT;",
+      "dkim-signature": "a=rsa-sha256",
+      "x-mailgun-sid": "WyI4NTEyOSIsImppc2gubmF0aEBjbG91ZGJhdWQuY29tIiwiNTQ0MTQyIl0=",
+      "x-mailgun-sending-ip": "159.112.241.98",
+      "date": "\"2026-05-20T15:17:26.000Z\"",
+      "mime-version": "1.0",
+      "content-type": "multipart/alternative",
+      "subject": "Free Webinar: Stop working for others. Start your AI Consulting Business",
+      "from": "\"Stack Team\" <join@stack.expert>",
+      "to": "jish.nath@cloudbaud.com",
+      "x-mailgun-dkim": "true",
+      "x-mailgun-native-send": "true",
+      "x-mailgun-track-clicks": "false",
+      "x-mailgun-track-opens": "false",
+      "list": "{\"unsubscribe\":{\"mail\":\"32.MRTVG4TVO5ZUIQKJKE3WO6TTIJXGWWBSMJIUM32MKNFUYOKZMNKVKTDSPI======@unsubscribe2.customer.io\",\"url\":\"https://e.customeriomail.com/unsubscribe/dgSruwsDAIQ7gzsBnkX2bQFoLSKL9YcUULrz\"},\"unsubscribe-post\":{\"name\":\"List-Unsubscribe=One-Click\"}}",
+      "x-mailer": "Customer.io (dgSruwsDAIQ7gzsBnkX2bQFoLSKL9YcUULrz; +https://whatis.customeriomail.com)",
+      "x-report-abuse-to": "badactor@customer.io",
+      "x-mailgun-variables": "{\"email_id\": \"dgSruwsDAIQ7gzsBnkX2bQFoLSKL9YcUULrz\"}",
+      "message-id": "<20260520151726.a87c7bdcbdc3df67@cio127641.stack.expert>"
+    },
+    "raw": {
+      "download_url": "https://cdn.resend.app/receiving/raw/2tlle1jihil9visa4jtkjfb1vgeruta8p63haao1?response-content-disposition=attachment%3B+filename%3D%222tlle1jihil9visa4jtkjfb1vgeruta8p63haao1%22&Expires=1779307158&Key-Pair-Id=K1EE1EYO2ZO8UR&Signature=WcpOQp04z9eDldT2sBFkEXzFj34v4KHDWDllx5X71QYEn1z0B0xGVIX3QvXUwcYvtNI5MuGkSuvzqN6yQB6VGAHBin9EF9uneaFOPvoWElUzTWmj48lcx7tiNHYqGMJAxi4WYgisU~bNL-1~Z3wTCDNm8tI0OhCYxRbi8gqUveAY4--R460H-yE11VLPvH~hYKP3gjIXwha83vavJjhFSg4bpVvAbF1jQI3QMe2FM62JoDUsC8FxIAkVYb2ZPpwDjv5PuZn0HPlxxzwJzGzDK5OiVk6LM~TnlOxYPGH01xh1ayqmULYauvmn30W7QbXIFM3ReNKmaUMeCKN~6bgfpg__",
+      "expires_at": "2026-05-20T19:59:17.937Z"
+    },
+    "attachments": []
+  }
+}

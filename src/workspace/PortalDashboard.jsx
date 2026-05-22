@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/shared/ui/badge';
 import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
 
 
 const QuickAction = ({ icon, label, sublabel, onClick }) => {
@@ -284,8 +285,11 @@ const PortalDashboard = () => {
                                 </div>
                             </div>
                         </div>
-                        <button className="w-full mt-4 text-xs text-muted-foreground hover:text-primary transition-colors flex items-center justify-center gap-1">
-                            <LinkIcon className="size-3" /> Sync Outlook Calendar
+                        <button 
+                            onClick={() => toast.info("Microsoft integrations have been discontinued for this workspace.")}
+                            className="w-full mt-4 text-xs text-muted-foreground hover:text-rose-500 transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                        >
+                            <LinkIcon className="size-3" /> Sync Outlook Calendar (Discontinued)
                         </button>
                     </div>
                 </div>

@@ -27,15 +27,16 @@ Official reference: [Send emails using Supabase with SMTP](https://resend.com/do
 
 ## 3. Configuring redirect URLs
 
-Go to **Authentication** → **URL Configuration** → **Redirect URLs** in Supabase.
+Go to **Authentication** → **URL Configuration** in Supabase.
 
-Examples (match your real URLs):
+1. **Site URL**:
+   * Set this to `http://localhost:17117`
 
-* **Local dev** (this app’s Vite port):
-  * `http://localhost:17117/*`
-  * `https://localhost:17117/*` (if you terminate TLS locally)
-* **Production**:
-  * `https://your-production-domain.com/*`
+2. **Redirect URLs**:
+   * Add the following allowed patterns to match your local multi-SPA dev environment and production:
+     * `http://localhost:17117/*` (Main Portal)
+     * `http://localhost:17118/*` (Finance SPA)
+     * `https://your-production-domain.com/*` (Production fallback)
 
 ## 4. Customizing the email template
 

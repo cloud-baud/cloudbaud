@@ -5,7 +5,7 @@ import {
     Check, Paperclip, FileText, ChevronLeft, ChevronDown, ChevronRight,
     Upload, ExternalLink, X, Download, Eye, Lock, LockOpen, Filter, Undo, Redo,
     Save, Printer, FileDown, Bold, Italic, AlignLeft, AlignCenter, AlignRight,
-    ZoomIn, ZoomOut, Sparkles, MessageSquare, Bot, Activity
+    ZoomIn, ZoomOut, Sparkles, MessageSquare, Bot, Activity, RefreshCw
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Ribbon, RibbonButton, RibbonSeparator, RibbonGroup, RibbonFontSizeSelector, RibbonColorPicker } from 'synolic.core';
@@ -14,10 +14,78 @@ import HighlightablePdfViewer from '../components/HighlightablePdfViewer';
 import SpreadsheetPreview from '../components/SpreadsheetPreview';
 import OllamaChatPanel from '../../workspace/OllamaChatPanel';
 import { buildTaxSystemPrompt } from '../ai/taxTrainingData';
+import useTaxData from '../hooks/useTaxData';
+import { uploadTaxDocument, linkDocumentToEntry } from '../api/taxService';
+import { extractTextFromPdf } from '../../lib/pdfUtils';
+
 
 // ──────────────────────────────────────────────────────────────
 // 2017 TAX DATA — Full 1040 Structure with Supporting Documents
 // ──────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────
+// EDITABLE CELL HELPER FOR SIDE-BY-SIDE LEDGER COLUMNS
+// ──────────────────────────────────────────────────────────────
+const EditableCell = ({ value, onSave, type = 'number', formatter, className, isLocked, onClick }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [localValue, setLocalValue] = useState(value ?? '');
+
+    useEffect(() => {
+        setLocalValue(value ?? '');
+    }, [value]);
+
+    const handleBlur = () => {
+        setIsEditing(false);
+        const toSave = type === 'number' && localValue !== '' ? parseFloat(localValue) : localValue;
+        if (toSave !== value) {
+            onSave(toSave);
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.target.blur();
+        }
+    };
+
+    if (isLocked) {
+        return (
+            <div 
+                className={cn("w-full text-right font-mono cursor-pointer select-none", className)}
+                onClick={onClick}
+            >
+                {formatter ? formatter(value) : (value ?? '')}
+            </div>
+        );
+    }
+
+    if (isEditing) {
+        return (
+            <input
+                autoFocus
+                type={type === 'number' ? 'number' : 'text'}
+                step="0.01"
+                value={localValue}
+                onChange={e => setLocalValue(e.target.value)}
+                onBlur={handleBlur}
+                onKeyDown={handleKeyDown}
+                className={cn("w-full bg-slate-100 dark:bg-slate-800 text-right outline-none p-0.5 border border-blue-500 rounded font-mono text-slate-900 dark:text-slate-50", className)}
+                onClick={(e) => e.stopPropagation()}
+            />
+        );
+    }
+
+    return (
+        <div
+            onDoubleClick={(e) => { e.stopPropagation(); setIsEditing(true); }}
+            onClick={onClick}
+            className={cn("w-full text-right font-mono cursor-pointer select-text min-h-[20px] hover:bg-slate-100/50 dark:hover:bg-white/[0.04] transition-colors rounded px-0.5", className)}
+            title="Double-click to edit, Single-click to trace"
+        >
+            {formatter ? formatter(value) : (value ?? <span className="text-slate-400 italic text-xs">— not entered —</span>)}
+        </div>
+    );
+};
+
 // Document base path for 2017
 const DOC_BASE = '/src/data/Documents - Taxes/2017/';
 
@@ -585,7 +653,209 @@ const TaxSingleYear = () => {
         return () => clearTimeout(timer);
     }, [activeSection, splitPct, collapsedSections, autoFitFontSize]);
 
-    const yearData = TAX_DATA_BY_YEAR[yearNum];
+    // Supabase Hooks integration
+    const { loading, error, yearData, updateAmount, toggleVerified: toggleVerifiedHook, reload } = useTaxData(yearNum, TAX_DATA_BY_YEAR[yearNum]);
+
+    // State variables for Agentic Extraction
+    const [uploadedFile, setUploadedFile] = useState(null);
+    const [extracting, setExtracting] = useState(false);
+    const [agentTrigger, setAgentTrigger] = useState(null);
+    const fileInputRef = useRef(null);
+
+    // File Selector handler
+    const handleFileUpload = useCallback((e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        
+        console.log('[File Upload] Selected file:', file.name);
+        setUploadedFile(file);
+        
+        const blobUrl = URL.createObjectURL(file);
+        setPreviewUrl(blobUrl);
+        setPreviewName(file.name);
+        setShowPanel(true);
+        setRightPanelTab('docs');
+    }, []);
+
+    // Start extraction using client-side PDF parser & local Ollama
+    const handleStartExtraction = async () => {
+        let fileToParse = uploadedFile;
+        
+        if (!fileToParse && previewUrl) {
+            setExtracting(true);
+            try {
+                console.log(`[PDF Extraction] Fetching runtime document: ${previewUrl}`);
+                const response = await fetch(previewUrl);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch document: ${response.statusText} (${response.status})`);
+                }
+                const blob = await response.blob();
+                const file = new File([blob], previewName, { type: 'application/pdf' });
+                fileToParse = file;
+                setUploadedFile(file); // Link it so handleProcessComplete can upload and persist in Supabase
+            } catch (err) {
+                console.error('[Extraction Error] Failed to fetch preloaded PDF:', err);
+                setExtracting(false);
+                alert(`Could not load document: ${err.message}. Please try manually uploading the file.`);
+                return;
+            }
+        }
+
+        if (!fileToParse) return;
+        setExtracting(true);
+        try {
+            const text = await extractTextFromPdf(fileToParse);
+            const isCpaReturn = previewName?.toLowerCase().includes('1040') || 
+                                previewName?.toLowerCase().includes('return') || 
+                                previewName?.toLowerCase().includes('cpa');
+            if (isCpaReturn) {
+                setAgentTrigger({ type: 'audit', data: { text, name: previewName } });
+            } else {
+                setAgentTrigger({ type: 'extract', data: { text } });
+            }
+            setRightPanelTab('agent');
+        } catch (err) {
+            console.error('[Extraction Error] Failed to parse PDF text:', err);
+            const isCpaReturn = previewName?.toLowerCase().includes('1040') || 
+                                previewName?.toLowerCase().includes('return') || 
+                                previewName?.toLowerCase().includes('cpa');
+            if (isCpaReturn) {
+                setAgentTrigger({ type: 'audit', data: { text: '', name: previewName } });
+            } else {
+                setAgentTrigger({ type: 'extract', data: { text: '' } });
+            }
+            setRightPanelTab('agent');
+        } finally {
+            setExtracting(false);
+        }
+    };
+
+    // Mapping from Ollama shortcodes to internal taxonomy
+    const AI_CODE_MAPPING = {
+        'w2_wages': 'wages',
+        'w2_withheld': 'fed_withheld',
+        'w2_401k': 'k401'
+    };
+
+    // Helper context for mapping AI results to ledger accounts
+    const getCalculatorContext = useCallback(() => {
+        const availableCodes = [];
+        const codeRowMap = {};
+        const codeAccountIdMap = {};
+
+        let index = 1;
+        yearData?.sections?.forEach(section => {
+            section.items.forEach(item => {
+                if (!item.computed) {
+                    availableCodes.push({
+                        code: item.id,
+                        description: `${section.title} - ${item.label} (${item.formLine || ''})`
+                    });
+                    codeRowMap[item.id] = index;
+                    codeAccountIdMap[item.id] = item.accountId;
+                }
+                index++;
+                
+                item.children?.forEach(child => {
+                    availableCodes.push({
+                        code: child.id,
+                        description: `${section.title} - ${item.label} -> ${child.label}`
+                    });
+                    codeRowMap[child.id] = index;
+                    codeAccountIdMap[child.id] = child.accountId;
+                    index++;
+                });
+            });
+        });
+
+        return {
+            availableCodes,
+            codeRowMap,
+            codeAccountIdMap,
+            colLetter: 'E'
+        };
+    }, [yearData?.sections]);
+
+    // Handle extraction completion & Supabase transactional persist
+    const handleProcessComplete = async (extractedData) => {
+        const { codeAccountIdMap } = getCalculatorContext();
+        
+        // Normalize keys from AI back to internal dashboard tax codes
+        const normalizedData = {};
+        Object.entries(extractedData).forEach(([key, val]) => {
+            const numVal = parseFloat(val);
+            if (isNaN(numVal)) return;
+            
+            let targetKey = key;
+            if (AI_CODE_MAPPING[key]) {
+                targetKey = AI_CODE_MAPPING[key];
+            }
+            normalizedData[targetKey] = numVal;
+        });
+
+        console.log('[Process Complete] Normalized data for Supabase update:', normalizedData);
+
+        try {
+            setExtracting(true);
+            
+            // 1. Transactionally update tax ledger cell amounts
+            const updatePromises = Object.entries(normalizedData).map(async ([key, amount]) => {
+                const accountId = codeAccountIdMap[key];
+                if (accountId) {
+                    console.log(`[Process Complete] Updating cell: code=${key}, accountId=${accountId}, amount=${amount}`);
+                    const entryResult = await updateAmount(accountId, amount, null, 'CPA_VERIFIED');
+                    return { key, accountId, entryResult };
+                }
+                return null;
+            });
+            
+            const results = (await Promise.all(updatePromises)).filter(Boolean);
+            
+            // 2. If supporting file was uploaded, register in storage and link as evidence
+            if (uploadedFile && results.length > 0) {
+                console.log('[Process Complete] Uploading document to tax-docs storage bucket:', uploadedFile.name);
+                
+                const uploadResult = await uploadTaxDocument(uploadedFile, {
+                    year: yearNum,
+                    type: 'SUPPORTING'
+                });
+                
+                console.log('[Process Complete] Document uploaded successfully. ID:', uploadResult.id);
+                
+                // Link document to each updated entry
+                const linkPromises = results.map(async (res) => {
+                    const entryId = res.entryResult?.id;
+                    if (entryId) {
+                        console.log(`[Process Complete] Linking document ID ${uploadResult.id} to entry ID ${entryId}`);
+                        await linkDocumentToEntry(entryId, uploadResult.id);
+                    }
+                });
+                await Promise.all(linkPromises);
+            }
+            
+            // 3. Clean up states and hot-reload dashboard data from database
+            setUploadedFile(null);
+            await reload();
+            setRightPanelTab('docs');
+            
+        } catch (err) {
+            console.error('[Process Complete] Error committing updates and evidence linkage:', err);
+        } finally {
+            setExtracting(false);
+        }
+    };
+
+    // Listen to custom window events for global AI integrations (e.g. from global Workspace Layout Chat)
+    useEffect(() => {
+        const handleGlobalProcessComplete = (e) => {
+            if (e.detail?.data) {
+                console.log("[Single Year View] Received global process complete event:", e.detail.data);
+                handleProcessComplete(e.detail.data);
+            }
+        };
+        window.addEventListener('ollama-process-complete', handleGlobalProcessComplete);
+        return () => window.removeEventListener('ollama-process-complete', handleGlobalProcessComplete);
+    }, [handleProcessComplete]);
 
     // ── Document Preview Handler ──
     const handleDocClick = useCallback((docName) => {
@@ -597,11 +867,7 @@ const TaxSingleYear = () => {
     }, []);
 
     // ── Row Click — Source Tracing ──
-    // Opens the TAX RETURN (1040) so you can view the relevant schedule/line.
-    // If the item has an amount, it also highlights that value in the PDF.
-    // Supporting docs are only opened via the file attachment icons.
     const handleAmountClick = useCallback((item) => {
-        // Open the specific schedule PDF if available, otherwise the main 1040
         const scheduleDoc = item.returnSchedule || yearData?.filing?.returnDoc;
         if (scheduleDoc) {
             const url = `${DOC_BASE}${scheduleDoc}`;
@@ -609,13 +875,11 @@ const TaxSingleYear = () => {
             setPreviewName(scheduleDoc);
             setShowPanel(true);
         } else {
-            // No document available — show empty state in preview pane
             setPreviewUrl(null);
             setPreviewName(item.label);
             setShowPanel(true);
         }
 
-        // If the item has an amount, set up highlighting
         if (item.amount !== null && item.amount !== undefined) {
             const absAmount = Math.abs(item.amount);
             const searchTerm = absAmount.toLocaleString('en-US', {
@@ -657,9 +921,13 @@ const TaxSingleYear = () => {
     }, []);
 
     // ── Toggle Verified ──
-    const toggleVerified = useCallback((itemId) => {
-        setVerified(prev => ({ ...prev, [itemId]: !prev[itemId] }));
-    }, []);
+    const toggleVerified = useCallback((item) => {
+        if (toggleVerifiedHook) {
+            toggleVerifiedHook(item.accountId || item.id);
+        }
+        setVerified(prev => ({ ...prev, [item.id] : !prev[item.id] }));
+    }, [toggleVerifiedHook]);
+
 
     const toggleExpand = useCallback((itemId) => {
         setExpandedSections(prev => ({ ...prev, [itemId]: !prev[itemId] }));
@@ -669,6 +937,20 @@ const TaxSingleYear = () => {
     const toggleSection = useCallback((sectionId) => {
         setCollapsedSections(prev => ({ ...prev, [sectionId]: !prev[sectionId] }));
     }, []);
+
+    if (loading && !yearData) {
+        return (
+            <div className="flex flex-col items-center justify-center h-full bg-slate-50/50 dark:bg-slate-950/50 backdrop-blur-sm z-50 transition-all duration-300">
+                <div className="flex flex-col items-center space-y-4 p-8 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-white/10 rounded-2xl shadow-xl">
+                    <RefreshCw className="size-10 text-blue-600 animate-spin" />
+                    <div className="text-center space-y-1">
+                        <h3 className="font-semibold text-lg text-slate-800 dark:text-slate-200">Synchronizing Ledger</h3>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">Fetching live database ledger entries...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     if (!yearData) {
         return (
@@ -783,23 +1065,40 @@ const TaxSingleYear = () => {
                         </div>
                     </td>
 
-                    {/* Amount Column — Clickable for Source Tracing */}
+                    {/* Draft (Jishnu) Column */}
                     <td 
                         className={cn(
-                            "py-1 px-2 text-right font-mono",
-                            isMissing && "opacity-60",
-                            !isMissing && hasDocs && "cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors group/amount",
+                            "py-1 px-2 text-right font-mono w-32 border-r border-slate-200/60 dark:border-white/5",
+                            (item.amountDraft === null || item.amountDraft === undefined) && "opacity-60",
+                            item.amountDraft !== null && hasDocs && "hover:bg-red-50 dark:hover:bg-red-900/20",
                             highlightAmount?.itemId === item.id && "bg-red-100 dark:bg-red-900/30 ring-2 ring-red-400 ring-inset"
                         )}
-                        onClick={() => !isMissing && hasDocs && handleAmountClick(item)}
-                        title={!isMissing && hasDocs ? `Click to trace ${item.amount} in the tax return` : undefined}
                     >
-                        <div className="flex items-center justify-end gap-1">
-                            {!isMissing && hasDocs && (
-                                <Eye className="size-3 text-red-400 opacity-0 group-hover/amount:opacity-100 transition-opacity shrink-0" />
-                            )}
-                            {formatCurrency(item.amount)}
-                        </div>
+                        <EditableCell 
+                            value={item.amountDraft}
+                            onSave={(val) => updateAmount(item.accountId || item.id, val, null, 'MANUAL')}
+                            isLocked={item.computed}
+                            onClick={() => handleAmountClick({ ...item, amount: item.amountDraft })}
+                            formatter={formatCurrency}
+                        />
+                    </td>
+
+                    {/* CPA (David) Column */}
+                    <td 
+                        className={cn(
+                            "py-1 px-2 text-right font-mono w-32",
+                            (item.amountCpa === null || item.amountCpa === 0) && "opacity-60",
+                            item.amountCpa !== 0 && hasDocs && "hover:bg-red-50 dark:hover:bg-red-900/20",
+                            highlightAmount?.itemId === item.id && "bg-red-100 dark:bg-red-900/30 ring-2 ring-red-400 ring-inset"
+                        )}
+                    >
+                        <EditableCell 
+                            value={item.amountCpa}
+                            onSave={(val) => updateAmount(item.accountId || item.id, val, null, 'CPA_VERIFIED')}
+                            isLocked={item.computed}
+                            onClick={() => handleAmountClick({ ...item, amount: item.amountCpa })}
+                            formatter={formatCurrency}
+                        />
                     </td>
                 </tr>
 
@@ -858,8 +1157,11 @@ const TaxSingleYear = () => {
                                     <th className="py-1 px-2 text-left font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider" style={{ fontSize: '0.85em' }}>
                                         Tax Item
                                     </th>
+                                    <th className="py-1 px-2 text-right font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider w-32 border-r border-slate-200 dark:border-white/10" style={{ fontSize: '0.85em' }}>
+                                        Jishnu (Draft)
+                                    </th>
                                     <th className="py-1 px-2 text-right font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider w-32" style={{ fontSize: '0.85em' }}>
-                                        Amount ($)
+                                        David (CPA)
                                     </th>
                                 </tr>
                             </thead>
@@ -877,7 +1179,7 @@ const TaxSingleYear = () => {
                                             : "bg-slate-100 dark:bg-white/[0.06] border-slate-300 dark:border-white/10"
                                     )}>
                                         <td colSpan="3"></td>
-                                        <td className="py-1.5 px-2 text-right">
+                                        <td className="py-1.5 px-2 text-right border-r border-slate-200 dark:border-white/10">
                                             <span className={cn(
                                                 section.subtotal.isOwed ? "text-red-700 dark:text-red-400" : "text-slate-800 dark:text-slate-200"
                                             )}>
@@ -890,10 +1192,20 @@ const TaxSingleYear = () => {
                                             )}
                                         </td>
                                         <td className={cn(
+                                            "py-1.5 px-2 text-right font-mono border-r border-slate-200 dark:border-white/10",
+                                            section.subtotal.isOwed ? "text-red-700 dark:text-red-400" : ""
+                                        )}>
+                                            {formatCurrency(
+                                                section.items.reduce((sum, item) => sum + (item.amountDraft ?? item.amount ?? 0), 0)
+                                            )}
+                                        </td>
+                                        <td className={cn(
                                             "py-1.5 px-2 text-right font-mono",
                                             section.subtotal.isOwed ? "text-red-700 dark:text-red-400" : ""
                                         )}>
-                                            {formatCurrency(section.subtotal.amount)}
+                                            {formatCurrency(
+                                                section.items.reduce((sum, item) => sum + (item.amountCpa ?? 0), 0)
+                                            )}
                                         </td>
                                     </tr>
                                 </tfoot>
@@ -923,7 +1235,7 @@ const TaxSingleYear = () => {
                             <>
                                 <RibbonButton icon={Save} label="Save" />
                                 <RibbonButton icon={FileDown} label="Open Return" onClick={() => filing.returnDoc && handleDocClick(filing.returnDoc)} />
-                                <RibbonButton icon={Upload} label="Upload" />
+                                <RibbonButton icon={Upload} label="Upload" onClick={() => fileInputRef.current?.click()} />
                                 <RibbonSeparator />
                                 <RibbonButton icon={Upload} label="Export" />
                                 <RibbonButton icon={Printer} label="Print" />
@@ -1196,7 +1508,7 @@ const TaxSingleYear = () => {
                                         variant="ghost"
                                         size="sm"
                                         className="h-7 w-7 p-0"
-                                        onClick={() => { setPreviewUrl(null); setPreviewName(''); setHighlightAmount(null); }}
+                                        onClick={() => { setPreviewUrl(null); setPreviewName(''); setHighlightAmount(null); setUploadedFile(null); }}
                                         title="Back to documents"
                                     >
                                         <X className="size-3.5" />
@@ -1232,7 +1544,53 @@ const TaxSingleYear = () => {
                             </div>
                         )}
                         {/* Document Viewer — type-aware rendering */}
-                        <div className="flex-1 bg-slate-100 dark:bg-[#0c1222] overflow-hidden">
+                        <div className="flex-1 bg-slate-100 dark:bg-[#0c1222] overflow-hidden relative">
+                            {/* Floating "Extract with AI" Banner */}
+                            {previewUrl && previewName?.toLowerCase().endsWith('.pdf') && rightPanelTab === 'docs' && (() => {
+                                const isCpaReturn = previewName?.toLowerCase().includes('1040') || 
+                                                    previewName?.toLowerCase().includes('return') || 
+                                                    previewName?.toLowerCase().includes('cpa');
+                                return (
+                                    <div className={cn(
+                                        "absolute top-4 left-4 right-4 z-20 p-4 rounded-xl shadow-lg border text-white flex items-center justify-between animate-in fade-in slide-in-from-top-4 duration-300",
+                                        isCpaReturn 
+                                            ? "bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 border-indigo-400/20"
+                                            : "bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-700 dark:to-indigo-700 border-blue-400/20"
+                                    )}>
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
+                                                <Sparkles className="size-5 text-amber-300 animate-pulse" />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-semibold text-sm leading-tight text-white">
+                                                    {isCpaReturn ? "Audit CPA Return with Local AI" : "Extract Tax Data with AI"}
+                                                </h4>
+                                                <p className="text-[11px] text-blue-100">
+                                                    {isCpaReturn 
+                                                        ? "Cross-examine the finalized CPA tax return PDF against your raw spreadsheet numbers."
+                                                        : `Automatically map and sync values from ${uploadedFile?.name || previewName}`
+                                                    }
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <Button 
+                                            size="sm" 
+                                            disabled={extracting}
+                                            onClick={handleStartExtraction}
+                                            className="bg-white hover:bg-slate-100 text-blue-700 font-bold px-4 py-1.5 h-8 text-xs shadow-md border-0 shrink-0"
+                                        >
+                                            {extracting ? (
+                                                <>
+                                                    <RefreshCw className="size-3.5 mr-1.5 animate-spin" />
+                                                    {isCpaReturn ? 'Auditing...' : 'Parsing...'}
+                                                </>
+                                            ) : (
+                                                isCpaReturn ? 'Run AI Audit & Analysis' : 'Run AI Extraction'
+                                            )}
+                                        </Button>
+                                    </div>
+                                );
+                            })()}
                             {previewUrl ? (() => {
                                 const ext = previewName?.split('.').pop()?.toLowerCase();
                                 const isSpreadsheet = ['xls', 'xlsx', 'csv'].includes(ext);
@@ -1344,10 +1702,32 @@ const TaxSingleYear = () => {
                         {rightPanelTab === 'agent' && (
                             <div className="flex-1 overflow-hidden" style={{ fontSize: '14px' }}>
                                 <OllamaChatPanel
+                                    isOpen={rightPanelTab === 'agent'}
+                                    trigger={agentTrigger}
+                                    onProcessComplete={handleProcessComplete}
                                     contextData={{
                                         text: buildTaxSystemPrompt(yearData, activeSection),
                                         taxYear: year,
                                         sections: sections?.map(s => ({ id: s.id, title: s.title, items: s.items.length })),
+                                        calculator: getCalculatorContext,
+                                        draftData: sections?.map(s => ({
+                                            id: s.id,
+                                            title: s.title,
+                                            items: s.items.map(i => ({
+                                                id: i.id,
+                                                label: i.label,
+                                                amount: i.amount,
+                                                formLine: i.formLine,
+                                                verified: i.verified || verified[i.id],
+                                                children: i.children?.map(c => ({
+                                                    id: c.id,
+                                                    label: c.label,
+                                                    amount: c.amount,
+                                                    formLine: c.formLine,
+                                                    verified: c.verified || verified[c.id]
+                                                }))
+                                            }))
+                                        }))
                                     }}
                                 />
                             </div>
@@ -1418,6 +1798,13 @@ const TaxSingleYear = () => {
                     </div>
                 </div>
             </div>
+            <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                accept=".pdf"
+                className="hidden"
+            />
         </div>
     );
 };

@@ -1,0 +1,39 @@
+
+
+
+Run Date,Action,Symbol,Security Description,Security Type,Quantity,Price ($),Commission ($),Fees ($),Accrued Interest ($),Amount ($),Settlement Date
+ 12/31/2018, INTEREST EARNED, QHMAQ, FDIC INSURED DEPOSIT AT DISCOVER BANK I,Cash,,,,,,0.09,
+ 12/07/2018, DISTRIBUTION, , INPIXON RTS EXP 12/21/2018,Cash,75,,,,,,
+ 11/30/2018, INTEREST EARNED, QHMAQ, FDIC INSURED DEPOSIT AT DISCOVER BANK I,Cash,,,,,,0.12,
+ 11/13/2018, YOU BOUGHT           OPENING TRANSACTION, -WMT190621C110, CALL (WMT) WALMART INC COM JUN 21 19 $110 (100 SHS),Cash,2,4.5, 6.25,0.07,,-906.32, 11/14/2018
+ 11/09/2018, YOU BOUGHT           OPENING TRANSACTION, -WMT190621C110, CALL (WMT) WALMART INC COM JUN 21 19 $110 (100 SHS),Cash,1,4.9, 0.65,0.03,,-490.68, 11/13/2018
+ 11/09/2018, YOU SOLD             CLOSING TRANSACTION, -WMT200117C97.5, CALL (WMT) WALMART INC COM JAN 17 20 $97.5 (100 SHS),Cash,-1,14.82, 5.6,0.05,,1476.35, 11/13/2018
+ 11/06/2018, YOU BOUGHT           OPENING TRANSACTION, -ATVI200117C120, CALL (ATVI) ACTIVISION BLIZZARD JAN 17 20 $120 (100 SHS),Cash,9,0.75, 10.8,0.31,,-686.11, 11/07/2018
+ 11/02/2018, REVERSE SPLIT        R/S FROM   45790J305#REOR M0051156900001, INPX, INPIXON COM PAR,Cash,75,,,,,, 
+ 11/02/2018, REVERSE SPLIT        R/S TO     45790J503#REOR M0051156900000, 45790J305, INPIXON COM NEW 1 FOR 40 R/S INTO INPIX,Cash,-3000,,,,,, 
+ 10/31/2018, INTEREST EARNED, QHMAQ, FDIC INSURED DEPOSIT AT DISCOVER BANK I,Cash,,,,,,0.1, 
+ 10/23/2018, YOU SOLD             CLOSING TRANSACTION, -FEYE190118C17, CALL (FEYE) FIREEYE INC COM JAN 18 19 $17 (100 SHS),Cash,-5,1.78, 8.2,0.19,,881.61, 10/24/2018
+ 10/22/2018, EXPIRED              CALL (YRCW)         YRC WORLDWIDE INC as of 10/19/2018, -YRCW181019C11, CALL (YRCW) YRC WORLDWIDE INC OCT 19 18 $11 (100 SHS),Cash,-30,,,,,, 
+ 10/09/2018, YOU BOUGHT           OPENING TRANSACTION, -CSCO190418C50, CALL (CSCO) CISCO SYS INC COM APR 18 19 $50 (100 SHS),Cash,3,1.94, 6.9,0.1,,-589, 10/10/2018
+ 10/09/2018, YOU BOUGHT           OPENING TRANSACTION, -CSCO190418C50, CALL (CSCO) CISCO SYS INC COM APR 18 19 $50 (100 SHS),Cash,1,2, 0.65,0.03,,-200.68, 10/10/2018
+ 10/09/2018, YOU SOLD             CLOSING TRANSACTION, -CSCO200117C42, CALL (CSCO) CISCO SYS INC COM JAN 17 20 $42 (100 SHS),Cash,-1,8.2, 5.6,0.05,,814.35, 10/10/2018
+ 10/05/2018, YOU BOUGHT, 45790J305, INPIXON COM NEW 1 FOR 40 R/S INTO INPIX,Cash,2400,0.37, 4.95,,,-892.95, 10/10/2018
+ 10/05/2018, YOU SOLD, IGC, INDIA GLOBALIZATION CAPITAL INC COM USD,Cash,-200,4.39, 4.95,0.02,,872.15, 10/10/2018
+ 10/03/2018, DIVIDEND RECEIVED, SLCA, U S SILICA HLDGS INC COM USD0.01,Cash,,,,,,6.25, 
+ 10/02/2018, YOU BOUGHT, IGC, INDIA GLOBALIZATION CAPITAL INC COM USD,Cash,200,13.5, 4.95,,,-2704.75, 10/04/2018
+ 10/01/2018, YOU SOLD, NEPT, NEPTUNE WELLNESS SOLUTIONS INC COM NPV ,Cash,-500,4.58, 4.95,0.03,,2286.97, 10/03/2018
+
+
+
+
+
+"The data and information in this spreadsheet is provided to you solely for your use and is not for distribution. The spreadsheet is provided for"
+"informational purposes only, and is not intended to provide advice, nor should it be construed as an offer to sell, a solicitation of an offer to buy or a"
+"recommendation for any security by Fidelity or any third party. Data and information shown is based on information known to Fidelity as of the date it was"
+"exported and is subject to change. It should not be used in place of your account statements or trade confirmations and is not intended for tax reporting"
+"purposes. For more information on the data included in this spreadsheet, including any limitations thereof, go to Fidelity.com."
+
+"Brokerage services are provided by Fidelity Brokerage Services LLC, 900 Salem Street, Smithfield, RI 02917. Custody and other services provided by National"
+"Financial Services LLC. Both are Fidelity Investment companies and members SIPC, NYSE."
+
+"Date downloaded" 03/12/2019, 4:12 PM

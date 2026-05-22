@@ -139,13 +139,63 @@ const RIGHT_PANEL_TABS = [
     { id: 'resources', label: 'Resources', icon: FileText },
 ];
 
+function stripHtml(input) {
+    return String(input || '')
+        .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+        .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function categorizeEmail(message) {
+    const from = String(message?.from || '').toLowerCase();
+    const subject = String(message?.subject || '').toLowerCase();
+    const text = `${from} ${subject}`;
+
+    if (/(invoice|payment|tax|w2|billing|receipt|bank|payroll|finance)/.test(text)) return 'Finance';
+    if (/(resume|recruit|hiring|interview|position|candidate|job)/.test(text)) return 'Recruiting';
+    if (/(security|alert|auth|password|phish|icloud storage is full|verification)/.test(text)) return 'Security';
+    if (/(proposal|meeting|demo|pricing|quote|rate confirmation|client)/.test(text)) return 'Sales';
+    if (/(support|ticket|help|issue|case)/.test(text)) return 'Support';
+    if (/(newsletter|introducing|update|event|invite|community|promo|offer)/.test(text)) return 'Marketing';
+    if (/(gmail\.com|yahoo\.com|outlook\.com)/.test(from)) return 'Personal';
+    return 'General';
+}
+
+const isAbsoluteUrl = (url) => {
+    if (!url) return false;
+    return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('//');
+};
+
 const WorkspaceLayout = () => {
-    const { user, signOut } = useAuth();
+    const { user, session, signOut } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Multi-SPA dynamic routing resolution constants
+    const isFinanceConsole = window.location.port === '17118';
+    const mainOrigin = window.location.hostname.includes('localhost') || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:17117'
+        : 'https://cloudbaud.com';
+    const financeOrigin = window.location.hostname.includes('localhost') || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:17118'
+        : 'https://finance.cloudbaud.com';
+
+    const resolveLink = (href) => {
+        if (!href) return href;
+        if (isFinanceConsole && href.startsWith('/')) {
+            return `${mainOrigin}${href}`;
+        }
+        return href;
+    };
+
     const [isRightPanelOpen, setIsRightPanelOpen] = useState(false);
     const [rightPanelTab, setRightPanelTab] = useState('ai-chat');
     const [ollamaOnline, setOllamaOnline] = useState(null); // null=checking, true=online, false=offline
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+    const [workspaceSearchQuery, setWorkspaceSearchQuery] = useState('');
+    const [aiContextData, setAiContextData] = useState(null);
 
     // Resizable pane widths with persistence
     const [sidebarWidth, setSidebarWidth] = useState(() => {
@@ -198,6 +248,60 @@ const WorkspaceLayout = () => {
         const interval = setInterval(check, 15000);
         return () => clearInterval(interval);
     }, []);
+
+    // Route-aware AI context (inbox snapshot for email questions)
+    useEffect(() => {
+        let cancelled = false;
+
+        async function loadInboxContext() {
+            if (!location.pathname.startsWith('/workspace/inbox')) {
+                setAiContextData({ route: location.pathname });
+                return;
+            }
+
+            try {
+                const res = await fetch('/data/emails/cloudbaud.com/inbox-list.json', { cache: 'no-store' });
+                if (!res.ok) {
+                    setAiContextData({ route: location.pathname, inbox: { available: false } });
+                    return;
+                }
+
+                const payload = await res.json();
+                const compact = (payload?.messages || []).slice(0, 30).map((m) => ({
+                    id: m.id,
+                    from: m.from || '',
+                    to: m.to || [],
+                    cc: m.cc || [],
+                    subject: m.subject || '(No subject)',
+                    createdAt: m.created_at || '',
+                    attachmentCount: Array.isArray(m.attachments) ? m.attachments.length : 0,
+                    category: categorizeEmail(m),
+                    snippet: stripHtml(m.text || m.html || m.raw || '').slice(0, 200),
+                }));
+
+                if (!cancelled) {
+                    setAiContextData({
+                        route: location.pathname,
+                        inbox: {
+                            available: true,
+                            total: payload?.total || compact.length,
+                            fetchedAt: payload?.fetchedAt || '',
+                            messages: compact,
+                        },
+                    });
+                }
+            } catch {
+                if (!cancelled) {
+                    setAiContextData({ route: location.pathname, inbox: { available: false } });
+                }
+            }
+        }
+
+        loadInboxContext();
+        return () => {
+            cancelled = true;
+        };
+    }, [location.pathname]);
 
     // Searchbox background is now standardized to White (Always-White Searchbox Standard)
 
@@ -274,32 +378,60 @@ const WorkspaceLayout = () => {
                         <PanelLeftOpen className="size-5" />
                     </button>
 
-                    <Link to="/workspace" className="flex items-center gap-4 lg:gap-6 font-semibold text-lg hover:opacity-90 transition-opacity text-white shrink-0">
-                        {user?.user_metadata?.custom_logo_url ? (
-                            <img src={user.user_metadata.custom_logo_url} alt="Logo" className="h-16 w-auto object-contain" />
-                        ) : (
-                            <CloudBaudLogo className="h-12 w-auto object-contain shrink-0" />
-                        )}
-                        <span className="tracking-tight hidden xl:block">{user?.user_metadata?.site_name || 'CloudBaud'}</span>
-                    </Link>
+                    {isFinanceConsole ? (
+                        <a href={`${mainOrigin}/workspace`} className="flex items-center gap-4 lg:gap-6 font-semibold text-lg hover:opacity-90 transition-opacity text-white shrink-0">
+                            {user?.user_metadata?.custom_logo_url ? (
+                                <img src={user.user_metadata.custom_logo_url} alt="Logo" className="h-16 w-auto object-contain" />
+                            ) : (
+                                <CloudBaudLogo className="h-12 w-auto object-contain shrink-0" />
+                            )}
+                            <span className="tracking-tight hidden xl:block">{user?.user_metadata?.site_name || 'CloudBaud'}</span>
+                        </a>
+                    ) : (
+                        <Link to="/workspace" className="flex items-center gap-4 lg:gap-6 font-semibold text-lg hover:opacity-90 transition-opacity text-white shrink-0">
+                            {user?.user_metadata?.custom_logo_url ? (
+                                <img src={user.user_metadata.custom_logo_url} alt="Logo" className="h-16 w-auto object-contain" />
+                            ) : (
+                                <CloudBaudLogo className="h-12 w-auto object-contain shrink-0" />
+                            )}
+                            <span className="tracking-tight hidden xl:block">{user?.user_metadata?.site_name || 'CloudBaud'}</span>
+                        </Link>
+                    )}
 
                     {/* Prominent Search Bar (Next to Logo) */}
                     <SearchBox
                         placeholder="Search..."
                         variant="inset"
                         className="w-64 hidden md:block"
+                        value={workspaceSearchQuery}
+                        onChange={setWorkspaceSearchQuery}
+                        onClear={() => setWorkspaceSearchQuery('')}
                     />
                 </div>
 
                 {/* Center: Global Navigation Links */}
                 <nav className="hidden lg:flex items-center gap-1 xl:gap-2 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                    {user?.email === 'jishnunath@gmail.com' && (
-                        <TopNavItem to="/finances" icon={PieChart} label="Finances" />
-                    )}
+                    {user?.email === 'jishnunath@gmail.com' && (() => {
+                        const targetOrigin = window.location.hostname.includes('localhost') || window.location.hostname === '127.0.0.1'
+                            ? 'http://localhost:17118'
+                            : 'https://finance.cloudbaud.com';
+                        
+                        let financeHref = `${targetOrigin}/workspace/finance`;
+                        if (session?.access_token) {
+                            financeHref = `${targetOrigin}/auth/handoff?access_token=${encodeURIComponent(session.access_token)}&refresh_token=${encodeURIComponent(session.refresh_token)}`;
+                        }
+                        
+                        const targetHref = isFinanceConsole ? '/workspace/finance' : financeHref;
+                        
+                        return (
+                            <TopNavItem to={targetHref} icon={PieChart} label="Finances" />
+                        );
+                    })()}
 
                     {/* Dynamic Nav Items */}
                     {navItems.map(item => {
                         const ItemIcon = ICON_MAP[item.icon] || Briefcase;
+                        const resolvedHref = resolveLink(item.href);
 
                         return item.subItems && item.subItems.length > 0 ? (
                             <DropdownMenu key={item.id}>
@@ -311,19 +443,26 @@ const WorkspaceLayout = () => {
                                     <span>{item.label}</span>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>
-                                    {item.subItems.map(sub => (
-                                        <DropdownMenuItem key={sub.id} asChild>
-                                            <Link to={sub.href} className="w-full cursor-pointer">
-                                                {sub.label}
-                                            </Link>
-                                        </DropdownMenuItem>
-                                    ))}
+                                    {item.subItems.map(sub => {
+                                        const resolvedSubHref = resolveLink(sub.href);
+                                        const isSubAbsolute = isAbsoluteUrl(resolvedSubHref);
+                                        const SubLinkComponent = isSubAbsolute ? 'a' : Link;
+                                        const subLinkProps = isSubAbsolute ? { href: resolvedSubHref } : { to: resolvedSubHref };
+                                        
+                                        return (
+                                            <DropdownMenuItem key={sub.id} asChild>
+                                                <SubLinkComponent {...subLinkProps} className="w-full cursor-pointer">
+                                                    {sub.label}
+                                                </SubLinkComponent>
+                                            </DropdownMenuItem>
+                                        );
+                                    })}
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         ) : (
                             <TopNavItem
                                 key={item.id}
-                                to={item.href}
+                                to={resolvedHref}
                                 icon={ItemIcon}
                                 label={item.label}
                             />
@@ -333,12 +472,21 @@ const WorkspaceLayout = () => {
 
                 {/* Right: Actions & Profile */}
                 <div className="flex items-center gap-3">
-                    <Link 
-                        to="/" 
-                        className="text-slate-400 hover:text-white font-medium text-sm transition-colors border border-slate-700 px-3 py-1.5 rounded-md hover:border-slate-500"
-                    >
-                        Portal Site
-                    </Link>
+                    {isFinanceConsole ? (
+                        <a 
+                            href={`${mainOrigin}/`} 
+                            className="text-slate-400 hover:text-white font-medium text-sm transition-colors border border-slate-700 px-3 py-1.5 rounded-md hover:border-slate-500"
+                        >
+                            Portal Site
+                        </a>
+                    ) : (
+                        <Link 
+                            to="/" 
+                            className="text-slate-400 hover:text-white font-medium text-sm transition-colors border border-slate-700 px-3 py-1.5 rounded-md hover:border-slate-500"
+                        >
+                            Portal Site
+                        </Link>
+                    )}
 
                     {/* AI Assistant Toggle */}
                     <button
@@ -407,7 +555,13 @@ const WorkspaceLayout = () => {
                             <DropdownMenuLabel>My Account</DropdownMenuLabel>
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem onClick={() => navigate('/workspace/settings')}>
+                            <DropdownMenuItem onClick={() => {
+                                if (isFinanceConsole) {
+                                    window.location.href = `${mainOrigin}/workspace/settings`;
+                                } else {
+                                    navigate('/workspace/settings');
+                                }
+                            }}>
                                 <Settings className="mr-2 h-4 w-4" />
                                 <span>Settings</span>
                             </DropdownMenuItem>
@@ -464,18 +618,47 @@ const WorkspaceLayout = () => {
 
                         <div className="px-2 pb-4 pt-2 space-y-6">
                             <Section title="Overview" collapsed={isSidebarCollapsed}>
-                                <SidebarLink icon={FileText} label="My Feed" href="/portal" active collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
-                                <SidebarLink icon={Calendar} label="Calendar" href="/workspace/calendar" collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
-                                <SidebarLink icon={Users} label="My Network" href="/portal/network" collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
+                                <SidebarLink icon={FileText} label="My Feed" href={resolveLink("/portal")} active={!isFinanceConsole && location.pathname === "/portal"} collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
+                                <SidebarLink icon={Calendar} label="Calendar" href={resolveLink("/workspace/calendar")} collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
+                                <SidebarLink icon={MessageSquare} label="Inbox" href={resolveLink("/workspace/inbox")} collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
+                                <SidebarLink icon={Users} label="My Network" href={resolveLink("/portal/network")} collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
                             </Section>
 
-                            <Section title="Operations" collapsed={isSidebarCollapsed}>
-                                {operationsApps
-                                    .filter(app => app.label !== 'Finance' || isFinanceAuthorized(user)) // Hide Finance if not authorized
-                                    .map((item) => (
-                                    <SidebarLink key={item.label} {...item} collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
-                                ))}
-                            </Section>
+                             <Section title="Operations" collapsed={isSidebarCollapsed}>
+                                 {operationsApps
+                                     .filter(app => app.label !== 'Finance' || isFinanceAuthorized(user)) // Hide Finance if not authorized
+                                     .map((item) => {
+                                         let mappedItem = { ...item };
+                                         let finalHref = item.href;
+                                         if (item.label === 'Finance') {
+                                             const financeOriginHost = window.location.hostname.includes('localhost') || window.location.hostname === '127.0.0.1'
+                                                 ? 'http://localhost:17118'
+                                                 : 'https://finance.cloudbaud.com';
+                                             
+                                             if (session?.access_token) {
+                                                 finalHref = `${financeOriginHost}/auth/handoff?access_token=${encodeURIComponent(session.access_token)}&refresh_token=${encodeURIComponent(session.refresh_token)}`;
+                                             } else {
+                                                 finalHref = `${financeOriginHost}/workspace/finance`;
+                                             }
+                                             // If we are already on the finance console, use relative URL to avoid unnecessary reload!
+                                             if (isFinanceConsole) {
+                                                 finalHref = '/workspace/finance';
+                                             }
+                                         } else if (isFinanceConsole && finalHref.startsWith('/')) {
+                                             finalHref = `${mainOrigin}${finalHref}`;
+                                             if (item.children) {
+                                                 mappedItem.children = item.children.map(child => ({
+                                                     ...child,
+                                                     href: child.href.startsWith('/') ? `${mainOrigin}${child.href}` : child.href
+                                                 }));
+                                             }
+                                         }
+                                         mappedItem.href = finalHref;
+                                         return (
+                                             <SidebarLink key={item.label} {...mappedItem} collapsed={isSidebarCollapsed} onExpand={() => setIsSidebarCollapsed(false)} />
+                                         );
+                                     })}
+                             </Section>
                         </div>
                     </div>
 
@@ -484,7 +667,7 @@ const WorkspaceLayout = () => {
                         <div className="px-2 py-4 space-y-6">
                             <Section title="Favorites" collapsed={isSidebarCollapsed}>
                                 {favorites.map((item) => (
-                                    <SidebarLink key={item.label} {...item} collapsed={isSidebarCollapsed} />
+                                    <SidebarLink key={item.label} {...item} href={resolveLink(item.href)} collapsed={isSidebarCollapsed} />
                                 ))}
                             </Section>
                         </div>
@@ -508,7 +691,7 @@ const WorkspaceLayout = () => {
                 {/* Page Content */}
                 <main className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden relative p-2 md:p-4 lg:p-6">
                     <div className="flex-1 bg-card rounded-xl border border-border shadow-sm overflow-hidden flex flex-col relative w-full">
-                        <Outlet />
+                        <Outlet context={{ workspaceSearchQuery }} />
                     </div>
                 </main>
 
@@ -538,7 +721,7 @@ const WorkspaceLayout = () => {
                         {/* Panel Content */}
                         <div className="flex-1 overflow-hidden flex flex-col">
                             {rightPanelTab === 'ai-chat' && (
-                                <OllamaChatPanel isOpen={true} onClose={() => setIsRightPanelOpen(false)} variant="embedded" />
+                                <OllamaChatPanel isOpen={true} onClose={() => setIsRightPanelOpen(false)} variant="embedded" contextData={aiContextData} />
                             )}
                             {rightPanelTab === 'people' && (
                                 <WorkspaceChat
@@ -628,7 +811,7 @@ const WorkspaceLayout = () => {
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                         <span className="px-1.5 py-0.5 rounded bg-neutral-800 border border-neutral-700 text-neutral-300 font-mono">DEV_SERVER</span>
-                        <span className="text-neutral-500">Port: 17117</span>
+                        <span className="text-neutral-500">Port: {window.location.port || '80'}</span>
                     </div>
                     <div className="h-3 w-px bg-neutral-800" />
                     <div className="flex items-center gap-1.5 text-neutral-300">
@@ -645,6 +828,20 @@ const WorkspaceLayout = () => {
 const TopNavItem = ({ to, icon, label, exact }) => {
     const Icon = icon;
     if (!Icon) return null;
+    const isAbsolute = isAbsoluteUrl(to);
+    
+    if (isAbsolute) {
+        return (
+            <a
+                href={to}
+                className="flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 group min-w-[70px] h-full min-h-[58px] text-slate-400 hover:text-white hover:bg-white/10"
+            >
+                <Icon className="size-5 mb-0.5 transition-colors text-slate-400 group-hover:text-white" />
+                <span className="whitespace-nowrap">{label}</span>
+            </a>
+        );
+    }
+
     return (
         <NavLink
             to={to}
@@ -685,10 +882,14 @@ const SidebarLink = ({ icon: Icon, label, href, active, collapsed, children, onE
     const hasChildren = children && children.length > 0;
     const isActive = active || location.pathname === href || (hasChildren && children.some(child => (location.pathname + location.search).includes(child.href)));
 
+    const isAbsolute = isAbsoluteUrl(href);
+    const linkProps = isAbsolute ? { href } : { to: href };
+    const LinkComponent = isAbsolute ? 'a' : Link;
+
     return (
         <div className="flex flex-col">
-            <Link
-                to={href}
+            <LinkComponent
+                {...linkProps}
                 className={cn(
                     "flex items-center gap-3 py-2 px-3 text-sm rounded-lg transition-all duration-200 group relative select-none",
                     isActive && !hasChildren
@@ -721,18 +922,21 @@ const SidebarLink = ({ icon: Icon, label, href, active, collapsed, children, onE
                         )}
                     </div>
                 )}
-            </Link>
+            </LinkComponent>
 
             {/* Child Links (Tree View) */}
             {hasChildren && isOpen && !collapsed && (
                 <div className="flex flex-col mt-0.5 space-y-0.5">
                     {children.map(child => {
                         const isChildActive = location.search === child.href.split('?')[0] + '?' + child.href.split('?')[1] || (location.pathname + location.search) === child.href;
+                        const isChildAbsolute = isAbsoluteUrl(child.href);
+                        const childLinkProps = isChildAbsolute ? { href: child.href } : { to: child.href };
+                        const ChildLinkComponent = isChildAbsolute ? 'a' : Link;
 
                         return (
-                            <Link
+                            <ChildLinkComponent
                                 key={child.label}
-                                to={child.href}
+                                {...childLinkProps}
                                 className={cn(
                                     "flex items-center py-1.5 pl-10 pr-3 text-xs rounded-md transition-colors",
                                     isChildActive
@@ -741,7 +945,7 @@ const SidebarLink = ({ icon: Icon, label, href, active, collapsed, children, onE
                                 )}
                             >
                                 {child.label}
-                            </Link>
+                            </ChildLinkComponent>
                         );
                     })}
                 </div>

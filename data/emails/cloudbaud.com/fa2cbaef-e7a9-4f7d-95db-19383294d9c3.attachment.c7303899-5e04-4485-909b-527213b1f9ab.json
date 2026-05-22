@@ -1,0 +1,17 @@
+{
+  "fetchedAt": "2026-05-20T18:59:20.147Z",
+  "targetDomain": "cloudbaud.com",
+  "emailId": "fa2cbaef-e7a9-4f7d-95db-19383294d9c3",
+  "attachmentId": "c7303899-5e04-4485-909b-527213b1f9ab",
+  "attachment": {
+    "object": "attachment",
+    "id": "c7303899-5e04-4485-909b-527213b1f9ab",
+    "filename": "image001.jpg",
+    "content_type": "image/jpeg",
+    "content_id": "<image001.jpg@01DCCDB9.7B059700>",
+    "content_disposition": "inline",
+    "size": 62525,
+    "download_url": "https://cdn.resend.app/receiving/fa2cbaef-e7a9-4f7d-95db-19383294d9c3/attachments/c7303899-5e04-4485-909b-527213b1f9ab?response-content-disposition=attachment%3B+filename%3D%22image001.jpg%22&Expires=1779307160&Key-Pair-Id=K1EE1EYO2ZO8UR&Signature=3~juY29rDhjzu4zxkb~Ss9dcBNzhJEhoDyMUaQbE64S8~GvwMzzQwwFlI0wcpWhf3ifj7pvZir27SQISLvS0-zNRdrVgJKKvL-S9Dv0CZ7~mEGUBmZyfvn0mvYmQvVq2Icd7g549LYCA~nkxr8iYeXj~4xOc0srabqYjVFhE30wfUUKH6zv7CaUQto0oM3HONdvdjKYu4SrhRYI64RNxqcJtH4q~-cNCDUVIGreyi0g1lpYDJUidaZMPX9OsdfSjGbxkdK0nLXPJKYKUl0BrnZgane5V9k4lp2-1ACPDrN3pSuVZI-BIDbliN8Mx84ox5TA2NDaeZ8cz1MCaxM3vKw__",
+    "expires_at": "2026-05-20T19:59:20.138Z"
+  }
+}

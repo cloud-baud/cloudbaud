@@ -1,0 +1,26 @@
+
+
+
+Run Date,Action,Symbol,Security Description,Security Type,Quantity,Price ($),Commission ($),Fees ($),Accrued Interest ($),Amount ($),Settlement Date
+ 12/29/2017, INTEREST EARNED, QHMAQ, FDIC INSURED DEPOSIT AT DISCOVER BANK I,Cash,,,,,,0.24,
+ 12/27/2017, YOU BOUGHT, NXTD, NXT ID INC COM NEW,Cash,1000,4, 4.95,,,-4004.95, 12/29/2017
+ 12/26/2017, YOU SOLD, 09173T108, BITCOIN INVT TR SHS,Cash,-1,2448.37, 4.95,0.06,,2443.36, 12/28/2017
+ 12/22/2017, YOU BOUGHT, 09173T108, BITCOIN INVT TR SHS,Cash,1,1864.95, 4.95,,,-1869.9, 12/27/2017
+ 12/18/2017,                      EXCHANGED TO QHMAQ, QHMAQ, FDIC INSURED DEPOSIT AT DISCOVER BANK I,Cash,,,,,,, 
+ 12/18/2017, CONTRIBUTION         VS X86-337692-1     SEP CONTRIBUTION, , No Description,Cash,,,,,,5244.9, 
+ 12/04/2017,                      EXCHANGED TO SPAXX, SPAXX, FIDELITY GOVERNMENT MONEY MARKET,Cash,,,,,,, 
+
+
+
+
+
+"The data and information in this spreadsheet is provided to you solely for your use and is not for distribution. The spreadsheet is provided for"
+"informational purposes only, and is not intended to provide advice, nor should it be construed as an offer to sell, a solicitation of an offer to buy or a"
+"recommendation for any security by Fidelity or any third party. Data and information shown is based on information known to Fidelity as of the date it was"
+"exported and is subject to change. It should not be used in place of your account statements or trade confirmations and is not intended for tax reporting"
+"purposes. For more information on the data included in this spreadsheet, including any limitations thereof, go to Fidelity.com."
+
+"Brokerage services are provided by Fidelity Brokerage Services LLC, 900 Salem Street, Smithfield, RI 02917. Custody and other services provided by National"
+"Financial Services LLC. Both are Fidelity Investment companies and members SIPC, NYSE."
+
+"Date downloaded" 03/12/2019, 4:09 PM

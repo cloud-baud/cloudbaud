@@ -100,16 +100,14 @@ export const getClientCategories = async () => {
 
 // 2. Tax Entries for a specific year (from year-specific schema)
 export const getTaxEntries = async (year) => {
-    if (!year) return [];
-    
     const user = await getUser();
     
     // Query from finance schema with year filter
     // Secure API Call
-    const { data, error } = await supabase.rpc('api_get_tax_entries', { p_year: year });
+    const { data, error } = await supabase.rpc('api_get_tax_entries', { p_year: year || null });
     
     if (error) {
-        console.error(`Error fetching tax entries for ${year}:`, error);
+        console.error(`Error fetching tax entries for ${year || 'all years'}:`, error);
         return [];
     }
     return data || [];
@@ -120,7 +118,7 @@ export const getTaxEntries = async (year) => {
  * Updates a single cell value transactionally with audit logging.
  * Uses the Supabase RPC function `update_tax_cell`.
  */
-export const updateTaxCell = async (accountId, year, amount, notes = null) => {
+export const updateTaxCell = async (accountId, year, amount, notes = null, source = 'MANUAL') => {
     try {
         await getUser(); // Auth check locally first
         
@@ -129,7 +127,8 @@ export const updateTaxCell = async (accountId, year, amount, notes = null) => {
                 p_account_id: accountId,
                 p_year: year,
                 p_amount: amount,
-                p_notes: notes
+                p_notes: notes,
+                p_source: source
             });
 
         if (error) throw error;
@@ -286,15 +285,11 @@ export const getRowAttachments = async () => {
 
         if (error) throw error;
 
-        // Transform to map: "section-row" -> { fileName, fileUrl, docId }
+        // Transform to map: "section-row" -> { fileName, fileUrl, docId, year }
         const attachmentMap = {};
         data.forEach(doc => {
             // Extract row ID from storage path or metadata
-            // For now, we'll use a simple pattern extraction from storage_path
             // Expected format: userId/general/timestamp_rowId_filename.pdf
-            // or we can store rowId in a metadata field (better approach)
-            
-            // Parse rowId from storage path (temporary solution)
             const pathParts = doc.storage_path.split('/');
             const filenamePart = pathParts[pathParts.length - 1];
             // Extract rowId from filename pattern: timestamp_rowId_filename.pdf
@@ -306,7 +301,8 @@ export const getRowAttachments = async () => {
                 attachmentMap[rowId] = {
                     fileName: doc.filename,
                     fileUrl: publicUrl,
-                    docId: doc.id
+                    docId: doc.id,
+                    year: doc.year  // Include year in attachment data
                 };
             }
         });

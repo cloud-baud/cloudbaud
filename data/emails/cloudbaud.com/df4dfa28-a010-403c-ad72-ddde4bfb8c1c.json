@@ -1,0 +1,49 @@
+{
+  "fetchedAt": "2026-05-20T18:59:12.044Z",
+  "targetDomain": "cloudbaud.com",
+  "message": {
+    "object": "email",
+    "id": "df4dfa28-a010-403c-ad72-ddde4bfb8c1c",
+    "to": [
+      "info@cloudbaud.com"
+    ],
+    "from": "ryan.salas@nobleusapoint.co",
+    "created_at": "2026-05-20 17:49:18.521158+00",
+    "subject": "Vaping",
+    "message_id": "<019e4681-8b45-78e1-908f-10de62720c12@nobleusapoint.co>",
+    "bcc": [],
+    "cc": [],
+    "reply_to": [],
+    "html": null,
+    "text": "Vaping,\n\nWould you apply as much as 150k at minimal monthly pricing for any project?\n\ncould get a response in one to two business hours with no PGs no hard inquiries.\n\nMake sense?\n\nRyan\n",
+    "headers": {
+      "return-path": "[{\"value\":[{\"address\":\"ryan.salas@nobleusapoint.co\",\"name\":\"\"}],\"html\":\"<span class=\\\"mp_address_group\\\"><a href=\\\"mailto:ryan.salas@nobleusapoint.co\\\" class=\\\"mp_address_email\\\">ryan.salas@nobleusapoint.co</a></span>\",\"text\":\"ryan.salas@nobleusapoint.co\"},{\"value\":[{\"address\":\"ryan.salas@nobleusapoint.co\",\"name\":\"\"}],\"html\":\"<span class=\\\"mp_address_group\\\"><a href=\\\"mailto:ryan.salas@nobleusapoint.co\\\" class=\\\"mp_address_email\\\">ryan.salas@nobleusapoint.co</a></span>\",\"text\":\"ryan.salas@nobleusapoint.co\"}]",
+      "received": "[\"from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178]) by inbound-smtp.us-east-1.amazonaws.com with SMTP id jtcr0ollfbbu0vptrgsu2d495v76p9ffdckrn181 for info@cloudbaud.com; Wed, 20 May 2026 17:49:17 +0000 (UTC)\",\"by mail-qt1-f178.google.com with SMTP id d75a77b69052e-50d7c12e48eso55195291cf.1 for <info@cloudbaud.com>; Wed, 20 May 2026 10:49:17 -0700 (PDT)\",\"from 019e4681-8b45-78e1-908f-10de62720c12.local (ec2-44-220-58-211.compute-1.amazonaws.com. [44.220.58.211]) by smtp.gmail.com with ESMTPSA id d75a77b69052e-516456888f6sm209348971cf.3.2026.05.20.10.49.16 for <info@cloudbaud.com> (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256); Wed, 20 May 2026 10:49:16 -0700 (PDT)\"]",
+      "x-ses-spam-verdict": "PASS",
+      "x-ses-virus-verdict": "PASS",
+      "received-spf": "pass (spfCheck: domain of nobleusapoint.co designates 209.85.160.178 as permitted sender) client-ip=209.85.160.178; envelope-from=ryan.salas@nobleusapoint.co; helo=mail-qt1-f178.google.com;",
+      "authentication-results": "amazonses.com; spf=pass (spfCheck: domain of nobleusapoint.co designates 209.85.160.178 as permitted sender) client-ip=209.85.160.178; envelope-from=ryan.salas@nobleusapoint.co; helo=mail-qt1-f178.google.com; dkim=pass header.i=@nobleusapoint.co; dmarc=pass header.from=nobleusapoint.co;",
+      "x-ses-receipt": "AEFBQUFBQUFBQUFFczMzVXZLN2J1cHJsZVp0STJ6eTNtRndYczhkdHgzeGxKd2hwdGpEVllKV2ltTDI4aitJa1dGRHdSQWxjR212dnAvS0x0TUtKT0VlYllaaW5LQkVMTlFQeGRidE9JdjdXaXdRL2ZsSWhMSWVjaFo0VWhaaVBvU21wTGtIQlU1VjVLcjBjQ2pCQlZ2enJVbVB5cGZiVnA5eHJTOWZ0bFQrL2FsS0I4ZGptSGpNN29qN2FDalpKUFZVV2JmU0Jva1JUcWs1aTBONjl1ZUtEMWZmaVFEYzVpdURBRERPTE1ydEFHS2N2VTlDdVRXeTZxMlo0Y3JkYnhFLzkwR3ZiK1RQVnp4ekRCWlcyMnM1cERyZDB0RTA3SUx0NDVXNzFVQS9wbnBxbFd2SDlXcEE9PQ==",
+      "x-ses-dkim-signature": "a=rsa-sha256; q=dns/txt; b=RGW2ESe0J3cYguncSACA8jA2laUAWwCGrtNULYut8MJ2Zy9j4vy7j2NGpx7KC/R7+0dRQOGqm3BZg/YvMCb2spKZ8E/RKhyp56LJiK/mFkG4ErQtqSDbLW5xcjZ/MinzoeJdsL/HJWUUhn/L4s+Q3WGsvRsTwn/RKe57wUhH3vQ=; c=relaxed/simple; s=224i4yxa5dv7c2xz3womw6peuasteono; d=amazonses.com; t=1779299358; v=1; bh=8fBjxMs9dN33+nEExzGEMFQSRfXNHZskhX1pRKtDZGE=; h=From:To:Cc:Bcc:Subject:Date:Message-ID:MIME-Version:Content-Type:X-SES-RECEIPT;",
+      "dkim-signature": "v=1",
+      "x-google-dkim-signature": "v=1; a=rsa-sha256; c=relaxed/relaxed; d=1e100.net; s=20251104; t=1779299357; x=1779904157; h=mime-version:date:content-transfer-encoding:subject:to:from :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date :message-id:reply-to; bh=8fBjxMs9dN33+nEExzGEMFQSRfXNHZskhX1pRKtDZGE=; b=B+rGEpd8yVg35jW7Skgaznfm32VzQLZERBFJJTg63dJAcLIEtA2fHSfuSgLEm7BjR2 bWEfVwyF17J4cSMgdHjqc7kTJQJoF2RnX95GPeFoqpXCfv64dccj8gorUrpEWS1efNg6 w1BJRO4aXOpw09odOJF+2zKw2jyfT//VdIUoSaSzsd45ZT//DZqZEeO1/6imgoQa3ucG /FtfdK8O4PjHULXw6aRtjefP7I55Rk0bvLusHnkhWaUr3Sg7Wt7BYIiJKhCL/G9xO8ue Z5wizA/yVvPZBafrQPFEP3nCPR4GoQHGYGSVhi9U+fTA2rwm/n/iW0+pz6Ml4pa/MCz0 nh7w==",
+      "x-gm-message-state": "AOJu0Yzbc2EXroDXbeUqoxX2a+ommFq+EkDOb1a85mIzJFBOoAy5SXgg o9LfQMrSxm73HnLQU1OlTPmAi1r4HuqSIh0NJzIBaN+JwpMPMJMi+kvM3rkHq2d0zEV2CsT0yrk ft6yweQ==",
+      "x-gm-gg": "Acq92OHQmY+f4aUTCpZUhXBm0Ek64VF0c5zGlar9WdV9oA69TidWS9tg/YJ0/R5LR1y S3Q+kEe9xvjzNYAKQlha/1TtHqvaf5VWmGhu1345aAmDE/BULck/ggpRYZgAabnDRTKAPqvgNOY Qgt0IvXyiWUsoHYHvtzlCrJRZfrcVmY8KFabDxTKuvyIAo9Njh+lLBYmM/ySEf66S0ty+nyG8aQ ZJz6dxG2H/2BKp3gOBnvGAXSrG2G5zd/JKwccKDs+bZwYBkqG0XrcnSHqqp7Mv3BIj/amgld2yC DWPevrDylL6c4CiEiXtc1rGzmH+kAMJBf5j58Pqq/TzoDfIu1pvlsQyJBfj7FmMgWs6/v88ABoV wnvghs2s2XEdqhTlFZNf0y4vlTh2/BnNn/BHfyKEOVSjeBT02Kt69Ro624QykjEEZMgEt6GyZns PO9KngzJUaObMtIghEsqNhJMqP8pK3c0ciArHG0pgGtRjTOh8aSHVTyBTExWFPVemp2UvJBrEyU m+bKqiY/f7h+A74unts7bTE71IlxGt2LWeSK+7w7GX2JEkmXPmqn5iHbEw=",
+      "x-received": "by 2002:a05:622a:14d1:b0:509:11bd:9d3 with SMTP id d75a77b69052e-516c2e70a70mr7428831cf.1.1779299356972; Wed, 20 May 2026 10:49:16 -0700 (PDT)",
+      "message-id": "<019e4681-8b45-78e1-908f-10de62720c12@nobleusapoint.co>",
+      "x-mail-abuse-inquiries": "https://app.instantly.ai/privacy/report-abuse/019e4681-8b45-78e1-908f-10de62720c12",
+      "from": "\"Ryan Salas\" <ryan.salas@nobleusapoint.co>",
+      "to": "info@cloudbaud.com",
+      "subject": "Vaping",
+      "content-transfer-encoding": "quoted-printable",
+      "date": "\"2026-05-20T17:49:16.000Z\"",
+      "mime-version": "1.0",
+      "content-type": "text/plain"
+    },
+    "raw": {
+      "download_url": "https://cdn.resend.app/receiving/raw/jtcr0ollfbbu0vptrgsu2d495v76p9ffdckrn181?response-content-disposition=attachment%3B+filename%3D%22jtcr0ollfbbu0vptrgsu2d495v76p9ffdckrn181%22&Expires=1779307152&Key-Pair-Id=K1EE1EYO2ZO8UR&Signature=db1~qISNjJLH4A~5W6pGE9DvjKc5BDsAu5XqwEdnHcV5dBib5FY5myRoyzFJxIiWn~QkVs60UelEqNV1iW5g~uXwjJU1HTdX~w45prsEN4q5fkYGKG-S4MLvtn4YhTTIYKqtsiOgLI662YmDGMXBTP9bgqNr3gbDIKKgrtyx3nLEmoW3im-S2N3R2~LvMS090jU~WiSg8tVhph4Ipm-caA9ARNsbJ1xSGhOPQw49b3XhMK63wcKs9oL2c~gKl~VnxM2NlhZq8~6Qf-peIStEAb1vWKRajLa5ceVj0ouoncbHe0PQJtxIAiv8o-g5BBHoQKLOez~HGJ1nx3EUKZKe0Q__",
+      "expires_at": "2026-05-20T19:59:12.060Z"
+    },
+    "attachments": []
+  }
+}

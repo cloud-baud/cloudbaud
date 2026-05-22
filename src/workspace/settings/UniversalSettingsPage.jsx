@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
  * This version uses the full CommonFeatures Master Page shell for parity with NRI Essentials.
  */
 const UniversalSettingsPage = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, enrollMfa, verifyMfa, unenrollMfa } = useAuth();
   const navigate = useNavigate();
   
   const [orgData, setOrgData] = React.useState(null);
@@ -172,6 +172,24 @@ const UniversalSettingsPage = () => {
         .getPublicUrl(filePath);
         
       return publicUrl;
+    },
+
+    onListMfaFactors: async () => {
+      const { data, error } = await supabase.auth.mfa.listFactors();
+      if (error) throw error;
+      return data || { all: [], active: [] };
+    },
+
+    onEnrollMfa: async () => {
+      return await enrollMfa();
+    },
+
+    onVerifyMfa: async (factorId, code) => {
+      return await verifyMfa(factorId, code);
+    },
+
+    onUnenrollMfa: async (factorId) => {
+      return await unenrollMfa(factorId);
     },
 
     onClose: () => navigate('/workspace')

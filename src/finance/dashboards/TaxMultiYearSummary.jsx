@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -525,7 +525,58 @@ const TaxMultiYearSummary = () => {
         });
     };
 
+    // Define process complete handler for staging extraction data
+    const handleProcessComplete = useCallback((data) => {
+        console.log("Multi-year extraction complete:", data);
+        let amount = null;
+        let year = focusedYear || Math.max(...years);
+        
+        const entries = Object.entries(data || {});
+        if (entries.length > 0) {
+            // Look for wages/w2 keys or fallback to first numeric value
+            const wageEntry = entries.find(([k, v]) => 
+                k.toLowerCase().includes('w2') || 
+                k.toLowerCase().includes('wage') || 
+                k.toLowerCase().includes('amount') ||
+                k.toLowerCase().includes('gross')
+            );
+            if (wageEntry && !isNaN(parseFloat(wageEntry[1]))) {
+                amount = parseFloat(wageEntry[1]);
+            } else {
+                const numEntry = entries.find(([k, v]) => !isNaN(parseFloat(v)));
+                if (numEntry) {
+                    amount = parseFloat(numEntry[1]);
+                }
+            }
+            
+            const yearEntry = entries.find(([k, v]) => k.toLowerCase().includes('year'));
+            if (yearEntry && !isNaN(parseInt(yearEntry[1]))) {
+                year = parseInt(yearEntry[1]);
+            }
+        }
+        
+        if (amount !== null) {
+            setExtractedData({
+                amount,
+                year,
+                category: 'W-2 Wages',
+                data
+            });
+            setActiveRightTab('agent');
+        }
+    }, [focusedYear, years]);
 
+    // Listen to custom window events for global AI integrations
+    useEffect(() => {
+        const handleGlobalProcessComplete = (e) => {
+            if (e.detail?.data) {
+                console.log("[Multi Year Summary] Received global process complete event:", e.detail.data);
+                handleProcessComplete(e.detail.data);
+            }
+        };
+        window.addEventListener('ollama-process-complete', handleGlobalProcessComplete);
+        return () => window.removeEventListener('ollama-process-complete', handleGlobalProcessComplete);
+    }, [handleProcessComplete]);
 
     // handle "Open Tax Return"
     const handleOpenReturn_Click = () => {
@@ -595,8 +646,8 @@ const TaxMultiYearSummary = () => {
     };
 
     // Handle attachment icon click - open file picker
-    const handleAttachmentClick = (sectionId, rowIndex) => {
-        setPendingAttachmentRow({ sectionId, rowIndex });
+    const handleAttachmentClick = (sectionId, rowIndex, year) => {
+        setPendingAttachmentRow({ sectionId, rowIndex, year });
         if (attachmentInputRef.current) attachmentInputRef.current.click();
     };
 
@@ -604,8 +655,8 @@ const TaxMultiYearSummary = () => {
     const handleAttachmentFileChange = async (e) => {
         const file = e.target.files?.[0];
         if (file && pendingAttachmentRow) {
-            const { sectionId, rowIndex } = pendingAttachmentRow;
-            const rowId = `${sectionId}-${rowIndex}`;
+            const { sectionId, rowIndex, year } = pendingAttachmentRow;
+            const rowId = `${sectionId}-${rowIndex}-${year}`;
             
             // Optimistic Update
             const url = URL.createObjectURL(file);
@@ -617,7 +668,7 @@ const TaxMultiYearSummary = () => {
             // Upload to Supabase
             try {
                 const { uploadTaxDocument } = await import('@/finance/api/taxService');
-                const doc = await uploadTaxDocument(file, { type: 'ROW_ATTACHMENT', rowId });
+                const doc = await uploadTaxDocument(file, { type: 'ROW_ATTACHMENT', rowId, year });
                 
                 // Update with actual doc ID
                 setRowAttachments(prev => ({
@@ -1543,7 +1594,8 @@ const TaxMultiYearSummary = () => {
                                                                 style={{ width: '40px', minWidth: '40px', maxWidth: '40px' }}
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
-                                                                    const rowId = `${section.id}-${rowIndex}`;
+                                                                    const selectedYear = searchParams.get('year') || visibleYears[0];
+                                                                    const rowId = `${section.id}-${rowIndex}-${selectedYear}`;
                                                                     const attachment = rowAttachments[rowId];
                                                                     if (attachment) {
                                                                         // If attachment exists, show it in preview
@@ -1551,12 +1603,13 @@ const TaxMultiYearSummary = () => {
                                                                         setShowFilePanel(true);
                                                                     } else {
                                                                         // If no attachment, open file picker
-                                                                        handleAttachmentClick(section.id, rowIndex);
+                                                                        handleAttachmentClick(section.id, rowIndex, selectedYear);
                                                                     }
                                                                 }}
                                                             >
                                                                 {(() => {
-                                                                    const rowId = `${section.id}-${rowIndex}`;
+                                                                    const selectedYear = searchParams.get('year') || visibleYears[0];
+                                                                    const rowId = `${section.id}-${rowIndex}-${selectedYear}`;
                                                                     const hasAttachment = rowAttachments[rowId];
                                                                     return (
                                                                         <Paperclip 
@@ -1786,6 +1839,7 @@ const TaxMultiYearSummary = () => {
                                                     return { rows: currentData.length, rowMap, codeRowMap, availableCodes, colLetter, targetYear: targetYearProp };
                                                 }
                                             }}
+                                            onProcessComplete={handleProcessComplete}
                                             onStatusChange={setAgentStatus}
                                         />
                                         {/* Draft Import Card (Mock) */}

@@ -8,7 +8,9 @@ import { ShieldAlert } from 'lucide-react';
 const ALLOWED_FINANCE_EMAILS = [
     'jish.nath@cloudbaud.com',
     'admin@shiftleft.digital',
-    'cpa@example.com' // TODO: Replace with actual CPA email when onboarded
+    'davidr8415@gmail.com',     // David Rumsey CPA (Google)
+    'taxprep@davidrumseycpa.com', // David Rumsey CPA (Business)
+    'dev@example.com'   // Authorized standard dev bypass email
 ];
 
 export const isFinanceAuthorized = (user) => {

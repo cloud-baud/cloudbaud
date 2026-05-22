@@ -8,6 +8,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [session, setSession] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [aal, setAal] = useState({ currentLevel: 'aal1', nextLevel: 'aal1' });
 
     // --- DEV ONLY: Persona Impersonation State ---
     const [realUser, setRealUser] = useState(null); // Stores the actual authenticated user during impersonation
@@ -54,6 +55,30 @@ export const AuthProvider = ({ children }) => {
             }
         }
 
+        const isAuthCallbackInUrl = () => {
+            try {
+                const urlP = new URL(window.location.href);
+                const hash = urlP.hash;
+                const params = urlP.searchParams;
+                
+                // If there's an error in URL, it's not a successful callback exchange
+                if (params.has('error') || hash.includes('error=')) {
+                    return false;
+                }
+
+                return (
+                    hash.includes('access_token') ||
+                    hash.includes('type=signup') ||
+                    hash.includes('type=recovery') ||
+                    hash.includes('type=magiclink') ||
+                    hash.includes('type=invite') ||
+                    params.has('code')
+                );
+            } catch (e) {
+                return false;
+            }
+        };
+
         async function getSession() {
             try {
                 const { data: { session: currentSession } } = await supabase.auth.getSession();
@@ -78,8 +103,13 @@ export const AuthProvider = ({ children }) => {
                             console.warn('[Auth] Background profile fetch failed:', profileErr);
                         }
                     } else {
-                        setUser(null);
-                        setLoading(false);
+                        // If it's a callback, hold loading = true so the client can exchange the code/token
+                        if (!isAuthCallbackInUrl()) {
+                            setUser(null);
+                            setLoading(false);
+                        } else {
+                            console.log('[Auth] getSession: Auth callback detected in URL. Holding loading spinner.');
+                        }
                     }
                 }
             } catch (err) {
@@ -119,7 +149,12 @@ export const AuthProvider = ({ children }) => {
                         console.warn('[Auth] Background profile sync failed:', syncErr);
                     }
                 } else {
-                    setLoading(false);
+                    // If it's a callback, hold loading = true so the client can exchange the code/token
+                    if (!isAuthCallbackInUrl()) {
+                        setLoading(false);
+                    } else {
+                        console.log('[Auth] onAuthStateChange: Auth callback detected in URL. Holding loading spinner.');
+                    }
                 }
             }
         });
@@ -147,6 +182,64 @@ export const AuthProvider = ({ children }) => {
             clearTimeout(safetyTimer);
         };
     }, []);
+
+    const refreshAal = async () => {
+        try {
+            const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+            if (error) throw error;
+            if (data) {
+                console.log('[Auth] AAL fetched:', data);
+                setAal({
+                    currentLevel: data.currentLevel,
+                    nextLevel: data.nextLevel
+                });
+                return data;
+            }
+        } catch (err) {
+            console.error('[Auth] Error fetching AAL:', err);
+        }
+        return { currentLevel: 'aal1', nextLevel: 'aal1' };
+    };
+
+    useEffect(() => {
+        if (session) {
+            refreshAal();
+        } else {
+            setAal({ currentLevel: 'aal1', nextLevel: 'aal1' });
+        }
+    }, [session]);
+
+    const enrollMfa = async () => {
+        const { data, error } = await supabase.auth.mfa.enroll({
+            factorType: 'totp',
+            issuer: 'CloudBaud',
+            friendlyName: user?.email || 'CloudBaud User'
+        });
+        if (error) throw error;
+        return data;
+    };
+
+    const verifyMfa = async (factorId, code) => {
+        const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({ factorId });
+        if (challengeError) throw challengeError;
+
+        const { data: verifyData, error: verifyError } = await supabase.auth.mfa.verify({
+            factorId,
+            challengeId: challengeData.id,
+            code
+        });
+        if (verifyError) throw verifyError;
+
+        await refreshAal();
+        return verifyData;
+    };
+
+    const unenrollMfa = async (factorId) => {
+        const { data, error } = await supabase.auth.mfa.unenroll({ factorId });
+        if (error) throw error;
+        await refreshAal();
+        return data;
+    };
 
     // Helper: Check if email is allowed
     const checkAccess = async (email) => {
@@ -290,6 +383,11 @@ export const AuthProvider = ({ children }) => {
         user,
         session,
         loading,
+        aal,
+        refreshAal,
+        enrollMfa,
+        verifyMfa,
+        unenrollMfa,
         signInWithEmail,
         signInWithOtp,
         signInWithOAuth,

@@ -61,16 +61,7 @@ const SocialAuthButtons = () => {
                 </div>
             </div>
 
-            <Button
-                type="button"
-                variant="outline"
-                disabled={loading}
-                className="w-full bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-600"
-                onClick={() => handleOAuthLogin('azure')}
-            >
-                <MicrosoftIcon className="mr-2 h-4 w-4" />
-                Microsoft
-            </Button>
+
 
             <Button
                 type="button"

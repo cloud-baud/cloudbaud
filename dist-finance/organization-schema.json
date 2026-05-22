@@ -1,0 +1,42 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "CloudBaud",
+    "url": "https://cloudbaud.com",
+    "logo": "https://cloudbaud.com/cloudbaud_logo_clean_1769644805025.png",
+    "description": "CloudBaud delivers enterprise solutions architecture, AI engineering, cloud migration, and DevOps automation services.",
+    "foundingDate": "2017",
+    "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "US"
+    },
+    "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "Sales",
+        "email": "contact@cloudbaud.com",
+        "telephone": "+1-425-749-2101"
+    },
+    "sameAs": [
+        "https://www.linkedin.com/company/cloudbaud"
+    ],
+    "knowsAbout": [
+        "Enterprise Solutions Architecture",
+        "AI Engineering",
+        "Cloud Migration",
+        "DevOps Automation",
+        "TOGAF Architecture",
+        "AWS Well-Architected Framework",
+        "Azure Cloud Services",
+        "Google Cloud Platform",
+        "GCP",
+        "Microsoft Dynamics 365",
+        "Microsoft Teams Development",
+        "Salesforce Integration",
+        "Terraform Infrastructure as Code",
+        "SharePoint Development",
+        "Vector Databases",
+        "Graph Databases",
+        "Neo4j",
+        "MongoDB"
+    ]
+}

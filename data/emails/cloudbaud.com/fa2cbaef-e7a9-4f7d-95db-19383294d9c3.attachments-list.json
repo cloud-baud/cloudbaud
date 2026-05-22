@@ -1,0 +1,38 @@
+{
+  "fetchedAt": "2026-05-20T18:59:18.939Z",
+  "targetDomain": "cloudbaud.com",
+  "emailId": "fa2cbaef-e7a9-4f7d-95db-19383294d9c3",
+  "count": 3,
+  "attachments": [
+    {
+      "id": "c7303899-5e04-4485-909b-527213b1f9ab",
+      "filename": "image001.jpg",
+      "content_type": "image/jpeg",
+      "content_id": "<image001.jpg@01DCCDB9.7B059700>",
+      "content_disposition": "inline",
+      "size": 62525,
+      "download_url": "https://cdn.resend.app/receiving/fa2cbaef-e7a9-4f7d-95db-19383294d9c3/attachments/c7303899-5e04-4485-909b-527213b1f9ab?response-content-disposition=attachment%3B+filename%3D%22image001.jpg%22&Expires=1779307159&Key-Pair-Id=K1EE1EYO2ZO8UR&Signature=pmguYIm5QVSYy5Mw~JpPlwF6fiq4yPxeo8O-nepK8ZqKwz5wjvSERDkM-4rxhgjXmsawd4BqFuEs8cR2Xy0yoJDA3WEcgRsXc1D6mh2mgDkkEA~5NDOBpHf2NZ0eoZ8PCrn1s51hA0Zk6VHv56U0bNz2-cytUdP0Z6DdPv-sRY~AWBq98rnWs5L2pX3xtBQytNDLib4OsjcdVACT6PIH8bOPegB0U06x3cXVubfHSzX2hW80m36jXWnbQ-W~uPHB6nweCwhmuVQSgtQGoRgEf6H1rncSeXRdYCT4Cu30WcOR53ulE3GikyQkgXT0jr-4oUxoCRK2v5ub~mCXeaYkCA__",
+      "expires_at": "2026-05-20T19:59:18.938Z"
+    },
+    {
+      "id": "5bd8c5f5-d9da-4266-a969-f27d755fb6b6",
+      "filename": "image003.jpg",
+      "content_type": "image/jpeg",
+      "content_id": "<image003.jpg@01DCCDB9.7B059700>",
+      "content_disposition": "inline",
+      "size": 60025,
+      "download_url": "https://cdn.resend.app/receiving/fa2cbaef-e7a9-4f7d-95db-19383294d9c3/attachments/5bd8c5f5-d9da-4266-a969-f27d755fb6b6?response-content-disposition=attachment%3B+filename%3D%22image003.jpg%22&Expires=1779307159&Key-Pair-Id=K1EE1EYO2ZO8UR&Signature=oNK1nPL9BsAPed4cS3hIXVynXn~llGn1Ev7FolqkKQ~qi1-SMrgqZkGY-0qx~5Z9HtIXAfws8qlsOAM34BNbepojOjy9SEhNeQ7jcnRjX33Hq9vpM0g1IZyOnfyfAHHIM8mLC11Nl0dCUUbXKi7~UGXbh5PvVfOPBJzLYmVBsKFnVp4KctVVgF9iZlzCQclqOPUd2AcNrGxPbaQaUiFCsuG-kgSavUMuClc6pTqVTXMkiVtL3~3Ii6kEvN5PYXYEcAGlUUXLbiADZ5vs1HsDhJrsDKG5oudfVQr8CJNMRJD6iUqpneA2R39AhE5-PFJFLQehBffzLfwNssZ3Gh1H4A__",
+      "expires_at": "2026-05-20T19:59:18.940Z"
+    },
+    {
+      "id": "3aa902bb-c252-493a-a74f-055b6fb5d1c6",
+      "filename": "image002.png",
+      "content_type": "image/png",
+      "content_id": "<image002.png@01DCCDB9.7B059700>",
+      "content_disposition": "inline",
+      "size": 93716,
+      "download_url": "https://cdn.resend.app/receiving/fa2cbaef-e7a9-4f7d-95db-19383294d9c3/attachments/3aa902bb-c252-493a-a74f-055b6fb5d1c6?response-content-disposition=attachment%3B+filename%3D%22image002.png%22&Expires=1779307159&Key-Pair-Id=K1EE1EYO2ZO8UR&Signature=BJv4I2Y0zb6LuQc63gwBE15Iu2RMwwI6EMr154oWJrNnXzxQpjy9~71VEOCsV7SvQ4XjaSuhpaEmN2QQoHxG27YdDFm-wgpkSegBcWdncOPKexAlR2XvgO9Rw~FLXmNeL0e9HsEnTVEb58cuOlMSCMKdHRS3fw0SdMCHPSQhfZo~bjx9PHH1ap9W2zXArVI69hXx1OJCbZFrG2X0sOKfv6nfMVhAfOTRtZ8xjnST3TKytAbIaNbfzuRVUOXHCR2BG~MoKDVdErioupbmSizngYjoZZzC2R6tOG5CLNlGlEgd2c8eaOc3HMPN~Q4sBET2S6A2z4xmUQMjxyCqYgSsDg__",
+      "expires_at": "2026-05-20T19:59:18.941Z"
+    }
+  ]
+}

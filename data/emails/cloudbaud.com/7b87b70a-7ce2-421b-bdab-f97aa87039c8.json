@@ -1,0 +1,49 @@
+{
+  "fetchedAt": "2026-05-20T18:59:13.101Z",
+  "targetDomain": "cloudbaud.com",
+  "message": {
+    "object": "email",
+    "id": "7b87b70a-7ce2-421b-bdab-f97aa87039c8",
+    "to": [
+      "jish.nath@cloudbaud.com"
+    ],
+    "from": "davidvickers854@gmail.com",
+    "created_at": "2026-05-20 17:29:41.078624+00",
+    "subject": "Jish, 30 Days Trial",
+    "message_id": "<177929817746.254755.5281987864431148321@gmail.com>",
+    "bcc": [],
+    "cc": [],
+    "reply_to": [],
+    "html": null,
+    "text": "Hi Jish,\n\nApologies for reaching out cold. We provide resources that can start quickly, with a 30-day no-cost trial to evaluate.\n\nOpen to a quick look?\n\n1: Share profiles\n2: Schedule a call\n3: 30-day trial\n4: Not interested\n\nBest regards,\n\nPSS\n",
+    "headers": {
+      "return-path": "[{\"value\":[{\"address\":\"davidvickers854@gmail.com\",\"name\":\"\"}],\"html\":\"<span class=\\\"mp_address_group\\\"><a href=\\\"mailto:davidvickers854@gmail.com\\\" class=\\\"mp_address_email\\\">davidvickers854@gmail.com</a></span>\",\"text\":\"davidvickers854@gmail.com\"},{\"value\":[{\"address\":\"davidvickers854@gmail.com\",\"name\":\"\"}],\"html\":\"<span class=\\\"mp_address_group\\\"><a href=\\\"mailto:davidvickers854@gmail.com\\\" class=\\\"mp_address_email\\\">davidvickers854@gmail.com</a></span>\",\"text\":\"davidvickers854@gmail.com\"}]",
+      "received": "[\"from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52]) by inbound-smtp.us-east-1.amazonaws.com with SMTP id qbtrg3h46b6so3dehlou3okato7qqp609gnrr0o1 for jish.nath@cloudbaud.com; Wed, 20 May 2026 17:29:40 +0000 (UTC)\",\"by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-4526a8170ceso2485538f8f.2 for <jish.nath@cloudbaud.com>; Wed, 20 May 2026 10:29:39 -0700 (PDT)\",\"from vps-d43c6652.vps.ovh.net (vps-d43c6652.vps.ovh.net. [2001:41d0:801:2000::6061]) by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da0fe13b4sm56000507f8f.28.2026.05.20.10.29.37 for <jish.nath@cloudbaud.com> (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256); Wed, 20 May 2026 10:29:37 -0700 (PDT)\"]",
+      "x-ses-spam-verdict": "PASS",
+      "x-ses-virus-verdict": "PASS",
+      "received-spf": "pass (spfCheck: domain of _spf.google.com designates 209.85.221.52 as permitted sender) client-ip=209.85.221.52; envelope-from=davidvickers854@gmail.com; helo=mail-wr1-f52.google.com;",
+      "authentication-results": "amazonses.com; spf=pass (spfCheck: domain of _spf.google.com designates 209.85.221.52 as permitted sender) client-ip=209.85.221.52; envelope-from=davidvickers854@gmail.com; helo=mail-wr1-f52.google.com; dkim=pass header.i=@gmail.com; dmarc=pass header.from=gmail.com;",
+      "x-ses-receipt": "AEFBQUFBQUFBQUFFS2RaUDhsM2dOaVVMMjBzMnUrQ0NXR29oL1RaK1p4ZlNFY1B5a1VXUDZZVEgwMUx4UjJvcEJiNnhhY2pNclAzUzJQR2hjQVh5RWVsMENkUFBtZHFyK3FWRVpFSWJQbm1IZDVRenFkRzgvVHJpMHc5bmVEc2ErdG1hNGdWWXpoNjlKajJyVEhIVHk5T1lkOURzeDg2bFdqM1ViakxtYld6REpYSyt5THhRQkgzdm9TYWQ1NEF0aUNVMXZQWGlyY05oNkNKK2hrVHUyVDdCRkV2WEttMUJGangyY3liVk1ReTZpSzBOWE9BSS9COFBUNFo4eEpEQ1BBWjZxa3hEczdLalphVlE3NW9KSjF2WG01ZWFIWndkTjhyK1liaEkxWk9JL1IzanVxNm4rOFE9PQ==",
+      "x-ses-dkim-signature": "a=rsa-sha256; q=dns/txt; b=GKA0TDYfhta3aILeVC+dg/jewrSg5RRL3odlwGBWF1YYsDWr9X82YIQTdaXfEcOQP0YTv3fEAVsilR7FDs5KHYjxREGkktQWorVVCQwXgHztFTngZqBUrLLftZvT50HJ88rCrHxGgVDjtkgvseYvh+H9ast0+aAgskGxo4EzzMM=; c=relaxed/simple; s=224i4yxa5dv7c2xz3womw6peuasteono; d=amazonses.com; t=1779298180; v=1; bh=TGiC0u+y3EcCqtzMsGik7Kkfo5GoqXCycM/E71CprFE=; h=From:To:Cc:Bcc:Subject:Date:Message-ID:MIME-Version:Content-Type:X-SES-RECEIPT;",
+      "dkim-signature": "v=1",
+      "x-google-dkim-signature": "v=1; a=rsa-sha256; c=relaxed/relaxed; d=1e100.net; s=20251104; t=1779298178; x=1779902978; h=mime-version:content-transfer-encoding:message-id:subject:to:from :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id :reply-to; bh=TGiC0u+y3EcCqtzMsGik7Kkfo5GoqXCycM/E71CprFE=; b=Mt3Tpu/H0FlxOiqo2xm6OPhW53ipt+osGPw0/Lp4pyADkJpWEAI2WvCLARog2hhh+G S781fkLG1eNSHWwjnG8ivssSehycp+U71q6elQzgO4euSA7wwMcN7HFr8QFT8bB6a07I F8v6fxZSjwHxqEMJ0vaR5I4BaR1Bc8HKaywpii1/4gojLP+gEVRcbB6HkG51qy4iquEf 4YzRaOM+s+fJP9puhOkqAaqKQD/TvcDe4iplK58fZZitFxyo5yE16LxkVeFNjssxFECx WTs7c1LiYWptgzGZHW/JLRMOzkDFbfB1wYM8ZsTdpYZ3GR8+5prMS/hIMmxa/GtyTFKI 4BCg==",
+      "x-gm-message-state": "AOJu0YzRmgp1aAd3pyx4nWPAUDHKnnUXjQpzlGXoJwhW0MvRwGQr5ICJ uiV1stSd4591lOiYhF6Y+S+xcZIdIGxHAK76nSY+N6+CLanzaUk0GHdziYcW+WNv",
+      "x-gm-gg": "Acq92OHDdov+J3Rnm8e+yIfKab4rnpDoBzzZskJ2QpplLNv0b6sMhoOdNwQCURiokiy f8RSaqNKL7BxYb7Da72SD+xmq43+bMiKkZKqlk+p1zok4ctD6vltXQ9OVzfPdK8QYWxBZ0FHfzQ +edsBPAn2Xgs9gcb9Yw+yZxV1Z8Gw8p5qKktlMZIT3bXRUav8EirWO3sNUZ9Y1UFUz3IeB6WVHc vLi9cNRAs8etHRkkiONdAfG3HgR9Yhhuae+09D9atHH1cAnX8NC0Of3U20Ebx1l8waCGhI1n0Da H5uueID2f7MbrLplg1JlVlru3SnmakhFRpaAWpNuYzKHOQ+Utd8r/JA1TXEmkOODzb7x/FPdEBu vfg/BdOJEfn9R27GaIa1Qv2NqD1Bu0c9vCDoJN7ncf+ClTQemLf0ZtSnuK8TdCQkyHXXTNmnVJm /ZTpPrcrZzO3S78WAANGyTUwEPMaN6Y1+aV4fMd/Li1IPf1vjK/eMI5C3YV6c3zMxbGA==",
+      "x-received": "by 2002:a05:6000:22c5:b0:43d:6f0f:32fe with SMTP id ffacd0b85a97d-45e5c6049acmr39658147f8f.31.1779298178399; Wed, 20 May 2026 10:29:38 -0700 (PDT)",
+      "date": "\"2026-05-20T17:29:37.000Z\"",
+      "from": "\"Davidvickers854\" <davidvickers854@gmail.com>",
+      "x-google-original-from": "Davidvickers854 <DavidVickers854@gmail.com>",
+      "to": "jish.nath@cloudbaud.com",
+      "subject": "Jish, 30 Days Trial",
+      "message-id": "<177929817746.254755.5281987864431148321@gmail.com>",
+      "content-type": "text/plain",
+      "content-transfer-encoding": "quoted-printable",
+      "mime-version": "1.0"
+    },
+    "raw": {
+      "download_url": "https://cdn.resend.app/receiving/raw/qbtrg3h46b6so3dehlou3okato7qqp609gnrr0o1?response-content-disposition=attachment%3B+filename%3D%22qbtrg3h46b6so3dehlou3okato7qqp609gnrr0o1%22&Expires=1779307153&Key-Pair-Id=K1EE1EYO2ZO8UR&Signature=JnUXQv~El1u~0E6fVctWk02-nIyEamXvgZlBddxFKM014uDqaIT7LrX28-iWHEuWBVtfSs0F70M0~6snM4Z4iXMs6O9zYdUV76ZqrhmO426fA-K2wFFqu7U5V-qRw1HrCYlRJTPW9M2jPr05Z1WOQUkuJJC8ee24W4VgkIsjcScI0ww6n66HT4Wh00iHoOatIFUwQ7u2YehxpJlrSFcGs2HVzoLYxnZQ2ddU~n2UUYjQdR9q9MYOu-sy7y96p-Q58VbLgHgUGDJAOX7G161OTFWEUlCsI~fCB4z-wu3O9-6~1gFEUEPgkV7DFGK0TxW6u2bi9fEQp-~k7ANTDjgrOQ__",
+      "expires_at": "2026-05-20T19:59:13.114Z"
+    },
+    "attachments": []
+  }
+}

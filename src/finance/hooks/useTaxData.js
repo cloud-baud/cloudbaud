@@ -81,7 +81,7 @@ export function useTaxData(year, fallbackData = null) {
     }, [loadFromSupabase]);
 
     // ─── Update a single amount ────────────────────────
-    const updateAmount = useCallback(async (accountId, newAmount, notes = null) => {
+    const updateAmount = useCallback(async (accountId, newAmount, notes = null, source = 'MANUAL') => {
         try {
             const { data, error: updateErr } = await supabase
                 .rpc('api_update_tax_cell', {
@@ -89,6 +89,7 @@ export function useTaxData(year, fallbackData = null) {
                     p_year: year,
                     p_amount: newAmount,
                     p_notes: notes,
+                    p_source: source
                 });
 
             if (updateErr) throw updateErr;
@@ -101,17 +102,26 @@ export function useTaxData(year, fallbackData = null) {
                     ...section,
                     items: section.items.map(item => {
                         if (item.accountId === accountId) {
-                            return { ...item, amount: newAmount, verified: true };
+                            if (source === 'CPA_VERIFIED') {
+                                return { ...item, amountCpa: newAmount, verifiedCpa: true };
+                            } else {
+                                return { ...item, amount: newAmount, amountDraft: newAmount, verified: true };
+                            }
                         }
                         // Also check children
                         if (item.children) {
                             return {
                                 ...item,
-                                children: item.children.map(child =>
-                                    child.accountId === accountId
-                                        ? { ...child, amount: newAmount, verified: true }
-                                        : child
-                                ),
+                                children: item.children.map(child => {
+                                    if (child.accountId === accountId) {
+                                        if (source === 'CPA_VERIFIED') {
+                                            return { ...child, amountCpa: newAmount, verifiedCpa: true };
+                                        } else {
+                                            return { ...child, amount: newAmount, amountDraft: newAmount, verified: true };
+                                        }
+                                    }
+                                    return child;
+                                }),
                             };
                         }
                         return item;
@@ -204,7 +214,12 @@ function transformToViewerShape(dbRows, year) {
             label: row.label,
             formLine: row.form_line,
             amount: row.amount,
+            amountDraft: row.amount_draft ?? row.amount,
+            amountCpa: row.amount_cpa ?? 0,
+            notesDraft: row.notes_draft ?? row.notes,
+            notesCpa: row.notes_cpa ?? '',
             verified: row.verified || false,
+            verifiedCpa: row.verified_cpa || false,
             computed: row.is_computed || false,
             expandable: row.is_expandable || false,
             returnSchedule: row.return_schedule,
@@ -226,7 +241,12 @@ function transformToViewerShape(dbRows, year) {
                         accountId: child.id,
                         label: child.label,
                         amount: child.amount,
+                        amountDraft: child.amount_draft ?? child.amount,
+                        amountCpa: child.amount_cpa ?? 0,
+                        notesDraft: child.notes_draft ?? child.notes,
+                        notesCpa: child.notes_cpa ?? '',
                         verified: child.verified || false,
+                        verifiedCpa: child.verified_cpa || false,
                         returnSchedule: child.return_schedule,
                         category: child.category,
                         docs: (child.docs || []).map(d => d.filename),

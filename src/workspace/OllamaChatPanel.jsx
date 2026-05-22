@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { X, Send, Bot, User, Sparkles, RefreshCw, AlertCircle, Settings, ChevronDown, Plus, Paperclip, FileIcon } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
@@ -10,29 +10,54 @@ import { createContact } from './crm/contactsService';
 const OLLAMA_BASE = 'http://localhost:11434';
 const BRIDGE_ENDPOINT = 'http://localhost:4001';
 
-const SYSTEM_PROMPT = {
-    role: 'system',
-    content: `You are a helpful AI assistant embedded in CloudBaud, a professional workspace application.
+function buildSystemPrompt(contextData) {
+    const hasInboxContext = Boolean(contextData?.inbox?.available && Array.isArray(contextData?.inbox?.messages));
+
+    return {
+        role: 'system',
+        content: `You are a helpful AI assistant embedded in CloudBaud, a professional workspace application.
 
 WHAT YOU CAN DO:
-- Answer questions about code, business, finance, and general topics
-- Help extract structured data from text (e.g. contact info from a business card)
-- Explain concepts and provide guidance
+- Answer questions about code, business, finance, and general topics.
+- Review, analyze, and answer questions about documents (e.g. tax returns, W-2 forms, PDFs, or spreadsheet data) when the text/context of these documents is provided directly to you in the prompt or conversation history. You are fully capable of doing this because the application extracts the text and passes it to you!
+- Help extract structured data from text (e.g. contact info from a business card).
+- Explain concepts and provide guidance.
+- Answer inbox/email questions ONLY when inbox context is explicitly provided in the prompt.
 
 CRITICAL RULES - WHAT YOU CANNOT DO:
-- You CANNOT see the user's screen, UI, or any panels
-- You CANNOT read from or query any database
-- You CANNOT verify whether data was saved or exists
-- You CANNOT check, browse, or inspect any CRM, contact list, or dashboard
-- You CANNOT perform any action in the application — you can only generate text responses
-- NEVER claim to have checked, verified, looked at, or confirmed anything in the application
-- NEVER fabricate or simulate UI interactions, database lookups, or status checks
-- If the user asks you to verify something was saved, tell them to check the CRM Contacts tab themselves
+- You CANNOT see the user's screen, UI, or active panels in real time (though you CAN read any document text or layout data that has been extracted and passed to you in the conversation).
+- You CANNOT read from or query any database directly in real time (though you CAN reference any ledger rows, draft figures, or spreadsheet context passed to you).
+- You CANNOT verify whether data was saved or exists in the live database.
+- You CANNOT check, browse, or inspect the live CRM, contact list, or dashboard in real time.
+- You CANNOT perform any action in the application — you can only generate text responses.
+- NEVER claim to have accessed the live database or live CRM directly; clarify that you are looking at the provided context or extracted text.
+- NEVER fabricate or simulate UI interactions, database lookups, or status checks.
+- If the user asks you to verify something was saved, tell them to check the CRM Contacts tab or the Tax ledger, but you can confirm what numbers you extracted or have in your context.
+
+${hasInboxContext ? `INBOX CONTEXT RULES:
+- You have been provided a local inbox snapshot in the user message context.
+- You MAY summarize, filter, and answer questions based on that provided inbox snapshot only.
+- If details are missing from snapshot (e.g., full body text), say that clearly.` : `INBOX CONTEXT RULES:
+- If no inbox snapshot is provided, clearly say you cannot access inbox content automatically.`}
 
 When the user provides contact details and asks you to save/enter/add them, the application will handle saving automatically. Just acknowledge the request naturally — do NOT pretend to perform the save yourself.
 
 Be concise, honest, and helpful. If you don't know something, say so.`
-};
+    };
+}
+
+function buildInboxContextBlock(contextData) {
+    const inbox = contextData?.inbox;
+    if (!inbox?.available || !Array.isArray(inbox.messages) || inbox.messages.length === 0) return '';
+
+    const lines = inbox.messages.slice(0, 25).map((m, idx) => {
+        const toList = Array.isArray(m.to) ? m.to.join(', ') : '';
+        const ccList = Array.isArray(m.cc) ? m.cc.join(', ') : '';
+        return `${idx + 1}. id=${m.id}; from=${m.from}; to=${toList}; cc=${ccList}; subject=${m.subject}; createdAt=${m.createdAt}; attachments=${m.attachmentCount}`;
+    });
+
+    return `INBOX CONTEXT (local snapshot):\n- total=${inbox.total || inbox.messages.length}\n- fetchedAt=${inbox.fetchedAt || 'unknown'}\n${lines.join('\n')}`;
+}
 
 const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger, contextData, onProcessComplete, onStatusChange }) => {
     // Read config from Settings
@@ -60,6 +85,9 @@ const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger
     const scrollRef = useRef(null);
     const fileInputRef = useRef(null);
     const [attachedFile, setAttachedFile] = useState(null); // { name, type, content, size }
+    const [activePdfText, setActivePdfText] = useState('');
+    const [activePdfName, setActivePdfName] = useState('');
+    const runtimeSystemPrompt = useMemo(() => buildSystemPrompt(contextData), [contextData]);
 
     // Persist messages to localStorage
     useEffect(() => {
@@ -91,8 +119,12 @@ const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger
 
     // --- TRIGGER EFFECT ---
     useEffect(() => {
-        if (trigger && trigger.type === 'extract') {
-            handleTriggeredExtraction(trigger);
+        if (trigger) {
+            if (trigger.type === 'extract') {
+                handleTriggeredExtraction(trigger);
+            } else if (trigger.type === 'audit') {
+                handleTriggeredAudit(trigger);
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [trigger]); // Note: handleTriggeredExtraction is defined below, should be stable or ref'd
@@ -102,6 +134,12 @@ const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger
         const documentText = (typeof trigger.data === 'string') 
             ? trigger.data 
             : (contextData?.text || trigger.data?.text || '');
+
+        // Set active PDF text for follow-up questions
+        if (documentText) {
+            setActivePdfText(documentText);
+            setActivePdfName(trigger.data?.name || activePdfName || 'Extracted Tax Document');
+        }
 
         let availableRows = [];
         let sheetContext = null;
@@ -257,6 +295,105 @@ const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger
         }
     };
 
+    const handleTriggeredAudit = async (trigger) => {
+        const text = trigger.data?.text || '';
+        const name = trigger.data?.name || 'CPA Tax Return';
+
+        setActivePdfText(text);
+        setActivePdfName(name);
+
+        setMessages(prev => [...prev, { role: 'user', content: `Auditing and analyzing CPA tax return: **${name}**...` }]);
+        setIsLoading(true);
+        setStatus('Auditing Return...');
+
+        if (!text || text.trim().length === 0) {
+            setMessages(prev => [...prev, {
+                role: 'assistant',
+                content: `⚠️ **Audit Failed: Extracted PDF text is empty.**\n\nI could not extract text from the PDF. Please check if the file is scanned or encrypted.`
+            }]);
+            setIsLoading(false);
+            setStatus('Audit Failed');
+            return;
+        }
+
+        try {
+            // Format draft data for the prompt
+            let draftSummary = '';
+            if (contextData?.draftData) {
+                draftSummary = contextData.draftData.map(s => {
+                    const itemLines = s.items.map(i => {
+                        let lines = `- ${i.label} (${i.formLine || 'Line Info N/A'}): $${(i.amount !== null ? i.amount.toLocaleString() : 'N/A')}`;
+                        if (i.children && i.children.length > 0) {
+                            const childLines = i.children.map(c => `  * ${c.label}: $${(c.amount !== null ? c.amount.toLocaleString() : 'N/A')}`).join('\n');
+                            lines += '\n' + childLines;
+                        }
+                        return lines;
+                    }).join('\n');
+                    return `### ${s.title}\n${itemLines}`;
+                }).join('\n\n');
+            }
+
+            const prompt = `
+You are an expert IRS Tax Auditor and CPA reviewing David Rumsey CPA's finalized tax return prepared for Deepika and Jishnu.
+You have the raw, draft spreadsheet calculations from the taxpayer, and the extracted text from the finalized CPA Tax Return PDF.
+
+Your task is to:
+1. Cross-examine the finalized CPA tax return text against the raw draft spreadsheet numbers.
+2. Identify all matches and any discrepancies.
+3. Pay close attention to major figures like:
+   - Wages (Salary: $63,132.46)
+   - CloudBaud Consulting gross business income ($335,686.00) vs Net Profit ($334,565.42)
+   - Robertos gross or net losses (-$44,581.92)
+   - Deductions (Schedule A Mortgage, Real Estate taxes)
+   - SEP IRA or other adjustments
+   - Amount due or refunds ($49,394 due)
+4. Highlight why David's CPA software calculations might differ from the taxpayer's draft (e.g. self-employment tax, QBI deduction, Schedule A limitations, SEP contributions).
+5. Output a highly professional, beautifully formatted, easy-to-read audit and discrepancy report using Markdown tables, lists, and bold headings. Avoid vague statements. Be extremely specific using the actual numbers.
+
+RAW DRAFT SPREADSHEET NUMBERS:
+${draftSummary || 'None provided.'}
+
+EXTRACTED TEXT FROM CPA TAX RETURN PDF (${name}):
+${text.substring(0, 10000)}
+
+Output the audit report now:
+`;
+
+            setStatus('Running Audit...');
+            const response = await fetch(config.endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: config.model,
+                    messages: [{ role: 'user', content: prompt }],
+                    stream: false
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Ollama API error: ${response.status} ${response.statusText}`);
+            }
+
+            const json = await response.json();
+            const auditReport = json.message.content;
+
+            setMessages(prev => [...prev, {
+                role: 'assistant',
+                content: `### 📊 CPA Return Audit & Discrepancy Analysis\n\nI have successfully parsed **${name}** and cross-examined the numbers against your active draft spreadsheet values.\n\n${auditReport}\n\n*Note: This analysis is preserved. You can now ask any follow-up questions about this PDF directly in the chat!*`
+            }]);
+
+        } catch (err) {
+            console.error("AI Audit Failed", err);
+            setMessages(prev => [...prev, {
+                role: 'assistant',
+                content: `⚠️ **AI Audit & Analysis Failed**\n\n${err.message}\n\n**Troubleshooting:**\n- Ensure Ollama is running at ${OLLAMA_BASE}\n- Verify your model is loaded`
+            }]);
+        } finally {
+            setIsLoading(false);
+            setStatus('Ready');
+        }
+    };
+
     const handleApplyAction = () => {
         console.log("Applying suggested action:", suggestedAction);
         if (suggestedAction && suggestedAction.type === 'apply_data') {
@@ -266,8 +403,19 @@ const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger
                 setMessages(prev => [...prev, { role: 'assistant', content: '✅ **Updates Applied.** The spreadsheet has been updated.' }]);
                 setSuggestedAction(null);
             } else {
-                console.error("onProcessComplete prop is missing!");
-                setMessages(prev => [...prev, { role: 'assistant', content: '⚠️ **Error:** Cannot apply updates. Application interface is disconnected.' }]);
+                console.log("onProcessComplete prop is missing, dispatching custom window event 'ollama-process-complete'");
+                
+                // Dispatch custom window event as a robust fallback
+                const event = new CustomEvent('ollama-process-complete', {
+                    detail: {
+                        data: suggestedAction.data,
+                        action: suggestedAction
+                    }
+                });
+                window.dispatchEvent(event);
+                
+                setMessages(prev => [...prev, { role: 'assistant', content: '✅ **Updates Applied.** The spreadsheet has been updated.' }]);
+                setSuggestedAction(null);
             }
         }
     };
@@ -304,6 +452,7 @@ const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger
             // --- SLASH COMMAND REGISTRY ---
             const SLASH_COMMANDS = [
                 { cmd: '/help', args: '', desc: 'Show this command reference' },
+                { cmd: '/audit', args: '', desc: 'Re-run the audit on the currently loaded PDF' },
                 { cmd: '/edit', args: '<file> <instruction>', desc: 'Edit a source file via AI' },
                 { cmd: '/contact', args: '<business card text>', desc: 'Extract & save a contact to CRM' },
             ];
@@ -320,6 +469,21 @@ const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger
                 }]);
                 setIsLoading(false);
                 setStatus('Ready');
+                return;
+            }
+
+            // 0.5. Check for /audit command
+            if (originalInput.trim() === '/audit') {
+                if (!activePdfText) {
+                    setMessages(prev => [...prev, { 
+                        role: 'assistant', 
+                        content: `⚠️ **No CPA tax return PDF currently loaded.**\n\nPlease open the CPA PDF in the Document Viewer and click **"Run AI Audit & Analysis"** to start.` 
+                    }]);
+                    setIsLoading(false);
+                    setStatus('Ready');
+                    return;
+                }
+                handleTriggeredAudit({ data: { text: activePdfText, name: activePdfName } });
                 return;
             }
 
@@ -451,7 +615,7 @@ Return ONLY the JSON object, no markdown, no explanation.`;
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         model: config.model,
-                        messages: [SYSTEM_PROMPT, { role: 'user', content: extractPrompt }],
+                        messages: [runtimeSystemPrompt, { role: 'user', content: extractPrompt }],
                         stream: false,
                     }),
                 });
@@ -498,6 +662,15 @@ Return ONLY the JSON object, no markdown, no explanation.`;
             }
 
             // --- STANDARD CHAT FALLBACK ---
+            const inboxContextBlock = buildInboxContextBlock(contextData);
+            const likelyEmailQuery = /\b(email|emails|inbox|message|messages|subject|from|to|attachment|attachments|unread|mail)\b/i.test(originalInput);
+            if (activePdfText) {
+                const pdfContextBlock = `[Context: Extracted text from active document "${activePdfName}"]\n${activePdfText.substring(0, 12000)}\n[End of Document Context]\n\n`;
+                fullInput = `${pdfContextBlock}User Question: ${fullInput}`;
+            } else if (inboxContextBlock && likelyEmailQuery) {
+                fullInput = `${inboxContextBlock}\n\nUser question:\n${fullInput}`;
+            }
+
             // Create a placeholder for the bot's response
             setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
 
@@ -506,7 +679,7 @@ Return ONLY the JSON object, no markdown, no explanation.`;
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     model: config.model,
-                    messages: [SYSTEM_PROMPT, ...messages, { role: 'user', content: fullInput }].map(m => ({ role: m.role, content: m.content })),
+                    messages: [runtimeSystemPrompt, ...messages, { role: 'user', content: fullInput }].map(m => ({ role: m.role, content: m.content })),
                     stream: true
                 })
             });

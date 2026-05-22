@@ -1,0 +1,51 @@
+{
+  "fetchedAt": "2026-05-20T18:59:11.203Z",
+  "targetDomain": "cloudbaud.com",
+  "message": {
+    "object": "email",
+    "id": "60572d78-1266-4ff3-b020-4e86f8d3a42f",
+    "to": [
+      "info@cloudbaud.com"
+    ],
+    "from": "kabir@nativeappsdeveloper.com",
+    "created_at": "2026-05-20 18:36:15.6478+00",
+    "subject": "Apps Proposal 20 May 2026",
+    "message_id": "<70cbf01dce887$869b5cb0$93d21610$@com>",
+    "bcc": [],
+    "cc": [],
+    "reply_to": [],
+    "html": "<html xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:w=\"urn:schemas-microsoft-com:office:word\" xmlns:m=\"http://schemas.microsoft.com/office/2004/12/omml\" xmlns=\"http://www.w3.org/TR/REC-html40\"><head><META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=us-ascii\"><meta name=Generator content=\"Microsoft Word 12 (filtered medium)\"><style><!--\n/* Font Definitions */\n@font-face\n\t{font-family:\"Cambria Math\";\n\tpanose-1:2 4 5 3 5 4 6 3 2 4;}\n@font-face\n\t{font-family:Calibri;\n\tpanose-1:2 15 5 2 2 2 4 3 2 4;}\n/* Style Definitions */\np.MsoNormal, li.MsoNormal, div.MsoNormal\n\t{margin-top:0in;\n\tmargin-right:0in;\n\tmargin-bottom:10.0pt;\n\tmargin-left:0in;\n\tline-height:115%;\n\tfont-size:11.0pt;\n\tfont-family:\"Calibri\",\"sans-serif\";}\n.MsoChpDefault\n\t{mso-style-type:export-only;}\n.MsoPapDefault\n\t{mso-style-type:export-only;\n\tmargin-bottom:10.0pt;\n\tline-height:115%;}\n@page WordSection1\n\t{size:8.5in 11.0in;\n\tmargin:1.0in 1.0in 1.0in 1.0in;}\ndiv.WordSection1\n\t{page:WordSection1;}\n--></style><!--[if gte mso 9]><xml>\n<o:shapedefaults v:ext=\"edit\" spidmax=\"1026\" />\n</xml><![endif]--><!--[if gte mso 9]><xml>\n<o:shapelayout v:ext=\"edit\">\n<o:idmap v:ext=\"edit\" data=\"1\" />\n</o:shapelayout></xml><![endif]--></head><body lang=EN-US><div class=WordSection1><p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:normal'>Hi</p><p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:normal'><o:p>&nbsp;</o:p></p><p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:normal'>Thinking about building a new Android or iOS app, or upgrading an existing one?</p><p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:normal'><o:p>&nbsp;</o:p></p><p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:normal'>Our <b>India-based team</b> develops custom mobile apps tailored to your goals. We keep things flexible, with rates starting at <b>USD 12 per hour</b>.</p><p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:normal'><o:p>&nbsp;</o:p></p><p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:normal'>If you&#8217;d like to explore ideas or get a quick estimate, just reply here or share your WhatsApp number and we&#8217;ll connect.</p><p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:normal'><o:p>&nbsp;</o:p></p><p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:normal'>Best</p><p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:normal'>Kabir .</p><p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:normal'><span style='color:red'>P.S. Prefer not to hear from us again? Just reply with &#8220;NO&#8221; in the subject line.<o:p></o:p></span></p></div></body></html>",
+    "text": "Hi\n\n \n\nThinking about building a new Android or iOS app, or upgrading an existing\none?\n\n \n\nOur India-based team develops custom mobile apps tailored to your goals. We\nkeep things flexible, with rates starting at USD 12 per hour.\n\n \n\nIf you'd like to explore ideas or get a quick estimate, just reply here or\nshare your WhatsApp number and we'll connect.\n\n \n\nBest\n\nKabir .\n\nP.S. Prefer not to hear from us again? Just reply with \"NO\" in the subject\nline.\n\n",
+    "headers": {
+      "return-path": "[{\"value\":[{\"address\":\"kabir@nativeappsdeveloper.com\",\"name\":\"\"}],\"html\":\"<span class=\\\"mp_address_group\\\"><a href=\\\"mailto:kabir@nativeappsdeveloper.com\\\" class=\\\"mp_address_email\\\">kabir@nativeappsdeveloper.com</a></span>\",\"text\":\"kabir@nativeappsdeveloper.com\"},{\"value\":[{\"address\":\"kabir@nativeappsdeveloper.com\",\"name\":\"\"}],\"html\":\"<span class=\\\"mp_address_group\\\"><a href=\\\"mailto:kabir@nativeappsdeveloper.com\\\" class=\\\"mp_address_email\\\">kabir@nativeappsdeveloper.com</a></span>\",\"text\":\"kabir@nativeappsdeveloper.com\"}]",
+      "received": "[\"from mail-pg1-f193.google.com (mail-pg1-f193.google.com [209.85.215.193]) by inbound-smtp.us-east-1.amazonaws.com with SMTP id cdm84ht80eu6mlqlmtbeor2ht44akoo4gjekus81 for info@cloudbaud.com; Wed, 20 May 2026 18:36:14 +0000 (UTC)\",\"by mail-pg1-f193.google.com with SMTP id 41be03b00d2f7-c85067c9ccdso501078a12.3 for <info@cloudbaud.com>; Wed, 20 May 2026 11:36:14 -0700 (PDT)\",\"from ArvindKumar ([2405:201:404f:103b:10d:4598:9f45:88ac]) by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5bd5fe44sm232489045ad.11.2026.05.20.11.36.11 for <info@cloudbaud.com> (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128); Wed, 20 May 2026 11:36:12 -0700 (PDT)\"]",
+      "x-ses-spam-verdict": "FAIL",
+      "x-ses-virus-verdict": "PASS",
+      "received-spf": "pass (spfCheck: domain of nativeappsdeveloper.com designates 209.85.215.193 as permitted sender) client-ip=209.85.215.193; envelope-from=kabir@nativeappsdeveloper.com; helo=mail-pg1-f193.google.com;",
+      "authentication-results": "amazonses.com; spf=pass (spfCheck: domain of nativeappsdeveloper.com designates 209.85.215.193 as permitted sender) client-ip=209.85.215.193; envelope-from=kabir@nativeappsdeveloper.com; helo=mail-pg1-f193.google.com; dkim=pass header.i=@nativeappsdeveloper.com; dmarc=none header.from=nativeappsdeveloper.com;",
+      "x-ses-receipt": "AEFBQUFBQUFBQUFHTFhKRE1EaVhEUElaRG83Nm5lcFk2NGgrbG9KWDE1WmEwVEFodEgxeHk3WEF2ckdLcm9nL2JjclNuWXZIRXBydzFybWhEQlZJMk15WnYrOWY3Z2ZrZ1UveGNnUjZYTnovOGtHalB1V3Y0Mm1TbVdlejdnRWZWM3VLZGVkWGxwQkdYckZiK2RhR2FGMFRxcDBoTVVGK1ducFpjcjgwTXdweS9hY0tmWlFKdFQvN3NQY0dmQmloRlFTYlBFSlZWSGhWcGZ0ZzhiS1Q0WmU2ZWM1a1pCdjg4bldnekNZazlXcE84cC83ZG4vV0JEQ2ZlOU1FS0t0cG9VRkFHUVl2Y0dpQXlRVEF2SG9SbkhRRG9aa3Q1T215OEhjYzYyUDZOd01QU21OaFlYclM2RFE9PQ==",
+      "x-ses-dkim-signature": "a=rsa-sha256; q=dns/txt; b=ZcAsgZXQJ1IHuqBeqoOsVUEdhRqtqJumPtAZBHmWh9tZSaOqn5kEGdHYEmgwEfk3UD9taOZUcmBCQB8llFqsR8bIW1Y5CE0MPUQg0L3gN59PQm/GcGC38EbkkEI248OBBj6rvuQlu6nbQox0F9OAbqQjfuRS+ycgV87Z5UkAzKY=; c=relaxed/simple; s=224i4yxa5dv7c2xz3womw6peuasteono; d=amazonses.com; t=1779302175; v=1; bh=7Wx/3kkajrIayoYw/PvTfnLYgrUO1jQRcvKZI/91gTk=; h=From:To:Cc:Bcc:Subject:Date:Message-ID:MIME-Version:Content-Type:X-SES-RECEIPT;",
+      "dkim-signature": "v=1",
+      "x-google-dkim-signature": "v=1; a=rsa-sha256; c=relaxed/relaxed; d=1e100.net; s=20251104; t=1779302174; x=1779906974; h=content-language:thread-index:mime-version:message-id:date:subject :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date :message-id:reply-to; bh=PpYHtsOcywAeFkVP8eZgT9qBg4dB+8IaTKlsqx96o9c=; b=goR0BSmqLkUjJZW+KjaUFtgBqDYgO8azyJaMONn4SD4E29RikyoJnxqOp4+cQihhNJ 4+kA7T3tZ5I/UFmgh3+arEovxXJH9u/j3kapDQV6yo5kKYR1LqpR/+ZLU2zFReX4uFZj Q7yUsUXXq6WzIJ0Xy/LD8GG5Mt2F+0zCfauLki1fFvibn03SCyr1EQGPn0Ff7SXL+QDB cXXGnFmzF0F5gPQKRiTkDPz6vX51BuKQ6/2b24pDpAQ0A52WeFUeH2BSb2SIUgwfMD8N XEUeVDUyiA6IEt7paZKCQB5ztrTO/7oYjVN/LrI3TMnxuDhegWDLgfoDiccqrETE7dT3 XD6A==",
+      "x-gm-message-state": "AOJu0Yx4toEZrmOst7yPSMK3/eN/5iskwV1G0fWsrAo3K8sEj21H9/op AnZp5xlepUQTZXnWsTV8ZIS7ZFFEUJJlQuGLNm86TDpyxSUA6/1AXkFxTkv+tOtzvEJvYGWpKWY Z0qCilB0=",
+      "x-gm-gg": "Acq92OFtohXMUZQzt7LZ94b0GcktmDPEZkI++GJUodTFUyHyP8vI9XBNNvU2zZQgKZm 9bOQJpEGuHnZDfu/avkUnx1ZgdSV1UrdhcvSShdkq4N36WTUJXlY6SOPufsP2WBXglAnOvJfsy7 RK5RR2Kto1uzAHmpUrnsDMW2LXoM5mOa6/QtnUpoOXvkWDQ5LVwNiPwGIAkqgGzIEXpr5BsBXVX lbAo0D7crKZAfnoPPl6NnxOejnzhp3FfnMBDenDp1i86I+XKlSRcl2dVUc6WlF2uGH7prLOCx5M ESCbpW8Tszvv9bBmamlQ3n/kAeo9LlOw8JSeW66GrtzK0TtuL5psvq7i3IwSJQg9a4Kg0UCbU2D OwupDeTbD589ZcVN7VIaHdA1u3jqlD0VhopbYa4tgrvrzNzR3v4PP0GJepBFscW0cQzSYGTatHh XA1+9lEICOFq1NnJITVECrINp+0w49xlvBFeNx3ZvAIMESJuE2M1XgR/OTFA==",
+      "x-received": "by 2002:a17:902:b713:b0:2b2:67ca:5ff9 with SMTP id d9443c01a7336-2bd7e317a63mr167477955ad.0.1779302173546; Wed, 20 May 2026 11:36:13 -0700 (PDT)",
+      "from": "\"Kabir\" <kabir@nativeappsdeveloper.com>",
+      "x-google-original-from": "\"Kabir\" <Kabir@nativeappsdeveloper.com>",
+      "to": "info@cloudbaud.com",
+      "subject": "Apps Proposal 20 May 2026",
+      "date": "\"2026-05-20T18:26:45.000Z\"",
+      "message-id": "<70cbf01dce887$869b5cb0$93d21610$@com>",
+      "mime-version": "1.0",
+      "content-type": "multipart/alternative",
+      "x-mailer": "Microsoft Office Outlook 12.0",
+      "thread-index": "AdzoNSiQSjE8MgP4RySxuACxB9swFw==",
+      "content-language": "en-us"
+    },
+    "raw": {
+      "download_url": "https://cdn.resend.app/receiving/raw/cdm84ht80eu6mlqlmtbeor2ht44akoo4gjekus81?response-content-disposition=attachment%3B+filename%3D%22cdm84ht80eu6mlqlmtbeor2ht44akoo4gjekus81%22&Expires=1779307151&Key-Pair-Id=K1EE1EYO2ZO8UR&Signature=PXoW1SfFyTAwPjB24LzYBf88zdUl77obcRF~yxToDwRPBjAb0-dk1~TisY8UGy0ADl1WsmZD7gBLaX9s2TPCA4WnsJ65y3Yj7vRYA6-YasWdK4AbRil-TPsn5vw319nbItWsHW0jvDaUGQ46Ew-xSPcIPvq3tOdL0JP~mzJP5r9l6KGDXe5nu66tKB8~lHaZM3oNUQlkEL9G0eY6TDYkqraONKTUeMS65xHWN7pfFqriTYaaR1O7454-jrP1SRZ4m0cPPXgY9JktcaGFRCcFjNC1WzxZhFBDSAP6FxsYF2SqN6SHb9GGPy3c0TBjTVTVPmTJg1rxFxhbdOiiVCCfEA__",
+      "expires_at": "2026-05-20T19:59:11.198Z"
+    },
+    "attachments": []
+  }
+}
