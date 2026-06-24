@@ -8,9 +8,9 @@ import WorkspaceLayout from './collaboration/WorkspaceLayout';
 import PortalDashboard from './collaboration/PortalDashboard';
 import FabricDemo from './collaboration/sales/FabricDemo';
 import FinOpsDashboard from './collaboration/FinOpsDashboard';
-// import SettingsPage from './collaboration/settings/SettingsPage'; // OLD: Local version
-import { SettingsPage } from 'common-features/frontend/components/features/settings/SettingsPage'; // NEW: CommonFeatures master
+import SettingsPage from './collaboration/settings/SettingsPage';
 import PlaceholderPage from './collaboration/PlaceholderPage';
+import UnifiedCommunicationsPage from './collaboration/support/UnifiedCommunicationsPage';
 import ContextLayout from './collaboration/ContextLayout';
 import TaxDashboard from './collaboration/finance/TaxDashboard';
 import AccountingDashboard from './collaboration/finance/AccountingDashboard';
@@ -101,7 +101,7 @@ function App() {
                       <Route path="accounting" element={<AccountingDashboard />} />
                       <Route path="investments" element={<PlaceholderPage />} />
                     </Route>
-                    <Route path="support" element={<PlaceholderPage />} />
+                    <Route path="support" element={<UnifiedCommunicationsPage />} />
                     <Route path="crm" element={<CrmDashboard />} />
                     <Route path="sales" element={<SalesDashboard />} />
                     <Route path="marketing" element={<MarketingDashboard />} />

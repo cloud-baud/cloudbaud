@@ -1,6 +1,13 @@
 [build]
   command = "npm run build"
   publish = "dist"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/resend/inbound"
+  to = "/.netlify/functions/resend-inbound"
+  status = 200
+  force = true
 
 [[redirects]]
   from = "/*"
