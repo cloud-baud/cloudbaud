@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/shared/ui/button';
-import { Mail, Lock, Loader2, Wand2 } from 'lucide-react';
+import { Mail, Loader2, Wand2 } from 'lucide-react';
 
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
@@ -11,7 +11,10 @@ import SocialAuthButtons from '@/components/auth/SocialAuthButtons';
 const LoginPage = () => {
     const [loading, setLoading] = useState(false);
     const [cooldown, setCooldown] = useState(0);
-    const { signInWithOtp, impersonateUser } = useAuth();
+    const [email, setEmail] = useState('');
+    const [otp, setOtp] = useState('');
+    const [otpSent, setOtpSent] = useState(false);
+    const { signInWithMagicLink, verifyEmailOtp, impersonateUser } = useAuth();
     const navigate = useNavigate();
     const isDev = import.meta.env.DEV;
 
@@ -28,8 +31,6 @@ const LoginPage = () => {
         if (cooldown > 0) return;
 
         setLoading(true);
-        const formData = new FormData(e.currentTarget);
-        const email = formData.get('email');
 
         if (!email) {
             toast.error("Please enter a valid email address");
@@ -38,16 +39,45 @@ const LoginPage = () => {
         }
 
         try {
-            await signInWithOtp(email);
-            toast.success('Magic link sent! Check your email to log in.');
+            await signInWithMagicLink(email);
+            setOtpSent(true);
+            toast.success('Sign-in email sent. Use the magic link or enter the OTP code from the same email.');
             setCooldown(60); // 60 second cooldown to prevent spam/link invalidation
         } catch (error) {
             console.error("Login Error:", error);
-            if (error.status === 500 || error.message?.includes("500")) {
-                toast.error("Service Error: Sending failed. You may have hit the email rate limit (3/hour on free tier). Please wait or check Supabase logs.");
+            const message = error?.message || '';
+            const code = error?.code || '';
+            const isRateLimited =
+                code === 'over_email_send_rate_limit' ||
+                /rate|limit|too many|security purposes/i.test(message);
+
+            if (isRateLimited) {
+                toast.error('Email sending is temporarily throttled. Please wait about a minute and retry.', {
+                    description: message || 'Provider rate limit reached.',
+                });
+            } else if (error?.status === 500) {
+                toast.error('Service error while sending sign-in email.', {
+                    description: message || 'Please check Supabase Auth logs and SMTP settings.',
+                });
             } else {
-                toast.error(error.message || 'Failed to send magic link');
+                toast.error(message || 'Failed to send sign-in email');
             }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleOtpVerify = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            await verifyEmailOtp(email, otp.trim());
+            toast.success('OTP verified. Signed in successfully.');
+            navigate('/collaboration');
+        } catch (error) {
+            console.error('OTP Verify Error:', error);
+            toast.error(error.message || 'Invalid or expired OTP code');
         } finally {
             setLoading(false);
         }
@@ -70,6 +100,8 @@ const LoginPage = () => {
                                 name="email"
                                 type="email"
                                 required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                                 placeholder="name@company.com"
                             />
@@ -89,10 +121,34 @@ const LoginPage = () => {
                             </span>
                         ) : (
                             <>
-                                <Wand2 className="w-4 h-4 mr-2" /> Send Magic Link
+                                <Wand2 className="w-4 h-4 mr-2" /> Send Sign-In Email
                             </>
                         )}
                     </Button>
+
+                    {otpSent && (
+                        <div className="space-y-3 p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/40">
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Enter OTP Code</label>
+                            <input
+                                type="text"
+                                inputMode="numeric"
+                                autoComplete="one-time-code"
+                                maxLength={6}
+                                value={otp}
+                                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all tracking-[0.25em] text-center font-semibold"
+                                placeholder="123456"
+                            />
+                            <Button
+                                type="button"
+                                onClick={handleOtpVerify}
+                                disabled={loading || otp.length !== 6}
+                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                            >
+                                {loading ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : 'Verify and Sign In'}
+                            </Button>
+                        </div>
+                    )}
 
                     {isDev && (
                         <div className="relative">

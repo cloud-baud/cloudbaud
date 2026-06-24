@@ -82,6 +82,11 @@ const suggested = [
 
 const operationsApps = [
     {
+        icon: MessageSquare,
+        label: 'Inbox',
+        href: '/collaboration/support'
+    },
+    {
         icon: PieChart,
         label: 'Finance',
         href: '/collaboration/finance'

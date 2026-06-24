@@ -135,13 +135,36 @@ export const AuthProvider = ({ children }) => {
         return data;
     };
 
-    const signInWithOtp = async (email) => {
+    const signInWithMagicLink = async (email) => {
         await checkAccess(email);
         const { data, error } = await supabase.auth.signInWithOtp({
             email,
             options: {
+                shouldCreateUser: false,
                 emailRedirectTo: `${window.location.origin}/portal`,
             },
+        });
+        if (error) throw error;
+        return data;
+    };
+
+    const sendEmailOtp = async (email) => {
+        await checkAccess(email);
+        const { data, error } = await supabase.auth.signInWithOtp({
+            email,
+            options: {
+                shouldCreateUser: false,
+            },
+        });
+        if (error) throw error;
+        return data;
+    };
+
+    const verifyEmailOtp = async (email, token) => {
+        const { data, error } = await supabase.auth.verifyOtp({
+            email,
+            token,
+            type: 'email',
         });
         if (error) throw error;
         return data;
@@ -228,7 +251,10 @@ export const AuthProvider = ({ children }) => {
         session,
         loading,
         signInWithEmail,
-        signInWithOtp,
+        signInWithOtp: signInWithMagicLink,
+        signInWithMagicLink,
+        sendEmailOtp,
+        verifyEmailOtp,
         signInWithOAuth,
         signInWithSSO,
         signUpWithEmail,

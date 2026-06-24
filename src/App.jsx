@@ -42,6 +42,7 @@ import SiteMapPage from './pages/legal/SiteMapPage';
 
 import SignupPage from './pages/auth/SignupPage';
 import LoginPage from './pages/auth/LoginPage';
+import AuthConfirmPage from './pages/auth/AuthConfirmPage';
 import RedirectHandler from './components/auth/RedirectHandler';
 import AuthRedirector from './components/auth/AuthRedirector';
 import AiEngineeringPage from './portal/pages/engineering/AiEngineeringPage';
@@ -76,6 +77,7 @@ function App() {
               <AuthRedirector />
               <Routes>
                 <Route path="/book" element={<BookingPage />} />
+                <Route path="/auth/confirm" element={<AuthConfirmPage />} />
 
                 {/* Protected Portal Routes */}
                 <Route element={<ProtectedRoute />}>
