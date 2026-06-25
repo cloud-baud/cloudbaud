@@ -1,0 +1,197 @@
+.standard-inbox-root {
+  --inbox-left-width: 220px;
+  --inbox-middle-width: 360px;
+}
+
+.standard-inbox-left {
+  width: var(--inbox-left-width);
+}
+
+.standard-inbox-middle {
+  width: var(--inbox-middle-width);
+}
+
+.standard-inbox-message-row {
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.standard-inbox-message-row:hover {
+  background-color: rgba(148, 163, 184, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(0, 75, 151, 0.35);
+}
+
+.standard-inbox-message-row.is-active {
+  background-color: transparent;
+  box-shadow: inset 2px 0 0 0 rgba(0, 75, 151, 0.85);
+}
+
+.dark .standard-inbox-message-row {
+  background-color: transparent;
+  color: #f3f4f6;
+}
+
+.dark .standard-inbox-message-row:hover,
+[data-theme='dark'] .standard-inbox-message-row:hover,
+[data-color-mode='dark'] .standard-inbox-message-row:hover {
+  background-color: rgba(148, 163, 184, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(147, 197, 253, 0.45);
+}
+
+.dark .standard-inbox-message-row.is-active,
+[data-theme='dark'] .standard-inbox-message-row.is-active,
+[data-color-mode='dark'] .standard-inbox-message-row.is-active {
+  background-color: transparent;
+  box-shadow: inset 2px 0 0 0 rgba(191, 219, 254, 0.9);
+}
+
+.standard-inbox-category-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  border: 1px solid transparent;
+}
+
+.standard-inbox-category-pill.category-general {
+  background: #e5e7eb;
+  color: #1f2937;
+}
+
+.standard-inbox-category-pill.category-sales {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.standard-inbox-category-pill.category-recruiting {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.standard-inbox-category-pill.category-security {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.standard-inbox-category-pill.category-finance {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.standard-inbox-category-pill.category-support {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.standard-inbox-category-pill.category-personal {
+  background: #fce7f3;
+  color: #9d174d;
+}
+
+.dark .standard-inbox-category-pill,
+[data-theme='dark'] .standard-inbox-category-pill,
+[data-color-mode='dark'] .standard-inbox-category-pill {
+  border-color: rgba(255, 255, 255, 0.25);
+  filter: brightness(0.9);
+}
+
+.standard-inbox-filter-pill {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #e5e7eb;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  line-height: 1.2;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.standard-inbox-filter-pill:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.standard-inbox-filter-pill.is-active {
+  background: #dbeafe;
+  color: #1e3a8a;
+  border-color: #93c5fd;
+}
+
+.standard-inbox-rich-body {
+  word-break: break-word;
+  color: #111827;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.standard-inbox-rich-body * {
+  color: #111827 !important;
+}
+
+.standard-inbox-rich-body table,
+.standard-inbox-rich-body td,
+.standard-inbox-rich-body th,
+.standard-inbox-rich-body tr {
+  background: transparent !important;
+}
+
+.standard-inbox-rich-body img {
+  max-width: 100%;
+  height: auto;
+}
+
+.standard-inbox-rich-body table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.standard-inbox-rich-body a {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.dark .standard-inbox-rich-body a,
+[data-theme='dark'] .standard-inbox-rich-body a,
+[data-color-mode='dark'] .standard-inbox-rich-body a {
+  color: #93c5fd;
+}
+
+.dark .standard-inbox-rich-body,
+[data-theme='dark'] .standard-inbox-rich-body,
+[data-color-mode='dark'] .standard-inbox-rich-body {
+  color: #111827;
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.dark .standard-inbox-rich-body *,
+[data-theme='dark'] .standard-inbox-rich-body *,
+[data-color-mode='dark'] .standard-inbox-rich-body * {
+  color: #111827 !important;
+}
+
+.standard-inbox-folder-button {
+  color: #404040;
+}
+
+.standard-inbox-folder-button.is-active {
+  background-color: #ffffff;
+  color: #111827;
+}
+
+.dark .standard-inbox-folder-button {
+  color: #d4d4d8;
+}
+
+.dark .standard-inbox-folder-button.is-active,
+[data-theme='dark'] .standard-inbox-folder-button.is-active,
+[data-color-mode='dark'] .standard-inbox-folder-button.is-active {
+  background-color: #3f3f46;
+  color: #ffffff;
+}

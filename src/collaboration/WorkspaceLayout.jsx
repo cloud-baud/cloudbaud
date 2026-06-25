@@ -84,7 +84,7 @@ const operationsApps = [
     {
         icon: MessageSquare,
         label: 'Inbox',
-        href: '/collaboration/support'
+        href: '/collaboration/inbox'
     },
     {
         icon: PieChart,
@@ -120,6 +120,8 @@ const operationsApps = [
 const WorkspaceLayout = () => {
     const { user, signOut } = useAuth();
     const [isChatOpen, setIsChatOpen] = useState(false); // State for chat panel
+    const location = useLocation();
+    const isInboxRoute = location.pathname === '/collaboration/inbox';
 
     // Sidebar collapse state with persistence
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
@@ -262,7 +264,7 @@ const WorkspaceLayout = () => {
                                 ? "bg-brand-blue text-white shadow-lg shadow-brand-blue/20"
                                 : "hover:bg-white/10 text-slate-400 hover:text-white"
                         )}
-                        title="Toggle AI Assistant"
+                        title="Toggle CloudBot"
                     >
                         <Sparkles className="size-4" />
                     </button>
@@ -402,13 +404,31 @@ const WorkspaceLayout = () => {
                 </aside>
 
                 {/* Page Content */}
-                <main className="flex-1 flex flex-col overflow-auto relative p-4 lg:p-6">
+                <main className={cn(
+                    "flex-1 flex flex-col overflow-auto relative",
+                    isInboxRoute ? "p-1.5 lg:p-2" : "p-4 lg:p-6"
+                )}>
                     <div className="flex-1 bg-card rounded-xl border border-border shadow-sm overflow-hidden flex flex-col relative">
                         <Outlet />
-                        {/* Ollama Chat Panel Overlay */}
-                        <OllamaChatPanel isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} variant="overlay" />
                     </div>
                 </main>
+
+                {/* Docked Persistent CloudBot Panel */}
+                <aside
+                    className={cn(
+                        "flex-shrink-0 flex flex-col pt-6 pb-4 pr-4 lg:pr-6 bg-transparent h-full transition-all duration-300 ease-in-out overflow-hidden",
+                        isChatOpen ? "w-[400px]" : "w-[88px]"
+                    )}
+                >
+                    <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden flex-1 flex flex-col relative ml-2">
+                        <OllamaChatPanel 
+                            isOpen={true} 
+                            isCollapsed={!isChatOpen}
+                            onToggleCollapse={() => setIsChatOpen(!isChatOpen)}
+                            variant="docked" 
+                        />
+                    </div>
+                </aside>
             </div>
         </div>
     );

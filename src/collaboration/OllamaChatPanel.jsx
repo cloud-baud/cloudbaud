@@ -4,19 +4,35 @@ import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown'; // Assuming react-markdown is available, if not fallback to plain text
+import { CLOUDBOT_SYSTEM_PROMPT } from './CloudBotPrompt';
 
 const BRIDGE_ENDPOINT = 'http://localhost:3001/api'; // Our new bridge
 
-const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger, contextData, onProcessComplete, onStatusChange }) => {
-    // Read config from Settings
-    const [config, setConfig] = useState({
-        endpoint: localStorage.getItem('ai_endpoint') || 'http://localhost:11434/api/chat',
-        model: localStorage.getItem('ai_model') || 'llama3.1:8b',
-        provider: localStorage.getItem('ai_provider') || 'ollama'
+const OllamaChatPanel = ({ 
+    isOpen = true, 
+    onClose, 
+    variant = 'embedded', 
+    trigger, 
+    contextData, 
+    onProcessComplete, 
+    onStatusChange,
+    isCollapsed = false,
+    onToggleCollapse
+}) => {
+    // Read config from Settings with auto-migration from Llama
+    const [config, setConfig] = useState(() => {
+        const endpoint = localStorage.getItem('ai_endpoint') || 'http://localhost:11434/api/chat';
+        let model = localStorage.getItem('ai_model') || 'qwen2.5:7b';
+        if (model.toLowerCase().includes('llama')) {
+            model = 'qwen2.5:7b';
+            localStorage.setItem('ai_model', 'qwen2.5:7b');
+        }
+        const provider = localStorage.getItem('ai_provider') || 'ollama';
+        return { endpoint, model, provider };
     });
 
     const [messages, setMessages] = useState([
-        { role: 'assistant', content: `Hello! I am using **${config.model}** via **${config.provider}**. \n\n**Try this:**\n\`/edit src/components/portal/PortalDashboard.jsx Change the rocket icon to a star\`` }
+        { role: 'assistant', content: `Hello! I am **CloudBot**, using **${config.model}** via **${config.provider}**. \n\n**Try this:**\n\`/edit src/components/portal/PortalDashboard.jsx Change the rocket icon to a star\`` }
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -350,7 +366,11 @@ const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     model: config.model,
-                    messages: [...messages, userMessage].map(m => ({ role: m.role, content: m.content })),
+                    messages: [
+                        { role: 'system', content: CLOUDBOT_SYSTEM_PROMPT },
+                        ...messages,
+                        userMessage
+                    ].map(m => ({ role: m.role, content: m.content })),
                     stream: true
                 })
             });
@@ -429,21 +449,83 @@ const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger
 
     if (!isOpen) return null;
 
+    if (isCollapsed) {
+        return (
+            <div className="h-full flex flex-col items-center py-6 justify-between bg-card select-none">
+                {/* Top Slot: Expand button */}
+                <div className="flex flex-col items-center gap-4">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-10 w-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/20 transition-all shadow-sm"
+                        onClick={onToggleCollapse}
+                        title="Expand CloudBot"
+                    >
+                        <Bot className="size-5" />
+                    </Button>
+                </div>
+
+                {/* Middle Slot: Quick Actions */}
+                <div className="flex flex-col items-center gap-3">
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 rounded-lg text-slate-400 hover:text-brand-blue hover:bg-brand-blue/10 transition-colors"
+                        onClick={() => {
+                            setMessages([{ role: 'assistant', content: `Hello! I am **CloudBot**, using **${config.model}** via **${config.provider}**. \n\n**Try this:**\n\`/edit src/components/portal/PortalDashboard.jsx Change the rocket icon to a star\`` }]);
+                            setSuggestedAction(null);
+                            setError(null);
+                        }}
+                        title="New Conversation"
+                    >
+                        <Plus className="size-4" />
+                    </Button>
+                    
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 rounded-lg text-slate-400 hover:text-foreground"
+                        onClick={() => {
+                            onToggleCollapse();
+                            setShowSettings(true);
+                        }}
+                        title="Configure Model"
+                    >
+                        <Settings className="size-4" />
+                    </Button>
+                </div>
+
+                {/* Bottom Slot: Mini Status */}
+                <div className="flex flex-col items-center gap-2">
+                    <div 
+                        className={cn(
+                            "size-2 rounded-full", 
+                            error ? "bg-destructive animate-pulse" : (isLoading ? "bg-amber-500 animate-pulse" : "bg-emerald-500")
+                        )} 
+                        title={error ? "Offline" : (isLoading ? "Thinking..." : "Ready")}
+                    />
+                </div>
+            </div>
+        );
+    }
+
     const containerClasses = variant === 'overlay'
         ? "fixed top-16 right-0 bottom-0 w-[400px] bg-background border-l border-border shadow-2xl z-40 flex flex-col animate-in slide-in-from-right duration-300"
         : "h-full flex flex-col bg-background";
 
     return (
         <div className={containerClasses}>
-            {/* Header (Only for Overlay) */}
-            {variant === 'overlay' && (
+            {/* Header (For Overlay and Docked variants) */}
+            {(variant === 'overlay' || variant === 'docked') && (
                 <div className="flex items-center justify-between p-4 border-b border-border bg-muted/30">
                     <div className="flex items-center gap-2">
-                        <div className={cn("p-1.5 rounded-md transition-colors", error ? "bg-destructive/10 text-destructive" : "bg-emerald-500/10 text-emerald-600")}>
+                        <div className={cn("p-1.5 rounded-md transition-colors", error ? "bg-destructive/10 text-destructive" : "bg-purple-500/10 text-purple-600")}>
                             <Sparkles className="size-4" />
                         </div>
                         <div>
-                            <h3 className="font-semibold text-sm">AI Agent</h3>
+                            <h3 className="font-semibold text-sm">CloudBot</h3>
                             <div className="flex items-center gap-1.5">
                                 <span className={cn("size-2 rounded-full", error ? "bg-destructive" : (isLoading ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'))} />
                                 <span className="text-[10px] text-muted-foreground uppercase font-mono">
@@ -452,7 +534,13 @@ const OllamaChatPanel = ({ isOpen = true, onClose, variant = 'embedded', trigger
                             </div>
                         </div>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive">
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={variant === 'docked' ? onToggleCollapse : onClose} 
+                        className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
+                        title={variant === 'docked' ? "Collapse CloudBot" : "Close"}
+                    >
                         <X className="size-4" />
                     </Button>
                 </div>

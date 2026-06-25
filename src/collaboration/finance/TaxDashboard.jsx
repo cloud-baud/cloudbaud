@@ -1294,7 +1294,7 @@ const TaxDashboard = () => {
                                             agentStatus.error ? "text-destructive" : (agentStatus.isLoading ? "text-amber-600" : "text-emerald-600")
                                         )}>
                                             <Bot className="size-4" />
-                                            AI Agent
+                                            CloudBot
                                             <span className="text-[10px] uppercase font-mono bg-black/5 dark:bg-white/10 px-1 rounded ml-1">
                                                 {agentStatus.error ? 'Offline' : (agentStatus.isLoading ? 'Working' : 'Ready')}
                                             </span>
@@ -1378,7 +1378,7 @@ const TaxDashboard = () => {
                         size="icon"
                         className={cn("h-8 w-8 rounded-full", activeRightTab === 'agent' ? "bg-white dark:bg-slate-800 shadow-sm text-purple-600" : "text-slate-500")}
                         onClick={() => setActiveRightTab(activeRightTab === 'agent' ? null : 'agent')}
-                        title="AI Agent"
+                        title="CloudBot"
                     >
                         <Bot className="size-4" />
                     </Button>

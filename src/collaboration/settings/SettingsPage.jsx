@@ -78,6 +78,58 @@ const SettingsPage = () => {
         setIsEditingConfig(false);
     };
 
+    // Inbox providers state management
+    const [inboxProviders, setInboxProviders] = useState(() => {
+        const defaultList = [
+            { id: 'outlook_1', type: 'email_outlook', label: 'cloud.baud@outlook.com', isActive: true, connectedAt: new Date() },
+            { id: 'gmail_1', type: 'email_gmail', label: 'cloud9baud@gmail.com', isActive: true, connectedAt: new Date() },
+            { id: 'resend_1', type: 'email_imap', label: 'jish.nath@cloudbaud.com (Resend)', isActive: true, connectedAt: new Date() },
+            { id: 'whatsapp_1', type: 'whatsapp', label: 'WhatsApp (+1 425 749 2101)', isActive: true, connectedAt: new Date() },
+            { id: 'sms_1', type: 'sms', label: 'SMS (+1 425 749 2101)', isActive: true, connectedAt: new Date() },
+            { id: 'telegram_1', type: 'telegram', label: 'Telegram (+1 425 749 2101)', isActive: true, connectedAt: new Date() }
+        ];
+        try {
+            const initialized = localStorage.getItem('inbox_providers_initialized_v2');
+            if (initialized !== 'true') {
+                localStorage.setItem('inbox_providers', JSON.stringify(defaultList));
+                localStorage.setItem('inbox_providers_initialized_v2', 'true');
+                return defaultList;
+            }
+            const saved = localStorage.getItem('inbox_providers');
+            return saved ? JSON.parse(saved) : defaultList;
+        } catch (e) {
+            return defaultList;
+        }
+    });
+
+    const isOutlookConnected = inboxProviders.some(p => p.type === 'email_outlook');
+    const isGmailConnected = inboxProviders.some(p => p.type === 'email_gmail');
+    const isResendConnected = inboxProviders.some(p => p.type === 'email_imap');
+    const isWhatsappConnected = inboxProviders.some(p => p.type === 'whatsapp');
+    const isSmsConnected = inboxProviders.some(p => p.type === 'sms');
+    const isTelegramConnected = inboxProviders.some(p => p.type === 'telegram');
+
+    const handleToggleProvider = (type, defaultLabel) => {
+        let newList;
+        const exists = inboxProviders.some(p => p.type === type);
+        if (exists) {
+            newList = inboxProviders.filter(p => p.type !== type);
+            toast.info(`Disconnected ${type.replace('email_', '').replace('outlook', 'Outlook').replace('gmail', 'Gmail').replace('imap', 'Resend')} account`);
+        } else {
+            newList = [...inboxProviders, {
+                id: crypto.randomUUID(),
+                type,
+                label: defaultLabel,
+                isActive: true,
+                connectedAt: new Date()
+            }];
+            toast.success(`Connected ${type.replace('email_', '').replace('outlook', 'Outlook').replace('gmail', 'Gmail').replace('imap', 'Resend')} account successfully!`);
+        }
+        setInboxProviders(newList);
+        localStorage.setItem('inbox_providers', JSON.stringify(newList));
+        window.dispatchEvent(new Event('storage'));
+    };
+
     const handleConnectMicrosoft = async () => {
         try {
             await instance.loginPopup(loginRequest);
@@ -1249,6 +1301,150 @@ const SettingsPage = () => {
                                             <pre>{JSON.stringify(graphData, null, 2)}</pre>
                                         </div>
                                     )}
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        {/* Unified Inbox Channels Card */}
+                        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Puzzle className="size-5 text-brand-blue" />
+                                        Unified Inbox Channels
+                                    </CardTitle>
+                                    <CardDescription>
+                                        Connect Google, Outlook, WhatsApp, and SMS accounts to enable the unified support inbox workspace.
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {/* Outlook Channel */}
+                                        <div className="flex items-center justify-between p-4 border border-slate-800 rounded-lg bg-slate-950/20">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-9 h-9 bg-blue-500/10 text-blue-400 rounded-lg flex items-center justify-center font-bold">O</div>
+                                                <div>
+                                                    <h4 className="font-semibold text-sm">Microsoft Outlook</h4>
+                                                    <p className="text-xs text-slate-400">
+                                                        {isOutlookConnected ? "Connected" : "Disconnected"}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <Button 
+                                                variant={isOutlookConnected ? "outline" : "default"} 
+                                                size="sm"
+                                                onClick={() => handleToggleProvider('email_outlook', 'cloud.baud@outlook.com')}
+                                                className="cursor-pointer"
+                                            >
+                                                {isOutlookConnected ? "Disconnect" : "Connect"}
+                                            </Button>
+                                        </div>
+
+                                        {/* Gmail Channel */}
+                                        <div className="flex items-center justify-between p-4 border border-slate-800 rounded-lg bg-slate-950/20">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-9 h-9 bg-red-500/10 text-red-400 rounded-lg flex items-center justify-center font-bold">G</div>
+                                                <div>
+                                                    <h4 className="font-semibold text-sm">Google Gmail</h4>
+                                                    <p className="text-xs text-slate-400">
+                                                        {isGmailConnected ? "Connected" : "Disconnected"}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <Button 
+                                                variant={isGmailConnected ? "outline" : "default"} 
+                                                size="sm"
+                                                onClick={() => handleToggleProvider('email_gmail', 'cloud9baud@gmail.com')}
+                                                className="cursor-pointer"
+                                            >
+                                                {isGmailConnected ? "Disconnect" : "Connect"}
+                                            </Button>
+                                        </div>
+
+                                        {/* Resend Channel */}
+                                        <div className="flex items-center justify-between p-4 border border-slate-800 rounded-lg bg-slate-950/20">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-9 h-9 bg-purple-500/10 text-purple-400 rounded-lg flex items-center justify-center font-bold">R</div>
+                                                <div>
+                                                    <h4 className="font-semibold text-sm">Resend Email</h4>
+                                                    <p className="text-xs text-slate-400">
+                                                        {isResendConnected ? "Connected" : "Disconnected"}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <Button 
+                                                variant={isResendConnected ? "outline" : "default"} 
+                                                size="sm"
+                                                onClick={() => handleToggleProvider('email_imap', 'jish.nath@cloudbaud.com (Resend)')}
+                                                className="cursor-pointer"
+                                            >
+                                                {isResendConnected ? "Disconnect" : "Connect"}
+                                            </Button>
+                                        </div>
+
+                                        {/* WhatsApp Channel */}
+                                        <div className="flex items-center justify-between p-4 border border-slate-800 rounded-lg bg-slate-950/20">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-9 h-9 bg-emerald-500/10 text-emerald-400 rounded-lg flex items-center justify-center font-bold">W</div>
+                                                <div>
+                                                    <h4 className="font-semibold text-sm">WhatsApp Business</h4>
+                                                    <p className="text-xs text-slate-400">
+                                                        {isWhatsappConnected ? "Connected" : "Disconnected"}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <Button 
+                                                variant={isWhatsappConnected ? "outline" : "default"} 
+                                                size="sm"
+                                                onClick={() => handleToggleProvider('whatsapp', 'WhatsApp (+1 425 749 2101)')}
+                                                className="cursor-pointer"
+                                            >
+                                                {isWhatsappConnected ? "Disconnect" : "Connect"}
+                                            </Button>
+                                        </div>
+
+                                        {/* SMS Channel */}
+                                        <div className="flex items-center justify-between p-4 border border-slate-800 rounded-lg bg-slate-950/20">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-9 h-9 bg-indigo-500/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold">S</div>
+                                                <div>
+                                                    <h4 className="font-semibold text-sm">SMS (Twilio)</h4>
+                                                    <p className="text-xs text-slate-400">
+                                                        {isSmsConnected ? "Connected" : "Disconnected"}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <Button 
+                                                variant={isSmsConnected ? "outline" : "default"} 
+                                                size="sm"
+                                                onClick={() => handleToggleProvider('sms', 'SMS (+1 425 749 2101)')}
+                                                className="cursor-pointer"
+                                            >
+                                                {isSmsConnected ? "Disconnect" : "Connect"}
+                                            </Button>
+                                        </div>
+
+                                        {/* Telegram Channel */}
+                                        <div className="flex items-center justify-between p-4 border border-slate-800 rounded-lg bg-slate-950/20">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-9 h-9 bg-sky-500/10 text-sky-400 rounded-lg flex items-center justify-center font-bold">T</div>
+                                                <div>
+                                                    <h4 className="font-semibold text-sm">Telegram Bot</h4>
+                                                    <p className="text-xs text-slate-400">
+                                                        {isTelegramConnected ? "Connected" : "Disconnected"}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <Button 
+                                                variant={isTelegramConnected ? "outline" : "default"} 
+                                                size="sm"
+                                                onClick={() => handleToggleProvider('telegram', 'Telegram (+1 425 749 2101)')}
+                                                className="cursor-pointer"
+                                            >
+                                                {isTelegramConnected ? "Disconnect" : "Connect"}
+                                            </Button>
+                                        </div>
+                                    </div>
                                 </CardContent>
                             </Card>
                         </div>

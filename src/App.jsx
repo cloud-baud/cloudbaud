@@ -103,7 +103,7 @@ function App() {
                       <Route path="accounting" element={<AccountingDashboard />} />
                       <Route path="investments" element={<PlaceholderPage />} />
                     </Route>
-                    <Route path="support" element={<UnifiedCommunicationsPage />} />
+                    <Route path="inbox" element={<UnifiedCommunicationsPage />} />
                     <Route path="crm" element={<CrmDashboard />} />
                     <Route path="sales" element={<SalesDashboard />} />
                     <Route path="marketing" element={<MarketingDashboard />} />
