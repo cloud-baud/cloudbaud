@@ -69,14 +69,18 @@ export default defineConfig({
     '__BUILD_TIME__': JSON.stringify(new Date().toISOString()),
   },
   resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-      "@common": path.resolve(__dirname, "../Synolic.Core/frontend/components"),
-      "synolic.core": path.resolve(__dirname, "../Synolic.Core/index.ts"),
-      "@synolic.core": path.resolve(__dirname, "../Synolic.Core/frontend/components/features"),
-      "react": path.resolve(__dirname, "./node_modules/react"),
-      "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
-    },
+    alias: [
+      { find: '@/components/ui', replacement: path.resolve(__dirname, '../Synolic.Core/@/components/ui') },
+      { find: '@/components', replacement: path.resolve(__dirname, '../Synolic.Core/@/components') },
+      { find: '@/lib', replacement: path.resolve(__dirname, '../Synolic.Core/@/lib') },
+      { find: "@", replacement: path.resolve(__dirname, "./src") },
+      { find: "@common", replacement: path.resolve(__dirname, "../Synolic.Core/frontend/components") },
+      { find: "synolic.core", replacement: path.resolve(__dirname, "../Synolic.Core/index.ts") },
+      { find: "@synolic.core", replacement: path.resolve(__dirname, "../Synolic.Core/frontend/components/features") },
+      { find: "react", replacement: path.resolve(__dirname, "./node_modules/react") },
+      { find: "react-dom", replacement: path.resolve(__dirname, "./node_modules/react-dom") },
+   
+  ],
     dedupe: ['react', 'react-dom'],
   },
   build: {

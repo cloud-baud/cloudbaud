@@ -2,9 +2,9 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import { ThemeProvider } from 'next-themes';
-import DynamicMsalProvider from './components/auth/DynamicMsalProvider';
+//import DynamicMsalProvider from "synolic.core";
 import { AppearanceProvider } from 'synolic.core';
-import MarketingLayout from './portal/layout/MarketingLayout';
+//import MarketingLayout from './portal/layout/MarketingLayout';
 import WorkspaceLayout from './workspace/WorkspaceLayout';
 import PortalDashboard from './workspace/PortalDashboard';
 import FabricDemo from './workspace/sales/FabricDemo';
@@ -46,8 +46,8 @@ import AuthRedirector from './components/auth/AuthRedirector';
 import AiEngineeringPage from './portal/pages/engineering/AiEngineeringPage';
 import CompetencyLandingPage from './portal/pages/competencies/CompetencyLandingPage';
 
-import { AuthProvider } from './context/AuthContext';
-import { ContentProvider } from './context/ContentContext';
+import { AuthProvider } from './contexts/AuthContext';
+import { ContentProvider } from './contexts/ContentContext';
 import ContentControl from './workspace/ContentControl';
 import ConsultingDashboard from './workspace/consulting/ConsultingDashboard';
 
@@ -71,7 +71,7 @@ import LegalDashboard from './workspace/legal/LegalDashboard';
 import ProvisionalPatentsDashboard from './workspace/legal/ProvisionalPatentsDashboard';
 import NdaForm from './workspace/legal/NdaForm';
 import { ShieldCheck, ArrowRight } from 'lucide-react';
-import { useAuth } from './context/AuthContext';
+import { useAuth } from './contexts/AuthContext';
 
 const AirGappedFinanceRedirect = () => {
     const { user, session, aal } = useAuth();
@@ -155,7 +155,7 @@ const AirGappedFinanceRedirect = () => {
 function App() {
   console.log('App: Rendering...');
   return (
-    <DynamicMsalProvider>
+    //<DynamicMsalProvider>
       <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
         <AppearanceProvider appId="cloudbaud" defaultAccent="#3b82f6" defaultPortalAccent="#3b82f6">
           <AuthProvider>
@@ -286,7 +286,7 @@ function App() {
           </AuthProvider>
         </AppearanceProvider>
       </ThemeProvider>
-    </DynamicMsalProvider>
+   // </DynamicMsalProvider>
   );
 }
 
