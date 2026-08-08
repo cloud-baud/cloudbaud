@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table';
-import { Button } from '@/shared/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/table';
+import { Button } from '@/shared/components/button';
 import { ArrowLeft, Download, Filter, Calendar, PlusCircle, AlertCircle, CheckCircle2, FileText, Upload } from 'lucide-react';
-import { Badge } from '@/shared/ui/badge';
+import { Badge } from '@/shared/components/badge';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/shared/ui/dialog';
-import { Input } from '@/shared/ui/input';
-import { Label } from '@/shared/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
-import { Tabs, TabsList, TabsContent, TabsTrigger } from '@/shared/ui/tabs'; // Added this import as it was missing but used
-import { Progress } from '@/shared/ui/progress';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/shared/components/dialog';
+import { Input } from '@/shared/components/input';
+import { Label } from '@/shared/components/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/select';
+import { Tabs, TabsList, TabsContent, TabsTrigger } from '@/shared/components/tabs'; // Added this import as it was missing but used
+import { Progress } from '@/shared/components/progress';
 import {
     ResizableHandle,
     ResizablePanel,
     ResizablePanelGroup,
-} from "@/shared/ui/resizable";
+} from "@/shared/components/resizable";
 import DocumentPreviewPanel from '@/finance/components/DocumentPreviewPanel';
 
 const MOCK_TRANSACTIONS = [

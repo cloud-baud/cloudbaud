@@ -11,7 +11,7 @@ import {
     CheckCircle2
 } from 'lucide-react';
 import { careers } from '@/data/careers';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 
 const iconMap = {
     DollarSign,

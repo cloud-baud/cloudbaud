@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Button } from '@/shared/ui/button';
-import { Input } from '@/shared/ui/input';
-import { ScrollArea } from '@/shared/ui/scroll-area';
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
+import { Button } from '@/shared/components/button';
+import { Input } from '@/shared/components/input';
+import { ScrollArea } from '@/shared/components/scroll-area';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/avatar';
 import { Send, Users, MoreHorizontal, Phone, Video, UserPlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {

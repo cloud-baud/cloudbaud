@@ -4,7 +4,7 @@ import './App.css';
 import { ThemeProvider } from 'next-themes';
 //import DynamicMsalProvider from "synolic.core";
 import { AppearanceProvider } from 'synolic.core';
-//import MarketingLayout from './portal/layout/MarketingLayout';
+import MarketingLayout from './portal/layout/MarketingLayout';
 import WorkspaceLayout from './workspace/WorkspaceLayout';
 import PortalDashboard from './workspace/PortalDashboard';
 import FabricDemo from './workspace/sales/FabricDemo';

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card';
-import { Checkbox } from '@/shared/ui/checkbox';
-import { Progress } from '@/shared/ui/progress';
-import { ScrollArea } from '@/shared/ui/scroll-area';
-import { Badge } from '@/shared/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/card';
+import { Checkbox } from '@/shared/components/checkbox';
+import { Progress } from '@/shared/components/progress';
+import { ScrollArea } from '@/shared/components/scroll-area';
+import { Badge } from '@/shared/components/badge';
 import { FileText, Briefcase, Calculator, Building, Receipt, Home } from 'lucide-react';
 
 const CHECKLIST_DATA = [

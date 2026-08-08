@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowRight, PlayCircle, Calculator, Target, Eye } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 import SEO from '@/components/common/SEO';
 import InteractiveArchitecture from '@/components/competencies/InteractiveArchitecture';
 import BeforeAfterComparison from '@/components/competencies/BeforeAfterComparison';

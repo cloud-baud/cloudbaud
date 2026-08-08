@@ -5,7 +5,7 @@ import {
     Layers, Brain, ArrowLeft, X, Activity, Settings
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 
 const OLLAMA_BASE = 'http://localhost:11434';
 

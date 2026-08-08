@@ -17,16 +17,16 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/shared/ui/button';
-import { Input } from '@/shared/ui/input';
-import { Badge } from '@/shared/ui/badge';
+import { Button } from '@/shared/components/button';
+import { Input } from '@/shared/components/input';
+import { Badge } from '@/shared/components/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger
-} from '@/shared/ui/dropdown-menu';
+} from '@/shared/components/dropdown-menu';
 
 const TABS = [
   { id: 'projects', label: 'Projects', icon: Briefcase },

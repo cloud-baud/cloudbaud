@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Lock, User, Phone, CheckCircle, ArrowRight } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 import PrivacyConsent from '@/components/common/PrivacyConsent';
 import SEO from '@/components/common/SEO';
 import SocialAuthButtons from '@/components/auth/SocialAuthButtons';

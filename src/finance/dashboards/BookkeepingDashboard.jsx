@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card';
-import { Button } from '@/shared/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table';
-import { Badge } from '@/shared/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/card';
+import { Button } from '@/shared/components/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/table';
+import { Badge } from '@/shared/components/badge';
 import { Plus, Search, Filter } from 'lucide-react';
 
 // Mock Data for Transactions

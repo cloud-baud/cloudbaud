@@ -15,8 +15,8 @@ import {
     Loader2,
     Terminal
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/shared/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/shared/components/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/tabs";
 import {
     BarChart,
     Bar,

@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, ExternalLink, PenTool, Users, TrendingUp } from 'lucide-react';
 import { agents } from '@/data/agents';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 
 const iconMap = {
     PenTool,

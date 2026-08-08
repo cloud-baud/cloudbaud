@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/shared/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/shared/components/card';
 import { FileText, Lightbulb, Clock, CheckCircle2, Plus, Search, Loader2 } from 'lucide-react';
 import PriorArtSearch from './PriorArtSearch'; // Import the new search component
 import { supabase } from '@/lib/supabase';

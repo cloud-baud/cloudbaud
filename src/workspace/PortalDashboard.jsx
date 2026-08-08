@@ -30,7 +30,7 @@ import {
     Plus,
     Mail
 } from 'lucide-react';
-import { Badge } from '@/shared/ui/badge';
+import { Badge } from '@/shared/components/badge';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 

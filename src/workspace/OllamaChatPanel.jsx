@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { X, Send, Bot, User, Sparkles, RefreshCw, AlertCircle, Settings, ChevronDown, Plus, Paperclip, FileIcon } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
-import { Input } from '@/shared/ui/input';
+import { Button } from '@/shared/components/button';
+import { Input } from '@/shared/components/input';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import AiControlPlane from './AiControlPlane';

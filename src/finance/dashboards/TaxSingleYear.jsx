@@ -7,7 +7,7 @@ import {
     Save, Printer, FileDown, Bold, Italic, AlignLeft, AlignCenter, AlignRight,
     ZoomIn, ZoomOut, Sparkles, MessageSquare, Bot, Activity, RefreshCw
 } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 import { Ribbon, RibbonButton, RibbonSeparator, RibbonGroup, RibbonFontSizeSelector, RibbonColorPicker } from 'synolic.core';
 import DocumentPreviewPanel from '../components/DocumentPreviewPanel';
 import HighlightablePdfViewer from '../components/HighlightablePdfViewer';

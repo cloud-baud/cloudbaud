@@ -13,7 +13,7 @@ import {
     ChevronDown,
     ChevronRight
 } from 'lucide-react';
-import { Card } from "@/shared/ui/card";
+import { Card } from "@/shared/components/card";
 
 // Context specific sub-navigation data
 const SUB_NAVS = {

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table';
-import { Badge } from '@/shared/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/table';
+import { Badge } from '@/shared/components/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/tabs';
 
 import { RefreshCw, ChevronRight, Save, FileDown, Printer, Filter, Plus, Pencil, Trash2, SlidersHorizontal } from 'lucide-react';
 import { Ribbon, RibbonButton, RibbonSeparator, RibbonGroup } from 'synolic.core'; // Import Ribbon
-import { Button } from '@/shared/ui/button'; // Import Button for toggle
+import { Button } from '@/shared/components/button'; // Import Button for toggle
 import { getChartOfAccounts } from '../api/taxService';
 
 // Helper for type colors

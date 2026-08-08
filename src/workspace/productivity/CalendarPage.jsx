@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import PageShell from '@/workspace/PageShell';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card';
-import { Button } from '@/shared/ui/button';
-import { Input } from '@/shared/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
-import { Label } from '@/shared/ui/label';
-import { Badge } from '@/shared/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/card';
+import { Button } from '@/shared/components/button';
+import { Input } from '@/shared/components/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/select';
+import { Label } from '@/shared/components/label';
+import { Badge } from '@/shared/components/badge';
 import {
     Dialog,
     DialogContent,
@@ -14,7 +14,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from '@/shared/ui/dialog';
+} from '@/shared/components/dialog';
 import {
     ChevronLeft,
     ChevronRight,
@@ -37,7 +37,7 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "@/shared/ui/dropdown-menu";
+} from "@/shared/components/dropdown-menu";
 
 const CATEGORY_COLORS = {
     'Business': 'bg-blue-500',

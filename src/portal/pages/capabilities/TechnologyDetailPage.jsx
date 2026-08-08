@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, CheckCircle, Code, Server, Shield, Zap, Lock, ChevronDown, ChevronUp } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 import SEO from '@/components/common/SEO';
 import { technicalCapabilities } from '@/data/capabilities';
 import FabricDemo from '@/workspace/sales/FabricDemo';

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 import { Loader2, ShieldCheck, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';

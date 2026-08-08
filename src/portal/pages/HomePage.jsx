@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import * as THREE from 'three';
 import GLOBE from 'vanta/dist/vanta.globe.min';
 import { ArrowRight, Code, Cloud, Server, Smartphone, Database, Award, Users, CheckCircle, TrendingUp, Brain, Building, Shield, Activity, BarChart3, Terminal, Bot } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 import { useTheme } from 'next-themes';
 import { useContent } from '@/context/ContentContext';
 import SEO from '@/components/common/SEO';
@@ -120,49 +120,44 @@ const HomePage = () => {
       />
 
       {/* Hero Section */}
-      <section className="relative min-h-[85vh] flex flex-col justify-center px-4 sm:px-6 lg:px-8 pt-16">
+      <section className="relative min-h-[85vh] flex flex-col justify-center items-center text-center px-4 sm:px-6 lg:px-8 pt-16 pb-12">
         {/* Vanta Background Container */}
         <div ref={vantaRef} className="absolute inset-0 z-0 opacity-40"></div>
 
-        <div className="max-w-7xl mx-auto w-full relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className="max-w-3xl">
-            {/* Badge */}
-            {/* Badge - Removed */}
+        <div className="max-w-5xl mx-auto w-full relative z-10 flex flex-col items-center">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight text-foreground animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+            Architecting <span className="text-brand-blue drop-shadow-[0_0_8px_rgba(0,210,255,0.5)]">Mission-Critical</span> Data Platforms
+          </h1>
 
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight text-foreground animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
-              Architecting <span className="text-brand-blue drop-shadow-[0_0_8px_rgba(0,210,255,0.5)]">Mission-Critical</span> Data Platforms
-            </h1>
+          <p className="text-xl md:text-2xl text-slate-300 mb-10 leading-relaxed max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
+            Balancing operational excellence, governance, and developer enablement on Azure Databricks.
+            <br />
+            <span className="text-base text-slate-400 mt-2 block">Specializing in Healthcare Data & Insurance Feeds.</span>
+          </p>
 
-            <p className="text-xl md:text-2xl text-slate-300 mb-10 leading-relaxed max-w-2xl animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
-              Balancing operational excellence, governance, and developer enablement on Azure Databricks.
-              <br />
-              <span className="text-base text-slate-400 mt-2 block">Specializing in Healthcare Data & Insurance Feeds.</span>
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-              <Button
-                asChild
-                size="lg"
-                className="bg-brand-blue hover:bg-brand-blue/80 text-black px-8 py-6 text-lg rounded-lg shadow-lg shadow-brand-blue/20 transition-all font-bold"
-              >
-                <Link to="/contact">
-                  Start Your Transformation
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 px-8 py-6 text-lg rounded-lg transition-all"
-              >
-                <Link to="/capabilities">Platform Expertise</Link>
-              </Button>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300 mb-12">
+            <Button
+              asChild
+              size="lg"
+              className="bg-brand-blue hover:bg-brand-blue/80 text-black px-8 py-6 text-lg rounded-lg shadow-lg shadow-brand-blue/20 transition-all font-bold"
+            >
+              <Link to="/contact">
+                Start Your Transformation
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 px-8 py-6 text-lg rounded-lg transition-all"
+            >
+              <Link to="/capabilities">Platform Expertise</Link>
+            </Button>
           </div>
 
-          {/* Hero Dashboard Preview - Mobile/Tablet Only hidden on desktop if too crowded, but we want it visible */}
-          <div className="hidden lg:block w-full animate-in fade-in slide-in-from-right-8 duration-1000 delay-300">
+          {/* Hero Dashboard Preview - Centered */}
+          <div className="w-full max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-400 text-left">
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-brand-blue to-brand-aqua rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
               <div className="relative bg-slate-900 ring-1 ring-slate-800 rounded-xl p-6 shadow-2xl">

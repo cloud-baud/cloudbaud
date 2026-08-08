@@ -7,10 +7,10 @@ import {
     TrendingDown, TrendingUp, DollarSign, AlertTriangle, CheckCircle2,
     PieChart as PieIcon, LayoutDashboard, Download, Filter
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card';
-import { Button } from '@/shared/ui/button';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
-import { Progress } from '@/shared/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/card';
+import { Button } from '@/shared/components/button';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/tabs';
+import { Progress } from '@/shared/components/progress';
 
 // --- MOCK DATA ---
 

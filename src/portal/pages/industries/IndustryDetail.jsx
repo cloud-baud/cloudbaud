@@ -14,7 +14,7 @@ import {
     Landmark,
     HelpCircle
 } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 import { supabase } from '@/lib/supabase';
 
 const iconMap = {

@@ -9,8 +9,8 @@ import {
     Lock, LockOpen, Upload, X, Activity, MessageSquare, Bot, Sparkles, FileText, ListTodo, Check, Paperclip
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { Button } from '@/shared/ui/button';
-import { Separator } from '@/shared/ui/separator';
+import { Button } from '@/shared/components/button';
+import { Separator } from '@/shared/components/separator';
 
 import { Ribbon, RibbonButton, RibbonSeparator, RibbonGroup } from 'synolic.core';
 import TaxRibbon, { YEAR_DOCUMENTS, DOC_BASE } from '../components/TaxRibbon';

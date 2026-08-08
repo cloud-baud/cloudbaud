@@ -13,7 +13,7 @@ import {
     HelpCircle // Fallback icon
 } from 'lucide-react';
 import { industryStats } from '@/data/industries';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 import { supabase } from '@/lib/supabase';
 
 const iconMap = {

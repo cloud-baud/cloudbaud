@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FileDown, Sparkles, X, Upload } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 import { cn } from '@/lib/utils';
 
 /**

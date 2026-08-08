@@ -43,7 +43,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger
-} from '@/shared/ui/dropdown-menu';
+} from '@/shared/components/dropdown-menu';
 import ThemeToggle from '@/components/layout/ThemeToggle';
 import { SearchBox } from '@synolic.core/search';
 import OllamaChatPanel from './OllamaChatPanel';

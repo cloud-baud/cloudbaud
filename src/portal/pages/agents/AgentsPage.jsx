@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { agents, agentBenefits } from '@/data/agents';
 import AgentCard from '@/components/agents/AgentCard';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 
 const AgentsPage = () => {
     return (

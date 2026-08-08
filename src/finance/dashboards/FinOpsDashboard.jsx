@@ -2,12 +2,12 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
-import { Badge } from '@/shared/ui/badge';
-import { Button } from '@/shared/ui/button';
-import { Separator } from '@/shared/ui/separator';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/tabs';
+import { Badge } from '@/shared/components/badge';
+import { Button } from '@/shared/components/button';
+import { Separator } from '@/shared/components/separator';
 import { Plus, Download, RefreshCw, ArrowUpRight, TrendingUp, TrendingDown, DollarSign, Edit, Trash2 } from 'lucide-react';
 import { getChartOfAccounts, populateChartOfAccounts } from '../api/taxService';
 

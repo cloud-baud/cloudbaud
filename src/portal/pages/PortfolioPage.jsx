@@ -3,18 +3,18 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Filter, Maximize2, X } from 'lucide-react';
 import { portfolioProjects, categories } from '@/data/portfolio';
 import ProjectCard from '@/components/portfolio/ProjectCard';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 import {
     Dialog,
     DialogContent,
     DialogTrigger,
     DialogClose,
-} from "@/shared/ui/dialog";
+} from "@/shared/components/dialog";
 import GenericDiscoveryWizard from '@/components/discovery/GenericDiscoveryWizard';
 import { useAuth } from '@/context/AuthContext';
 import { Lock, FileCode, Server } from 'lucide-react';
-import { Badge } from '@/shared/ui/badge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
+import { Badge } from '@/shared/components/badge';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/tabs';
 
 const PortfolioPage = () => {
     const [selectedCategory, setSelectedCategory] = useState('All Projects');
