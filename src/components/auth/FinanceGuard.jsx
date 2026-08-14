@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from "@/shared/contexts/AuthContext";
 import { ShieldAlert } from 'lucide-react';
 
 // Hardcoded Allowlist for Finance Access
@@ -45,3 +45,6 @@ const FinanceGuard = () => {
 };
 
 export default FinanceGuard;
+
+
+

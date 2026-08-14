@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import PageShell from '@/workspace/PageShell';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/card';
-import { Button } from '@/shared/components/button';
-import { Input } from '@/shared/components/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/select';
-import { Label } from '@/shared/components/label';
-import { Badge } from '@/shared/components/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
+import { Label } from '@/shared/ui/label';
+import { Badge } from '@/shared/ui/badge';
 import {
     Dialog,
     DialogContent,
@@ -14,7 +14,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from '@/shared/components/dialog';
+} from '@/shared/ui/dialog';
 import {
     ChevronLeft,
     ChevronRight,
@@ -29,15 +29,15 @@ import {
     Edit // Import Edit
 } from 'lucide-react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isSameMonth, isSameDay, addDays, parseISO, isToday, startOfDay, endOfDay } from 'date-fns';
-import { useAuth } from '@/context/AuthContext';
-import { CalendarService } from '@/services/calendarService'; // Use the new service
-import { cn } from '@/lib/utils';
+import { useAuth } from '@/shared/contexts/AuthContext';
+import { CalendarService } from '@/workspace/services/calendarService'; // Use the new service
+import { cn } from '@/shared/lib/utils';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "@/shared/components/dropdown-menu";
+} from "@/shared/ui/dropdown-menu";
 
 const CATEGORY_COLORS = {
     'Business': 'bg-blue-500',
@@ -522,3 +522,4 @@ const CalendarPage = () => {
 };
 
 export default CalendarPage;
+

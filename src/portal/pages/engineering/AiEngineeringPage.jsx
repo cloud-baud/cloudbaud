@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Brain, Cpu, Shield, Database, LayoutGrid, Zap, CheckCircle, Smartphone } from 'lucide-react';
-import { Button } from '@/shared/components/button';
+import { Button } from '@/shared/ui/button';
 import { useTheme } from 'next-themes';
 import SEO from '@/components/common/SEO';
 
@@ -270,3 +270,4 @@ const AiEngineeringPage = () => {
 };
 
 export default AiEngineeringPage;
+

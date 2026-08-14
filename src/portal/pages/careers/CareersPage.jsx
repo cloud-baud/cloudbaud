@@ -10,8 +10,8 @@ import {
     Calendar,
     CheckCircle2
 } from 'lucide-react';
-import { careers } from '@/data/careers';
-import { Button } from '@/shared/components/button';
+import { careers } from '@/workspace/data/careers';
+import { Button } from '@/shared/ui/button';
 
 const iconMap = {
     DollarSign,
@@ -278,3 +278,4 @@ const CareersPage = () => {
 };
 
 export default CareersPage;
+

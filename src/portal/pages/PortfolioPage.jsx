@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Filter, Maximize2, X } from 'lucide-react';
-import { portfolioProjects, categories } from '@/data/portfolio';
+import { portfolioProjects, categories } from '@/workspace/data/portfolio';
 import ProjectCard from '@/components/portfolio/ProjectCard';
-import { Button } from '@/shared/components/button';
+import { Button } from '@/shared/ui/button';
 import {
     Dialog,
     DialogContent,
     DialogTrigger,
     DialogClose,
-} from "@/shared/components/dialog";
+} from "@/shared/ui/dialog";
 import GenericDiscoveryWizard from '@/components/discovery/GenericDiscoveryWizard';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/shared/contexts/AuthContext';
 import { Lock, FileCode, Server } from 'lucide-react';
-import { Badge } from '@/shared/components/badge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/tabs';
+import { Badge } from '@/shared/ui/badge';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
 
 const PortfolioPage = () => {
     const [selectedCategory, setSelectedCategory] = useState('All Projects');
@@ -318,3 +318,5 @@ const PortfolioDetailCard = ({ project }) => {
         </div>
     );
 };
+
+

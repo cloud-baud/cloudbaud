@@ -12,9 +12,9 @@ import {
     Check,
     HelpCircle // Fallback icon
 } from 'lucide-react';
-import { industryStats } from '@/data/industries';
-import { Button } from '@/shared/components/button';
-import { supabase } from '@/lib/supabase';
+import { industryStats } from '@/workspace/data/industries';
+import { Button } from '@/shared/ui/button';
+import { supabase } from '@/shared/lib/supabase';
 
 const iconMap = {
     Heart,
@@ -242,3 +242,4 @@ const IndustriesPage = () => {
 };
 
 export default IndustriesPage;
+

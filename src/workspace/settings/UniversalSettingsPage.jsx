@@ -1,7 +1,7 @@
 import React from 'react';
 import { UniversalSettingsPage as CommonSettingsPage } from 'synolic.core';
-import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/shared/contexts/AuthContext';
+import { supabase } from '@/shared/lib/supabase';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
@@ -231,3 +231,4 @@ const UniversalSettingsPage = () => {
 };
 
 export default UniversalSettingsPage;
+

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
-import { agents, agentBenefits } from '@/data/agents';
+import { agents, agentBenefits } from '@/workspace/data/agents';
 import AgentCard from '@/components/agents/AgentCard';
-import { Button } from '@/shared/components/button';
+import { Button } from '@/shared/ui/button';
 
 const AgentsPage = () => {
     return (
@@ -173,3 +173,4 @@ const AgentsPage = () => {
 };
 
 export default AgentsPage;
+

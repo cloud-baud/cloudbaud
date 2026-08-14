@@ -155,9 +155,9 @@ const Footer = () => {
         {/* Build Info */}
         <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/50 flex justify-center opacity-60 hover:opacity-100 transition-opacity">
            <p className="text-[10px] font-mono text-slate-400 dark:text-slate-600 flex items-center gap-2">
-              <span>v{__APP_VERSION__}</span>
+              <span>v{"0.0.2"}</span>
               <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
-              <span>{new Date(__BUILD_TIME__).toLocaleString()}</span>
+              <span>{new Date((new Date().toISOString())).toLocaleString()}</span>
               <span className="w-1 h-1 rounded-full bg-emerald-500/50" title="System Operational" />
            </p>
         </div>

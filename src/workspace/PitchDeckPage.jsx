@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/shared/components/card';
-import { Button } from '@/shared/components/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
+import { Button } from '@/shared/ui/button';
 import { FileText, Upload, Edit, Download, Users } from 'lucide-react';
 
 /**

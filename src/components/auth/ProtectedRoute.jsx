@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from "@/shared/contexts/AuthContext";
 import MfaChallengeScreen from './MfaChallengeScreen';
 import { Loader2 } from 'lucide-react';
 
@@ -20,7 +20,7 @@ const ProtectedRoute = () => {
     }
 
     // Intercept if MFA is active but user session is unverified (AAL1 instead of AAL2)
-    if (aal.currentLevel === 'aal1' && aal.nextLevel === 'aal2') {
+    if (aal && aal.currentLevel === 'aal1' && aal.nextLevel === 'aal2') {
         return <MfaChallengeScreen />;
     }
 
@@ -28,3 +28,5 @@ const ProtectedRoute = () => {
 };
 
 export default ProtectedRoute;
+
+

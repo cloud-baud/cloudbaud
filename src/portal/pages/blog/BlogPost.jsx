@@ -1,8 +1,8 @@
 import React from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { Calendar, User, ArrowLeft, Share2, Clock } from 'lucide-react';
-import { blogPosts } from '@/data/blog-posts';
-import { Button } from '@/shared/components/button';
+import { blogPosts } from '@/workspace/data/blog-posts';
+import { Button } from '@/shared/ui/button';
 import CloudBaudDocumentTemplate from '@/components/common/CloudBaudDocumentTemplate';
 
 const BlogPost = () => {
@@ -109,3 +109,4 @@ const BlogPost = () => {
 };
 
 export default BlogPost;
+

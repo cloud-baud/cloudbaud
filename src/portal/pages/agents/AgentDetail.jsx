@@ -1,8 +1,8 @@
 import React from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, ExternalLink, PenTool, Users, TrendingUp } from 'lucide-react';
-import { agents } from '@/data/agents';
-import { Button } from '@/shared/components/button';
+import { agents } from '@/workspace/data/agents';
+import { Button } from '@/shared/ui/button';
 
 const iconMap = {
     PenTool,
@@ -307,3 +307,4 @@ const AgentDetail = () => {
 };
 
 export default AgentDetail;
+

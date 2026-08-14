@@ -47,17 +47,17 @@ import {
 } from 'recharts';
 import { getContacts, createContact, updateContact, deleteContact, seedDemoContacts } from './contactsService';
 import { inviteContact, getWorkspaceTree, buildTree } from '../services/workspaceService';
-import { cn } from '@/lib/utils';
-import { Separator } from '@/shared/components/separator';
-import { Button } from '@/shared/components/button';
-import { Input } from '@/shared/components/input';
-import { Badge } from '@/shared/components/badge';
+import { cn } from '@/shared/lib/utils';
+import { Separator } from '@/shared/ui/separator';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Badge } from '@/shared/ui/badge';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuTrigger 
-} from '@/shared/components/dropdown-menu';
+} from '@/shared/ui/dropdown-menu';
 
 const TABS = [
   { id: 'home', label: 'Home', icon: LayoutDashboard },

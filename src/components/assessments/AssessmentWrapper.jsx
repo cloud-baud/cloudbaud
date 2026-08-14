@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AssessmentEngine from './AssessmentEngine';
 import { assessmentConfigs } from './definitions';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/shared/lib/supabase';
 import { Loader2 } from 'lucide-react';
 
 const AssessmentWrapper = ({ slug, ...props }) => {

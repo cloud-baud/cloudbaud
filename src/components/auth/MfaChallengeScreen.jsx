@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { supabase } from '../../lib/supabase';
+import { useAuth } from "@/shared/contexts/AuthContext";
+import { supabase } from '../../shared/lib/supabase';
 import { ShieldCheck, Lock, LogOut, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -249,3 +249,5 @@ const MfaChallengeScreen = () => {
 };
 
 export default MfaChallengeScreen;
+
+

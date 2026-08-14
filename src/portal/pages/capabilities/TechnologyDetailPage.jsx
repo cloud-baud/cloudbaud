@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, CheckCircle, Code, Server, Shield, Zap, Lock, ChevronDown, ChevronUp } from 'lucide-react';
-import { Button } from '@/shared/components/button';
+import { Button } from '@/shared/ui/button';
 import SEO from '@/components/common/SEO';
-import { technicalCapabilities } from '@/data/capabilities';
+import { technicalCapabilities } from '@/workspace/data/capabilities';
 import FabricDemo from '@/workspace/sales/FabricDemo';
 import FinOpsDashboard from '@/workspace/FinOpsDashboard';
 import FabricDiscoveryWizard from '@/components/discovery/FabricDiscoveryWizard';
 import GenericDiscoveryWizard from '@/components/discovery/GenericDiscoveryWizard';
 import { getAssessmentComponent } from '@/components/assessments/index.jsx';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/shared/contexts/AuthContext';
 
 const TechnologyDetailPage = () => {
     const { slug, techSlug } = useParams();
@@ -297,3 +297,5 @@ const TechnologyDetailPage = () => {
 };
 
 export default TechnologyDetailPage;
+
+

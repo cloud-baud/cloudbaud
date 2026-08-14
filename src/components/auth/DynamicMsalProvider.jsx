@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 // import { MsalProvider } from "@azure/msal-react"; // Temporarily disabled
-import { msalInstance as defaultInstance } from "../../lib/authConfig";
+import { msalInstance as defaultInstance } from "../../shared/lib/authConfig";
 
 export const AUTH_CONFIG_CHANGE_EVENT = 'auth-config-change';
 

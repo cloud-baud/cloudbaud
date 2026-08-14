@@ -33,10 +33,10 @@ import {
   Bar,
   Legend
 } from 'recharts';
-import { cn } from '@/lib/utils';
-import { Button } from '@/shared/components/button';
-import { Input } from '@/shared/components/input';
-import { Badge } from '@/shared/components/badge';
+import { cn } from '@/shared/lib/utils';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Badge } from '@/shared/ui/badge';
 
 /* --- CMS / Publishing View (The ECM Engine) --- */
 const CmsPublishingView = () => (

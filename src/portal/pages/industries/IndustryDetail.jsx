@@ -14,8 +14,8 @@ import {
     Landmark,
     HelpCircle
 } from 'lucide-react';
-import { Button } from '@/shared/components/button';
-import { supabase } from '@/lib/supabase';
+import { Button } from '@/shared/ui/button';
+import { supabase } from '@/shared/lib/supabase';
 
 const iconMap = {
     Heart,
@@ -312,3 +312,4 @@ const IndustryDetail = () => {
     );
 };
 export default IndustryDetail;
+

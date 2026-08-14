@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
-import { Button } from '@/shared/components/button';
+import { Button } from '@/shared/ui/button';
 
 import PrivacyConsent from '@/components/common/PrivacyConsent';
 
@@ -360,4 +360,5 @@ const ContactPage = () => {
 };
 
 export default ContactPage;
+
 

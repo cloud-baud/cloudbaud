@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { useContent } from '@/context/ContentContext';
+import { useContent } from '@/shared/contexts/ContentContext';
 import { Save, Bot, Activity } from 'lucide-react';
-import { Button } from '@/shared/components/button';
-import { Input } from '@/shared/components/input';
-import { Textarea } from '@/shared/components/textarea';
-import { Switch } from '@/shared/components/switch';
-import { Label } from '@/shared/components/label';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/shared/components/card";
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Textarea } from '@/shared/ui/textarea';
+import { Switch } from '@/shared/ui/switch';
+import { Label } from '@/shared/ui/label';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/shared/ui/card";
 
 const ContentControl = () => {
     const { content, updateContent } = useContent();
@@ -115,3 +115,4 @@ const ContentControl = () => {
 };
 
 export default ContentControl;
+

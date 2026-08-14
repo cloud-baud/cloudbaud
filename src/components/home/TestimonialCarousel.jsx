@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { ChevronLeft, ChevronRight, Star, Quote } from 'lucide-react';
-import { testimonials } from '../../data/testimonials';
-import { Button } from '@/shared/components/button';
+import { testimonials } from '../../workspace/data/testimonials';
+import { Button } from '@/shared/ui/button';
 
 const TestimonialCarousel = () => {
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });
@@ -119,3 +119,4 @@ const TestimonialCarousel = () => {
 };
 
 export default TestimonialCarousel;
+

@@ -1,8 +1,8 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { Construction, ArrowLeft } from 'lucide-react';
-import { Button } from '@/shared/components/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/shared/components/card";
+import { Button } from '@/shared/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/shared/ui/card";
 
 const PlaceholderPage = () => {
     const location = useLocation();

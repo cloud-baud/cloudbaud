@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Scale, FileText, FileSignature, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

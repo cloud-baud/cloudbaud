@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FileText, BookOpen, ArrowRight } from 'lucide-react';
-import { Button } from '@/shared/components/button';
+import { Button } from '@/shared/ui/button';
 import CloudBaudDocumentTemplate from '@/components/common/CloudBaudDocumentTemplate';
 
 const DEFAULT_SECTIONS = [
@@ -63,3 +63,4 @@ const ResourcePlaceholderPage = ({
 };
 
 export default ResourcePlaceholderPage;
+

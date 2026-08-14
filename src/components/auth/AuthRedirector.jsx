@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from "@/shared/contexts/AuthContext";
 import { toast } from 'sonner';
 
 const AuthRedirector = () => {
@@ -54,3 +54,5 @@ const AuthRedirector = () => {
 };
 
 export default AuthRedirector;
+
+

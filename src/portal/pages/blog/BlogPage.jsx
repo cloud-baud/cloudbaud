@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Filter } from 'lucide-react';
-import { blogPosts, blogCategories } from '@/data/blog-posts';
+import { blogPosts, blogCategories } from '@/workspace/data/blog-posts';
 import BlogCard from '@/components/blog/BlogCard';
 import CloudBaudDocumentTemplate from '@/components/common/CloudBaudDocumentTemplate';
 

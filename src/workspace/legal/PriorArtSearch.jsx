@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/shared/components/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/shared/ui/card';
 import { Search, Loader2, ExternalLink, Calendar, Key, AlertCircle } from 'lucide-react';
 
 const PriorArtSearch = () => {

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { Button } from '@/shared/components/button';
-import { Input } from '@/shared/components/input';
-import { Card, CardHeader, CardTitle, CardContent } from '@/shared/components/card';
+import { supabase } from '@/shared/lib/supabase';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
 import { Trash2, UserPlus, Check, X, ShieldAlert } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
-import { Alert, AlertDescription, AlertTitle } from '@/shared/components/alert';
+import { useAuth } from '@/shared/contexts/AuthContext';
+import { Alert, AlertDescription, AlertTitle } from '@/shared/ui/alert';
 
 const AccessManagement = () => {
     const { user } = useAuth();
@@ -198,3 +198,4 @@ const AccessManagement = () => {
 };
 
 export default AccessManagement;
+

@@ -1,11 +1,11 @@
 import React from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, ArrowRight } from 'lucide-react';
-import { Button } from '@/shared/components/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/tabs";
+import { Button } from '@/shared/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import SEO from '@/components/common/SEO';
-import { technicalCapabilities } from '@/data/capabilities';
-import { portfolioProjects } from '@/data/portfolio';
+import { technicalCapabilities } from '@/workspace/data/capabilities';
+import { portfolioProjects } from '@/workspace/data/portfolio';
 
 const CapabilityDetailPage = () => {
     const { slug } = useParams();
@@ -340,3 +340,4 @@ const CapabilityDetailPage = () => {
 };
 
 export default CapabilityDetailPage;
+

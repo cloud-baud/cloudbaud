@@ -5,8 +5,8 @@ import {
     ExternalLink, Trash2, AlertCircle, CheckCircle2, File,
     FileSpreadsheet, Image, Archive, LogOut, Cloud
 } from 'lucide-react';
-import { googleDriveService } from '@/services/googleDriveService';
-import { cn } from '@/lib/utils';
+import { googleDriveService } from '@/workspace/services/googleDriveService';
+import { cn } from '@/shared/lib/utils';
 import { toast } from 'sonner';
 
 // ─── Constants ───────────────────────────────────────────────────────────────

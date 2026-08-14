@@ -6,20 +6,20 @@ import {
     ChevronRight, ChevronDown, Check, Plus, MoveVertical, Puzzle, ZoomIn, X, Trash2, Pencil, Type,
     Image as ImageIcon, Sparkles, Search
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/shared/components/card";
-import { Button } from "@/shared/components/button";
-import { useAuth } from '@/context/AuthContext';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/shared/ui/card";
+import { Button } from "@/shared/ui/button";
+import { useAuth } from '@/shared/contexts/AuthContext';
 import { useMsal } from "@azure/msal-react";
-import { loginRequest } from "@/lib/authConfig";
+import { loginRequest } from "@/shared/lib/authConfig";
 import { graphService } from "@/services/graphService";
-import { Switch } from "@/shared/components/switch";
-import { Separator } from "@/shared/components/separator";
+import { Switch } from "@/shared/ui/switch";
+import { Separator } from "@/shared/ui/separator";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger
-} from '@/shared/components/dropdown-menu';
+} from '@/shared/ui/dropdown-menu';
 import {
     Dialog,
     DialogContent,
@@ -28,12 +28,12 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/shared/components/dialog";
-import { Label } from "@/shared/components/label";
-import { Input } from "@/shared/components/input";
+} from "@/shared/ui/dialog";
+import { Label } from "@/shared/ui/label";
+import { Input } from "@/shared/ui/input";
 import { AUTH_CONFIG_CHANGE_EVENT } from '@/components/auth/DynamicMsalProvider';
-import { supabase, envInfo } from "@/lib/supabase";
-import { hasHubAdminAccess } from '@/utils/rbac';
+import { supabase, envInfo } from "@/shared/lib/supabase";
+import { hasHubAdminAccess } from '@/workspace/utils/rbac';
 // import PageShell from './PageShell';
 import { Database, ArrowRightLeft, Server } from 'lucide-react';
 import ContentControl from '../ContentControl';
@@ -2047,5 +2047,6 @@ const SettingsPage = () => {
 };
 
 export default SettingsPage;
+
 
 

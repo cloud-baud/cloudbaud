@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import * as LucideIcons from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import { Button } from '@/shared/components/button';
-import { Input } from '@/shared/components/input';
-import { Textarea } from '@/shared/components/textarea';
-import { Label } from '@/shared/components/label';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/shared/components/card';
-import { RadioGroup, RadioGroupItem } from '@/shared/components/radio-group';
-import { Checkbox } from '@/shared/components/checkbox';
-import { Progress } from '@/shared/components/progress';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/shared/components/select';
+import { supabase } from '@/shared/lib/supabase';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Textarea } from '@/shared/ui/textarea';
+import { Label } from '@/shared/ui/label';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/shared/ui/card';
+import { RadioGroup, RadioGroupItem } from '@/shared/ui/radio-group';
+import { Checkbox } from '@/shared/ui/checkbox';
+import { Progress } from '@/shared/ui/progress';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/shared/ui/select';
 
 const AssessmentEngine = ({ config, assessmentType, ...props }) => {
     // ... (existing state) ...
@@ -345,3 +345,4 @@ const AssessmentEngine = ({ config, assessmentType, ...props }) => {
 };
 
 export default AssessmentEngine;
+

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowRight, PlayCircle, Calculator, Target, Eye } from 'lucide-react';
-import { Button } from '@/shared/components/button';
+import { Button } from '@/shared/ui/button';
 import SEO from '@/components/common/SEO';
 import InteractiveArchitecture from '@/components/competencies/InteractiveArchitecture';
 import BeforeAfterComparison from '@/components/competencies/BeforeAfterComparison';
 import FearFactorAlert from '@/components/competencies/FearFactorAlert';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/shared/lib/supabase';
+import { useAuth } from '@/shared/contexts/AuthContext';
 
 const CompetencyLandingPage = () => {
   const { slug } = useParams();
@@ -333,3 +333,5 @@ const CompetencyLandingPage = () => {
 };
 
 export default CompetencyLandingPage;
+
+

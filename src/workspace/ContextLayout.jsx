@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation, Link } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 import {
     PieChart,
     Calculator,
@@ -13,33 +13,38 @@ import {
     ChevronDown,
     ChevronRight
 } from 'lucide-react';
-import { Card } from "@/shared/components/card";
 
-// Context specific sub-navigation data
-const SUB_NAVS = {
+// FIXED: Make hrefs work for both /workspace and /collaboration
+// Use relative detection instead of hardcoded /workspace
+const getBasePath = (pathname) => {
+  if (pathname.includes('/collaboration')) return '/collaboration';
+  if (pathname.includes('/workspace')) return '/workspace';
+  return '/workspace'; // default fallback
+};
+
+const SUB_NAVS = (basePath) => ({
     'finance': [
         {
             label: 'Taxes',
-            href: '/workspace/finance/taxes',
+            href: `${basePath}/finance/taxes`,
             icon: Calculator,
             children: [
-                { label: '2024', href: '/workspace/finance/taxes?year=2024' },
-                { label: '2023', href: '/workspace/finance/taxes?year=2023' },
-                { label: '2022', href: '/workspace/finance/taxes?year=2022' },
-                { label: '2021', href: '/workspace/finance/taxes?year=2021' },
-                { label: '2020', href: '/workspace/finance/taxes?year=2020' },
-                { label: '2019', href: '/workspace/finance/taxes?year=2019' },
-                { label: '2018', href: '/workspace/finance/taxes?year=2018' },
-                { label: '2017', href: '/workspace/finance/taxes?year=2017' }
+                { label: '2024', href: `${basePath}/finance/taxes?year=2024` },
+                { label: '2023', href: `${basePath}/finance/taxes?year=2023` },
+                { label: '2022', href: `${basePath}/finance/taxes?year=2022` },
+                { label: '2021', href: `${basePath}/finance/taxes?year=2021` },
+                { label: '2020', href: `${basePath}/finance/taxes?year=2020` },
+                { label: '2019', href: `${basePath}/finance/taxes?year=2019` },
+                { label: '2018', href: `${basePath}/finance/taxes?year=2018` },
+                { label: '2017', href: `${basePath}/finance/taxes?year=2017` }
             ]
         },
-        { label: 'Bookkeeping', href: '/workspace/finance/bookkeeping', icon: BookOpen },
-        { label: 'Accounting', href: '/workspace/finance/accounting', icon: PieChart },
-        { label: 'Consulting', href: '/workspace/finance/consulting', icon: Briefcase },
-        { label: 'Investments', href: '/workspace/finance/investments', icon: TrendingUp },
+        { label: 'Bookkeeping', href: `${basePath}/finance/bookkeeping`, icon: BookOpen },
+        { label: 'Accounting', href: `${basePath}/finance/accounting`, icon: PieChart },
+        { label: 'Consulting', href: `${basePath}/finance/consulting`, icon: Briefcase },
+        { label: 'Investments', href: `${basePath}/finance/investments`, icon: TrendingUp },
     ],
-    // Add other contexts here as needed (e.g. 'crm', 'sales')
-};
+});
 
 const ContextLink = ({ href, label, icon: Icon, children }) => {
     const location = useLocation();
@@ -47,15 +52,11 @@ const ContextLink = ({ href, label, icon: Icon, children }) => {
 
     const hasChildren = children && children.length > 0;
 
-    // Normalize paths ensuring no trailing slash issues or query param mismatches
-    // Active if current path starts with href (parent) OR matches exactly
-    // For Taxes: href=/workspace/finance. location=/workspace/finance?year=2024. Match.
+    // FIXED: Check both pathname and base - support /collaboration and /workspace
     const isParentActive = location.pathname === href.split('?')[0];
     const isChildActive = children && children.some(child => (location.pathname + location.search) === child.href);
-
     const isActive = isParentActive || isChildActive;
 
-    // Auto-expand if active
     useEffect(() => {
         if (isActive) {
             setIsOpen(true);
@@ -74,9 +75,6 @@ const ContextLink = ({ href, label, icon: Icon, children }) => {
                 )}
                 onClick={(e) => {
                     if (hasChildren) {
-                        // User wants to navigate and toggle.
-                        // Navigation is handled by Link.
-                        // Toggle is handled here.
                         setIsOpen(!isOpen);
                     }
                 }}
@@ -92,7 +90,6 @@ const ContextLink = ({ href, label, icon: Icon, children }) => {
                 </div>
             </Link>
 
-            {/* Children */}
             {hasChildren && isOpen && (
                 <div className="flex flex-col mt-0.5 ml-7 space-y-0.5 border-l border-slate-200 dark:border-slate-800 pl-2">
                     {children.map(child => {
@@ -122,22 +119,23 @@ const ContextLayout = () => {
     const location = useLocation();
     const [isCollapsed, setIsCollapsed] = useState(false);
 
-    // Determine current context based on path
+    // FIXED: This was the bug - only checked /workspace/finance, but you're on /collaboration/finance
+    // Now checks for /finance generally - works for both /workspace/finance and /collaboration/finance
     let activeContext = null;
-    if (location.pathname.includes('/workspace/finance')) {
+    if (location.pathname.includes('/finance')) {
         activeContext = 'finance';
     }
-    // Add other checks here
 
-    const subNavItems = activeContext ? SUB_NAVS[activeContext] : [];
+    const basePath = getBasePath(location.pathname);
+    const subNavItems = activeContext ? SUB_NAVS(basePath)[activeContext] : [];
 
     if (!activeContext || !subNavItems.length) {
-        return <Outlet />; // If no sub-nav context, just render the content vertically
+        return <Outlet />;
     }
 
     return (
         <div className="flex flex-1 h-full overflow-hidden">
-            {/* Middle Nav - Context Specific */}
+            {/* Middle Nav - Context Specific - THIS IS YOUR FILTER PANE */}
             <div className={cn(
                 "flex-shrink-0 flex flex-col border-r border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-black/20 backdrop-blur-sm transition-all duration-300 ease-in-out relative",
                 isCollapsed ? "w-0 border-r-0 opacity-0 overflow-hidden" : "w-64 opacity-100 py-6 px-4"
@@ -159,14 +157,14 @@ const ContextLayout = () => {
                     </button>
                 </div>
 
-                <nav className="space-y-1 min-w-[200px]"> {/* min-w forces text stability during transition */}
+                <nav className="space-y-1 min-w-[200px]">
                     {subNavItems.map((item) => (
                         <ContextLink key={item.label} {...item} />
                     ))}
                 </nav>
             </div>
 
-            {/* Main Content Area - Renders the specific page */}
+            {/* Main Content Area */}
             <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 relative">
                 {isCollapsed && (
                     <div className="absolute top-2 left-0 z-10 transition-opacity duration-300 animate-in fade-in slide-in-from-left-2">

@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import * as THREE from 'three';
-import GLOBE from 'vanta/dist/vanta.globe.min';
+import GLOBE from 'vanta/dist/vanta.globe.min.js';
 import { ArrowRight, Code, Cloud, Server, Smartphone, Database, Award, Users, CheckCircle, TrendingUp, Brain, Building, Shield, Activity, BarChart3, Terminal, Bot } from 'lucide-react';
-import { Button } from '@/shared/components/button';
+import { Button } from '@/shared/ui/button';
 import { useTheme } from 'next-themes';
 import { useContent } from '@/context/ContentContext';
 import SEO from '@/components/common/SEO';

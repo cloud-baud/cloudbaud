@@ -24,9 +24,9 @@ import {
   Zap,
   BarChart2,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/shared/components/badge';
-import { Button } from '@/shared/components/button';
+import { cn } from '@/shared/lib/utils';
+import { Badge } from '@/shared/ui/badge';
+import { Button } from '@/shared/ui/button';
 import { ResponsiveContainer, FunnelChart, Funnel, LabelList, Tooltip } from 'recharts';
 
 // ─────────────────────────────────────────────

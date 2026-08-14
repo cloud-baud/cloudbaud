@@ -5,8 +5,8 @@ import {
   MoreHorizontalIcon,
 } from "lucide-react"
 
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/shared/components/button";
+import { cn } from "@/shared/lib/utils"
+import { buttonVariants } from "@/shared/ui/button";
 
 function Pagination({
   className,
@@ -116,3 +116,4 @@ export {
   PaginationNext,
   PaginationEllipsis,
 }
+

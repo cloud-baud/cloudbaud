@@ -11,10 +11,10 @@ import {
     Zap,
     Shield
 } from 'lucide-react';
-import { Button } from '@/shared/components/button';
+import { Button } from '@/shared/ui/button';
 import SEO from '@/components/common/SEO';
 
-import { technicalCapabilities, deliveryModels } from '@/data/capabilities';
+import { technicalCapabilities, deliveryModels } from '@/workspace/data/capabilities';
 
 const CapabilitiesPage = () => {
     return (
@@ -167,3 +167,4 @@ const CapabilitiesPage = () => {
 };
 
 export default CapabilitiesPage;
+

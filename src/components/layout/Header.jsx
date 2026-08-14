@@ -9,12 +9,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
-import { supabase } from '@/lib/supabase';
+import { supabaseAuth } from '@/shared/lib/supabase';
 
 
 
 
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '@/shared/contexts/AuthContext';
 import CloudBaudLogo from '../common/CloudBaudLogo';
 
 const Header = () => {
@@ -34,13 +34,11 @@ const Header = () => {
     const fetchData = async () => {
       try {
         const [navRes, indRes] = await Promise.all([
-          supabase
-            .from('site_navigation')
+          supabaseAuth.from('site_navigation')
             .select('label, path')
             .eq('is_active', true)
             .order('order_index'),
-          supabase
-            .from('industries')
+          supabaseAuth.from('industries')
             .select('name, slug')
             .eq('is_active', true)
             .order('name')
@@ -106,7 +104,7 @@ const Header = () => {
                   style={{ maxHeight: '48px' }}
                 />
               ) : (
-                <CloudBaudLogo className="h-full w-auto p-1" />
+                <CloudBaudLogo className="h-full w-auto" />
               )}
             </div>
             <span className="tracking-tight font-semibold text-lg hover:opacity-90 transition-opacity text-white">
@@ -279,3 +277,7 @@ const Header = () => {
 };
 
 export default Header;
+
+
+
+
