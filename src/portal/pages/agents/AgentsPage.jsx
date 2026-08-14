@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { agents, agentBenefits } from '@/data/agents';
 import AgentCard from '@/components/agents/AgentCard';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 
 const AgentsPage = () => {
     return (
@@ -11,14 +11,14 @@ const AgentsPage = () => {
             {/* Hero Section */}
             <section className="py-20 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto text-center">
-                    <div className="inline-block mb-6 px-4 py-1 rounded-full border border-purple-500 text-xs uppercase tracking-wider">
+                    <div className="inline-block mb-6 px-4 py-1 rounded-full border border-brand-aqua text-xs uppercase tracking-wider">
                         <Sparkles className="inline h-3 w-3 mr-2" />
                         AI Agents That Work For You
                     </div>
 
                     <h1 className="text-5xl md:text-6xl font-bold mb-6">
                         Deploy{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                             Intelligent Agents
                         </span>{' '}
                         <br />
@@ -34,7 +34,7 @@ const AgentsPage = () => {
                         <Button
                             asChild
                             size="lg"
-                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full"
+                            className="bg-gradient-to-r from-brand-blue to-brand-aqua hover:from-brand-blue hover:to-brand-aqua text-white px-8 py-3 rounded-full"
                         >
                             <Link to="/contact">
                                 Schedule Demo
@@ -70,7 +70,7 @@ const AgentsPage = () => {
                     <div className="text-center mb-12">
                         <h2 className="text-4xl font-bold mb-4">
                             Why Choose{' '}
-                            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                            <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                                 CloudBaud Agents
                             </span>
                             ?
@@ -103,7 +103,7 @@ const AgentsPage = () => {
                     <div className="text-center mb-16">
                         <h2 className="text-4xl font-bold mb-4">
                             Get Started in{' '}
-                            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                            <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                                 Three Steps
                             </span>
                         </h2>
@@ -111,7 +111,7 @@ const AgentsPage = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="text-center">
-                            <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <div className="w-16 h-16 bg-gradient-to-r from-brand-blue to-brand-aqua rounded-2xl flex items-center justify-center mx-auto mb-6">
                                 <span className="text-2xl font-bold text-white">1</span>
                             </div>
                             <h3 className="text-xl font-semibold text-white mb-3">Choose Your Agent</h3>
@@ -121,7 +121,7 @@ const AgentsPage = () => {
                         </div>
 
                         <div className="text-center">
-                            <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <div className="w-16 h-16 bg-gradient-to-r from-brand-blue to-brand-aqua rounded-2xl flex items-center justify-center mx-auto mb-6">
                                 <span className="text-2xl font-bold text-white">2</span>
                             </div>
                             <h3 className="text-xl font-semibold text-white mb-3">Quick Integration</h3>
@@ -131,7 +131,7 @@ const AgentsPage = () => {
                         </div>
 
                         <div className="text-center">
-                            <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <div className="w-16 h-16 bg-gradient-to-r from-brand-blue to-brand-aqua rounded-2xl flex items-center justify-center mx-auto mb-6">
                                 <span className="text-2xl font-bold text-white">3</span>
                             </div>
                             <h3 className="text-xl font-semibold text-white mb-3">Start Seeing Results</h3>
@@ -148,7 +148,7 @@ const AgentsPage = () => {
                 <div className="max-w-4xl mx-auto text-center">
                     <h2 className="text-4xl md:text-5xl font-bold mb-6">
                         Ready to{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                             deploy your agent
                         </span>
                         ?
@@ -159,7 +159,7 @@ const AgentsPage = () => {
                     <Button
                         asChild
                         size="lg"
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full"
+                        className="bg-gradient-to-r from-brand-blue to-brand-aqua hover:from-brand-blue hover:to-brand-aqua text-white px-8 py-3 rounded-full"
                     >
                         <Link to="/contact">
                             Schedule Your Demo

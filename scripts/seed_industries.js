@@ -1,37 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-// Convert import.meta.url to __dirname equivalent for ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Import data - resolve relative to this script
 import { industries } from '../src/data/industries.js';
+import { loadRootEnv } from './loadRootEnv.js';
 
-// Manually parse .env
-const envPath = path.resolve(process.cwd(), '.env');
-console.log(`Loading env from ${envPath}`);
-
-if (fs.existsSync(envPath)) {
-    const envConfig = fs.readFileSync(envPath, 'utf-8');
-    envConfig.split('\n').forEach(line => {
-        if (!line || line.startsWith('#')) return;
-        const equalsIdx = line.indexOf('=');
-        if (equalsIdx > 0) {
-            const key = line.substring(0, equalsIdx).trim();
-            let val = line.substring(equalsIdx + 1).trim();
-            // Remove quotes if present
-            if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
-                val = val.slice(1, -1);
-            }
-            if (!process.env[key]) {
-                process.env[key] = val;
-            }
-        }
-    });
-}
+loadRootEnv();
 
 const args = process.argv.slice(2);
 const isDev = args.includes('--dev') || args.includes('dev');
@@ -62,7 +33,7 @@ const anonKey = isDev
 const supabaseKey = serviceKey || anonKey;
 
 if (!supabaseUrl || !supabaseKey) {
-    console.error('Missing Credentials. Please check .env file.');
+    console.error('Missing Credentials. Please check .env.test (or .env).');
     console.error(`Required for ${isDev ? 'DEV' : 'PROD'}: URL and KEY.`);
     process.exit(1);
 }

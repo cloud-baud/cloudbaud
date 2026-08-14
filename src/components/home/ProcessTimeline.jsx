@@ -69,7 +69,7 @@ const ProcessTimeline = () => {
         <div className="space-y-12">
             <div className="text-center mb-16">
                 <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white font-serif">
-                    Our <span className="text-blue-500">Methodology</span>
+                    Our <span className="text-blue-500">Approach</span>
                 </h2>
                 <div className="w-20 h-1 bg-blue-600 mx-auto mb-8"></div>
                 <p className="text-slate-400 text-xl max-w-3xl mx-auto">

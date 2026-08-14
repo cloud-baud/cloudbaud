@@ -1,5 +1,6 @@
+# Build uses production mode; set all secrets in Netlify UI (not committed .env files).
 [build]
-  command = "npm run build"
+  command = "npm run build:all"
   publish = "dist"
   functions = "netlify/functions"
 
@@ -9,6 +10,20 @@
   status = 200
   force = true
 
+# 1. Route the exact root of the finance subdomain to finance.html
+[[redirects]]
+  from = "https://finance.cloudbaud.com/"
+  to = "/finance.html"
+  status = 200
+  force = true
+
+# 2. Route all other non-static requests on the finance subdomain to finance.html
+[[redirects]]
+  from = "https://finance.cloudbaud.com/*"
+  to = "/finance.html"
+  status = 200
+
+# 3. Standard fallback routing for main portal deep-linking
 [[redirects]]
   from = "/*"
   to = "/index.html"

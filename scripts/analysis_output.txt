@@ -1,0 +1,14 @@
+Total pages: 31
+
+================================================================================
+Page   1 | Form 1040                      | September 15, 2021 | CONFIDENTIAL | Jishnu & Deepika Nath | 2455 130th Ave SE | Bellevue, WA  98005 | Dear Jishnu & Deep
+Page   2 | UNKNOWN                        | This office is committed to using safeguards that protect your information from data theft. To  | further protect your i
+Page   3 | UNKNOWN                        | September 15, 2021 | CONFIDENTIAL | Jishnu & Deepika Nath | 2455 130th Ave SE | Bellevue, WA  98005 | For professional s
+Traceback (most recent call last):
+  File "D:\repos\cloudbaud.com\scripts\analyze_return.py", line 72, in <module>
+    print(f"Page {i+1:3d} | {form_id:30s} | {preview[:120]}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jishn\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\uf071' in position 44: character maps to <undefined>

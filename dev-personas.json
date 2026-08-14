@@ -1,0 +1,18 @@
+[
+  {
+    "id": "admin",
+    "name": "Admin",
+    "role": "admin",
+    "email": "admin@cloudbaud.com",
+    "avatarUrl": "https://randomuser.me/api/portraits/men/99.jpg",
+    "description": "CloudBaud platform administrator"
+  },
+  {
+    "id": "user",
+    "name": "User",
+    "role": "user",
+    "email": "user@cloudbaud.com",
+    "avatarUrl": "https://randomuser.me/api/portraits/women/99.jpg",
+    "description": "Standard user"
+  }
+]

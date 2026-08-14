@@ -3,12 +3,11 @@ import { Link } from 'react-router-dom';
 import * as THREE from 'three';
 import GLOBE from 'vanta/dist/vanta.globe.min';
 import { ArrowRight, Code, Cloud, Server, Smartphone, Database, Award, Users, CheckCircle, TrendingUp, Brain, Building, Shield, Activity, BarChart3, Terminal, Bot } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 import { useTheme } from 'next-themes';
 import { useContent } from '@/context/ContentContext';
 import SEO from '@/components/common/SEO';
 import TechnologyStack from '@/components/common/TechnologyStack';
-import ProcessTimeline from '@/components/home/ProcessTimeline';
 import TrustedBy from '@/components/home/TrustedBy';
 import PlatformDashboard from '@/components/home/PlatformDashboard';
 
@@ -102,54 +101,63 @@ const HomePage = () => {
       <SEO
         title="CloudBaud - Intelligent Systems Engineering"
         description="Hire expert AI Engineers for custom ML/LLM solutions. We build production-grade RAG systems, AI agents, and scalable data platforms on Azure Databricks. Specializing in Healthcare & Finance."
-        keywords="CloudBaud, AI Engineering, Azure Databricks, Data Engineering, RAG Systems, Machine Learning, Cloud Solutions, DevOps, Healthcare Data, Unity Catalog, Enterprise AI, Intelligent Systems, Seattle Tech, Custom LLM"
         canonical="/"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "CloudBaud",
+          "url": "https://cloudbaud.com",
+          "logo": "https://cloudbaud.com/cloudbaud_logo_clean_1769644805025.png",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+1-425-749-2101",
+            "contactType": "sales"
+          },
+          "sameAs": [
+            "https://www.linkedin.com/company/cloudbaud"
+          ]
+        }}
       />
 
       {/* Hero Section */}
-      <section className="relative min-h-[85vh] flex flex-col justify-center px-4 sm:px-6 lg:px-8 pt-16">
+      <section className="relative min-h-[85vh] flex flex-col justify-center items-center text-center px-4 sm:px-6 lg:px-8 pt-16 pb-12">
         {/* Vanta Background Container */}
         <div ref={vantaRef} className="absolute inset-0 z-0 opacity-40"></div>
 
-        <div className="max-w-7xl mx-auto w-full relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className="max-w-3xl">
-            {/* Badge */}
-            {/* Badge - Removed */}
+        <div className="max-w-5xl mx-auto w-full relative z-10 flex flex-col items-center">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight text-foreground animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+            Architecting <span className="text-brand-blue drop-shadow-[0_0_8px_rgba(0,210,255,0.5)]">Mission-Critical</span> Data Platforms
+          </h1>
 
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight text-foreground animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
-              Architecting <span className="text-brand-blue drop-shadow-[0_0_8px_rgba(0,210,255,0.5)]">Mission-Critical</span> Data Platforms
-            </h1>
+          <p className="text-xl md:text-2xl text-slate-300 mb-10 leading-relaxed max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
+            Balancing operational excellence, governance, and developer enablement on Azure Databricks.
+            <br />
+            <span className="text-base text-slate-400 mt-2 block">Specializing in Healthcare Data & Insurance Feeds.</span>
+          </p>
 
-            <p className="text-xl md:text-2xl text-slate-300 mb-10 leading-relaxed max-w-2xl animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
-              Balancing operational excellence, governance, and developer enablement on Azure Databricks.
-              <br />
-              <span className="text-base text-slate-400 mt-2 block">Specializing in Healthcare Data & Insurance Feeds.</span>
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-              <Button
-                asChild
-                size="lg"
-                className="bg-brand-blue hover:bg-brand-blue/80 text-black px-8 py-6 text-lg rounded-lg shadow-lg shadow-brand-blue/20 transition-all font-bold"
-              >
-                <Link to="/contact">
-                  Start Your Transformation
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 px-8 py-6 text-lg rounded-lg transition-all"
-              >
-                <Link to="/capabilities">Platform Expertise</Link>
-              </Button>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300 mb-12">
+            <Button
+              asChild
+              size="lg"
+              className="bg-brand-blue hover:bg-brand-blue/80 text-black px-8 py-6 text-lg rounded-lg shadow-lg shadow-brand-blue/20 transition-all font-bold"
+            >
+              <Link to="/contact">
+                Start Your Transformation
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 px-8 py-6 text-lg rounded-lg transition-all"
+            >
+              <Link to="/capabilities">Platform Expertise</Link>
+            </Button>
           </div>
 
-          {/* Hero Dashboard Preview - Mobile/Tablet Only hidden on desktop if too crowded, but we want it visible */}
-          <div className="hidden lg:block w-full animate-in fade-in slide-in-from-right-8 duration-1000 delay-300">
+          {/* Hero Dashboard Preview - Centered */}
+          <div className="w-full max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-400 text-left">
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-brand-blue to-brand-aqua rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
               <div className="relative bg-slate-900 ring-1 ring-slate-800 rounded-xl p-6 shadow-2xl">
@@ -171,7 +179,7 @@ const HomePage = () => {
                       <div className="text-xs text-slate-500">Current Throughput</div>
                       <div className="text-xl font-bold text-white">4.2 GB/s</div>
                     </div>
-                    <div className="h-8 w-24 bg-gradient-to-t from-blue-500/20 to-transparent relative overflow-hidden">
+                    <div className="h-8 w-24 bg-gradient-to-t from-brand-blue/20 to-transparent relative overflow-hidden">
                       <div className="absolute bottom-0 left-0 right-0 h-[60%] bg-brand-blue/40 animate-pulse" />
                     </div>
                   </div>
@@ -188,7 +196,7 @@ const HomePage = () => {
           <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay"></div>
           <div className="max-w-7xl mx-auto relative z-10 flex flex-col md:flex-row items-center gap-12">
             <div className="flex-1 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-semibold mb-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-blue/10 border border-brand-blue/20 text-brand-blue text-sm font-semibold mb-2">
                 <Brain className="w-4 h-4" />
                 <span>{content.aiShowcase.highlight || "New Capability"}</span>
               </div>
@@ -199,7 +207,7 @@ const HomePage = () => {
                 {content.aiShowcase.description}
               </p>
               <div className="flex gap-4 pt-4">
-                <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white font-bold h-12 px-8">
+                <Button asChild className="bg-brand-blue hover:bg-brand-blue/80 text-black font-bold h-12 px-8">
                   <Link to="/ai-engineering">
                     Explore AI Agents
                     <ArrowRight className="ml-2 w-4 h-4" />
@@ -210,12 +218,12 @@ const HomePage = () => {
             {/* Visual Representation of Agentic Workflow */}
             <div className="flex-1 w-full relative">
               <div className="relative aspect-video bg-slate-900 rounded-xl border border-slate-800 p-6 overflow-hidden shadow-2xl group">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-blue-500"></div>
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-blue to-brand-aqua"></div>
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
-                        <Bot className="w-4 h-4 text-purple-400" />
+                      <div className="w-8 h-8 rounded-full bg-brand-blue/20 flex items-center justify-center">
+                        <Bot className="w-4 h-4 text-brand-blue" />
                       </div>
                       <span className="font-mono text-sm text-slate-400">Agent_Orchestrator_v2</span>
                     </div>
@@ -224,7 +232,7 @@ const HomePage = () => {
                   <div className="space-y-3 font-mono text-xs md:text-sm">
                     <div className="flex gap-3 items-center text-slate-300">
                       <span className="text-slate-600">INPUT:</span>
-                      <span className="bg-slate-800 px-2 py-1 rounded text-purple-300">"Analyze tax implications for 2024 hiring plan"</span>
+                      <span className="bg-slate-800 px-2 py-1 rounded text-brand-aqua">"Analyze tax implications for 2024 hiring plan"</span>
                     </div>
                     <div className="flex gap-3 items-start text-slate-300">
                       <span className="text-slate-600 mt-1">PLAN:</span>
@@ -313,15 +321,6 @@ const HomePage = () => {
           <TechnologyStack />
         </div>
       </section>
-
-      {/* Process Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-background transition-colors">
-        <div className="max-w-7xl mx-auto">
-          <ProcessTimeline />
-        </div>
-      </section>
-
-
 
       {/* CTA Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-950 overflow-hidden relative border-t border-slate-100 dark:border-slate-900 transition-colors">

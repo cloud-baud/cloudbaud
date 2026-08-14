@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Users, Target, Award, Lightbulb, Shield, CheckCircle } from 'lucide-react';
 import TrustedBy from '@/components/home/TrustedBy';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 
 const AboutPage = () => {
   const values = [

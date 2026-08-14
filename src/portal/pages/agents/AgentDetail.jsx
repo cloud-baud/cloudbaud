@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, ExternalLink, PenTool, Users, TrendingUp } from 'lucide-react';
 import { agents } from '@/data/agents';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 
 const iconMap = {
     PenTool,
@@ -45,7 +45,7 @@ const AgentDetail = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         <div>
                             {/* Icon */}
-                            <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mb-6">
+                            <div className="w-20 h-20 bg-gradient-to-r from-brand-blue to-brand-aqua rounded-2xl flex items-center justify-center mb-6">
                                 <Icon className="h-10 w-10 text-white" />
                             </div>
 
@@ -61,7 +61,7 @@ const AgentDetail = () => {
                                 <Button
                                     asChild
                                     size="lg"
-                                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full"
+                                    className="bg-gradient-to-r from-brand-blue to-brand-aqua hover:from-brand-blue hover:to-brand-aqua text-white px-8 py-3 rounded-full"
                                 >
                                     <Link to="/contact">
                                         Request Demo
@@ -82,7 +82,7 @@ const AgentDetail = () => {
                         {/* Metrics Grid */}
                         <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-3xl p-8">
                             <div className="mb-8">
-                                <div className="text-6xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                                <div className="text-6xl font-bold bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent mb-2">
                                     {agent.metrics.primary.value}
                                 </div>
                                 <div className="text-xl text-gray-400">{agent.metrics.primary.label}</div>
@@ -106,7 +106,7 @@ const AgentDetail = () => {
                 <div className="max-w-7xl mx-auto">
                     <h2 className="text-4xl font-bold mb-12 text-center">
                         Key{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                             Features
                         </span>
                     </h2>
@@ -130,7 +130,7 @@ const AgentDetail = () => {
                 <div className="max-w-7xl mx-auto">
                     <h2 className="text-4xl font-bold mb-12 text-center">
                         Use{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                             Cases
                         </span>
                     </h2>
@@ -154,7 +154,7 @@ const AgentDetail = () => {
                 <div className="max-w-5xl mx-auto">
                     <h2 className="text-4xl font-bold mb-12 text-center">
                         Success{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                             Story
                         </span>
                     </h2>
@@ -194,7 +194,7 @@ const AgentDetail = () => {
                 <div className="max-w-7xl mx-auto">
                     <h2 className="text-4xl font-bold mb-8 text-center">
                         Seamless{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                             Integrations
                         </span>
                     </h2>
@@ -220,7 +220,7 @@ const AgentDetail = () => {
                 <div className="max-w-7xl mx-auto">
                     <h2 className="text-4xl font-bold mb-12 text-center">
                         Simple,{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                             Transparent Pricing
                         </span>
                     </h2>
@@ -263,7 +263,7 @@ const AgentDetail = () => {
                                     asChild
                                     className={
                                         tier === 'professional'
-                                            ? 'w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white'
+                                            ? 'w-full bg-gradient-to-r from-brand-blue to-brand-aqua hover:from-brand-blue hover:to-brand-aqua text-white'
                                             : 'w-full border border-gray-600 bg-transparent text-white hover:bg-gray-800'
                                     }
                                 >
@@ -282,7 +282,7 @@ const AgentDetail = () => {
                 <div className="max-w-4xl mx-auto text-center">
                     <h2 className="text-4xl md:text-5xl font-bold mb-6">
                         Ready to{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-brand-blue to-brand-aqua bg-clip-text text-transparent">
                             get started
                         </span>
                         ?
@@ -293,7 +293,7 @@ const AgentDetail = () => {
                     <Button
                         asChild
                         size="lg"
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full"
+                        className="bg-gradient-to-r from-brand-blue to-brand-aqua hover:from-brand-blue hover:to-brand-aqua text-white px-8 py-3 rounded-full"
                     >
                         <Link to="/contact">
                             Schedule Demo

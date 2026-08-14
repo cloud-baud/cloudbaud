@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Brain, Cpu, Shield, Database, LayoutGrid, Zap, CheckCircle, Smartphone } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 import { useTheme } from 'next-themes';
 import SEO from '@/components/common/SEO';
 
@@ -168,14 +168,14 @@ const AiEngineeringPage = () => {
                                 </div>
                             </div>
                             <div className="space-y-1">
-                                <div className="text-purple-400">class <span className="text-yellow-300">IntelligentAgent</span>:</div>
+                                <div className="text-brand-aqua">class <span className="text-brand-aqua">IntelligentAgent</span>:</div>
                                 <div className="pl-4 text-slate-300">def <span className="text-blue-400">__init__</span>(self, tools):</div>
                                 <div className="pl-8 text-slate-400">self.memory = <span className="text-emerald-400">VectorStoreMemory()</span></div>
                                 <div className="pl-8 text-slate-400">self.planner = <span className="text-emerald-400">CoTPlanner(model="gpt-4-turbo")</span></div>
                                 <div className="pl-4 text-slate-300">async def <span className="text-blue-400">execute</span>(self, query):</div>
-                                <div className="pl-8 text-slate-400">plan = <span className="text-purple-400">await</span> self.planner.analyze(query)</div>
-                                <div className="pl-8 text-slate-400">context = <span className="text-purple-400">await</span> self.memory.retrieve(query)</div>
-                                <div className="pl-8 text-slate-400"><span className="text-purple-400">return</span> self.synthesize(plan, context)</div>
+                                <div className="pl-8 text-slate-400">plan = <span className="text-brand-aqua">await</span> self.planner.analyze(query)</div>
+                                <div className="pl-8 text-slate-400">context = <span className="text-brand-aqua">await</span> self.memory.retrieve(query)</div>
+                                <div className="pl-8 text-slate-400"><span className="text-brand-aqua">return</span> self.synthesize(plan, context)</div>
                             </div>
                         </div>
                     </div>
@@ -191,7 +191,7 @@ const AiEngineeringPage = () => {
                         {/* Case Study 1 */}
                         <div className="bg-slate-50 dark:bg-slate-900/20 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 lg:p-10 flex flex-col lg:flex-row gap-8 hover:border-brand-blue/30 transition-colors">
                             <div className="lg:w-1/3">
-                                <div className="inline-block px-3 py-1 bg-purple-500/10 text-purple-400 rounded-full text-xs font-bold mb-4">MULTI-AGENT RAG</div>
+                                <div className="inline-block px-3 py-1 bg-brand-blue/10 text-brand-aqua rounded-full text-xs font-bold mb-4">MULTI-AGENT RAG</div>
                                 <h3 className="text-2xl font-bold mb-4">Personal Life Intelligence Platform</h3>
                                 <p className="text-slate-400 mb-6">An enterprise-grade retrieval system aggregating data across 6 domains (Finances, Health, Business, etc.).</p>
                                 <div className="flex flex-wrap gap-2 mb-6">

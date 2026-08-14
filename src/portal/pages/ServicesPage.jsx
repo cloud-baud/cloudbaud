@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Brain, Database, Smartphone, Code, Building, CheckCircle } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 
 const ServicesPage = () => {
   const services = [
@@ -80,7 +80,7 @@ const ServicesPage = () => {
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
             Our{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-brand-blue to-blue-600 bg-clip-text text-transparent">
               Services
             </span>
           </h1>
@@ -102,7 +102,7 @@ const ServicesPage = () => {
             >
               {/* Content */}
               <div className={index % 2 === 1 ? 'lg:col-start-2' : ''}>
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center mb-6">
+                <div className="w-16 h-16 bg-gradient-to-r from-brand-blue to-blue-800 rounded-2xl flex items-center justify-center mb-6">
                   <service.icon className="h-8 w-8 text-white" />
                 </div>
 
@@ -144,7 +144,7 @@ const ServicesPage = () => {
 
                 <Button
                   asChild
-                  className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white"
+                  className="bg-gradient-to-r from-brand-blue to-blue-800 hover:from-brand-blue hover:to-blue-900 text-white"
                 >
                   <Link to={service.link || "/contact"}>
                     {service.link ? 'Explore Service' : 'Get Started'}
@@ -155,7 +155,7 @@ const ServicesPage = () => {
 
               {/* Visual */}
               <div className={`${index % 2 === 1 ? 'lg:col-start-1' : ''} relative`}>
-                <div className="aspect-square bg-gradient-to-br from-blue-600/20 to-blue-800/20 rounded-3xl border border-slate-700 flex items-center justify-center">
+                <div className="aspect-square bg-gradient-to-br from-brand-blue/20 to-blue-800/20 rounded-3xl border border-slate-700 flex items-center justify-center">
                   <service.icon className="h-32 w-32 text-blue-400 opacity-50" />
                 </div>
               </div>
@@ -169,7 +169,7 @@ const ServicesPage = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Ready to{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-brand-blue to-blue-600 bg-clip-text text-transparent">
               get started
             </span>
             ?
@@ -180,7 +180,7 @@ const ServicesPage = () => {
           <Button
             asChild
             size="lg"
-            className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-8 py-3 rounded-full"
+            className="bg-gradient-to-r from-brand-blue to-blue-800 hover:from-brand-blue hover:to-blue-900 text-white px-8 py-3 rounded-full"
           >
             <Link to="/contact">
               Schedule a Consultation

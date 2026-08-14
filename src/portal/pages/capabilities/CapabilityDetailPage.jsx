@@ -1,8 +1,8 @@
 import React from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, ArrowRight } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { Button } from '@/shared/components/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/tabs";
 import SEO from '@/components/common/SEO';
 import { technicalCapabilities } from '@/data/capabilities';
 import { portfolioProjects } from '@/data/portfolio';
@@ -164,7 +164,7 @@ const CapabilityDetailPage = () => {
                                 />
                             </div>
                             <div className="absolute -z-10 top-10 -right-10 w-72 h-72 bg-blue-100 rounded-full blur-3xl opacity-50"></div>
-                            <div className="absolute -z-10 -bottom-10 -left-10 w-72 h-72 bg-purple-100 rounded-full blur-3xl opacity-50"></div>
+                            <div className="absolute -z-10 -bottom-10 -left-10 w-72 h-72 bg-brand-blue rounded-full blur-3xl opacity-50"></div>
                         </div>
                     </div>
                 </div>
@@ -267,7 +267,7 @@ const CapabilityDetailPage = () => {
                                     return (
                                         <div key={idx} className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-brand-blue/50 transition-colors">
                                             <div className="flex items-start gap-3">
-                                                <CheckCircle className="w-5 h-5 text-purple-500 mt-1 shrink-0" />
+                                                <CheckCircle className="w-5 h-5 text-brand-aqua mt-1 shrink-0" />
                                                 <div>
                                                     {isLink ? (
                                                         <Link to={`/capabilities/devops-infrastructure/${item.slug}`} className="font-bold text-lg text-slate-900 dark:text-white hover:text-brand-blue transition-colors">

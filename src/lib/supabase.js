@@ -37,3 +37,12 @@ export const envInfo = {
     activeDatabase: isLocalhost ? 'TEST' : 'PROD',
     activeUrl: activeUrl
 };
+
+// unblock dev - replace with real logic later
+export async function checkAllowedAccess(email) {
+  if (!email) return false
+  // TODO: implement your allow-list check
+  // const { data } = await supabase.from('allowed_users').select('email').eq('email', email).maybeSingle()
+  // return !!data
+  return true // allow all for now
+}

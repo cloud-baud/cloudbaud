@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CloudBaud LinkedIn Sync</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="sidebar.css">
+</head>
+<body class="dark-mode">
+  <div class="app-container">
+    
+    <!-- 1. Header Bar -->
+    <header class="app-header">
+      <div class="logo-group">
+        <span class="logo-mark">CB</span>
+        <span class="logo-text">CloudBaud</span>
+      </div>
+      <div class="status-indicator">
+        <span class="pulse-dot" id="status-dot"></span>
+        <span class="status-label" id="status-text">Disconnected</span>
+      </div>
+    </header>
+
+    <!-- Scrollable Main Container -->
+    <main class="main-content">
+
+      <!-- 2. Authentication & Environment Control -->
+      <section class="card auth-card">
+        <div class="env-toggle-container">
+          <button class="env-btn active" id="env-test" data-env="TEST">TEST DB</button>
+          <button class="env-btn" id="env-prod" data-env="PROD">PROD DB</button>
+        </div>
+        
+        <div id="auth-unauthenticated" class="auth-state">
+          <div class="info-alert">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>CloudBaud tab not detected. Open CloudBaud to sync session.</span>
+          </div>
+          <button class="btn btn-secondary w-100" id="btn-open-portal">
+            <svg class="icon mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Open CloudBaud Workspace
+          </button>
+        </div>
+
+        <div id="auth-authenticated" class="auth-state hidden">
+          <div class="user-profile">
+            <div class="avatar" id="user-avatar">U</div>
+            <div class="user-details">
+              <h4 id="user-name">Loading...</h4>
+              <p id="user-email">...</p>
+            </div>
+            <button class="icon-btn" id="btn-refresh-session" title="Refresh Session">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Active LinkedIn Thread Context -->
+      <section class="card context-card">
+        <div class="card-header">
+          <div class="title-group">
+            <svg class="icon text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <h3>Active LinkedIn Chat</h3>
+          </div>
+          <button class="text-btn flex-center" id="btn-rescrape">
+            <svg class="icon mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Scrape Thread
+          </button>
+        </div>
+
+        <div id="thread-empty" class="thread-state">
+          <p class="empty-text">Open a messaging thread on LinkedIn to capture profile context.</p>
+        </div>
+
+        <div id="thread-loaded" class="thread-state hidden">
+          <div class="thread-meta">
+            <div class="info-row">
+              <span class="label">Contact:</span>
+              <span class="val font-semibold" id="li-contact-name">...</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Thread ID:</span>
+              <span class="val code" id="li-thread-id">...</span>
+            </div>
+          </div>
+          
+          <div class="message-preview-container">
+            <div class="preview-header">Last Message Scraped:</div>
+            <div class="preview-bubble">
+              <div class="bubble-sender" id="li-bubble-sender">...</div>
+              <div class="bubble-text" id="li-bubble-text">...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. CRM Sync & Deal Mapping Panel -->
+      <section class="card crm-card" id="crm-panel">
+        <div class="card-header">
+          <div class="title-group">
+            <svg class="icon text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <h3>CRM Mapping</h3>
+          </div>
+        </div>
+
+        <div id="crm-loading" class="flex-center p-4">
+          <div class="spinner"></div>
+          <span class="ml-2">Connecting to Supabase...</span>
+        </div>
+
+        <div id="crm-actions" class="hidden">
+          
+          <!-- State: Contact Match -->
+          <div id="contact-sync-status" class="section-box">
+            <div class="sync-banner">
+              <span id="contact-status-icon" class="status-badge red">Unmapped</span>
+              <span class="sync-banner-text" id="contact-status-text">No matching contact found.</span>
+            </div>
+            <button class="btn btn-secondary w-100 mt-2" id="btn-create-contact">
+              Create New Contact
+            </button>
+          </div>
+
+          <!-- State: Linked Deal Selection -->
+          <div class="form-group mt-3">
+            <label for="deal-selector">Select Active Sales Deal</label>
+            <div class="select-container">
+              <select id="deal-selector">
+                <option value="">-- Choose an Open Deal --</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="separator-text">OR</div>
+
+          <!-- Quick Deal Creation -->
+          <div class="accordion">
+            <button class="accordion-trigger" id="deal-accordion-trigger">
+              <span>Create New Deal...</span>
+              <svg class="icon arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="accordion-content hidden" id="deal-accordion-content">
+              <div class="form-group">
+                <label for="new-deal-name">Deal Name*</label>
+                <input type="text" id="new-deal-name" placeholder="e.g. Acme - Enterprise Support">
+              </div>
+              <div class="form-group">
+                <label for="new-deal-value">Deal Value ($)</label>
+                <input type="number" id="new-deal-value" placeholder="e.g. 50000" min="0">
+              </div>
+              <button class="btn btn-secondary w-100" id="btn-create-deal">
+                Save New Deal
+              </button>
+            </div>
+          </div>
+
+          <!-- Core Push Action -->
+          <div class="sync-action-box mt-4">
+            <button class="btn btn-primary btn-gradient w-100" id="btn-sync-now" disabled>
+              <svg class="icon mr-2 spinner-icon hidden" id="sync-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <svg class="icon mr-2 static-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.2 15c.7-1.2 1-2.5.7-3.9-.6-3.4-3.7-5.7-7.2-5.1L13 6.3V2h-4v4.3L7.3 5.4c-3.5-.6-6.6 1.7-7.2 5.1-.3 1.4 0 2.7.7 3.9M12 12l9 9M12 12l-9 9"/></svg>
+              <span>Sync Active Chat Log</span>
+            </button>
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- 5. Footer Information -->
+    <footer class="app-footer">
+      <span>CloudBaud CRM Sync v1.0.0</span>
+      <span class="accent-dot"></span>
+      <a href="#" id="footer-portal-link">Dashboard</a>
+    </footer>
+
+  </div>
+  
+  <script src="sidebar.js"></script>
+</body>
+</html>

@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { BookingService } from '@/services/calendarService';
-import { Button } from '@/shared/ui/button';
-import { Card, CardContent } from '@/shared/ui/card';
+import { Button } from '@/shared/components/button';
+import { Card, CardContent } from '@/shared/components/card';
 import { ChevronLeft, ChevronRight, Clock, User, Mail, Calendar, CheckCircle2 } from 'lucide-react';
 import { format, addMonths, startOfMonth, startOfWeek, endOfMonth, endOfWeek, isSameMonth, isSameDay, addDays, getDay, isAfter, isBefore, setHours, setMinutes, parseISO } from 'date-fns';
-import { Input } from '@/shared/ui/input';
-import { Label } from '@/shared/ui/label';
-import { Textarea } from '@/shared/ui/textarea';
+import { Input } from '@/shared/components/input';
+import { Label } from '@/shared/components/label';
+import { Textarea } from '@/shared/components/textarea';
 
 const MEETING_DURATION = 15; // default duration
 const WORKING_HOURS = { start: 9, end: 17 }; // 9 AM to 5 PM

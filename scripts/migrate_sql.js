@@ -1,38 +1,40 @@
 import pg from 'pg';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { loadRootEnv } from './loadRootEnv.js';
+import dotenv from 'dotenv';
 
-const { Client } = pg;
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Load Env
-const envPath = path.resolve(process.cwd(), '.env');
-const env = {};
-if (fs.existsSync(envPath)) {
-    fs.readFileSync(envPath, 'utf-8').split('\n').forEach(line => {
-        if (!line || line.startsWith('#')) return;
-        const [k, v] = line.split('=');
-        if (k && v) env[k.trim()] = v.trim().replace(/^["']|["']$/g, '');
-    });
-}
-
-// Args
 const args = process.argv.slice(2);
 const isDev = args.includes('--dev');
+
+if (isDev) {
+    loadRootEnv();
+} else {
+    const prodEnvPath = path.resolve(process.cwd(), '.env.prod');
+    if (fs.existsSync(prodEnvPath)) {
+        dotenv.config({ path: prodEnvPath });
+        console.log(`[env] Loaded ${prodEnvPath}`);
+    } else {
+        loadRootEnv();
+    }
+}
+
+const { Client } = pg;
+
+const env = process.env;
 
 // Config
 const PROJECT_REF = isDev ? 'knhrygguhgfpimaogfkw' : 'mvyavzjzdinelcufpzek'; // Extracted from URLs in .env
 const DB_PASSWORD = isDev ? env.VITE_SUPABASE_DB_PASSWORD_TEST : env.VITE_SUPABASE_DB_PASSWORD_PROD;
 
 // Use explicit Direct URL if available (Test Env), otherwise construct it
-let connectionString = isDev && env.DIRECT_URL_TEST
-    ? env.DIRECT_URL_TEST
-    : `postgres://postgres:${DB_PASSWORD}@db.${PROJECT_REF}.supabase.co:5432/postgres`;
+// Use explicit Direct URL if available, otherwise construct it
+let connectionString = isDev
+    ? (env.DIRECT_URL_TEST || `postgres://postgres:${DB_PASSWORD}@db.${PROJECT_REF}.supabase.co:5432/postgres`)
+    : (env.DIRECT_URL_PROD || `postgres://postgres:${DB_PASSWORD}@db.${PROJECT_REF}.supabase.co:5432/postgres`);
 
-if (!DB_PASSWORD && !env.DIRECT_URL_TEST) {
-    console.error('Missing DB Password in .env');
+if (!DB_PASSWORD && !env.DIRECT_URL_TEST && !env.DIRECT_URL_PROD) {
+    console.error('Missing DB Password / DIRECT_URL in .env.test (or .env)');
     process.exit(1);
 }
 // Updated to use direct connection string format: db.[ref].supabase.co

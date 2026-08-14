@@ -1,8 +1,14 @@
 node_modules
 dist
-.env.*
+.env
 .DS_Store
 *.local
 
 # Local Netlify folder
 .netlify
+docs
+src/data
+*.ics
+*.zip
+*.pdf
+.venv

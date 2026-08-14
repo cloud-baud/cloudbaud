@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "CloudBaud LinkedIn Sync",
+  "version": "1.0.0",
+  "description": "Sync LinkedIn messaging threads directly to CloudBaud deals and CRM activities.",
+  "permissions": [
+    "sidePanel",
+    "storage",
+    "tabs",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://*.linkedin.com/*",
+    "http://localhost:5173/*",
+    "https://*.supabase.co/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.linkedin.com/messaging/*",
+        "https://*.linkedin.com/messaging/thread/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "Open CloudBaud LinkedIn Sync"
+  },
+  "side_panel": {
+    "default_path": "sidebar.html"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

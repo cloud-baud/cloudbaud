@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle2, XCircle, AlertCircle, RefreshCw, Activity, Database, Cloud, Cpu, Zap } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 

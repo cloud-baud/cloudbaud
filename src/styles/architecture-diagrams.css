@@ -1,0 +1,337 @@
+/* Professional Architecture Diagram Styles */
+/* Clean, technical aesthetic - no vibe-coded gradients */
+
+:root {
+  /* Professional Tech Palette - AWS/Azure inspired */
+  --diagram-bg: #0f172a;
+  --diagram-bg-light: #f8fafc;
+  --node-primary: #1e293b;
+  --node-primary-light: #ffffff;
+  --node-border: #334155;
+  --node-border-light: #cbd5e1;
+  --accent-blue: #3b82f6;
+  --accent-green: #10b981;
+  --accent-red: #ef4444;
+  --accent-amber: #f59e0b;
+  --text-primary: #e2e8f0;
+  --text-primary-light: #0f172a;
+  --text-secondary: #94a3b8;
+  --text-secondary-light: #64748b;
+  --connection-line: #475569;
+  --connection-line-light: #94a3b8;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --shadow-color-light: rgba(0, 0, 0, 0.1);
+}
+
+/* React Flow Base Styles */
+.react-flow__node {
+  border: 2px solid var(--node-border);
+  border-radius: 8px;
+  background: var(--node-primary);
+  padding: 16px;
+  box-shadow: 0 4px 6px var(--shadow-color);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.react-flow__node:hover {
+  border-color: var(--accent-blue);
+  box-shadow: 0 8px 12px var(--shadow-color), 0 0 0 3px rgba(59, 130, 246, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Light mode */
+.light .react-flow__node {
+  background: var(--node-primary-light);
+  border-color: var(--node-border-light);
+  color: var(--text-primary-light);
+  box-shadow: 0 4px 6px var(--shadow-color-light);
+}
+
+/* Node Types */
+.react-flow__node.central {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  border-color: #60a5fa;
+  color: white;
+  font-weight: 600;
+  min-width: 200px;
+}
+
+.react-flow__node.workspace {
+  border-left: 4px solid var(--accent-blue);
+}
+
+.react-flow__node.security {
+  border-left: 4px solid var(--accent-green);
+}
+
+.react-flow__node.storage {
+  border-left: 4px solid var(--accent-amber);
+}
+
+.react-flow__node.transform {
+  border-left: 4px solid #8b5cf6;
+}
+
+/* Edge Styles */
+.react-flow__edge-path {
+  stroke: var(--connection-line);
+  stroke-width: 2px;
+  transition: stroke 0.2s ease;
+}
+
+.light .react-flow__edge-path {
+  stroke: var(--connection-line-light);
+}
+
+.react-flow__edge.animated .react-flow__edge-path {
+  stroke-dasharray: 5;
+  animation: dashdraw 0.5s linear infinite;
+}
+
+.react-flow__edge:hover .react-flow__edge-path {
+  stroke: var(--accent-blue);
+  stroke-width: 3px;
+}
+
+.react-flow__edge-text {
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--text-secondary);
+  background: var(--diagram-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.light .react-flow__edge-text {
+  fill: var(--text-secondary-light);
+  background: var(--diagram-bg-light);
+}
+
+/* Markers (arrows) */
+.react-flow__arrowhead {
+  fill: var(--connection-line);
+}
+
+.light .react-flow__arrowhead {
+  fill: var(--connection-line-light);
+}
+
+/* Architecture Node Components */
+.architecture-node {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 160px;
+}
+
+.architecture-node-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.architecture-node-icon {
+  width: 20px;
+  height: 20px;
+  opacity: 0.8;
+}
+
+.architecture-node-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--node-border);
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+.light .architecture-node-metrics {
+  color: var(--text-secondary-light);
+  border-color: var(--node-border-light);
+}
+
+.architecture-node-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.architecture-node-metric-label {
+  opacity: 0.7;
+}
+
+.architecture-node-metric-value {
+  font-weight: 600;
+  color: var(--accent-blue);
+}
+
+/* Metric Badges (AWS/Azure style) */
+.metric-badge {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.metric-badge.success {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: var(--accent-green);
+}
+
+.metric-badge.warning {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: var(--accent-amber);
+}
+
+.metric-badge.error {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--accent-red);
+}
+
+/* Status Indicators */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.active {
+  background: var(--accent-green);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.status-dot.inactive {
+  background: var(--text-secondary);
+}
+
+.status-dot.error {
+  background: var(--accent-red);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+/* Animations */
+@keyframes dashdraw {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* React Flow Controls */
+.react-flow__controls {
+  background: var(--node-primary);
+  border: 1px solid var(--node-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px var(--shadow-color);
+}
+
+.light .react-flow__controls {
+  background: var(--node-primary-light);
+  border-color: var(--node-border-light);
+  box-shadow: 0 4px 6px var(--shadow-color-light);
+}
+
+.react-flow__controls-button {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--node-border);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.light .react-flow__controls-button {
+  border-color: var(--node-border-light);
+  color: var(--text-primary-light);
+}
+
+.react-flow__controls-button:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--accent-blue);
+}
+
+.react-flow__controls-button:last-child {
+  border-bottom: none;
+}
+
+/* Mini Map */
+.react-flow__minimap {
+  background: var(--node-primary);
+  border: 1px solid var(--node-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px var(--shadow-color);
+}
+
+.light .react-flow__minimap {
+  background: var(--node-primary-light);
+  border-color: var(--node-border-light);
+  box-shadow: 0 4px 6px var(--shadow-color-light);
+}
+
+/* Background Pattern */
+.react-flow__background {
+  background-color: var(--diagram-bg);
+}
+
+.light .react-flow__background {
+  background-color: var(--diagram-bg-light);
+}
+
+.react-flow__background-pattern {
+  stroke: var(--node-border);
+  opacity: 0.3;
+}
+
+.light .react-flow__background-pattern {
+  stroke: var(--node-border-light);
+  opacity: 0.5;
+}
+
+/* Selection Box */
+.react-flow__selection {
+  background: rgba(59, 130, 246, 0.1);
+  border: 2px solid var(--accent-blue);
+}
+
+/* Handle (connection points) */
+.react-flow__handle {
+  width: 10px;
+  height: 10px;
+  background: var(--accent-blue);
+  border: 2px solid var(--node-primary);
+  transition: all 0.2s ease;
+}
+
+.react-flow__handle:hover {
+  width: 14px;
+  height: 14px;
+  background: var(--accent-green);
+}
+
+.light .react-flow__handle {
+  border-color: var(--node-primary-light);
+}

@@ -11,7 +11,7 @@ import {
     Zap,
     Shield
 } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 import SEO from '@/components/common/SEO';
 
 import { technicalCapabilities, deliveryModels } from '@/data/capabilities';

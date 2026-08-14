@@ -3,21 +3,25 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Filter, Maximize2, X } from 'lucide-react';
 import { portfolioProjects, categories } from '@/data/portfolio';
 import ProjectCard from '@/components/portfolio/ProjectCard';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 import {
     Dialog,
     DialogContent,
     DialogTrigger,
     DialogClose,
-} from "@/shared/ui/dialog";
+} from "@/shared/components/dialog";
 import GenericDiscoveryWizard from '@/components/discovery/GenericDiscoveryWizard';
+import { useAuth } from '@/context/AuthContext';
+import { Lock, FileCode, Server } from 'lucide-react';
+import { Badge } from '@/shared/components/badge';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/tabs';
 
 const PortfolioPage = () => {
     const [selectedCategory, setSelectedCategory] = useState('All Projects');
 
     const filteredProjects = selectedCategory === 'All Projects'
         ? portfolioProjects
-        : portfolioProjects.filter(project => project.category === selectedCategory);
+        : portfolioProjects.filter(project => project.categories && project.categories.includes(selectedCategory));
 
     return (
         <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
@@ -108,121 +112,7 @@ const PortfolioPage = () => {
 
                     <div className="space-y-20">
                         {filteredProjects.map((project) => (
-                            <div
-                                key={project.id}
-                                id={project.id}
-                                className="scroll-mt-20"
-                            >
-                                <div className="bg-white dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700 rounded-3xl overflow-hidden shadow-sm dark:shadow-none">
-
-                                    {/* Detailed Image Banner */}
-                                    {project.image && (
-                                        <div className="w-full h-64 md:h-96 relative group bg-slate-900">
-                                            <Dialog>
-                                                <DialogTrigger asChild>
-                                                    <div className="w-full h-full cursor-pointer relative">
-                                                        <img
-                                                            src={project.image}
-                                                            alt={project.title}
-                                                            className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
-                                                        />
-                                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20 backdrop-blur-[2px]">
-                                                            <span className="bg-black/50 text-white px-4 py-2 rounded-full text-base font-medium flex items-center gap-2">
-                                                                <Maximize2 className="w-5 h-5" />
-                                                                View Full Size
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </DialogTrigger>
-                                                <DialogContent className="max-w-7xl w-full p-1 bg-transparent border-none shadow-none text-white overflow-hidden">
-                                                    <div className="relative w-full h-[90vh] flex items-center justify-center">
-                                                        <img
-                                                            src={project.image}
-                                                            alt={project.title}
-                                                            className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
-                                                        />
-                                                        <DialogClose className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors">
-                                                            <X className="w-6 h-6" />
-                                                        </DialogClose>
-                                                    </div>
-                                                </DialogContent>
-                                            </Dialog>
-                                        </div>
-                                    )}
-
-                                    <div className="p-8 md:p-12">
-                                        {/* Header */}
-                                        <div className="mb-8">
-                                            <div className="flex items-center gap-3 mb-4">
-                                                <span className="px-4 py-2 bg-brand-blue/10 text-brand-blue text-sm font-semibold rounded-full border border-brand-blue/20">
-                                                    {project.category}
-                                                </span>
-                                                <span className="text-gray-500 dark:text-gray-400">{project.year}</span>
-                                            </div>
-                                            <h3 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                                                {project.title}
-                                            </h3>
-                                            <p className="text-brand-blue text-lg font-medium">
-                                                Client: {project.client}
-                                            </p>
-                                        </div>
-
-                                        {/* Content Grid */}
-                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                                            {/* Challenge & Solution */}
-                                            <div className="space-y-8">
-                                                <div>
-                                                    <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">The Challenge</h4>
-                                                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{project.challenge}</p>
-                                                </div>
-
-                                                <div>
-                                                    <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Our Solution</h4>
-                                                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{project.solution}</p>
-                                                </div>
-                                            </div>
-
-                                            {/* Results & Tech */}
-                                            <div className="space-y-8">
-                                                <div>
-                                                    <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Results Achieved</h4>
-                                                    <div className="space-y-3">
-                                                        {project.results.map((result, index) => (
-                                                            <div key={index} className="flex items-start gap-3">
-                                                                <div className="w-6 h-6 bg-brand-aqua/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                                                    <div className="w-2 h-2 bg-brand-aqua rounded-full" />
-                                                                </div>
-                                                                <span className="text-gray-600 dark:text-gray-300">{result}</span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                <div>
-                                                    <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Technologies Used</h4>
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {project.technologies.map((tech, index) => (
-                                                            <span
-                                                                key={index}
-                                                                className="px-3 py-1.5 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 text-sm rounded-lg border border-gray-200 dark:border-slate-600"
-                                                            >
-                                                                {tech}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                <div className="pt-4">
-                                                    <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                                                        <span className="font-medium">Duration:</span>
-                                                        <span>{project.duration}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <PortfolioDetailCard key={project.id} project={project} />
                         ))}
                     </div>
 
@@ -270,3 +160,161 @@ const PortfolioPage = () => {
 };
 
 export default PortfolioPage;
+
+const PortfolioDetailCard = ({ project }) => {
+    // Content tabs are handled by the Tabs component intrinsically
+    
+    return (
+        <div id={project.id} className="scroll-mt-20">
+            <div className="bg-white dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700 rounded-3xl overflow-hidden shadow-sm dark:shadow-none">
+                
+                {/* Image Banner */}
+                 {project.image && (
+                    <div className="w-full h-64 md:h-80 relative bg-slate-900">
+                        <img
+                            src={project.image}
+                            alt={project.title}
+                            className="w-full h-full object-cover object-top opacity-90"
+                        />
+                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
+                            <div className="p-8">
+                                <Badge className="bg-brand-blue text-black mb-3 border-none">{project.industry} Case Study</Badge>
+                                <h3 className="text-3xl font-bold text-white">{project.title}</h3>
+                            </div>
+                         </div>
+                    </div>
+                 )}
+
+                <div className="p-8">
+                     <Tabs defaultValue="executive" className="w-full">
+                        <TabsList className="grid w-full grid-cols-3 mb-8 bg-slate-100 dark:bg-slate-900/50 p-1 rounded-xl">
+                            <TabsTrigger value="executive" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm">
+                                Executive Summary
+                            </TabsTrigger>
+                            <TabsTrigger value="architecture" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm flex items-center gap-2">
+                                <Server className="w-4 h-4" /> Architecture
+                            </TabsTrigger>
+                            <TabsTrigger value="implementation" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm flex items-center gap-2">
+                                <FileCode className="w-4 h-4" /> Implementation
+                            </TabsTrigger>
+                        </TabsList>
+
+                        {/* EXECUTIVE VIEW (Public) */}
+                        <TabsContent value="executive" className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                                <div className="space-y-6">
+                                     <div>
+                                        <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">The Challenge</h4>
+                                        <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{project.challenge}</p>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Our Solution</h4>
+                                        <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{project.solution}</p>
+                                    </div>
+                                </div>
+                                <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-xl border border-slate-100 dark:border-slate-800">
+                                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Business Outcomes</h4>
+                                    <ul className="space-y-3">
+                                        {project.results.map((result, i) => (
+                                            <li key={i} className="flex items-start gap-3">
+                                                <div className="w-1.5 h-1.5 bg-brand-aqua rounded-full mt-2 shrink-0" />
+                                                <span className="text-gray-700 dark:text-gray-300">{result}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </TabsContent>
+
+                        {/* ARCHITECTURE VIEW (Public for Demo) */}
+                        <TabsContent value="architecture" className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            {project.architecture ? (
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    <div className="space-y-6">
+                                        <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+                                            <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                                                <Server className="w-5 h-5 text-indigo-500" /> System Design
+                                            </h4>
+                                            <p className="text-gray-600 dark:text-gray-300 mb-6">{project.architecture.summary}</p>
+                                            
+                                            <div className="space-y-4">
+                                                {project.architecture.components.map((comp, i) => (
+                                                    <div key={i} className="flex gap-4 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700 shadow-sm">
+                                                        <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-sm shrink-0">
+                                                            {i + 1}
+                                                        </div>
+                                                        <div>
+                                                            <h5 className="font-semibold text-gray-900 dark:text-white text-sm">{comp.name}</h5>
+                                                            <p className="text-xs text-gray-500 dark:text-gray-400 leading-snug">{comp.desc}</p>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Mock Diagram Placeholder */}
+                                    <div className="bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-center min-h-[300px] relative overflow-hidden group">
+                                        <div className="absolute inset-0 bg-grid-slate-200/50 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:bg-grid-slate-700/25" />
+                                        <img 
+                                            src={project.architecture.diagram} 
+                                            alt="Architecture Diagram"
+                                            className="max-w-[80%] max-h-[80%] shadow-2xl rounded border border-slate-200 dark:border-slate-700 bg-white"
+                                            onError={(e) => {
+                                                e.target.style.display = 'none';
+                                                e.target.nextSibling.style.display = 'flex';
+                                            }}
+                                        />
+                                        <div className="hidden absolute inset-0 flex-col items-center justify-center text-slate-400">
+                                            <Server className="w-16 h-16 mb-4 opacity-20" />
+                                            <p>Architecture Diagram Visual</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="p-12 text-center text-slate-500">Architecture details pending...</div>
+                            )}
+                        </TabsContent>
+
+                        {/* IMPLEMENTATION VIEW (Public for Demo) */}
+                         <TabsContent value="implementation" className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            {project.implementation ? (
+                                <div className="space-y-6">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-lg font-bold flex items-center gap-2">
+                                            <FileCode className="w-5 h-5 text-emerald-500" /> Implementation Patterns
+                                        </h3>
+                                        <Badge variant="outline" className="font-mono text-xs">Verified Code</Badge>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                        {project.implementation.files.map((file, i) => (
+                                            <div key={i} className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700 shadow-lg flex flex-col">
+                                                <div className="px-4 py-2 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+                                                    <span className="font-mono text-xs text-slate-400">{file.name}</span>
+                                                    <span className="text-[10px] text-slate-500 uppercase">{file.lang}</span>
+                                                </div>
+                                                <div className="p-4 overflow-x-auto flex-1">
+                                                    <pre className="text-xs font-mono text-emerald-300 leading-relaxed">
+                                                        <code>{file.code}</code>
+                                                    </pre>
+                                                </div>
+                                                <div className="px-4 py-2 bg-slate-900/50 border-t border-slate-800 text-[10px] text-slate-500 flex justify-end gap-2">
+                                                    <button className="hover:text-white transition-colors">Copy</button>
+                                                    <button className="hover:text-white transition-colors">Raw</button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="p-12 text-center text-slate-500">Implementation details pending...</div>
+                            )}
+                        </TabsContent>
+
+                     </Tabs>
+                </div>
+            </div>
+        </div>
+    );
+};

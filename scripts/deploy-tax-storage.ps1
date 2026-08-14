@@ -3,15 +3,21 @@
 
 $ErrorActionPreference = "Stop"
 
-# Load environment variables
-$envFile = Join-Path $PSScriptRoot ".." ".env"
-if (Test-Path $envFile) {
-    Get-Content $envFile | ForEach-Object {
-        if ($_ -match '^\s*([^#][^=]+)=(.*)$') {
-            $key = $matches[1].Trim()
-            $value = $matches[2].Trim()
-            [Environment]::SetEnvironmentVariable($key, $value, "Process")
-        }
+# Load environment variables (local only: prefer .env.test, then .env — never committed)
+$root = Resolve-Path (Join-Path $PSScriptRoot "..")
+$envFile = $null
+foreach ($c in @((Join-Path $root '.env.test'), (Join-Path $root '.env'))) {
+    if (Test-Path $c) { $envFile = $c; break }
+}
+if (-not $envFile) {
+    Write-Error "Missing .env.test or .env at repo root. Copy .env.example to .env.test and fill values."
+    exit 1
+}
+Get-Content $envFile | ForEach-Object {
+    if ($_ -match '^\s*([^#][^=]+)=(.*)$') {
+        $key = $matches[1].Trim()
+        $value = $matches[2].Trim()
+        [Environment]::SetEnvironmentVariable($key, $value, "Process")
     }
 }
 
@@ -21,7 +27,7 @@ $serviceRoleKey = $env:VITE_SUPABASE_SERVICE_ROLE_KEY_TEST
 $dbPassword = $env:VITE_SUPABASE_DB_PASSWORD_TEST
 
 if (-not $supabaseUrl -or -not $serviceRoleKey) {
-    Write-Error "Missing Supabase credentials in .env file"
+    Write-Error "Missing Supabase credentials in .env.test (or .env)"
     exit 1
 }
 
@@ -29,7 +35,7 @@ Write-Host "Deploying tax storage setup to TEST database..." -ForegroundColor Cy
 Write-Host "Supabase URL: $supabaseUrl" -ForegroundColor Gray
 
 # Read the SQL file
-$sqlFile = Join-Path $PSScriptRoot ".." "supabase_tax_storage_setup.sql"
+$sqlFile = Join-Path $PSScriptRoot ".." "supabase\sql\supabase_tax_storage_setup.sql"
 $sqlContent = Get-Content $sqlFile -Raw
 
 # Execute SQL using Supabase REST API

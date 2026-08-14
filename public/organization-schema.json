@@ -3,7 +3,7 @@
     "@type": "Organization",
     "name": "CloudBaud",
     "url": "https://cloudbaud.com",
-    "logo": "https://cloudbaud.com/logo.png",
+    "logo": "https://cloudbaud.com/cloudbaud_logo_clean_1769644805025.png",
     "description": "CloudBaud delivers enterprise solutions architecture, AI engineering, cloud migration, and DevOps automation services.",
     "foundingDate": "2017",
     "address": {
@@ -13,7 +13,8 @@
     "contactPoint": {
         "@type": "ContactPoint",
         "contactType": "Sales",
-        "email": "contact@cloudbaud.com"
+        "email": "contact@cloudbaud.com",
+        "telephone": "+1-425-749-2101"
     },
     "sameAs": [
         "https://www.linkedin.com/company/cloudbaud"

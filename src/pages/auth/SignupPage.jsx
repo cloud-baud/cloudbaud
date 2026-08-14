@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Lock, User, Phone, CheckCircle, ArrowRight } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/components/button';
 import PrivacyConsent from '@/components/common/PrivacyConsent';
 import SEO from '@/components/common/SEO';
 import SocialAuthButtons from '@/components/auth/SocialAuthButtons';
@@ -44,7 +44,11 @@ const SignupPage = () => {
             toast.success('Account created! Please check your email.');
         } catch (error) {
             console.error(error);
-            toast.error(error.message || 'Failed to sign up');
+            if (error.status === 500 || error.message?.includes("500")) {
+                toast.error("Account created, but verification email failed to send. Supabase free tier limits emails to 3/hour. Please try logging in directly in 1 hour.");
+            } else {
+                toast.error(error.message || 'Failed to sign up');
+            }
         }
     };
 
