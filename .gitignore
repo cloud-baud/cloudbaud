@@ -12,3 +12,7 @@ src/data
 *.zip
 *.pdf
 .venv
+
+data/emails/
+dist-finance/
+dist/
