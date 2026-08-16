@@ -15,7 +15,7 @@ import WorkspaceChat from '../WorkspaceChat';
 import OllamaChatPanel from '../OllamaChatPanel';
 import { 
     updateTaxCell, 
-} from '../../services/taxService';
+} from '../../workspace/finance/api/taxService';
 
 // Initial Data
 const INITIAL_YEARS = [2025,2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];

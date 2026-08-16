@@ -318,7 +318,7 @@ const TaxDashboard = () => {
             setIsLoading(true);
             try {
                 // 1. Fetch Chart of Accounts & Returns
-                const { getChartOfAccounts, getTaxEntries, getYearReturns } = await import('@/services/taxService');
+                const { getChartOfAccounts, getTaxEntries, getYearReturns } = await import('@/workspace/finance/api/taxService');
                 const accounts = await getChartOfAccounts();
                 const returns = await getYearReturns();
                 setYearReturns(returns || {});
@@ -433,7 +433,7 @@ const TaxDashboard = () => {
             
             // Upload to Supabase
             try {
-                const { uploadTaxDocument } = await import('@/services/taxService');
+                const { uploadTaxDocument } = await import('@/workspace/finance/api/taxService');
                 const doc = await uploadTaxDocument(file, { year: focusedYear, type: 'RETURN' });
                 // We'd ideally store the remote URL or doc ID now
                 console.log("Uploaded Return:", doc);
@@ -469,7 +469,7 @@ const TaxDashboard = () => {
 
             // Upload & Link in Supabase
             try {
-                const { uploadTaxDocument, linkDocumentToCell } = await import('@/services/taxService');
+                const { uploadTaxDocument, linkDocumentToCell } = await import('@/workspace/finance/api/taxService');
                 // 1. Upload
                 const doc = await uploadTaxDocument(file, { type: 'SUPPORTING' });
                 // 2. Link
