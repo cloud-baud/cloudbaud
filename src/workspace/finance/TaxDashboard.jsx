@@ -82,7 +82,7 @@ const INITIAL_DATA = [
 ];
 
 const formatCurrency = (amount) => {
-    if (amount === undefined || amount === null) return <span className="text-muted-foreground/50">-</span>;
+    if (amount === undefined || amount === null) return <span className="text-slate-600/50">-</span>;
     const isNegative = amount < 0;
     const absAmount = Math.abs(amount).toLocaleString('en-US', {
         style: 'currency',
@@ -123,7 +123,7 @@ const EditableCell = ({ value, onSave, type = 'text', formatter, className, isLo
 
     if (isLocked) {
         return (
-            <div className={cn("w-full h-full flex items-center bg-muted/50 text-muted-foreground cursor-not-allowed select-none", className)}>
+            <div className={cn("w-full h-full flex items-center bg-muted/50 text-slate-600 cursor-not-allowed select-none", className)}>
                 <Lock className="size-3 mr-1 opacity-50" />
                 {formatter ? formatter(value) : (value || '')}
             </div>
@@ -152,7 +152,7 @@ const EditableCell = ({ value, onSave, type = 'text', formatter, className, isLo
             className={cn("w-full h-full cursor-text min-h-[20px] flex items-center", className)}
             title="Click to edit"
         >
-            {formatter ? formatter(value) : (value || <span className="text-muted-foreground/50 italic text-xs">Empty</span>)}
+            {formatter ? formatter(value) : (value || <span className="text-slate-600/50 italic text-xs">Empty</span>)}
         </div>
     );
 };
@@ -164,7 +164,7 @@ const RibbonBtn = ({ icon, label, onClick, className }) => {
             type="button"
             onClick={onClick}
             className={cn(
-                "flex flex-col items-center justify-center p-2 h-16 min-w-[64px] rounded-md hover:bg-accent text-muted-foreground hover:text-primary transition-colors gap-1",
+                "flex flex-col items-center justify-center p-2 h-16 min-w-[64px] rounded-md hover:bg-accent text-slate-600 hover:text-primary transition-colors gap-1",
                 className
             )}
         >

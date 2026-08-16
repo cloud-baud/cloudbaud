@@ -14,8 +14,8 @@ BEGIN
     END IF;
 
     -- Only populate if empty to avoid overwriting or duplicating
-    IF NOT EXISTS (SELECT 1 FROM public.chart_of_accounts WHERE user_id = v_user_id) THEN
-        INSERT INTO public.chart_of_accounts (user_id, name, code, type, section, sort_order)
+    IF NOT EXISTS (SELECT 1 FROM finance.chart_of_accounts WHERE user_id = v_user_id) THEN
+        INSERT INTO finance.chart_of_accounts (user_id, name, code, type, section, sort_order)
         VALUES 
             -- ASSETS (1000-1999)
             -- 1000 Current Assets
@@ -112,3 +112,4 @@ END;
 $$;
 
 GRANT EXECUTE ON FUNCTION public.populate_default_coa TO authenticated;
+

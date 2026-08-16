@@ -17,12 +17,4 @@ export default defineConfig({
     port: 17118,
     strictPort: true,
   },
-  build: {
-    outDir: 'dist',
-    rollupOptions: {
-      input: {
-        finance: path.resolve(__dirname, 'src/workspace/finance/finance.html'),
-      },
-    },
-  },
 })
