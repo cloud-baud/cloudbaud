@@ -1,10 +1,43 @@
-import { StrictMode } from 'react'
+import { StrictMode, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { HelmetProvider } from 'react-helmet-async'
 import { BrowserRouter, Routes, Route, NavLink, Link, useLocation } from 'react-router-dom'
 import '@/index.css'
 import FinanceApp from './FinanceApp'
 import InvitePage from './pages/InvitePage'
+import { setViewAs, VIEW_AS_KEY } from './api/taxService'
+
+/**
+ * On initial load, check for ?viewAs=<userId> query parameter
+ * (injected by the parent app's iframe src) and sync to localStorage.
+ * Also listen for postMessage VIEW_AS_CHANGE from the parent app.
+ */
+const ViewAsSync = () => {
+  useEffect(() => {
+    // 1. Parse ?viewAs= from URL on initial load
+    const params = new URLSearchParams(window.location.search)
+    const viewAsParam = params.get('viewAs')
+    if (viewAsParam) {
+      setViewAs(viewAsParam)
+    }
+  }, []) // only on mount
+
+  useEffect(() => {
+    // 2. Listen for postMessage from the parent iframe host
+    const handler = (event) => {
+      if (event.data?.type === 'VIEW_AS_CHANGE') {
+        const userId = event.data.userId || ''
+        setViewAs(userId)
+        // Reload the page to re-fetch all data with the new identity
+        window.location.reload()
+      }
+    }
+    window.addEventListener('message', handler)
+    return () => window.removeEventListener('message', handler)
+  }, [])
+
+  return null
+}
 
 const FinanceNav = () => {
   const location = useLocation()
@@ -54,20 +87,25 @@ const FinanceNav = () => {
   )
 }
 
-const AppLayout = () => (
-  <div className="flex h-screen bg-[#0b0f19] overflow-hidden">
-    <FinanceNav />
-    <main className="flex-1 overflow-auto bg-[#f8fafc] dark:bg-[#0b0f19] relative">
-      {/* Fix for ribbon visibility - force light theme toolbar to be readable */}
-      <style>{`
-        /* Force tax dashboard ribbon to be visible on light bg */
-        button, [role="button"] { color: inherit; }
-        .bg-white .text-white\\/50, .bg-white .text-white { color: rgb(71 85 105) !important; }
-      `}</style>
-      <FinanceApp />
-    </main>
-  </div>
-)
+const AppLayout = () => {
+  const isEmbedded = typeof window !== 'undefined' && (window.self !== window.top || window.location.search.includes('embedded=true'));
+
+  return (
+    <div className="flex h-screen bg-[#0b0f19] overflow-hidden">
+      {!isEmbedded && <FinanceNav />}
+      <main className="flex-1 overflow-auto bg-[#f8fafc] dark:bg-[#0b0f19] relative">
+        {/* Fix for ribbon visibility - force light theme toolbar to be readable */}
+        <style>{`
+          /* Force tax dashboard ribbon to be visible on light bg */
+          button, [role="button"] { color: inherit; }
+          .bg-white .text-white\\/50, .bg-white .text-white { color: rgb(71 85 105) !important; }
+        `}</style>
+        <ViewAsSync />
+        <FinanceApp />
+      </main>
+    </div>
+  );
+};
 
 const root = createRoot(document.getElementById('root'))
 root.render(
@@ -84,3 +122,4 @@ root.render(
     </HelmetProvider>
   </StrictMode>
 )
+

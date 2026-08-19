@@ -10,7 +10,7 @@ import {
 import { Ribbon, RibbonButton, RibbonSeparator, RibbonGroup } from 'synolic.core';
 
 // ── Document Index by Year ──
-const DOC_BASE = '/src/data/Documents - Taxes';
+const DOC_BASE = '/src/workspace/data/Documents - Taxes';
 
 const YEAR_DOCUMENTS = {
     2017: {
@@ -119,7 +119,7 @@ const YEAR_DOCUMENTS = {
     },
     2022: {
         docs: [
-            { id: 'w2',       short: 'W-2',       label: 'W-2 from employer',               status: 'tracked', file: 'Deepika W2 2022.pdf' },
+            { id: 'w2',       short: 'W-2',       label: 'W-2 from employer',               status: 'empty',   file: null },
             { id: '1099nec',  short: '1099-NEC',   label: '1099-NEC (Consulting)',            status: 'empty',   file: null },
             { id: '1099b',    short: '1099-B',     label: '1099-B (stock/brokerage)',         status: 'empty',   file: null },
             { id: '1099int',  short: '1099-INT',   label: '1099-INT/DIV (bank interest)',     status: 'empty',   file: null },

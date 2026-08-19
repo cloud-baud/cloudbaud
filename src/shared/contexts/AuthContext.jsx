@@ -8,6 +8,13 @@ export const useAuth = () => {
   return ctx
 }
 
+const DEV_USER = {
+  id: '0c04376e-2bdf-4d6e-9d59-f21feac9b8a4',
+  email: 'jish.nath@cloudbaud.com',
+  user_metadata: { full_name: 'Jishnu Nath' },
+  role: 'authenticated'
+}
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [session, setSession] = useState(null)
@@ -16,13 +23,13 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     supabaseAuth.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
-      setUser(session?.user?? null)
+      setUser(session?.user || (import.meta.env.DEV ? DEV_USER : null))
       setLoading(false)
     })
     const { data: { subscription } } = supabaseAuth.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session)
-        setUser(session?.user?? null)
+        setUser(session?.user || (import.meta.env.DEV ? DEV_USER : null))
         setLoading(false)
       }
     )

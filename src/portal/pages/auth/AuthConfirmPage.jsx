@@ -7,6 +7,7 @@ const AuthConfirmPage = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState('Verifying your sign-in link...');
   const [error, setError] = useState('');
+  const isDev = import.meta.env.DEV;
 
   useEffect(() => {
     const run = async () => {
@@ -18,7 +19,6 @@ const AuthConfirmPage = () => {
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const hasAccessToken = hashParams.has('access_token');
 
-        // Flow 1: PKCE?code=
         if (code) {
           const { error } = await supabaseAuth.auth.exchangeCodeForSession(code);
           if (error) throw error;
@@ -26,15 +26,12 @@ const AuthConfirmPage = () => {
           return;
         }
 
-        // Flow 2: Implicit - hash has #access_token (what you have now)
         if (hasAccessToken) {
-          // detectSessionInUrl already parsed the hash, just wait for session
           const { data: { session } } = await supabaseAuth.auth.getSession();
           if (session) {
             navigate('/collaboration', { replace: true });
             return;
           }
-          // fallback - give it a second
           setTimeout(async () => {
             const { data } = await supabaseAuth.auth.getSession();
             if (data.session) navigate('/collaboration', { replace: true });
@@ -42,7 +39,6 @@ const AuthConfirmPage = () => {
           return;
         }
 
-        // Flow 3: token_hash manual verify
         if (tokenHash) {
           const { error: verifyError } = await supabaseAuth.auth.verifyOtp({
             token_hash: tokenHash,
@@ -72,8 +68,11 @@ const AuthConfirmPage = () => {
         {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
         {error && (
           <Link to="/login" className="inline-block mt-4 text-sm text-white/60 hover:text-white">
-            Back to Login (localhost:17117)
+            {isDev ? 'Back to Login (localhost:17117)' : 'Back to Login'}
           </Link>
+        )}
+        {isDev && error && (
+          <p className="mt-2 text-[10px] text-white/30">Debug: check console for full error</p>
         )}
       </div>
     </div>

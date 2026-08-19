@@ -184,3 +184,27 @@ export const setViewAs = (userId) => {
 export const getViewAs = () => {
   try { return localStorage.getItem(VIEW_AS_KEY); } catch { return null; }
 };
+
+export const uploadTaxDocument = async (file, year, categoryId = null) => {
+  const userId = await getEffectiveUserId();
+  const filePath = `${userId}/${year}/${Date.now()}_${file.name}`;
+  const { error: upErr } = await supabaseAuth.storage.from('tax-docs').upload(filePath, file);
+  if (upErr) throw upErr;
+  const { data, error: dbErr } = await supabaseAuth.from('tax_documents').insert({
+    user_id: userId,
+    year,
+    category_id: categoryId,
+    file_name: file.name,
+    storage_path: filePath,
+    file_size: file.size,
+    mime_type: file.type,
+  }).select().single();
+  if (dbErr) throw dbErr;
+  return data;
+};
+
+export const linkDocumentToCell = async (docId, categoryId, year) => {
+  const { error } = await supabaseAuth.from('tax_documents').update({ category_id: categoryId, year }).eq('id', docId);
+  if (error) throw error;
+  return true;
+};

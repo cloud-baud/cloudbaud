@@ -15,7 +15,9 @@ const ProtectedRoute = () => {
         );
     }
 
-    if (!user) {
+    const isDev = import.meta.env.DEV;
+
+    if (!user && !isDev) {
         return <Navigate to="/login" replace />;
     }
 

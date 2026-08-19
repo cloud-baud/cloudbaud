@@ -13,8 +13,13 @@ import { Separator } from '@/shared/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import WorkspaceChat from '../WorkspaceChat';
 import OllamaChatPanel from '../OllamaChatPanel';
-import { 
-    updateTaxCell, 
+import {
+  getChartOfAccounts,
+  getTaxEntries,
+  getYearReturns,
+  getMyDocuments,
+  uploadTaxDocument,
+  linkDocumentToCell,
 } from './api/taxService';
 
 // Initial Data
@@ -318,7 +323,7 @@ const TaxDashboard = () => {
             setIsLoading(true);
             try {
                 // 1. Fetch Chart of Accounts & Returns
-                const { getChartOfAccounts, getTaxEntries, getYearReturns } = await import('./api/taxService');
+                // static import - using top-level imports
                 const accounts = await getChartOfAccounts();
                 const returns = await getYearReturns();
                 setYearReturns(returns || {});
@@ -433,7 +438,7 @@ const TaxDashboard = () => {
             
             // Upload to Supabase
             try {
-                const { uploadTaxDocument } = await import('./api/taxService');
+                // now statically imported
                 const doc = await uploadTaxDocument(file, { year: focusedYear, type: 'RETURN' });
                 // We'd ideally store the remote URL or doc ID now
                 console.log("Uploaded Return:", doc);
@@ -469,7 +474,7 @@ const TaxDashboard = () => {
 
             // Upload & Link in Supabase
             try {
-                const { uploadTaxDocument, linkDocumentToCell } = await import('./api/taxService');
+                // now statically imported
                 // 1. Upload
                 const doc = await uploadTaxDocument(file, { type: 'SUPPORTING' });
                 // 2. Link
@@ -1458,6 +1463,7 @@ const TaxDashboardWithBoundary = (props) => (
 );
 
 export default TaxDashboardWithBoundary;
+
 
 
 

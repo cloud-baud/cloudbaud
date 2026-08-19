@@ -35,8 +35,8 @@ const INITIAL_DATA = [
         id: 'w2',
         title: 'INCOME',
         rows: [
-            { code: 'w2_wages', label: 'W2 Wages', values: { 2024: 0, 2023: 0, 2022: 37995.76, 2021: 49793.32, 2020: 69549.66, 2019: 84444.89, 2018: 70399.57, 2017: 63132.46 } },
-            { code: 'w2_withheld', label: 'Taxes Withheld', values: { 2024: 0, 2023: 0, 2022: 4063.44, 2021: 5834.02, 2020: 10423.75, 2019: 12386.28, 2018: 7675.56, 2017: 7909.36 } },
+            { code: 'w2_wages', label: 'W2 Wages', values: { 2024: 0, 2023: 59110.59, 2022: 0, 2021: 49793.32, 2020: 69549.66, 2019: 84444.89, 2018: 70399.57, 2017: 63132.46 } },
+            { code: 'w2_withheld', label: 'Taxes Withheld', values: { 2024: 0, 2023: 8005.09, 2022: 0, 2021: 5834.02, 2020: 10423.75, 2019: 12386.28, 2018: 7675.56, 2017: 7909.36 } },
             { label: '2. Income: 1099-NEC (CloudBaud Consulting)', values: {} },
             { label: '3. Income: 1099-B (Stock Sales/Cost Basis)', values: {} },
             { label: '4. Income: 1099-INT/DIV (Interest/Dividends)', values: {} },
@@ -1995,3 +1995,4 @@ const TaxMultiYearSummaryWithBoundary = (props) => (
 );
 
 export default TaxMultiYearSummaryWithBoundary;
+

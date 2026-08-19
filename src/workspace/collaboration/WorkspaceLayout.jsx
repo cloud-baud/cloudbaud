@@ -24,7 +24,9 @@ import {
     LayoutDashboard,
     Megaphone,
     Rocket,
-    Server
+    Server,
+    Eye,
+    Sparkles
 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
@@ -33,6 +35,7 @@ import { Separator } from '@radix-ui/react-separator';
 import { cn } from '@/shared/lib/utils';
 import CloudBaudLogo from '@/components/common/CloudBaudLogo';
 import { useAuth } from '@/shared/contexts/AuthContext';
+import { useViewAs } from '../finance/ViewAsContext';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -43,7 +46,6 @@ import {
 } from '@/shared/ui/dropdown-menu';
 import ThemeToggle from '@/components/layout/ThemeToggle';
 import OllamaChatPanel from './OllamaChatPanel';
-import { Sparkles } from 'lucide-react'; // Import icon for the trigger button
 
 // Icon Mapping for Dynamic Navigation
 const ICON_MAP = {
@@ -119,6 +121,7 @@ const operationsApps = [
 
 const WorkspaceLayout = () => {
     const { user, signOut } = useAuth();
+    const { viewAsId, activePersona, isViewingAs, setViewAs, clearViewAs, personas } = useViewAs();
     const [isChatOpen, setIsChatOpen] = useState(false); // State for chat panel
     const location = useLocation();
     const isInboxRoute = location.pathname === '/collaboration/inbox';
@@ -277,12 +280,66 @@ const WorkspaceLayout = () => {
 
                     <ThemeToggle />
 
+                    {/* SharePoint-Style Top-Right "View As" Pill */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button
+                                className={cn(
+                                    "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors border",
+                                    isViewingAs
+                                        ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/25"
+                                        : "bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10"
+                                )}
+                                title="Switch Persona / View As"
+                            >
+                                <Eye className="size-3.5" />
+                                <span>{isViewingAs ? `Viewing as: ${activePersona.name}` : 'View As'}</span>
+                                <ChevronDown className="size-3 opacity-60" />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-64">
+                            <DropdownMenuLabel className="flex items-center gap-1.5 text-xs text-slate-400">
+                                <Eye className="size-3.5" />
+                                <span>View As Persona</span>
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {personas.map((p) => (
+                                <DropdownMenuItem
+                                    key={p.id}
+                                    onClick={() => setViewAs(p.id)}
+                                    className={cn(
+                                        "flex items-center justify-between cursor-pointer text-xs py-2",
+                                        p.id === viewAsId && "bg-brand-blue/10 text-brand-blue font-semibold"
+                                    )}
+                                >
+                                    <div className="flex flex-col">
+                                        <span className="font-medium">{p.name}</span>
+                                        <span className="text-[10px] text-slate-400">{p.role}</span>
+                                    </div>
+                                    {p.id === viewAsId && <span className="text-brand-blue font-bold ml-2">✓</span>}
+                                </DropdownMenuItem>
+                            ))}
+                            {isViewingAs && (
+                                <>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem onClick={clearViewAs} className="text-xs text-slate-400 hover:text-white cursor-pointer">
+                                        Reset to Default (Owner)
+                                    </DropdownMenuItem>
+                                </>
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
                     <div className="h-6 w-px bg-border mx-1" />
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <div className="flex items-center gap-3 cursor-pointer hover:bg-white/10 p-1.5 pr-2 rounded-full transition-colors border border-transparent">
-                                {user?.user_metadata?.avatar_url ? (
+                                {isViewingAs ? (
+                                    <div className="size-8 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold text-xs shadow-md ring-2 ring-emerald-400/50">
+                                        {activePersona.initials}
+                                    </div>
+                                ) : user?.user_metadata?.avatar_url ? (
                                     <div className="size-8 rounded-full overflow-hidden border border-slate-700">
                                         <img src={user.user_metadata.avatar_url} alt="User" className="h-full w-full object-cover" />
                                     </div>
@@ -300,14 +357,48 @@ const WorkspaceLayout = () => {
                                 )}
                                 <div className="text-left hidden sm:block">
                                     <div className="text-sm font-semibold leading-none text-slate-200">
-                                        {user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User'}
+                                        {isViewingAs
+                                            ? activePersona.name
+                                            : (user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User')}
                                     </div>
+                                    {isViewingAs && (
+                                        <div className="text-[10px] text-emerald-400 font-medium mt-0.5">
+                                            {activePersona.role}
+                                        </div>
+                                    )}
                                 </div>
                                 <ChevronRight className="rotate-90 text-slate-500 w-3.5 h-3.5 ml-0.5" />
                             </div>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56">
-                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                        <DropdownMenuContent align="end" className="w-60">
+                            <DropdownMenuLabel>
+                                {isViewingAs ? (
+                                    <div className="flex flex-col">
+                                        <span className="font-semibold text-emerald-400">Viewing as {activePersona.name}</span>
+                                        <span className="text-[10px] text-slate-400">{activePersona.role}</span>
+                                    </div>
+                                ) : 'My Account'}
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+
+                            <DropdownMenuLabel className="flex items-center gap-1.5 text-xs text-slate-400 font-normal">
+                                <Eye className="size-3.5" />
+                                <span>Switch Persona</span>
+                            </DropdownMenuLabel>
+                            {personas.map((p) => (
+                                <DropdownMenuItem
+                                    key={p.id}
+                                    onClick={() => setViewAs(p.id)}
+                                    className={cn(
+                                        "flex items-center justify-between cursor-pointer text-xs",
+                                        p.id === viewAsId && "bg-brand-blue/10 text-brand-blue font-semibold"
+                                    )}
+                                >
+                                    <span>{p.name}</span>
+                                    {p.id === viewAsId && <span className="text-brand-blue font-bold">✓</span>}
+                                </DropdownMenuItem>
+                            ))}
+
                             <DropdownMenuSeparator />
 
                             <DropdownMenuItem onClick={() => window.location.href = '/collaboration/settings'}>
@@ -413,16 +504,16 @@ const WorkspaceLayout = () => {
                     </div>
                 </main>
 
-                {/* Docked Persistent CloudBot Panel */}
+                {/* Docked Persistent CloudBot Panel - Expand / Collapse at will */}
                 <aside
                     className={cn(
-                        "flex-shrink-0 flex flex-col pt-6 pb-4 pr-4 lg:pr-6 bg-transparent h-full transition-all duration-300 ease-in-out overflow-hidden",
-                        isChatOpen ? "w-[400px]" : "w-[88px]"
+                        "flex-shrink-0 flex flex-col bg-transparent h-full transition-all duration-300 ease-in-out overflow-hidden",
+                        isChatOpen ? "w-[400px] pt-6 pb-4 pr-4 lg:pr-6 opacity-100" : "w-0 p-0 m-0 border-0 opacity-0 pointer-events-none"
                     )}
                 >
                     <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden flex-1 flex flex-col relative ml-2">
                         <OllamaChatPanel 
-                            isOpen={true} 
+                            isOpen={isChatOpen} 
                             isCollapsed={!isChatOpen}
                             onToggleCollapse={() => setIsChatOpen(!isChatOpen)}
                             variant="docked" 
@@ -435,7 +526,7 @@ const WorkspaceLayout = () => {
 };
 
 // Helper Components
-const TopNavItem = ({ to, icon: Icon, label, exact }) => (
+const TopNavItem = ({ to, icon: IconComponent, label, exact }) => (
     <NavLink
         to={to}
         end={exact}
@@ -450,7 +541,9 @@ const TopNavItem = ({ to, icon: Icon, label, exact }) => (
     >
         {({ isActive }) => (
             <>
-                <Icon className={cn("size-5 mb-0.5 transition-colors", isActive ? "text-brand-blue" : "text-slate-400 group-hover:text-white")} />
+                {IconComponent && (
+                    <IconComponent className={cn("size-5 mb-0.5 transition-colors", isActive ? "text-brand-blue" : "text-slate-400 group-hover:text-white")} />
+                )}
                 <span className="whitespace-nowrap">{label}</span>
                 {isActive && <div className="absolute bottom-0 h-0.5 w-[20px] bg-brand-blue rounded-t-full opacity-80" />}
             </>

@@ -87,7 +87,7 @@ const EditableCell = ({ value, onSave, type = 'number', formatter, className, is
 };
 
 // Document base path for 2017
-const DOC_BASE = '/src/data/Documents - Taxes/2017/';
+const DOC_BASE = '/src/workspace/data/Documents - Taxes/2017/';
 
 const TAX_DATA_BY_YEAR = {
     2017: {
@@ -1810,3 +1810,4 @@ const TaxSingleYear = () => {
 };
 
 export default TaxSingleYear;
+
