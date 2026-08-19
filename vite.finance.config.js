@@ -2,9 +2,10 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
-import { execSync } from 'child_process';
+import { fileURLToPath } from 'url'
 
-try { execSync('npx --yes kill-port 17118', { stdio: 'ignore' }); } catch {}
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
@@ -18,11 +19,10 @@ export default defineConfig({
     strictPort: true,
   },
   build: {
-    outDir: 'dist',
+    outDir: 'dist-finance',
+    emptyOutDir: true,
     rollupOptions: {
-      input: {
-        finance: path.resolve(__dirname, 'src/workspace/finance/finance.html'),
-      },
+      input: path.resolve(__dirname, 'finance.html'),
     },
   },
 })

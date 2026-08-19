@@ -1,5 +1,6 @@
 [build]
-  publish = "dist"
+  command = "npm run build:finance"
+  publish = "dist-finance"
   functions = "netlify/functions"
 
 [[redirects]]

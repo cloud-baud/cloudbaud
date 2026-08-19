@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import FinanceThreePane from './FinanceThreePane';
 import TaxDashboard from './TaxDashboard';
 import Accounting from './Accounting';
 import Bookkeeping from './Bookkeeping';
@@ -9,13 +10,13 @@ export default function FinanceApp() {
   return (
     <Routes>
       <Route path="invite/:token" element={<InvitePage />} />
-      <Route index element={<TaxDashboard />} />
-      <Route path="taxes" element={<TaxDashboard />} />
-      <Route path="taxes/*" element={<TaxDashboard />} />
-      <Route path="bookkeeping" element={<Bookkeeping />} />
-      <Route path="accounting" element={<Accounting />} />
-      <Route path="coa" element={<Accounting />} />
-      <Route path="*" element={<Navigate to="taxes" replace />} />
+      <Route index element={<FinanceThreePane />} />
+      <Route path="taxes" element={<FinanceThreePane />} />
+      <Route path="accounting" element={<FinanceThreePane />} />
+      <Route path="bookkeeping" element={<FinanceThreePane />} />
+      <Route path="standalone/taxes" element={<TaxDashboard />} />
+      <Route path="standalone/accounting" element={<Accounting />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

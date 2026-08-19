@@ -8,7 +8,7 @@
     "dev:finance": "npx --yes kill-port 17118 && vite --config vite.finance.config.js --mode test",
     "dev": "npx --yes concurrently --kill-others --names \"portal,finance\" --prefix-colors \"blue,magenta\" \"npm run dev:main\" \"npm run dev:finance\"",
     "build": "vite build",
-    "build:finance": "vite build --config vite.finance.config.js",
+    "build:finance": "vite build --config vite.finance.config.js && node -e \"const fs=require('fs'); const out='dist-finance'; if(fs.existsSync(out+'/finance.html')){fs.copyFileSync(out+'/finance.html', out+'/index.html'); console.log('copied finance.html -> index.html in '+out)}\"",
     "build:all": "npm run build && npm run build:finance",
     "build:local": "vite build --mode test",
     "deploy": "npm run build:all && npx netlify deploy --prod",
