@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   FileText,
   Plus,
@@ -8,16 +8,15 @@ import {
   XCircle,
   Clock,
   ArrowLeft,
-  ZoomIn,
-  ZoomOut,
   MessageSquare,
-  ShieldCheck,
   Eye,
   Download,
   AlertTriangle,
-  Upload
+  Upload,
+  Loader2
 } from 'lucide-react';
 import SpreadsheetPreview from './SpreadsheetPreview';
+import { uploadTaxDocument } from '../api/taxService';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ACCURATE TAX DOCUMENTS REGISTRY BY YEAR
@@ -36,6 +35,7 @@ export const TAX_DOCUMENTS_BY_YEAR = {
     { id: 'doc_2023_nri', name: 'NRI_Essentials_AnnualReport_PaymentReceipt.pdf', category: 'Professional Services / CPA', payer: 'NRI Essentials', amount: 3500.00, type: 'PDF', status: 'verified', hasFile: true, pages: 2 },
   ],
   2022: [
+    { id: 'doc_2022_w2', name: 'Form W-2 (Deepika)', category: 'W2 Wages', payer: 'Employer', amount: 0, type: 'PDF', status: 'needs_upload', hasFile: false },
     { id: 'doc_2022_cb', name: 'CloudBaud LLC 2022 K-1', category: 'CloudBaud LLC', payer: 'CloudBaud LLC', amount: 365772.34, type: 'PDF', status: 'needs_upload', hasFile: false },
     { id: 'doc_2022_1098', name: 'Form 1098 (Mortgage Interest)', category: 'Real Estate Interest Woodridge', payer: 'Mortgage Lender', amount: 10516.14, type: 'PDF', status: 'needs_upload', hasFile: false },
     { id: 'doc_2022_tax', name: 'Property Tax Statement', category: 'Real Estate Taxes Woodridge', payer: 'King County', amount: 7271.09, type: 'PDF', status: 'needs_upload', hasFile: false },
@@ -91,12 +91,108 @@ export default function SupportingDocsViewerPane({
 }) {
   const [viewMode, setViewMode] = useState('list'); // 'list' | 'viewer'
   const [activeDocUrl, setActiveDocUrl] = useState(null);
-  const [zoomLevel, setZoomLevel] = useState(1.0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadSuccessMessage, setUploadSuccessMessage] = useState('');
+  const [uploadTargetDoc, setUploadTargetDoc] = useState(null);
+  const fileInputRef = useRef(null);
 
-  // Retrieve actual documents for the active year
-  const activeYearDocs = useMemo(() => {
-    return TAX_DOCUMENTS_BY_YEAR[year] || TAX_DOCUMENTS_BY_YEAR[2020] || [];
+  // Custom User Uploaded Documents for the active year with localStorage persistence
+  const [customDocs, setCustomDocs] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`cloudbaud_tax_custom_docs_${year}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Reload custom docs whenever active year changes
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(`cloudbaud_tax_custom_docs_${year}`);
+      setCustomDocs(saved ? JSON.parse(saved) : []);
+    } catch {
+      setCustomDocs([]);
+    }
   }, [year]);
+
+  // Trigger native file picker
+  const triggerUpload = (targetDoc = null) => {
+    setUploadTargetDoc(targetDoc);
+    fileInputRef.current?.click();
+  };
+
+  // Handle file selection and upload
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+
+    try {
+      const localUrl = URL.createObjectURL(file);
+      const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+      const isXlsx = file.name.toLowerCase().endsWith('.xlsx') || file.name.toLowerCase().endsWith('.xls') || file.name.toLowerCase().endsWith('.csv');
+      const isDocx = file.name.toLowerCase().endsWith('.docx') || file.name.toLowerCase().endsWith('.doc');
+      const docType = isPdf ? 'PDF' : isXlsx ? 'XLSX' : isDocx ? 'DOCX' : 'DOC';
+
+      const newDoc = {
+        id: uploadTargetDoc?.id || `doc_custom_${Date.now()}`,
+        name: file.name,
+        category: uploadTargetDoc?.category || selectedCat?.name || 'Supporting Document',
+        payer: uploadTargetDoc?.payer || 'Uploaded Document',
+        amount: uploadTargetDoc?.amount,
+        withholding: uploadTargetDoc?.withholding,
+        type: docType,
+        status: 'verified',
+        hasFile: true,
+        pages: 1,
+        localUrl: localUrl
+      };
+
+      // Persist to customDocs state & localStorage
+      setCustomDocs(prev => {
+        const filtered = prev.filter(d => d.id !== newDoc.id);
+        const next = [newDoc, ...filtered];
+        try {
+          localStorage.setItem(`cloudbaud_tax_custom_docs_${year}`, JSON.stringify(next));
+        } catch (err) {
+          console.debug('Storage error:', err);
+        }
+        return next;
+      });
+
+      // Try background upload to Supabase storage
+      try {
+        await uploadTaxDocument(file, year, selectedCat?.id);
+      } catch (cloudErr) {
+        console.warn('Cloud storage upload skipped, file cached locally:', cloudErr);
+      }
+
+      // Immediately select and view the uploaded document
+      setSelectedDoc(newDoc);
+      setActiveDocUrl(localUrl);
+      setViewMode('viewer');
+      setUploadSuccessMessage(`Successfully attached ${file.name}`);
+      setTimeout(() => setUploadSuccessMessage(''), 4500);
+    } catch (err) {
+      console.error('File upload error:', err);
+      alert('Upload failed: ' + err.message);
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  // Retrieve actual documents for the active year (merging base registry with user uploaded docs)
+  const activeYearDocs = useMemo(() => {
+    const base = TAX_DOCUMENTS_BY_YEAR[year] || TAX_DOCUMENTS_BY_YEAR[2022] || [];
+    const merged = base.map(b => {
+      const custom = customDocs.find(c => c.id === b.id);
+      return custom || b;
+    });
+    const uniqueCustom = customDocs.filter(c => !base.some(b => b.id === c.id));
+    return [...uniqueCustom, ...merged];
+  }, [year, customDocs]);
 
   // Filter docs if a category is selected in Excel
   const filteredDocs = useMemo(() => {
@@ -115,7 +211,7 @@ export default function SupportingDocsViewerPane({
   // Open Document in Viewer
   const handleOpenDoc = (doc) => {
     setSelectedDoc(doc);
-    const url = `/src/workspace/data/Documents - Taxes/${year}/${doc.name}`;
+    const url = doc.localUrl || `/src/workspace/data/Documents - Taxes/${year}/${doc.name}`;
     setActiveDocUrl(url);
     setViewMode('viewer');
     onSelectAndSwitch?.('docs');
@@ -124,7 +220,7 @@ export default function SupportingDocsViewerPane({
   // If selectedDoc changed from outside, sync url
   useEffect(() => {
     if (selectedDoc) {
-      const url = `/src/workspace/data/Documents - Taxes/${year}/${selectedDoc.name}`;
+      const url = selectedDoc.localUrl || `/src/workspace/data/Documents - Taxes/${year}/${selectedDoc.name}`;
       setActiveDocUrl(url);
     }
   }, [selectedDoc, year]);
@@ -156,7 +252,24 @@ export default function SupportingDocsViewerPane({
   }
 
   return (
-    <div className="h-full flex flex-col bg-[#070b14] text-white text-xs border-r border-white/10 overflow-hidden">
+    <div className="h-full flex flex-col bg-[#070b14] text-white text-xs border-r border-white/10 overflow-hidden relative">
+      {/* Hidden Native File Input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".pdf,.docx,.doc,.xlsx,.xls,.csv,.png,.jpg,.jpeg"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+
+      {/* Upload Success Toast */}
+      {uploadSuccessMessage && (
+        <div className="absolute top-12 left-4 right-4 z-50 bg-emerald-600 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-2xl flex items-center gap-2 border border-emerald-400/30 animate-in fade-in slide-in-from-top-2">
+          <CheckCircle2 className="size-4 shrink-0" />
+          <span className="truncate">{uploadSuccessMessage}</span>
+        </div>
+      )}
+
       {/* ── HEADER ── */}
       <div className="bg-[#121829] p-3 font-semibold border-b border-white/10 flex justify-between items-center shrink-0">
         <div className="flex items-center gap-2">
@@ -208,9 +321,14 @@ export default function SupportingDocsViewerPane({
             </button>
           )}
 
-          <button className="flex items-center gap-1 px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-semibold transition">
-            <Plus className="size-3" />
-            <span>Upload</span>
+          <button 
+            onClick={() => triggerUpload()}
+            disabled={isUploading}
+            className="flex items-center gap-1 px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-white text-[11px] font-semibold transition shadow-sm"
+            title="Upload new document from computer or Google Drive"
+          >
+            {isUploading ? <Loader2 className="size-3 animate-spin" /> : <Plus className="size-3" />}
+            <span>{isUploading ? 'Uploading...' : 'Upload'}</span>
           </button>
 
           {/* Collapse Button */}
@@ -335,7 +453,7 @@ export default function SupportingDocsViewerPane({
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleOpenDoc(doc);
+                          triggerUpload(doc);
                         }}
                         className="text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20"
                       >
@@ -381,41 +499,21 @@ export default function SupportingDocsViewerPane({
                 <a
                   href={activeDocUrl}
                   download={selectedDoc.name}
-                  className="flex items-center gap-1 px-2 py-1 rounded bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/40 text-emerald-300 text-[11px] font-semibold transition"
+                  className="flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/40 text-emerald-300 text-[11px] font-semibold transition"
                   title="Download File"
                 >
                   <Download className="size-3" />
                   <span>Download</span>
                 </a>
               )}
-
-              <div className="flex items-center gap-1">
-                <button 
-                  onClick={() => setZoomLevel(z => Math.max(0.6, z - 0.1))}
-                  className="p-1 rounded bg-white/5 hover:bg-white/15 text-white/70 hover:text-white"
-                  title="Zoom Out"
-                >
-                  <ZoomOut className="size-3.5" />
-                </button>
-                <span className="text-[10px] text-white/50 font-mono px-1">
-                  {Math.round(zoomLevel * 100)}%
-                </span>
-                <button 
-                  onClick={() => setZoomLevel(z => Math.min(2.5, z + 0.1))}
-                  className="p-1 rounded bg-white/5 hover:bg-white/15 text-white/70 hover:text-white"
-                  title="Zoom In"
-                >
-                  <ZoomIn className="size-3.5" />
-                </button>
-              </div>
             </div>
           </div>
 
-          {/* Document Canvas / High-Fidelity Preview Container */}
-          <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-[#03060d]">
+          {/* Document Canvas Container — Exact File As-Is */}
+          <div className="flex-1 overflow-hidden p-2 flex flex-col items-center justify-center bg-[#03060d]">
             {!selectedDoc.hasFile ? (
               /* Missing Document Upload Prompt */
-              <div className="bg-[#0b101c] border border-amber-500/30 rounded-xl p-6 text-center max-w-[420px] text-white shadow-2xl">
+              <div className="bg-[#0b101c] border border-amber-500/30 rounded-xl p-6 text-center max-w-[420px] text-white shadow-2xl m-auto">
                 <div className="size-12 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-3">
                   <AlertTriangle className="size-6" />
                 </div>
@@ -423,73 +521,25 @@ export default function SupportingDocsViewerPane({
                 <p className="text-xs text-white/60 leading-relaxed mb-4">
                   This tax line item has an amount reported in your return (${Number(selectedDoc.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}), but no physical PDF/document has been attached to your vault for <b>{year}</b> yet.
                 </p>
-                <button className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs mx-auto shadow transition">
-                  <Upload className="size-3.5" />
-                  <span>Upload {selectedDoc.category} PDF</span>
+                <button 
+                  onClick={() => triggerUpload(selectedDoc)}
+                  disabled={isUploading}
+                  className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-white font-semibold text-xs mx-auto shadow transition"
+                >
+                  {isUploading ? <Loader2 className="size-3.5 animate-spin" /> : <Upload className="size-3.5" />}
+                  <span>{isUploading ? 'Uploading...' : `Upload ${selectedDoc.category} PDF`}</span>
                 </button>
               </div>
             ) : selectedDoc.type === 'XLSX' ? (
               <SpreadsheetPreview url={activeDocUrl} name={selectedDoc.name} className="w-full h-full" />
             ) : (
-              /* High-Fidelity Interactive PDF / Form Canvas */
-              <div 
-                className="bg-white text-slate-900 rounded-lg shadow-2xl p-6 transition-transform origin-top w-full max-w-[540px] font-sans border border-slate-300 relative"
-                style={{ transform: `scale(${zoomLevel})` }}
-              >
-                {/* PDF Watermark / Header */}
-                <div className="border-b-2 border-slate-900 pb-3 mb-4 flex justify-between items-start">
-                  <div>
-                    <div className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">INTERNAL REVENUE SERVICE / OFFICIAL DOCUMENT</div>
-                    <div className="text-lg font-black tracking-tight text-slate-900">{selectedDoc.name.replace('.pdf', '')}</div>
-                    <div className="text-xs text-slate-600 font-mono mt-0.5">Tax Year {year} • Taxpayer: Jishnu & Deepika Nath</div>
-                  </div>
-                  <div className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-1 rounded border border-emerald-300 flex items-center gap-1">
-                    <ShieldCheck className="size-3 text-emerald-600" />
-                    <span>OCR Parsed</span>
-                  </div>
-                </div>
-
-                {/* Highlighted Extracted Box Grid */}
-                <div className="grid grid-cols-2 gap-3 mb-4 font-mono text-xs">
-                  <div className="bg-blue-50 border-2 border-blue-400 p-2.5 rounded shadow-sm relative">
-                    <div className="text-[10px] font-bold text-blue-800 uppercase flex items-center justify-between">
-                      <span>Box 1 — Taxable Amount</span>
-                      <span className="text-[9px] bg-blue-200 text-blue-900 px-1 rounded">MATCHED</span>
-                    </div>
-                    <div className="text-base font-bold text-blue-950 mt-1">
-                      ${Number(selectedDoc.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                    </div>
-                    <div className="text-[9px] text-blue-600 mt-0.5">Auto-traced to Form 1040 & Excel Worksheet</div>
-                  </div>
-
-                  <div className="bg-slate-50 border border-slate-300 p-2.5 rounded">
-                    <div className="text-[10px] font-bold text-slate-600 uppercase">Payer / Issuer</div>
-                    <div className="text-xs font-semibold text-slate-900 mt-1 truncate">{selectedDoc.payer || 'Authorized Issuer'}</div>
-                    <div className="text-[9px] text-slate-500 mt-0.5">EIN: XX-XXX4914</div>
-                  </div>
-                </div>
-
-                {/* Document Body Lines */}
-                <div className="space-y-2 text-xs font-mono border-t border-slate-200 pt-3 text-slate-700">
-                  <div className="flex justify-between py-1 border-b border-slate-100">
-                    <span>Category Association</span>
-                    <span className="font-bold text-slate-900">{selectedDoc.category}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-100">
-                    <span>Federal Income Tax Withheld</span>
-                    <span className="font-bold text-slate-900">${Number(selectedDoc.withholding || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-100">
-                    <span>CPA Audit Verification Status</span>
-                    <span className="font-bold text-emerald-700">Accepted by David Ramsey</span>
-                  </div>
-                </div>
-
-                {/* Audit Seal */}
-                <div className="mt-6 pt-3 border-t border-dashed border-slate-300 flex items-center justify-between text-[10px] text-slate-400">
-                  <span>Digital Hash: SHA256:{selectedDoc.id.replace('doc_', '')}...98f4</span>
-                  <span>CloudBaud Document Vault • {year}</span>
-                </div>
+              /* Direct As-Is PDF / Binary Document Frame */
+              <div className="w-full h-full flex flex-col rounded-lg overflow-hidden border border-white/10 bg-slate-950 shadow-2xl">
+                <iframe
+                  src={activeDocUrl}
+                  title={selectedDoc.name}
+                  className="w-full h-full border-0 bg-slate-900"
+                />
               </div>
             )}
           </div>
