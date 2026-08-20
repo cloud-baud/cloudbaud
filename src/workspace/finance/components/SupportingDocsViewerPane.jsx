@@ -13,10 +13,14 @@ import {
   Download,
   AlertTriangle,
   Upload,
-  Loader2
+  Loader2,
+  ListChecks,
+  Files,
+  ExternalLink
 } from 'lucide-react';
 import SpreadsheetPreview from './SpreadsheetPreview';
 import { uploadTaxDocument } from '../api/taxService';
+import TaxChecklist from './TaxChecklist';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ACCURATE TAX DOCUMENTS REGISTRY BY YEAR
@@ -32,7 +36,7 @@ export const TAX_DOCUMENTS_BY_YEAR = {
   2023: [
     { id: 'doc_2023_w2', name: 'Deepika W2 2023.pdf', category: 'W2 Wages', payer: 'Bellevue School District 405', amount: 59110.59, withholding: 8005.09, type: 'PDF', status: 'verified', hasFile: true, pages: 1 },
     { id: 'doc_2023_cb', name: 'CloudBaud LLC 2023 P&L', category: 'CloudBaud LLC', payer: 'CloudBaud LLC', amount: 38376.00, type: 'PDF', status: 'needs_upload', hasFile: false },
-    { id: 'doc_2023_nri', name: 'NRI_Essentials_AnnualReport_PaymentReceipt.pdf', category: 'Professional Services / CPA', payer: 'NRI Essentials', amount: 3500.00, type: 'PDF', status: 'verified', hasFile: true, pages: 2 },
+    { id: 'doc_2023_nri', name: 'NRI_Essentials_2023072100482718_AnnualReport_PaymentReceipt.pdf', category: 'Professional Services / CPA', payer: 'NRI Essentials', amount: 3500.00, type: 'PDF', status: 'verified', hasFile: true, pages: 2 },
   ],
   2022: [
     { id: 'doc_2022_w2', name: 'Form W-2 (Deepika)', category: 'W2 Wages', payer: 'Employer', amount: 0, type: 'PDF', status: 'needs_upload', hasFile: false },
@@ -78,7 +82,8 @@ export const TAX_DOCUMENTS_BY_YEAR = {
 };
 
 export default function SupportingDocsViewerPane({
-  year = 2020,
+  year = 2022,
+  onYearChange,
   selectedCat,
   setSelectedCat,
   selectedDoc,
@@ -89,14 +94,14 @@ export default function SupportingDocsViewerPane({
   setIsDocsCollapsed,
   onSelectAndSwitch
 }) {
-  const [viewMode, setViewMode] = useState('list'); // 'list' | 'viewer'
+  const [viewMode, setViewMode] = useState('checklist'); // 'checklist' | 'viewer'
   const [activeDocUrl, setActiveDocUrl] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadSuccessMessage, setUploadSuccessMessage] = useState('');
   const [uploadTargetDoc, setUploadTargetDoc] = useState(null);
+  const [uploadSuccessMessage, setUploadSuccessMessage] = useState('');
   const fileInputRef = useRef(null);
 
-  // Custom User Uploaded Documents for the active year with localStorage persistence
+  // Custom uploaded docs stored locally
   const [customDocs, setCustomDocs] = useState(() => {
     try {
       const saved = localStorage.getItem(`cloudbaud_tax_custom_docs_${year}`);
@@ -149,7 +154,6 @@ export default function SupportingDocsViewerPane({
         localUrl: localUrl
       };
 
-      // Persist to customDocs state & localStorage
       setCustomDocs(prev => {
         const filtered = prev.filter(d => d.id !== newDoc.id);
         const next = [newDoc, ...filtered];
@@ -161,18 +165,16 @@ export default function SupportingDocsViewerPane({
         return next;
       });
 
-      // Try background upload to Supabase storage
       try {
         await uploadTaxDocument(file, year, selectedCat?.id);
       } catch (cloudErr) {
         console.warn('Cloud storage upload skipped, file cached locally:', cloudErr);
       }
 
-      // Immediately select and view the uploaded document
       setSelectedDoc(newDoc);
       setActiveDocUrl(localUrl);
       setViewMode('viewer');
-      setUploadSuccessMessage(`Successfully attached ${file.name}`);
+      setUploadSuccessMessage(`Attached ${file.name}`);
       setTimeout(() => setUploadSuccessMessage(''), 4500);
     } catch (err) {
       console.error('File upload error:', err);
@@ -183,47 +185,34 @@ export default function SupportingDocsViewerPane({
     }
   };
 
-  // Retrieve actual documents for the active year (merging base registry with user uploaded docs)
-  const activeYearDocs = useMemo(() => {
-    const base = TAX_DOCUMENTS_BY_YEAR[year] || TAX_DOCUMENTS_BY_YEAR[2022] || [];
-    const merged = base.map(b => {
-      const custom = customDocs.find(c => c.id === b.id);
-      return custom || b;
+  const defaultDocs = useMemo(() => {
+    return TAX_DOCUMENTS_BY_YEAR[year] || [];
+  }, [year]);
+
+  const allAvailableDocs = useMemo(() => {
+    const combined = [...customDocs];
+    defaultDocs.forEach(d => {
+      if (!combined.some(c => c.id === d.id)) {
+        combined.push(d);
+      }
     });
-    const uniqueCustom = customDocs.filter(c => !base.some(b => b.id === c.id));
-    return [...uniqueCustom, ...merged];
-  }, [year, customDocs]);
+    return combined;
+  }, [customDocs, defaultDocs]);
 
-  // Filter docs if a category is selected in Excel
-  const filteredDocs = useMemo(() => {
-    if (!selectedCat) return activeYearDocs;
-    const catName = selectedCat.name || '';
-    const match = activeYearDocs.filter(d => 
-      d.category === catName || 
-      d.name?.toLowerCase().includes(catName.toLowerCase()) ||
-      (catName.includes('W2') && d.category.includes('W2')) ||
-      (catName.includes('CloudBaud') && (d.category.includes('CloudBaud') || d.name.includes('CloudBaud'))) ||
-      (catName.includes('Comfort') && d.name.includes('Comfort'))
-    );
-    return match.length > 0 ? match : activeYearDocs;
-  }, [activeYearDocs, selectedCat]);
-
-  // Open Document in Viewer
-  const handleOpenDoc = (doc) => {
-    setSelectedDoc(doc);
-    const url = doc.localUrl || `/src/workspace/data/Documents - Taxes/${year}/${doc.name}`;
-    setActiveDocUrl(url);
-    setViewMode('viewer');
-    onSelectAndSwitch?.('docs');
-  };
-
-  // If selectedDoc changed from outside, sync url
+  // Sync active doc URL when selectedDoc changes
   useEffect(() => {
     if (selectedDoc) {
-      const url = selectedDoc.localUrl || `/src/workspace/data/Documents - Taxes/${year}/${selectedDoc.name}`;
+      const url = selectedDoc.localUrl || encodeURI(`/src/workspace/data/Documents - Taxes/${year}/${selectedDoc.name}`);
       setActiveDocUrl(url);
     }
   }, [selectedDoc, year]);
+
+  const handleOpenDoc = (doc) => {
+    setSelectedDoc(doc);
+    const url = doc.localUrl || encodeURI(`/src/workspace/data/Documents - Taxes/${year}/${doc.name}`);
+    setActiveDocUrl(url);
+    setViewMode('viewer');
+  };
 
   // Render Slim Collapsed Strip
   if (isDocsCollapsed) {
@@ -231,21 +220,21 @@ export default function SupportingDocsViewerPane({
       <div 
         onClick={() => setIsDocsCollapsed(false)}
         className="w-11 h-full border-r border-white/10 bg-[#0a0f1d] hover:bg-[#11192e] cursor-pointer flex flex-col items-center py-4 justify-between transition group select-none shrink-0"
-        title="Click to expand Supporting Docs"
+        title="Click to expand Checklist Panel"
       >
         <div className="flex flex-col items-center gap-3">
-          <button className="p-1 rounded hover:bg-white/10 text-emerald-400 group-hover:scale-110 transition">
+          <button className="p-1 rounded hover:bg-white/10 text-blue-400 group-hover:scale-110 transition">
             <PanelLeftOpen className="size-4" />
           </button>
-          <FileText className="size-4 text-emerald-400/80" />
+          <ListChecks className="size-4 text-blue-400/80" />
         </div>
 
         <span className="[writing-mode:vertical-rl] rotate-180 text-[11px] font-semibold text-white/60 tracking-wider whitespace-nowrap">
-          Supporting Docs ({filteredDocs.length}) • {year}
+          Checklist Panel • {year}
         </span>
 
-        <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/20 px-1.5 py-0.5 rounded">
-          {filteredDocs.length}
+        <span className="text-[10px] text-blue-400 font-bold bg-blue-500/20 px-1.5 py-0.5 rounded">
+          65
         </span>
       </div>
     );
@@ -271,25 +260,25 @@ export default function SupportingDocsViewerPane({
       )}
 
       {/* ── HEADER ── */}
-      <div className="bg-[#121829] p-3 font-semibold border-b border-white/10 flex justify-between items-center shrink-0">
+      <div className="bg-[#121829] p-2 px-3 font-semibold border-b border-white/10 flex justify-between items-center shrink-0">
         <div className="flex items-center gap-2">
           {viewMode === 'viewer' ? (
             <button
-              onClick={() => setViewMode('list')}
-              className="p-1 rounded hover:bg-white/10 text-blue-400 hover:text-white flex items-center gap-1 transition text-xs font-semibold"
-              title="Back to Document List"
+              onClick={() => setViewMode('checklist')}
+              className="p-1 px-2 rounded bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white flex items-center gap-1.5 transition text-xs font-semibold border border-blue-500/30"
+              title="Return to Master Checklist"
             >
               <ArrowLeft className="size-3.5" />
-              <span>Docs ({year})</span>
+              <span>Back to Checklist</span>
             </button>
           ) : (
-            <>
-              <FileText className="size-4 text-emerald-400" />
-              <span className="font-bold text-sm tracking-tight">Supporting Docs</span>
-              <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-mono">
-                {year} ({filteredDocs.length} files)
+            <div className="flex items-center gap-2">
+              <ListChecks className="size-4 text-blue-400" />
+              <span className="font-bold text-sm tracking-tight">Checklist Panel</span>
+              <span className="text-[10px] text-blue-300 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20 font-mono">
+                {year}
               </span>
-            </>
+            </div>
           )}
         </div>
 
@@ -298,11 +287,11 @@ export default function SupportingDocsViewerPane({
             <a
               href={activeDocUrl}
               download={selectedDoc.name}
-              className="flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-semibold transition shadow-sm"
-              title={`Download ${selectedDoc.name} to audit locally`}
+              className="flex items-center gap-1 px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-semibold transition shadow-sm"
+              title={`Download ${selectedDoc.name}`}
             >
               <Download className="size-3" />
-              <span>Download</span>
+              <span className="hidden sm:inline">Download</span>
             </a>
           )}
 
@@ -317,243 +306,136 @@ export default function SupportingDocsViewerPane({
               title="Add CPA Annotation or Note to this Document"
             >
               <MessageSquare className="size-3 text-purple-300" />
-              <span>Annotate</span>
+              <span className="hidden sm:inline">Annotate</span>
             </button>
           )}
 
           <button 
             onClick={() => triggerUpload()}
             disabled={isUploading}
-            className="flex items-center gap-1 px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-white text-[11px] font-semibold transition shadow-sm"
-            title="Upload new document from computer or Google Drive"
+            className="flex items-center gap-1 px-2 py-1 rounded bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-white text-[11px] font-semibold transition shadow-sm"
+            title="Upload document"
           >
-            {isUploading ? <Loader2 className="size-3 animate-spin" /> : <Plus className="size-3" />}
-            <span>{isUploading ? 'Uploading...' : 'Upload'}</span>
+            {isUploading ? <Loader2 className="size-3 animate-spin" /> : <Upload className="size-3" />}
+            <span>{isUploading ? 'Uploading...' : 'Attach Doc'}</span>
           </button>
 
           {/* Collapse Button */}
           <button
             onClick={() => setIsDocsCollapsed(true)}
-            className="p-1.5 rounded hover:bg-white/10 text-slate-400 hover:text-white transition"
-            title="Collapse Supporting Docs"
+            className="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-white transition"
+            title="Collapse Checklist Panel"
           >
             <PanelLeftClose className="size-3.5" />
           </button>
         </div>
       </div>
 
-      {/* ── FILTER TAG (When Excel row selected) ── */}
-      {selectedCat && viewMode === 'list' && (
-        <div className="bg-blue-900/30 border-b border-blue-500/30 px-3 py-2 flex justify-between items-center shrink-0">
-          <span className="text-[11px] text-blue-300 truncate">
-            Excel Trace: <b>{selectedCat.name}</b> ({year})
-          </span>
-          <button 
-            onClick={() => setSelectedCat(null)} 
-            className="text-[10px] text-white/50 hover:text-white underline ml-2 shrink-0"
-          >
-            Show All ({activeYearDocs.length})
-          </button>
-        </div>
-      )}
-
-      {/* ── MODE 1: DOCUMENT LIST VIEW ── */}
-      {viewMode === 'list' && (
-        <div className="flex-1 overflow-auto p-3 space-y-2.5">
-          {filteredDocs.map(doc => {
-            const isSelected = selectedDoc?.id === doc.id;
-            const threadKey = `th_document_${doc.id}_${year}`;
-            const docThread = threads[threadKey];
-            const commentCount = docThread?.comments?.length || 0;
-            const isMissing = !doc.hasFile;
-
-            return (
-              <div 
-                key={doc.id}
-                onClick={() => handleOpenDoc(doc)}
-                className={`p-3 rounded-lg border cursor-pointer transition flex flex-col gap-2 ${
-                  isSelected 
-                    ? 'bg-blue-600/20 border-blue-500/50 shadow-md ring-1 ring-blue-500/40' 
-                    : isMissing 
-                    ? 'bg-amber-950/10 border-amber-500/20 hover:bg-amber-950/20'
-                    : 'bg-white/5 border-white/10 hover:bg-white/10'
-                }`}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-2 truncate">
-                    <FileText className={`size-4 shrink-0 ${doc.hasFile ? 'text-emerald-400' : 'text-amber-400'}`} />
-                    <span className="font-semibold text-xs text-white truncate">
-                      {doc.name}
-                    </span>
-                  </div>
-
-                  <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 shrink-0 ${
-                    doc.hasFile
-                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                      : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                  }`}>
-                    {doc.hasFile ? <CheckCircle2 className="size-2.5" /> : <AlertTriangle className="size-2.5" />}
-                    <span>{doc.hasFile ? 'Uploaded ✅' : 'Needs Upload'}</span>
-                  </span>
-                </div>
-
-                {/* Extracted Details & Payer */}
-                <div className="flex items-center justify-between text-[11px] text-white/60 bg-black/30 p-2 rounded border border-white/5 font-mono">
-                  <div className="truncate">
-                    <span className="text-white/40">Category: </span>
-                    <span className="text-white font-medium">{doc.category}</span>
-                  </div>
-                  {doc.amount !== undefined && (
-                    <div className="text-emerald-300 font-bold ml-2 shrink-0">
-                      ${Number(doc.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                    </div>
-                  )}
-                </div>
-
-                {/* Card Actions */}
-                <div className="flex items-center justify-between pt-1 border-t border-white/5 text-[10px]">
-                  <span className="text-white/40 flex items-center gap-1">
-                    <span>{doc.type}</span>
-                    {doc.hasFile ? (
-                      <>
-                        <span>•</span>
-                        <span>{doc.pages || 1} pg</span>
-                      </>
-                    ) : (
-                      <span className="text-amber-400/80">• Unattached</span>
-                    )}
-                  </span>
-
-                  <div className="flex items-center gap-2">
-                    {doc.hasFile ? (
-                      <>
-                        <a
-                          href={`/src/workspace/data/Documents - Taxes/${year}/${doc.name}`}
-                          download={doc.name}
-                          onClick={(e) => e.stopPropagation()}
-                          className="text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-emerald-500/10"
-                          title="Download file"
-                        >
-                          <Download className="size-2.5" />
-                          <span>Download</span>
-                        </a>
-
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenDoc(doc);
-                          }}
-                          className="text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1 px-2 py-0.5 rounded bg-blue-500/10 hover:bg-blue-500/20"
-                        >
-                          <Eye className="size-3" />
-                          <span>View</span>
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          triggerUpload(doc);
-                        }}
-                        className="text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20"
-                      >
-                        <Upload className="size-2.5" />
-                        <span>Upload</span>
-                      </button>
-                    )}
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openReviewPanel?.('document', doc.id, `${doc.name} (${year})`);
-                      }}
-                      className="text-white/50 hover:text-white flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-white/10"
-                    >
-                      <MessageSquare className="size-3 text-purple-400" />
-                      <span>{commentCount > 0 ? commentCount : 'Note'}</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* ── MODE 2: INTERACTIVE PDF / DOC VIEWER ── */}
-      {viewMode === 'viewer' && selectedDoc && (
-        <div className="flex-1 flex flex-col bg-[#050811] overflow-hidden">
-          {/* Viewer Toolbar */}
-          <div className="bg-[#0e1424] px-3 py-2 border-b border-white/10 flex items-center justify-between text-xs shrink-0">
-            <div className="flex items-center gap-2 truncate">
-              <span className="font-bold text-white truncate max-w-[160px]">{selectedDoc.name}</span>
-              {selectedDoc.amount !== undefined && (
-                <span className="bg-emerald-500/20 text-emerald-300 font-mono font-bold px-1.5 py-0.5 rounded text-[11px] border border-emerald-500/30 shrink-0">
-                  ${Number(selectedDoc.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+      {/* ── MAIN CONTENT: CHECKLIST vs DOCUMENT VIEWER ── */}
+      <div className="flex-1 min-h-0 h-full w-full overflow-hidden flex flex-col">
+        {viewMode === 'viewer' && selectedDoc ? (
+          <div className="h-full flex flex-col bg-[#050811] overflow-hidden">
+            {/* Viewer Sub-Header */}
+            <div className="bg-[#0b101c] px-3 py-1.5 border-b border-white/10 flex items-center justify-between text-xs gap-2 flex-wrap">
+              <div className="flex items-center gap-2 truncate max-w-[60%]">
+                <FileText className="size-3.5 text-blue-400 shrink-0" />
+                <span className="font-semibold text-white truncate" title={selectedDoc.name}>
+                  {selectedDoc.name}
                 </span>
-              )}
-            </div>
+                <span className="text-[10px] px-1.5 py-0.2 rounded bg-white/10 text-white/50 shrink-0 font-mono">
+                  {selectedDoc.type || 'PDF'}
+                </span>
+              </div>
 
-            <div className="flex items-center gap-2">
-              {selectedDoc.hasFile && (
-                <a
-                  href={activeDocUrl}
-                  download={selectedDoc.name}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/40 text-emerald-300 text-[11px] font-semibold transition"
-                  title="Download File"
+              <div className="flex items-center gap-3">
+                {activeDocUrl && selectedDoc.hasFile && (
+                  <a
+                    href={activeDocUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                    title="Open in external browser window"
+                  >
+                    <ExternalLink className="size-3" />
+                    <span>New Tab</span>
+                  </a>
+                )}
+                <button
+                  onClick={() => setViewMode('checklist')}
+                  className="text-[11px] text-white/60 hover:text-white underline shrink-0"
                 >
-                  <Download className="size-3" />
-                  <span>Download</span>
-                </a>
-              )}
-            </div>
-          </div>
-
-          {/* Document Canvas Container — Exact File As-Is */}
-          <div className="flex-1 overflow-hidden p-2 flex flex-col items-center justify-center bg-[#03060d]">
-            {!selectedDoc.hasFile ? (
-              /* Missing Document Upload Prompt */
-              <div className="bg-[#0b101c] border border-amber-500/30 rounded-xl p-6 text-center max-w-[420px] text-white shadow-2xl m-auto">
-                <div className="size-12 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-3">
-                  <AlertTriangle className="size-6" />
-                </div>
-                <h3 className="text-sm font-bold text-white mb-1">Physical File Not Uploaded Yet</h3>
-                <p className="text-xs text-white/60 leading-relaxed mb-4">
-                  This tax line item has an amount reported in your return (${Number(selectedDoc.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}), but no physical PDF/document has been attached to your vault for <b>{year}</b> yet.
-                </p>
-                <button 
-                  onClick={() => triggerUpload(selectedDoc)}
-                  disabled={isUploading}
-                  className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-white font-semibold text-xs mx-auto shadow transition"
-                >
-                  {isUploading ? <Loader2 className="size-3.5 animate-spin" /> : <Upload className="size-3.5" />}
-                  <span>{isUploading ? 'Uploading...' : `Upload ${selectedDoc.category} PDF`}</span>
+                  Back to Checklist
                 </button>
               </div>
-            ) : selectedDoc.type === 'XLSX' ? (
-              <SpreadsheetPreview url={activeDocUrl} name={selectedDoc.name} className="w-full h-full" />
-            ) : (
-              /* Direct As-Is PDF / Binary Document Frame */
-              <div className="w-full h-full flex flex-col rounded-lg overflow-hidden border border-white/10 bg-slate-950 shadow-2xl">
-                <iframe
-                  src={activeDocUrl}
-                  title={selectedDoc.name}
-                  className="w-full h-full border-0 bg-slate-900"
-                />
-              </div>
-            )}
-          </div>
+            </div>
 
-          {/* Viewer Footer */}
-          <div className="bg-[#0e1424] px-3 py-1.5 border-t border-white/10 flex items-center justify-between text-[11px] text-white/60 shrink-0">
-            <span className="truncate">Source: <b>{selectedDoc.hasFile ? `/Documents - Taxes/${year}/${selectedDoc.name}` : 'Not Uploaded Yet'}</b></span>
-            <span className="text-emerald-400 font-semibold flex items-center gap-1 shrink-0">
-              <CheckCircle2 className="size-3" />
-              <span>Linked to Worksheet Cell</span>
-            </span>
+            {/* Document Render (Native PDF Frame / Spreadsheet / Upload Prompt) */}
+            <div className="flex-1 overflow-hidden p-2 flex flex-col items-center justify-center bg-[#03060d] relative min-h-0">
+              {!selectedDoc.hasFile && !selectedDoc.localUrl ? (
+                /* Missing Document Upload Prompt */
+                <div className="bg-[#0b101c] border border-amber-500/30 rounded-xl p-6 text-center max-w-[420px] text-white shadow-2xl m-auto">
+                  <div className="size-12 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-3">
+                    <AlertTriangle className="size-6" />
+                  </div>
+                  <h3 className="text-sm font-bold text-white mb-1">Physical File Not Uploaded Yet</h3>
+                  <p className="text-xs text-white/60 leading-relaxed mb-4">
+                    No physical document has been attached for <b>{selectedDoc.name}</b> ({year}) yet. You can attach it directly from your computer or copy from Google Drive.
+                  </p>
+                  <div className="flex items-center justify-center gap-2">
+                    <button 
+                      onClick={() => triggerUpload(selectedDoc)}
+                      disabled={isUploading}
+                      className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-white font-semibold text-xs shadow transition"
+                    >
+                      {isUploading ? <Loader2 className="size-3.5 animate-spin" /> : <Upload className="size-3.5" />}
+                      <span>{isUploading ? 'Uploading...' : `Upload ${selectedDoc.name}`}</span>
+                    </button>
+                    <a
+                      href="https://drive.google.com/drive/folders/1bsHTGlWMp1j0fp_d2eDqiho1Ol0cMnzG?usp=sharing"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1 transition"
+                    >
+                      <ExternalLink className="size-3" />
+                      <span>Google Drive</span>
+                    </a>
+                  </div>
+                </div>
+              ) : selectedDoc.type === 'XLSX' || selectedDoc.name?.toLowerCase().endsWith('.xlsx') ? (
+                <SpreadsheetPreview url={activeDocUrl} name={selectedDoc.name} className="w-full h-full" />
+              ) : (
+                /* Direct Native PDF Frame */
+                <div className="w-full h-full flex flex-col rounded-lg overflow-hidden border border-white/10 bg-slate-950 shadow-2xl">
+                  <iframe
+                    src={activeDocUrl}
+                    title={selectedDoc.name}
+                    className="w-full h-full border-0 bg-slate-900 rounded-lg"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Viewer Footer */}
+            <div className="bg-[#0e1424] px-3 py-1.5 border-t border-white/10 flex items-center justify-between text-[11px] text-white/60 shrink-0">
+              <span className="truncate">
+                Source: <b>{selectedDoc.hasFile ? (selectedDoc.localUrl ? 'Locally Uploaded File' : `/Documents - Taxes/${year}/${selectedDoc.name}`) : 'Not Uploaded Yet'}</b>
+              </span>
+              <span className="text-emerald-400 font-semibold flex items-center gap-1 shrink-0">
+                <CheckCircle2 className="size-3" />
+                <span>Linked to Worksheet</span>
+              </span>
+            </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <TaxChecklist
+            year={year}
+            onYearChange={onYearChange}
+            availableDocs={allAvailableDocs}
+            onViewDocument={handleOpenDoc}
+            onTriggerUpload={(item) => triggerUpload({ id: item.id, name: `${item.label}.pdf`, category: item.label })}
+          />
+        )}
+      </div>
     </div>
   );
 }

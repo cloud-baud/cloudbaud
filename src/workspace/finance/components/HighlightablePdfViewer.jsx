@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle } f
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { cn } from '@/shared/lib/utils';
+import { AlertCircle } from 'lucide-react';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
@@ -32,11 +33,12 @@ const HighlightablePdfViewer = forwardRef(({ url, searchTerm, className, onState
     const [scale, setScale] = useState(1.3);
     const [highlights, setHighlights] = useState([]); // PDF-space coords
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     // Notify parent of state changes
     useEffect(() => {
-        onStateChange?.({ currentPage, numPages, scale, matchCount: highlights.length, loading });
-    }, [currentPage, numPages, scale, highlights.length, loading]); // eslint-disable-line react-hooks/exhaustive-deps
+        onStateChange?.({ currentPage, numPages, scale, matchCount: highlights.length, loading, error });
+    }, [currentPage, numPages, scale, highlights.length, loading, error]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Expose controls to parent via ref
     useImperativeHandle(ref, () => ({
@@ -53,11 +55,15 @@ const HighlightablePdfViewer = forwardRef(({ url, searchTerm, className, onState
 
         let cancelled = false;
         setLoading(true);
+        setError(null);
         setHighlights([]);
 
         const loadPdf = async () => {
             try {
                 const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`File not found on server (${response.status})`);
+                }
                 const data = await response.arrayBuffer();
                 const loadingTask = pdfjsLib.getDocument({ data });
                 const pdf = await loadingTask.promise;
@@ -74,7 +80,10 @@ const HighlightablePdfViewer = forwardRef(({ url, searchTerm, className, onState
                 setLoading(false);
             } catch (err) {
                 console.error('[HighlightablePdfViewer] Load failed:', err);
-                setLoading(false);
+                if (!cancelled) {
+                    setError(err.message || 'Failed to render PDF');
+                    setLoading(false);
+                }
             }
         };
 
@@ -220,18 +229,38 @@ const HighlightablePdfViewer = forwardRef(({ url, searchTerm, className, onState
     };
 
     return (
-        <div ref={containerRef} className={cn("overflow-auto flex justify-center p-4 bg-slate-100 dark:bg-slate-950", className)}>
-            {loading ? (
-                <div className="flex items-center justify-center h-full text-slate-400 text-sm">
+        <div ref={containerRef} className={cn("overflow-auto flex justify-center items-start p-4 bg-transparent min-h-[300px] w-full", className)}>
+            {error ? (
+                <div className="flex flex-col items-center justify-center p-6 text-center bg-[#0d1527] rounded-xl border border-white/10 max-w-sm m-auto shadow-2xl">
+                    <div className="p-3 rounded-full bg-amber-500/10 text-amber-400 mb-3">
+                        <AlertCircle className="size-8" />
+                    </div>
+                    <h4 className="text-sm font-bold text-white mb-1">Document Preview Unavailable</h4>
+                    <p className="text-[11px] text-white/50 mb-4 leading-relaxed">
+                        {error}. The file may be pending upload or located in your Google Drive folder.
+                    </p>
+                    <div className="flex items-center gap-2">
+                        <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-semibold shadow-sm transition"
+                        >
+                            Open Directly
+                        </a>
+                    </div>
+                </div>
+            ) : loading ? (
+                <div className="flex items-center justify-center h-full min-h-[200px] text-slate-400 text-sm">
                     <div className="flex flex-col items-center gap-2">
                         <div className="w-6 h-6 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin" />
-                        Loading PDF...
+                        <span className="text-xs text-white/60">Rendering PDF...</span>
                     </div>
                 </div>
             ) : (
                 <canvas
                     ref={canvasRef}
-                    className="shadow-lg rounded bg-white max-w-full"
+                    className="shadow-2xl rounded bg-white max-w-full"
                     style={{ imageRendering: 'auto' }}
                 />
             )}

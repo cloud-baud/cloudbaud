@@ -8,8 +8,13 @@ import {
   MessageSquare,
   PanelRightClose,
   PanelRightOpen,
-  ShieldCheck
+  ShieldCheck,
+  ZoomIn,
+  ZoomOut,
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon
 } from 'lucide-react';
+import HighlightablePdfViewer from './HighlightablePdfViewer';
 import { useViewAs } from '../ViewAsContext';
 
 export default function Form1040ReturnPane({
@@ -36,6 +41,8 @@ export default function Form1040ReturnPane({
   });
 
   const fileInputRef = useRef(null);
+  const pdfViewerRef = useRef(null);
+  const [pdfState, setPdfState] = useState({ currentPage: 1, numPages: 1, scale: 1.3, loading: false });
 
   // Local storage persisted uploaded 1040 Return PDF for this year
   const [uploadedReturnUrl, setUploadedReturnUrl] = useState(() => {
@@ -388,8 +395,56 @@ export default function Form1040ReturnPane({
         <div className="flex-1 flex flex-col overflow-hidden bg-[#050811] p-2">
           {uploadedReturnUrl ? (
             <div className="w-full h-full flex flex-col rounded-lg overflow-hidden border border-white/10 bg-slate-950 shadow-2xl">
-              <div className="bg-[#0e1424] px-3 py-1.5 border-b border-white/10 flex justify-between items-center text-xs">
-                <span className="font-semibold text-white truncate">{uploadedReturnName || `Form 1040 Return (${year})`}</span>
+              <div className="bg-[#0e1424] px-3 py-1.5 border-b border-white/10 flex justify-between items-center text-xs gap-2 flex-wrap">
+                <span className="font-semibold text-white truncate max-w-[200px]" title={uploadedReturnName || `Form 1040 Return (${year})`}>
+                  {uploadedReturnName || `Form 1040 Return (${year})`}
+                </span>
+
+                {/* PDF Page Navigation & Zoom Toolbar */}
+                <div className="flex items-center gap-1 bg-[#141b2d] px-1.5 py-0.5 rounded border border-white/10 text-white/70">
+                  <button
+                    type="button"
+                    onClick={() => pdfViewerRef.current?.prevPage()}
+                    disabled={pdfState.currentPage <= 1}
+                    className="p-1 rounded hover:bg-white/10 disabled:opacity-30 text-white transition"
+                    title="Previous Page"
+                  >
+                    <ChevronLeftIcon className="size-3" />
+                  </button>
+                  <span className="text-[10px] font-mono px-1">
+                    {pdfState.currentPage} / {pdfState.numPages || 1}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => pdfViewerRef.current?.nextPage()}
+                    disabled={pdfState.currentPage >= pdfState.numPages}
+                    className="p-1 rounded hover:bg-white/10 disabled:opacity-30 text-white transition"
+                    title="Next Page"
+                  >
+                    <ChevronRightIcon className="size-3" />
+                  </button>
+                  <span className="text-white/20 mx-0.5">|</span>
+                  <button
+                    type="button"
+                    onClick={() => pdfViewerRef.current?.zoomOut()}
+                    className="p-1 rounded hover:bg-white/10 text-white transition"
+                    title="Zoom Out"
+                  >
+                    <ZoomOut className="size-3" />
+                  </button>
+                  <span className="text-[10px] font-mono px-0.5">
+                    {Math.round((pdfState.scale || 1.3) * 100)}%
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => pdfViewerRef.current?.zoomIn()}
+                    className="p-1 rounded hover:bg-white/10 text-white transition"
+                    title="Zoom In"
+                  >
+                    <ZoomIn className="size-3" />
+                  </button>
+                </div>
+
                 <a
                   href={uploadedReturnUrl}
                   download={uploadedReturnName || `Form 1040 Return (${year}).pdf`}
@@ -399,11 +454,14 @@ export default function Form1040ReturnPane({
                   <span>Download</span>
                 </a>
               </div>
-              <iframe
-                src={uploadedReturnUrl}
-                title="Form 1040 Return PDF"
-                className="w-full h-full border-0 bg-slate-900"
-              />
+              <div className="flex-1 overflow-auto bg-[#03060c] flex justify-center items-start p-2">
+                <HighlightablePdfViewer
+                  ref={pdfViewerRef}
+                  url={uploadedReturnUrl}
+                  onStateChange={setPdfState}
+                  className="bg-transparent"
+                />
+              </div>
             </div>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center p-6 text-center bg-[#0b101c] rounded-xl border border-white/10 m-auto max-w-[420px]">

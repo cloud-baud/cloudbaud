@@ -116,7 +116,9 @@ function WorksheetPane({ onSelectAndSwitch }) {
     isDocsCollapsed,
     setIsDocsCollapsed,
     isFormCollapsed,
-    setIsFormCollapsed
+    setIsFormCollapsed,
+    activeSheet,
+    setActiveSheet
   } = useWorkbench();
 
   return (
@@ -137,6 +139,8 @@ function WorksheetPane({ onSelectAndSwitch }) {
         setIsDocsCollapsed={setIsDocsCollapsed}
         isFormCollapsed={isFormCollapsed}
         setIsFormCollapsed={setIsFormCollapsed}
+        activeSheet={activeSheet}
+        onActiveSheetChange={setActiveSheet}
       />
     </div>
   );
@@ -475,6 +479,8 @@ export default function FinanceThreePane() {
     };
   }, [activeReviewTarget, threads, year]);
 
+  const [activeSheet, setActiveSheet] = useState('worksheet'); // 'worksheet' | 'checklist'
+
   const ctx = {
     year,
     setYear,
@@ -492,7 +498,9 @@ export default function FinanceThreePane() {
     isDocsCollapsed,
     setIsDocsCollapsed,
     isFormCollapsed,
-    setIsFormCollapsed
+    setIsFormCollapsed,
+    activeSheet,
+    setActiveSheet
   };
 
   return (
@@ -502,7 +510,7 @@ export default function FinanceThreePane() {
         <div className="md:hidden flex border-b border-white/10 bg-[#0f172a] text-white text-[13px] shrink-0">
           {[
             { id: 'worksheet', label: 'Worksheet', count: accounts.length },
-            { id: 'docs', label: 'Supporting Docs', count: docs.length },
+            { id: 'docs', label: 'Checklist (65)', count: null },
             { id: 'form', label: '1040 Return', count: null },
           ].map(t => (
             <button 
@@ -523,6 +531,8 @@ export default function FinanceThreePane() {
             activeYear={year}
             years={[2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017]}
             viewMode="three_pane"
+            activeSheet={activeSheet}
+            onActiveSheetChange={setActiveSheet}
             onYearChange={(newYear) => {
               if (newYear && newYear !== 'summary') {
                 setYear(parseInt(newYear, 10));
@@ -536,11 +546,22 @@ export default function FinanceThreePane() {
             onSave={() => {
               console.log('Worksheet and documents saved.');
             }}
+            isDocsCollapsed={isDocsCollapsed}
+            setIsDocsCollapsed={setIsDocsCollapsed}
+            isFormCollapsed={isFormCollapsed}
+            setIsFormCollapsed={setIsFormCollapsed}
           />
         </div>
 
         {/* WORKFLOW PROGRESS BAR — always visible, hover for audit checklist */}
-        <TaxWorkflowProgressBar year={year} onYearChange={setYear} />
+        <TaxWorkflowProgressBar
+          year={year}
+          onYearChange={setYear}
+          onOpenDocCollection={() => {
+            setIsDocsCollapsed(false);
+            setActiveTab('docs');
+          }}
+        />
 
         {/* MAIN 3-PANE WORKBENCH */}
         <div className="flex-1 flex overflow-hidden relative">

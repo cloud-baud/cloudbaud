@@ -4,8 +4,12 @@ import { supabaseAuth } from '@/shared/lib/supabase';
 export const VIEW_AS_KEY = 'finance_view_as_user_id';
 
 const getUser = async () => {
-  const { data: { session } } = await supabaseAuth.auth.getSession();
-  return session?.user || null;
+  try {
+    const { data: { session } } = await supabaseAuth.auth.getSession();
+    return session?.user || null;
+  } catch {
+    return null;
+  }
 };
 
 export const getEffectiveUserId = async () => {
@@ -19,28 +23,42 @@ export const getEffectiveUserId = async () => {
 
 const getMembership = async (userId) => {
   if (!userId) return null;
-  const { data } = await supabaseAuth.schema('saas').from('memberships').select('org_id, role').eq('user_id', userId).single();
-  return data;
+  try {
+    const { data, error } = await supabaseAuth
+      .schema('saas')
+      .from('memberships')
+      .select('org_id, role')
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (error) return null;
+    return data;
+  } catch {
+    return null;
+  }
 };
 
 export const getClientCategories = async () => {
-  const effectiveUserId = await getEffectiveUserId();
-  if (!effectiveUserId) return [];
-  const membership = await getMembership(effectiveUserId);
-  const client = supabaseAuth;
-  let q = client.schema('finance').from('client_input_categories').select('*').order('sort_order', { ascending: true });
-  if (membership?.org_id) q = q.eq('org_id', membership.org_id);
-  else q = q.eq('user_id', effectiveUserId);
-  const { data, error } = await q;
-  if (error) {
-    console.error('COA error', error);
-    let q2 = client.schema('finance').from('chart_of_accounts').select('*').order('sort_order', { ascending: true });
-    if (membership?.org_id) q2 = q2.eq('org_id', membership.org_id);
-    else q2 = q2.eq('user_id', effectiveUserId);
-    const { data: d2 } = await q2;
-    return d2 || [];
+  try {
+    const effectiveUserId = await getEffectiveUserId();
+    if (!effectiveUserId) return [];
+    const membership = await getMembership(effectiveUserId);
+    const client = supabaseAuth;
+    let q = client.schema('finance').from('client_input_categories').select('*').order('sort_order', { ascending: true });
+    if (membership?.org_id) q = q.eq('org_id', membership.org_id);
+    else q = q.eq('user_id', effectiveUserId);
+    const { data, error } = await q;
+    if (error) {
+      let q2 = client.schema('finance').from('chart_of_accounts').select('*').order('sort_order', { ascending: true });
+      if (membership?.org_id) q2 = q2.eq('org_id', membership.org_id);
+      else q2 = q2.eq('user_id', effectiveUserId);
+      const { data: d2, error: e2 } = await q2;
+      if (e2) return [];
+      return d2 || [];
+    }
+    return data || [];
+  } catch (err) {
+    return [];
   }
-  return data || [];
 };
 
 export const getChartOfAccounts = getClientCategories;
@@ -63,9 +81,9 @@ export const createAccount = async ({ name, type, section }) => {
     section: section || null,
     sort_order: 999,
   };
-  let { data, error } = await supabaseAuth.schema('finance').from('client_input_categories').insert(payload).select().single();
-  if (!error) return data;
-  const { data: d2, error: e2 } = await supabaseAuth.schema('finance').from('chart_of_accounts').insert(payload).select().single();
+  let { data, error } = await supabaseAuth.schema('finance').from('client_input_categories').insert(payload).select().maybeSingle();
+  if (!error && data) return data;
+  const { data: d2, error: e2 } = await supabaseAuth.schema('finance').from('chart_of_accounts').insert(payload).select().maybeSingle();
   if (e2) throw e2;
   return d2;
 };
@@ -90,7 +108,7 @@ export const getTaxEntries = async (year) => {
     .select('*, category:client_input_categories(*)')
     .eq('org_id', membership.org_id)
     .eq('year', year);
-  return data||[];
+  return data || [];
 };
 
 // --- V2 FIX: missing function that TaxDashboard expects ---
@@ -118,7 +136,7 @@ export const getTaxReturns = getYearReturns;
 export const listReturns = getYearReturns;
 export const fetchYearReturns = getYearReturns;
 
-export const updateTaxCell = async (categoryId, year, amount, notes=null) => {
+export const updateTaxCell = async (categoryId, year, amount, notes = null) => {
   const user = await getUser(); 
   if (!user) throw new Error('Not auth');
   const effectiveUserId = await getEffectiveUserId();
@@ -130,12 +148,13 @@ export const updateTaxCell = async (categoryId, year, amount, notes=null) => {
       user_id: user.id,
       year: Number(year), 
       category_id: categoryId, 
-      amount: Number(amount)||0, 
+      amount: Number(amount) || 0, 
       notes, 
       updated_at: new Date().toISOString() 
     }, { onConflict: 'org_id,year,category_id' })
-    .select().single();
-  if (error) throw error; return data;
+    .select().maybeSingle();
+  if (error) throw error;
+  return data;
 };
 
 export const loadTaxState = async () => {
@@ -156,7 +175,7 @@ export const saveTaxState = async (state) => {
   if (!membership?.org_id) return false;
   const { error } = await supabaseAuth.schema('finance').from('user_tax_state')
     .upsert({ 
-      org_id: membership.org_id,
+      org_id: membership.org_id, 
       user_id: user.id,
       years: state.years, 
       tax_data: state.taxData, 
@@ -173,38 +192,81 @@ export const getMyDocuments = async (year) => {
   const membership = await getMembership(effectiveUserId);
   if (!membership?.org_id) return [];
   let q = supabaseAuth.schema('finance').from('tax_documents').select('*').eq('org_id', membership.org_id); 
-  if (year) q=q.eq('year', year);
-  const { data } = await q; return data||[];
+  if (year) q = q.eq('year', year);
+  const { data } = await q;
+  return data || [];
+};
+
+export const getViewAs = () => {
+  try {
+    return localStorage.getItem(VIEW_AS_KEY) || '';
+  } catch {
+    return '';
+  }
 };
 
 export const setViewAs = (userId) => {
-  if (userId) localStorage.setItem(VIEW_AS_KEY, userId);
-  else localStorage.removeItem(VIEW_AS_KEY);
-};
-export const getViewAs = () => {
-  try { return localStorage.getItem(VIEW_AS_KEY); } catch { return null; }
+  if (!userId) localStorage.removeItem(VIEW_AS_KEY);
+  else localStorage.setItem(VIEW_AS_KEY, userId);
+  window.dispatchEvent(new Event('finance_view_as_changed'));
 };
 
-export const uploadTaxDocument = async (file, year, categoryId = null) => {
-  const userId = await getEffectiveUserId();
-  const filePath = `${userId}/${year}/${Date.now()}_${file.name}`;
-  const { error: upErr } = await supabaseAuth.storage.from('tax-docs').upload(filePath, file);
-  if (upErr) throw upErr;
-  const { data, error: dbErr } = await supabaseAuth.from('tax_documents').insert({
-    user_id: userId,
-    year,
-    category_id: categoryId,
-    file_name: file.name,
-    storage_path: filePath,
-    file_size: file.size,
-    mime_type: file.type,
-  }).select().single();
-  if (dbErr) throw dbErr;
+export const uploadTaxDocument = async (file, year, categoryId) => {
+  const user = await getUser();
+  if (!user) throw new Error('Not authenticated');
+  const effectiveUserId = await getEffectiveUserId();
+  const membership = await getMembership(effectiveUserId);
+  if (!membership?.org_id) throw new Error('No org_id');
+
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${year}/${Date.now()}_${file.name}`;
+  const filePath = `${membership.org_id}/${fileName}`;
+
+  const { error: uploadError } = await supabaseAuth.storage
+    .from('tax_documents')
+    .upload(filePath, file);
+
+  if (uploadError) {
+    console.warn('Storage upload error:', uploadError);
+  }
+
+  const { data, error: dbError } = await supabaseAuth.schema('finance').from('tax_documents')
+    .insert({
+      org_id: membership.org_id,
+      user_id: user.id,
+      year: Number(year),
+      category_id: categoryId || null,
+      file_name: file.name,
+      file_path: filePath,
+      file_size: file.size,
+      mime_type: file.type || 'application/octet-stream',
+      status: 'verified',
+      created_at: new Date().toISOString()
+    })
+    .select().maybeSingle();
+
+  if (dbError) {
+    console.warn('DB record insert error:', dbError);
+  }
+
+  return data || { name: file.name, path: filePath };
+};
+
+export const linkDocumentToCell = async (documentId, categoryId, year) => {
+  const user = await getUser();
+  if (!user) throw new Error('Not authenticated');
+  const effectiveUserId = await getEffectiveUserId();
+  const membership = await getMembership(effectiveUserId);
+  if (!membership?.org_id) throw new Error('No org_id');
+
+  const { data, error } = await supabaseAuth.schema('finance').from('tax_documents')
+    .update({ category_id: categoryId, year: Number(year) })
+    .eq('id', documentId)
+    .eq('org_id', membership.org_id)
+    .select().maybeSingle();
+
+  if (error) {
+    console.warn('Link doc to cell error:', error);
+  }
   return data;
-};
-
-export const linkDocumentToCell = async (docId, categoryId, year) => {
-  const { error } = await supabaseAuth.from('tax_documents').update({ category_id: categoryId, year }).eq('id', docId);
-  if (error) throw error;
-  return true;
 };

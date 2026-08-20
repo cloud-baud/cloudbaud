@@ -134,7 +134,7 @@ function getStageStatus(index) {
 // ─────────────────────────────────────────────────────────────────────────────
 // COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
-export default function TaxWorkflowProgressBar({ year = 2020, onYearChange }) {
+export default function TaxWorkflowProgressBar({ year = 2020, onYearChange, onOpenDocCollection }) {
   const [openStageId, setOpenStageId] = useState(null);
   const [showPeopleDropdown, setShowPeopleDropdown] = useState(false);
   const flyoutRef = useRef(null);
@@ -418,17 +418,33 @@ export default function TaxWorkflowProgressBar({ year = 2020, onYearChange }) {
               ))}
             </div>
 
-            {/* Mini progress bar in flyout */}
-            <div className="px-4 py-2 border-t border-white/10 flex items-center gap-3">
-              <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-blue-500 to-emerald-400 rounded-full transition-all"
-                  style={{ width: `${Math.round((doneCount / stage.checklist.length) * 100)}%` }}
-                />
+            {/* Mini progress bar & action button in flyout */}
+            <div className="px-4 py-2 border-t border-white/10 flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-3 flex-1 min-w-[200px]">
+                <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-blue-500 to-emerald-400 rounded-full transition-all"
+                    style={{ width: `${Math.round((doneCount / stage.checklist.length) * 100)}%` }}
+                  />
+                </div>
+                <span className="text-[10px] text-white/40 shrink-0">
+                  {Math.round((doneCount / stage.checklist.length) * 100)}% of this step
+                </span>
               </div>
-              <span className="text-[10px] text-white/40 shrink-0">
-                {Math.round((doneCount / stage.checklist.length) * 100)}% of this step
-              </span>
+
+              {stage.id === 'collection' && (
+                <button
+                  onClick={() => {
+                    setOpenStageId(null);
+                    onOpenDocCollection?.();
+                  }}
+                  className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-semibold flex items-center gap-1.5 shadow-sm transition"
+                  title="Open Master Doc Collection Checklist in Worksheet"
+                >
+                  <FileText className="size-3" />
+                  <span>Open Master Doc Checklist (65 Items) →</span>
+                </button>
+              )}
             </div>
           </div>
         );
