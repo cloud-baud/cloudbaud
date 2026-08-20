@@ -39,7 +39,7 @@ export const TAX_DOCUMENTS_BY_YEAR = {
     { id: 'doc_2023_nri', name: 'NRI_Essentials_2023072100482718_AnnualReport_PaymentReceipt.pdf', category: 'Professional Services / CPA', payer: 'NRI Essentials', amount: 3500.00, type: 'PDF', status: 'verified', hasFile: true, pages: 2 },
   ],
   2022: [
-    { id: 'doc_2022_w2', name: 'Form W-2 (Deepika)', category: 'W2 Wages', payer: 'Employer', amount: 0, type: 'PDF', status: 'needs_upload', hasFile: false },
+    { id: 'doc_2022_w2', name: 'Deepika W2 2022.pdf', category: 'W2 Wages', payer: 'Bellevue School District 405', amount: 37995.76, withholding: 4063.44, type: 'PDF', status: 'verified', hasFile: true, pages: 2 },
     { id: 'doc_2022_cb', name: 'CloudBaud LLC 2022 K-1', category: 'CloudBaud LLC', payer: 'CloudBaud LLC', amount: 365772.34, type: 'PDF', status: 'needs_upload', hasFile: false },
     { id: 'doc_2022_1098', name: 'Form 1098 (Mortgage Interest)', category: 'Real Estate Interest Woodridge', payer: 'Mortgage Lender', amount: 10516.14, type: 'PDF', status: 'needs_upload', hasFile: false },
     { id: 'doc_2022_tax', name: 'Property Tax Statement', category: 'Real Estate Taxes Woodridge', payer: 'King County', amount: 7271.09, type: 'PDF', status: 'needs_upload', hasFile: false },
@@ -92,7 +92,8 @@ export default function SupportingDocsViewerPane({
   openReviewPanel,
   isDocsCollapsed,
   setIsDocsCollapsed,
-  onSelectAndSwitch
+  onSelectAndSwitch,
+  onTransferValue
 }) {
   const [viewMode, setViewMode] = useState('checklist'); // 'checklist' | 'viewer'
   const [activeDocUrl, setActiveDocUrl] = useState(null);
@@ -433,6 +434,7 @@ export default function SupportingDocsViewerPane({
             availableDocs={allAvailableDocs}
             onViewDocument={handleOpenDoc}
             onTriggerUpload={(item) => triggerUpload({ id: item.id, name: `${item.label}.pdf`, category: item.label })}
+            onTransferValue={onTransferValue}
           />
         )}
       </div>

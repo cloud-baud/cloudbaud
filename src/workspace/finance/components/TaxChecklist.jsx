@@ -3,9 +3,11 @@ import {
     FileText, Briefcase, Building, TrendingUp, PiggyBank,
     HeartPulse, Users, Home, CreditCard, Globe, ExternalLink,
     AlertTriangle, CheckCircle2, RotateCcw, ChevronDown, ChevronRight,
-    CheckSquare, Square, ShieldCheck, Calendar, Upload, Eye, FileSpreadsheet, Lock
+    CheckSquare, Square, ShieldCheck, Calendar, Upload, Eye, FileSpreadsheet, Lock,
+    Sparkles, Cpu, Send, ArrowRight, Table, Check, Loader2, ArrowRightCircle
 } from 'lucide-react';
 import { useViewAs } from '../ViewAsContext';
+import { extractDocumentValues, getNamedCell, SUMMARY_TAB_NAMED_RANGES } from '../data/taxNamedRanges';
 
 const GDRIVE_URL = "https://drive.google.com/drive/folders/1bsHTGlWMp1j0fp_d2eDqiho1Ol0cMnzG?usp=sharing";
 
@@ -180,12 +182,31 @@ export default function TaxChecklist({
     onYearChange,
     onViewDocument,
     onTriggerUpload,
+    onTransferValue,
     availableDocs = [] 
 }) {
     const activeYear = String(year);
     const { activePersona, isViewingAs } = useViewAs();
     const isSecurityTrimmed = isViewingAs && activePersona?.role?.includes('CPA');
     const scrollContainerRef = useRef(null);
+
+    // Extraction preview state (itemId -> boolean)
+    const [expandedExtracts, setExpandedExtracts] = useState({});
+    const [extractingMap, setExtractingMap] = useState({});
+    // Transferred status map (itemId -> { namedCell, amount, timestamp })
+    const [transferredMap, setTransferredMap] = useState(() => {
+        try {
+            const saved = localStorage.getItem(`tax_transferred_cells_${year}`);
+            return saved ? JSON.parse(saved) : {};
+        } catch {
+            return {};
+        }
+    });
+
+    // Global transfer toast message
+    const [transferToast, setTransferToast] = useState(null);
+    // Custom user adjustments to extracted values before transfer
+    const [customFieldValues, setCustomFieldValues] = useState({});
 
     // Persisted accordion collapse state so it never resets when switching views
     const [collapsedSections, setCollapsedSections] = useState(() => {
@@ -347,6 +368,66 @@ export default function TaxChecklist({
     const totalCompleted = permCompletedCount + annualCompletedCount;
     const progressPercent = Math.round((totalCompleted / totalItems) * 100);
 
+    // Handle toggle Parse / Extraction preview
+    const handleToggleExtract = (e, item, attachedDoc) => {
+        e?.stopPropagation();
+        const itemId = item.id;
+        if (expandedExtracts[itemId]) {
+            setExpandedExtracts(prev => ({ ...prev, [itemId]: false }));
+            return;
+        }
+
+        // Show brief 250ms extracting feedback
+        setExtractingMap(prev => ({ ...prev, [itemId]: true }));
+        setTimeout(() => {
+            setExtractingMap(prev => ({ ...prev, [itemId]: false }));
+            setExpandedExtracts(prev => ({ ...prev, [itemId]: true }));
+        }, 250);
+    };
+
+    // Handle Transfer to Named Cell on Worksheet
+    const handleTransfer = (e, field, item, attachedDoc) => {
+        e?.stopPropagation();
+        const extraction = extractDocumentValues(item, attachedDoc, activeYear);
+        const targetField = field || extraction.fields.find(f => f.isPrimary) || extraction.fields[0];
+        if (!targetField) return;
+
+        const targetNamedCell = targetField.targetNamedCell || getNamedCell('W2_WAGES', activeYear);
+        const amount = targetField.value;
+        const targetAccount = targetField.targetAccount || 'W2 Wages';
+
+        onTransferValue?.({
+            namedCell: targetNamedCell,
+            targetAccount: targetAccount,
+            amount: amount,
+            year: Number(activeYear),
+            docName: attachedDoc?.name || item.label,
+            label: targetField.label
+        });
+
+        // Automatically mark as checked in the checklist
+        if (!currentYearChecked[item.id]) {
+            toggleAnnualItem(item.id);
+        }
+
+        // Record transfer status
+        const updated = {
+            ...transferredMap,
+            [item.id]: {
+                namedCell: targetNamedCell,
+                amount: targetField.formatted || `$${amount.toLocaleString()}`,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            }
+        };
+        setTransferredMap(updated);
+        try {
+            localStorage.setItem(`tax_transferred_cells_${activeYear}`, JSON.stringify(updated));
+        } catch {}
+
+        setTransferToast(`Transferred ${targetField.formatted || '$' + amount} ➔ [${targetNamedCell}]`);
+        setTimeout(() => setTransferToast(null), 4500);
+    };
+
     // Helper: find attached doc in availableDocs (ALWAYS preserved when checked)
     const getAttachedDoc = (item) => {
         if (!availableDocs || availableDocs.length === 0) return null;
@@ -357,7 +438,18 @@ export default function TaxChecklist({
     };
 
     return (
-        <div className="h-full w-full flex flex-col bg-[#070b14] text-white text-xs overflow-hidden select-none">
+        <div className="h-full w-full flex flex-col bg-[#070b14] text-white text-xs overflow-hidden select-none relative">
+            {/* Transfer Toast Banner */}
+            {transferToast && (
+                <div className="absolute top-11 left-3 right-3 z-50 bg-emerald-600/95 text-white px-3 py-2 rounded-lg shadow-2xl flex items-center justify-between gap-2 border border-emerald-400/40 text-xs font-semibold animate-in fade-in slide-in-from-top-2">
+                    <div className="flex items-center gap-2">
+                        <CheckCircle2 className="size-4 text-emerald-200 shrink-0" />
+                        <span>{transferToast}</span>
+                    </div>
+                    <span className="text-[10px] bg-black/20 px-2 py-0.5 rounded text-white/90 font-mono">Worksheet Updated</span>
+                </div>
+            )}
+
             {/* Sleek Minimal Toolbar with Security Trimming & Zero Duplication */}
             <div className="p-2 px-3 border-b border-white/10 bg-[#0b1120] shrink-0 flex items-center justify-between gap-2 flex-wrap">
                 <div className="flex items-center gap-2">
@@ -674,7 +766,7 @@ export default function TaxChecklist({
                                                     )}
                                                 </button>
 
-                                                <div className="space-y-1 flex-1">
+                                                <div className="space-y-1.5 flex-1">
                                                     <div className="flex items-center justify-between gap-2 flex-wrap">
                                                         <div className="flex items-center gap-1.5 flex-wrap">
                                                             <span className="font-mono text-blue-400 font-bold text-[11px]">
@@ -697,23 +789,53 @@ export default function TaxChecklist({
                                                             )}
                                                         </div>
 
-                                                        {/* Attached File Action or Upload — ALWAYS VISIBLE & ACTIVE */}
+                                                        {/* Attached File Actions: View Doc, Parse / Extract, Transfer */}
                                                         <div className="flex items-center gap-1.5 shrink-0">
                                                             {attachedDoc ? (
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        setLastActiveSectionId(section.id);
-                                                                        try { localStorage.setItem('tax_checklist_last_active_section', section.id); } catch {}
-                                                                        onViewDocument?.(attachedDoc);
-                                                                    }}
-                                                                    className="px-2 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold flex items-center gap-1 transition"
-                                                                    title={`View ${attachedDoc.name}`}
-                                                                >
-                                                                    <Eye className="size-2.5" />
-                                                                    <span>View Doc</span>
-                                                                </button>
+                                                                <>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            setLastActiveSectionId(section.id);
+                                                                            try { localStorage.setItem('tax_checklist_last_active_section', section.id); } catch {}
+                                                                            onViewDocument?.(attachedDoc);
+                                                                        }}
+                                                                        className="px-2 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold flex items-center gap-1 transition"
+                                                                        title={`View ${attachedDoc.name}`}
+                                                                    >
+                                                                        <Eye className="size-2.5" />
+                                                                        <span>View Doc</span>
+                                                                    </button>
+
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={(e) => handleToggleExtract(e, item, attachedDoc)}
+                                                                        className={`px-2 py-0.5 rounded border text-[10px] font-semibold flex items-center gap-1 transition ${
+                                                                            expandedExtracts[item.id]
+                                                                                ? 'bg-purple-600 text-white border-purple-400 shadow-sm'
+                                                                                : 'bg-purple-500/15 hover:bg-purple-500/30 text-purple-300 border-purple-500/30'
+                                                                        }`}
+                                                                        title="Extract and preview key tax values"
+                                                                    >
+                                                                        {extractingMap[item.id] ? (
+                                                                            <Loader2 className="size-2.5 animate-spin" />
+                                                                        ) : (
+                                                                            <Sparkles className="size-2.5 text-purple-300" />
+                                                                        )}
+                                                                        <span>{expandedExtracts[item.id] ? 'Hide Extract' : 'Parse'}</span>
+                                                                    </button>
+
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={(e) => handleTransfer(e, null, item, attachedDoc)}
+                                                                        className="px-2 py-0.5 rounded bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30 text-[10px] font-semibold flex items-center gap-1 transition"
+                                                                        title="Transfer parsed amount directly to worksheet named cell"
+                                                                    >
+                                                                        <ArrowRightCircle className="size-2.5 text-blue-400" />
+                                                                        <span>Transfer</span>
+                                                                    </button>
+                                                                </>
                                                             ) : (
                                                                 <button
                                                                     type="button"
@@ -736,6 +858,93 @@ export default function TaxChecklist({
                                                     <p className="text-[11px] text-white/50 leading-relaxed">
                                                         {item.subtext}
                                                     </p>
+
+                                                    {/* Transferred Badge if already applied */}
+                                                    {transferredMap[item.id] && (
+                                                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] font-mono mt-1">
+                                                            <CheckCircle2 className="size-3 text-emerald-400 shrink-0" />
+                                                            <span>Transferred {transferredMap[item.id].amount} ➔ <b>[{transferredMap[item.id].namedCell}]</b></span>
+                                                            <span className="text-white/40 text-[9px]">({transferredMap[item.id].timestamp})</span>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Inline Extracted Key-Value Preview Panel */}
+                                                    {expandedExtracts[item.id] && (() => {
+                                                        const extraction = extractDocumentValues(item, attachedDoc, activeYear);
+                                                        return (
+                                                            <div 
+                                                                className="mt-2 p-2.5 rounded-lg border border-purple-500/30 bg-[#120d24] text-white space-y-2 animate-in fade-in slide-in-from-top-1 shadow-lg"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            >
+                                                                <div className="flex items-center justify-between border-b border-purple-500/20 pb-1.5 text-[11px] flex-wrap gap-1">
+                                                                    <div className="flex items-center gap-1.5 text-purple-300 font-semibold">
+                                                                        <Cpu className="size-3.5 text-purple-400 shrink-0" />
+                                                                        <span>Extracted {extraction.formType}</span>
+                                                                        <span className="text-white/40 font-mono text-[10px]">({extraction.year})</span>
+                                                                    </div>
+                                                                    <span className="text-white/60 text-[10px] truncate max-w-[200px]" title={extraction.employer}>
+                                                                        {extraction.employer}
+                                                                    </span>
+                                                                </div>
+
+                                                                <div className="space-y-1.5">
+                                                                    {extraction.fields.map((field) => {
+                                                                        const fieldCustomKey = `${item.id}_${field.key}`;
+                                                                        const currentVal = customFieldValues[fieldCustomKey] !== undefined 
+                                                                            ? customFieldValues[fieldCustomKey] 
+                                                                            : field.value;
+
+                                                                        return (
+                                                                            <div 
+                                                                                key={field.key} 
+                                                                                className="flex items-center justify-between gap-2 p-1.5 rounded bg-black/40 border border-white/5 text-[11px] hover:border-purple-500/30 transition"
+                                                                            >
+                                                                                <div className="space-y-0.5 flex-1 min-w-0">
+                                                                                    <div className="text-white/70 font-medium text-[10px] truncate">{field.label}</div>
+                                                                                    <div className="flex items-center gap-1.5">
+                                                                                        <span className="text-emerald-400 font-mono text-xs">$</span>
+                                                                                        <input
+                                                                                            type="number"
+                                                                                            step="0.01"
+                                                                                            value={currentVal}
+                                                                                            onClick={(e) => e.stopPropagation()}
+                                                                                            onChange={(e) => {
+                                                                                                const nextVal = e.target.value;
+                                                                                                setCustomFieldValues(prev => ({
+                                                                                                    ...prev,
+                                                                                                    [fieldCustomKey]: nextVal
+                                                                                                }));
+                                                                                            }}
+                                                                                            className="bg-slate-900 border border-white/15 focus:border-purple-400 focus:ring-1 focus:ring-purple-400 rounded px-1.5 py-0.5 text-xs font-mono font-bold text-emerald-300 w-28 outline-none"
+                                                                                        />
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <div className="flex items-center gap-1.5 shrink-0">
+                                                                                    {field.targetNamedCell && (
+                                                                                        <span className="px-1.5 py-0.5 rounded bg-blue-500/15 border border-blue-500/25 text-[9px] font-mono text-blue-300" title={`Named Cell target: ${field.targetNamedCell}`}>
+                                                                                            [{field.targetNamedCell}]
+                                                                                        </span>
+                                                                                    )}
+                                                                                    {field.targetNamedCell && (
+                                                                                        <button
+                                                                                            type="button"
+                                                                                            onClick={(e) => handleTransfer(e, { ...field, value: parseFloat(currentVal) || 0, formatted: `$${(parseFloat(currentVal) || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}` }, item, attachedDoc)}
+                                                                                            className="px-2 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white font-semibold text-[10px] flex items-center gap-1 transition shadow-sm"
+                                                                                            title={`Transfer $${currentVal} into ${field.targetNamedCell}`}
+                                                                                        >
+                                                                                            <Send className="size-2.5" />
+                                                                                            <span>Transfer</span>
+                                                                                        </button>
+                                                                                    )}
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })()}
                                                 </div>
                                             </div>
                                         );

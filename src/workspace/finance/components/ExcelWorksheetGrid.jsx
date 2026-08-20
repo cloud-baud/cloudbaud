@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { updateTaxCell } from '../api/taxService';
 import SpreadsheetPreview from './SpreadsheetPreview';
+import { SUMMARY_TAB_NAMED_RANGES, getNamedCell } from '../data/taxNamedRanges';
 
 export const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1xiDL-_itpnVbIfufzP990O8CcyTz1h14/edit?usp=sharing&ouid=115232289970792282072&rtpof=true&sd=true";
 export const GOOGLE_SHEET_EMBED_URL = "https://docs.google.com/spreadsheets/d/1xiDL-_itpnVbIfufzP990O8CcyTz1h14/edit?usp=sharing&widget=true&headers=false";
@@ -78,8 +79,52 @@ export default function ExcelWorksheetGrid({
   const multiYears = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
   const columns = viewMode === 'multi' ? multiYears : [year];
 
-  // Local grid data matrix state
-  const [gridData, setGridData] = useState({});
+  // Cell status management (WIP, Ready for CPA Review, Question for CPA, Filed with CPA, Filed with IRS)
+  const [cellStatuses, setCellStatuses] = useState(() => {
+    try {
+      const saved = localStorage.getItem('tax_cell_statuses');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const updateCellStatus = (rowName, colYear, newStatus) => {
+    const key = `${rowName}_${colYear}`;
+    const updated = { ...cellStatuses, [key]: newStatus };
+    setCellStatuses(updated);
+    try {
+      localStorage.setItem('tax_cell_statuses', JSON.stringify(updated));
+    } catch {}
+  };
+
+  // Recent transfer animation flash set
+  const [flashingCells, setFlashingCells] = useState({});
+
+  const triggerCellFlash = (rowName, colYear) => {
+    const key = `${rowName}_${colYear}`;
+    setFlashingCells(prev => ({ ...prev, [key]: true }));
+    setTimeout(() => {
+      setFlashingCells(prev => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+    }, 2500);
+  };
+
+  // Listen for cross-pane transfer events to auto-update cell status and flash
+  useEffect(() => {
+    const handleTransferEvent = (e) => {
+      const { rowName, year: targetYear, status } = e.detail || {};
+      if (rowName && targetYear) {
+        updateCellStatus(rowName, targetYear, status || 'ready_cpa');
+        triggerCellFlash(rowName, targetYear);
+      }
+    };
+    window.addEventListener('tax_cell_transferred', handleTransferEvent);
+    return () => window.removeEventListener('tax_cell_transferred', handleTransferEvent);
+  }, []);
 
   // Populate grid data from props entries
   useEffect(() => {
@@ -94,7 +139,7 @@ export default function ExcelWorksheetGrid({
 
     // Sample fallback accounting baseline values
     const defaults = {
-      'W2 Wages': { 2024: 0, 2023: 59110.59, 2022: 0, 2021: 49793.32, 2020: 69549.66, 2019: 84444.89, 2018: 70399.57, 2017: 63132.46 },
+      'W2 Wages': { 2024: 84200.00, 2023: 59110.59, 2022: 37995.76, 2021: 49793.32, 2020: 69549.66, 2019: 84444.89, 2018: 70399.57, 2017: 63132.46 },
       'Comfort Foods': { 2020: -44581.92, 2019: -12500.00, 2018: -8400.00, 2017: -44581.92 },
       'CloudBaud LLC': { 2024: 153952.00, 2023: 38376.00, 2022: 365772.34, 2021: 67285.01, 2020: 365772.34, 2019: 79825.51, 2018: 485019.41, 2017: 334565.42 },
       'Home Office & Utilities': { 2020: 8450.00, 2019: 7600.00, 2018: 6200.00, 2017: 5800.00 },
@@ -303,90 +348,112 @@ export default function ExcelWorksheetGrid({
       ) : (
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           {/* ── EXCEL FORMULA BAR (fx) ── */}
-          <div className="bg-[#0b101c] border-b border-white/10 px-3 py-1.5 flex items-center gap-2 shrink-0">
-            {/* Name / Cell Coordinate Box (e.g. B2) */}
-            <div className="bg-slate-900 border border-white/15 rounded px-2.5 py-1 min-w-[54px] text-center font-mono font-bold text-emerald-400 text-xs shadow-inner">
-              {selectedCell?.address || 'A1'}
-            </div>
+          {(() => {
+            const selectedNamedRow = SUMMARY_TAB_NAMED_RANGES.find(r => r.accountName === (selectedCell?.rowName || selectedCell?.rowId));
+            const activeNamedCell = selectedNamedRow ? getNamedCell(selectedNamedRow.prefix, selectedCell?.colKey || year) : null;
 
-            <div className="text-white/40 font-mono font-bold italic select-none text-xs">
-              fx
-            </div>
+            return (
+              <div className="bg-[#0b101c] border-b border-white/10 px-3 py-1.5 flex items-center gap-2 shrink-0">
+                {/* Name / Cell Coordinate & Named Range Box */}
+                <div 
+                  className="bg-slate-900 border border-white/15 rounded px-2 py-1 text-center font-mono font-bold text-emerald-400 text-xs shadow-inner flex items-center gap-1.5 shrink-0" 
+                  title={activeNamedCell ? `Named Cell in Google Sheets: [${activeNamedCell}]` : 'Cell Address'}
+                >
+                  <span>{selectedCell?.address || 'A1'}</span>
+                  {activeNamedCell && (
+                    <span className="text-[10px] text-blue-300 font-mono font-semibold bg-blue-500/10 px-1 rounded border border-blue-500/20">
+                      {activeNamedCell}
+                    </span>
+                  )}
+                </div>
 
-            {/* Formula Input */}
-            <input
-              type="text"
-              value={formulaValue}
-              onChange={handleFormulaBarChange}
-              placeholder="Enter formula or value (e.g. 69549.66 or =SUM(B2:B5))..."
-              className="flex-1 bg-slate-900/90 border border-white/15 rounded px-2.5 py-1 text-xs text-white font-mono placeholder:text-white/25 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
+                <div className="text-white/40 font-mono font-bold italic select-none text-xs">
+                  fx
+                </div>
 
-            {selectedCell?.rowName && (
-              <span className="text-[10px] text-white/40 truncate max-w-[160px]">
-                {selectedCell.rowName}
-              </span>
-            )}
-          </div>
+                {/* Formula Input */}
+                <input
+                  type="text"
+                  value={formulaValue}
+                  onChange={handleFormulaBarChange}
+                  placeholder="Enter formula or value (e.g. 69549.66 or =SUM(B2:B5))..."
+                  className="flex-1 bg-slate-900/90 border border-white/15 rounded px-2.5 py-1 text-xs text-white font-mono placeholder:text-white/25 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+
+                {/* Cell Status Selector */}
+                {selectedCell && (
+                  <div className="flex items-center gap-1 shrink-0 bg-slate-900 border border-white/10 rounded px-1.5 py-0.5">
+                    <span className="text-[10px] text-white/40 font-medium">Status:</span>
+                    <select
+                      value={cellStatuses[`${selectedCell.rowName || selectedCell.rowId}_${selectedCell.colKey}`] || 'wip'}
+                      onChange={(e) => updateCellStatus(selectedCell.rowName || selectedCell.rowId, selectedCell.colKey, e.target.value)}
+                      className="bg-transparent text-[10px] font-semibold text-blue-300 outline-none cursor-pointer"
+                    >
+                      <option value="wip" className="bg-slate-900 text-amber-300">Work in Progress</option>
+                      <option value="ready_cpa" className="bg-slate-900 text-blue-300">Ready for CPA Review</option>
+                      <option value="cpa_question" className="bg-slate-900 text-purple-300">Question for CPA</option>
+                      <option value="filed_cpa" className="bg-slate-900 text-cyan-300">Filed with CPA</option>
+                      <option value="filed_irs" className="bg-slate-900 text-emerald-300">Filed with IRS</option>
+                    </select>
+                  </div>
+                )}
+
+                {selectedCell?.rowName && (
+                  <span className="text-[10px] text-white/40 truncate max-w-[140px]">
+                    {selectedCell.rowName}
+                  </span>
+                )}
+              </div>
+            );
+          })()}
 
           {/* ── EXCEL SPREADSHEET TABLE GRID ── */}
           <div className="flex-1 overflow-auto bg-[#070b14]">
-            <table className="w-full border-collapse table-fixed">
-              {/* Header Row 1: Column Letters (A, B, C, D...) */}
-              <thead className="sticky top-0 bg-[#0e1422] z-20 shadow-sm border-b border-white/15">
-                <tr className="h-6 text-[10px] text-white/50 font-mono">
-                  {/* Top-Left Corner Cell */}
-                  <th className="w-10 min-w-[40px] max-w-[40px] bg-[#0c1220] border-r border-b border-white/10 text-center select-none">
-                    #
+            <table className="w-full border-collapse text-left border border-white/10">
+              {/* Column Headers (A, B, C, D...) */}
+              <thead>
+                <tr className="bg-[#0b101c] text-white/60 text-[11px] font-mono border-b border-white/10 select-none sticky top-0 z-10">
+                  <th className="w-10 p-1.5 text-center border-r border-white/10 bg-[#070c17]">#</th>
+                  <th className="p-1.5 px-3 border-r border-white/10 min-w-[200px] font-semibold text-white">
+                    A • Account / Category
                   </th>
-
-                  {/* Column A: Categories */}
-                  <th className="min-w-[200px] border-r border-b border-white/10 px-3 text-center uppercase tracking-wider font-semibold text-white/70">
-                    A (Accounting Label)
-                  </th>
-
-                  {/* Column B, C, D...: Tax Years */}
                   {columns.map((colYear, idx) => {
                     const colLetter = String.fromCharCode(66 + idx);
                     return (
                       <th
                         key={colYear}
-                        className={`min-w-[140px] border-r border-b border-white/10 px-3 text-center uppercase tracking-wider font-semibold ${
-                          colYear === year ? 'text-emerald-400 bg-emerald-950/30' : 'text-white/70'
+                        className={`p-1.5 px-3 border-r border-white/10 text-right min-w-[130px] transition ${
+                          colYear === year ? 'bg-blue-950/40 text-blue-300 font-bold border-b-2 border-b-blue-500' : ''
                         }`}
                       >
-                        {colLetter} ({colYear})
+                        {colLetter} • {colYear}
                       </th>
                     );
                   })}
-
-                  {/* Review / CPA Thread Column */}
-                  <th className="w-24 min-w-[96px] border-b border-white/10 px-2 text-center text-white/50">
+                  <th className="w-24 p-1.5 text-center border-r border-white/10 text-[10px] font-sans">
                     CPA Thread
                   </th>
                 </tr>
               </thead>
 
-              <tbody>
+              {/* Data Rows */}
+              <tbody className="divide-y divide-white/5 font-mono text-xs">
                 {accounts.map((acc, rowIdx) => {
-                  const rowNum = rowIdx + 2;
-                  const isSelectedRow = selectedCell?.rowName === acc.name || selectedCat?.id === acc.id;
-                  const threadKey = `th_worksheet_row_${acc.name}_${year}`;
-                  const thread = threads[threadKey];
+                  const threadId = `th_category_${acc.id}_${year}`;
+                  const thread = threads[threadId];
                   const commentCount = thread?.comments?.length || 0;
-                  const status = thread?.status || 'none';
+                  const status = thread?.status || 'pending';
 
                   return (
                     <tr
-                      key={acc.id || acc.name}
-                      onClick={() => handleCellClick(acc, year, 0, rowIdx)}
-                      className={`border-b border-white/5 transition-colors cursor-pointer ${
-                        isSelectedRow ? 'bg-blue-900/30 text-white' : 'hover:bg-white/[0.03] text-white/90'
+                      key={acc.id}
+                      className={`hover:bg-blue-600/10 transition-colors group ${
+                        selectedCat?.id === acc.id ? 'bg-blue-950/20' : ''
                       }`}
                     >
-                      {/* Row Number Header (1, 2, 3...) */}
-                      <td className="w-10 min-w-[40px] max-w-[40px] bg-[#0c1220] border-r border-white/10 text-center font-mono text-[10px] text-white/40 select-none py-1.5">
-                        {rowNum}
+                      {/* Row Index Number */}
+                      <td className="p-1 text-center text-white/30 text-[10px] bg-[#070c17] select-none border-r border-white/10">
+                        {rowIdx + 2}
                       </td>
 
                       {/* Account Label (Column A) */}

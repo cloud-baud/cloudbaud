@@ -161,7 +161,8 @@ function DocsPane({ onSelectAndSwitch }) {
     openReviewPanel,
     year,
     isDocsCollapsed,
-    setIsDocsCollapsed
+    setIsDocsCollapsed,
+    onTransferValue
   } = useWorkbench();
 
   return (
@@ -176,6 +177,7 @@ function DocsPane({ onSelectAndSwitch }) {
       isDocsCollapsed={isDocsCollapsed}
       setIsDocsCollapsed={setIsDocsCollapsed}
       onSelectAndSwitch={onSelectAndSwitch}
+      onTransferValue={onTransferValue}
     />
   );
 }
@@ -236,7 +238,7 @@ const TAX_YEAR_ENTRIES_MAP = {
     { category_id: '5', amount: 3500.00 }
   ],
   2022: [
-    { category_id: '1', amount: 0 },
+    { category_id: '1', amount: 37995.76 },
     { category_id: '2', amount: 0 },
     { category_id: '3', amount: 365772.34 },
     { category_id: '4', amount: 8600.00 },
@@ -481,6 +483,46 @@ export default function FinanceThreePane() {
 
   const [activeSheet, setActiveSheet] = useState('worksheet'); // 'worksheet' | 'checklist'
 
+  // Handle cross-pane transfers from Checklist to Named Cell
+  const handleTransferValue = async ({ namedCell, targetAccount, amount, year: targetYear, docName, label }) => {
+    const yr = targetYear || year;
+    const numAmount = typeof amount === 'number' ? amount : parseFloat(amount);
+    if (isNaN(numAmount)) return;
+
+    // 1. Update entries state
+    setEntries(prev => {
+      const matchAcc = accounts.find(a => a.name.toLowerCase() === (targetAccount || '').toLowerCase()) || accounts[0];
+      const accId = matchAcc?.id || '1';
+      const existing = prev.find(e => e.category_id === accId);
+      if (existing) {
+        return prev.map(e => (e === existing ? { ...e, amount: numAmount } : e));
+      } else {
+        return [...prev, { category_id: accId, amount: numAmount }];
+      }
+    });
+
+    // 2. Set Cell Status to 'Ready for CPA Review' and flash cell
+    const targetRowName = targetAccount || 'W2 Wages';
+    try {
+      const savedStatuses = JSON.parse(localStorage.getItem('tax_cell_statuses') || '{}');
+      savedStatuses[`${targetRowName}_${yr}`] = 'ready_cpa';
+      localStorage.setItem('tax_cell_statuses', JSON.stringify(savedStatuses));
+      window.dispatchEvent(new CustomEvent('tax_cell_transferred', { 
+        detail: { rowName: targetRowName, year: yr, amount: numAmount, namedCell, status: 'ready_cpa' } 
+      }));
+    } catch {}
+
+    // 3. Persist to API if available
+    try {
+      const matchAcc = accounts.find(a => a.name.toLowerCase() === (targetAccount || '').toLowerCase()) || accounts[0];
+      if (matchAcc?.id) {
+        await updateTaxCell(matchAcc.id, yr, numAmount, `Transferred from ${docName} [${namedCell}] (Ready for CPA Review)`);
+      }
+    } catch (err) {
+      console.warn('Local cell updated, backend sync skipped:', err);
+    }
+  };
+
   const ctx = {
     year,
     setYear,
@@ -500,7 +542,8 @@ export default function FinanceThreePane() {
     isFormCollapsed,
     setIsFormCollapsed,
     activeSheet,
-    setActiveSheet
+    setActiveSheet,
+    onTransferValue: handleTransferValue
   };
 
   return (
