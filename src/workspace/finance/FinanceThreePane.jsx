@@ -20,7 +20,8 @@ import {
 } from 'lucide-react';
 import { getChartOfAccounts, getTaxEntries, getMyDocuments } from './api/taxService';
 import AnnotationReviewPanel from './components/AnnotationReviewPanel';
-import { useViewAs } from './ViewAsContext';
+import TaxRibbon from './components/TaxRibbon';
+import Form1040ReturnPane from './components/Form1040ReturnPane';
 
 const WorkbenchContext = createContext(null);
 const useWorkbench = () => useContext(WorkbenchContext);
@@ -111,7 +112,11 @@ function WorksheetPane({ onSelectAndSwitch }) {
     setSelectedDoc, 
     setSelectedFormLine, 
     threads, 
-    openReviewPanel
+    openReviewPanel,
+    isDocsCollapsed,
+    setIsDocsCollapsed,
+    isFormCollapsed,
+    setIsFormCollapsed
   } = useWorkbench();
 
   return (
@@ -128,6 +133,10 @@ function WorksheetPane({ onSelectAndSwitch }) {
         onSelectAndSwitch={onSelectAndSwitch}
         threads={threads}
         openReviewPanel={openReviewPanel}
+        isDocsCollapsed={isDocsCollapsed}
+        setIsDocsCollapsed={setIsDocsCollapsed}
+        isFormCollapsed={isFormCollapsed}
+        setIsFormCollapsed={setIsFormCollapsed}
       />
     </div>
   );
@@ -168,14 +177,15 @@ function DocsPane({ onSelectAndSwitch }) {
 }
 
 /* ========================================================
-   PANE 3: WIP (DRAFT) 1040 RETURN PANE
+   PANE 3: FORM 1040 RETURN PANE (ACCORDION & PDF VIEWER)
    ======================================================== */
-function WIPFormPane() {
+function Form1040Pane() {
   const { 
     selectedCat, 
     setSelectedFormLine, 
     setSelectedCat, 
     accounts,
+    entries,
     threads,
     openReviewPanel,
     year,
@@ -183,157 +193,19 @@ function WIPFormPane() {
     setIsFormCollapsed
   } = useWorkbench();
 
-  const { activePersona, isViewingAs } = useViewAs();
-
-  const formLines = [
-    { line: 'W2 Wages (Line 1a)', amount: 69549.66, cat: 'W2 Wages' },
-    { line: 'Biz Income - Comfort Foods (Sch C)', amount: -44581.92, cat: 'Comfort Foods' },
-    { line: 'CloudBaud LLC Pass-Through (Sch E)', amount: 365772.34, cat: 'CloudBaud LLC' },
-    { line: 'Total Adjusted Gross Income (AGI)', amount: 390740.08, total: true },
-    { line: 'Estimated Tax Due / Refund', amount: 4000.00, cat: 'Estimated Refund', total: true, refund: true },
-  ];
-
-  // Render Slim Collapsed Strip
-  if (isFormCollapsed) {
-    return (
-      <div 
-        onClick={() => setIsFormCollapsed(false)}
-        className="w-11 h-full border-l border-white/10 bg-[#0a0f1d] hover:bg-[#11192e] cursor-pointer flex flex-col items-center py-4 justify-between transition group select-none shrink-0"
-        title="Click to expand WIP 1040 Return"
-      >
-        <div className="flex flex-col items-center gap-3">
-          <button className="p-1 rounded hover:bg-white/10 text-purple-400 group-hover:scale-110 transition">
-            <PanelRightOpen className="size-4" />
-          </button>
-          <FileCheck className="size-4 text-purple-400/80" />
-        </div>
-
-        <span className="[writing-mode:vertical-rl] rotate-180 text-[11px] font-semibold text-white/60 tracking-wider whitespace-nowrap">
-          WIP (DRAFT) 1040 Return
-        </span>
-
-        <span className="text-[10px] text-purple-400 font-bold bg-purple-500/20 px-1.5 py-0.5 rounded">
-          $390k
-        </span>
-      </div>
-    );
-  }
-
   return (
-    <div className="h-full flex flex-col bg-[#0b0f19] text-white text-xs overflow-hidden">
-      {/* Header */}
-      <div className="bg-[#121829] p-3 font-semibold border-b border-white/10 flex justify-between items-center shrink-0">
-        <div className="flex items-center gap-2">
-          <FileCheck className="size-4 text-purple-400" />
-          <span className="font-bold text-sm tracking-tight">WIP Federal 1040 (Draft)</span>
-          <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-            CPA Review Stage
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <div className="text-[11px] text-white/50 hidden sm:block">
-            Reviewer: <b className="text-white">{isViewingAs ? activePersona.name : 'Me (Owner)'}</b>
-          </div>
-
-          {/* Collapse Button */}
-          <button
-            onClick={() => setIsFormCollapsed(true)}
-            className="p-1.5 rounded hover:bg-white/10 text-slate-400 hover:text-white transition"
-            title="Collapse WIP 1040 Return"
-          >
-            <PanelRightClose className="size-3.5" />
-          </button>
-        </div>
-      </div>
-
-      {/* Form Breakdown */}
-      <div className="flex-1 overflow-auto p-4 space-y-4">
-        {selectedCat && (
-          <div className="bg-blue-950/40 border border-blue-500/30 rounded-lg p-2.5 text-[11px] text-blue-200 flex items-center justify-between">
-            <span>📌 Focused Line: <b>{selectedCat.name}</b></span>
-            <button 
-              onClick={() => openReviewPanel('form_line', selectedCat.name, `Form 1040 - ${selectedCat.name}`)}
-              className="text-xs font-bold text-blue-400 hover:text-blue-200 underline"
-            >
-              Open Line Review
-            </button>
-          </div>
-        )}
-
-        {/* 1040 Line Items */}
-        <div className="border border-white/10 rounded-xl overflow-hidden divide-y divide-white/5 bg-[#0e1424]">
-          {formLines.map((fl, i) => {
-            const isHighlight = selectedCat && fl.cat && selectedCat.name.includes(fl.cat.split(' ')[0]);
-            const threadKey = `th_form_line_${fl.cat || fl.line}_${year}`;
-            const lineThread = threads[threadKey];
-            const status = lineThread?.status || 'pending';
-            const commentCount = lineThread?.comments?.length || 0;
-
-            return (
-              <div 
-                key={i} 
-                onClick={() => {
-                  if (fl.cat) {
-                    setSelectedFormLine(fl.cat);
-                    const match = accounts.find(a => a.name.includes(fl.cat));
-                    if (match) setSelectedCat(match);
-                  }
-                }}
-                className={`p-3.5 flex items-center justify-between cursor-pointer transition ${
-                  isHighlight ? 'bg-blue-600/25 text-white font-semibold' : 'hover:bg-white/5'
-                } ${fl.total ? 'bg-white/5 font-bold border-t border-white/10' : ''}`}
-              >
-                <div className="flex items-center gap-2">
-                  <span className={fl.refund ? 'text-emerald-400' : 'text-white/90'}>{fl.line}</span>
-                  {fl.cat && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openReviewPanel('form_line', fl.cat, `Form 1040 Line: ${fl.line}`);
-                      }}
-                      className={`size-5 rounded-full flex items-center justify-center text-[10px] border transition ${
-                        status === 'accepted' ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300' :
-                        status === 'rejected' ? 'bg-red-500/20 border-red-500/40 text-red-300' :
-                        commentCount > 0 ? 'bg-amber-500/20 border-amber-500/40 text-amber-300' :
-                        'bg-white/5 border-white/10 text-white/40 hover:text-white'
-                      }`}
-                      title="Line Review Thread"
-                    >
-                      <MessageSquare className="size-2.5" />
-                    </button>
-                  )}
-                </div>
-
-                <span className={`font-mono text-xs ${fl.refund ? 'text-emerald-400 font-bold text-sm' : 'text-white'}`}>
-                  ${fl.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* 1040 Form PDF Draft Canvas */}
-        <div className="border border-white/10 rounded-xl p-6 bg-[#070b14] flex flex-col items-center justify-center text-center space-y-3 min-h-[220px]">
-          <FileCheck className="size-10 text-blue-400 opacity-60" />
-          <div className="space-y-1">
-            <h4 className="font-bold text-sm text-white">Form 1040 Draft Preview</h4>
-            <p className="text-[11px] text-white/40 max-w-[280px]">
-              David Ramsey CPA review version • Reconciled against {accounts.length} categories and supporting docs.
-            </p>
-          </div>
-          <div className="flex gap-2 pt-2">
-            <button 
-              onClick={() => openReviewPanel('form_line', 'Form 1040 Complete Return', 'Full 1040 Draft Review')}
-              className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 rounded font-semibold text-xs text-white transition flex items-center gap-1.5"
-            >
-              <MessageSquare className="size-3" />
-              <span>Review & Make Decision</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Form1040ReturnPane
+      year={year}
+      accounts={accounts}
+      entries={entries}
+      selectedCat={selectedCat}
+      setSelectedCat={setSelectedCat}
+      setSelectedFormLine={setSelectedFormLine}
+      threads={threads}
+      openReviewPanel={openReviewPanel}
+      isFormCollapsed={isFormCollapsed}
+      setIsFormCollapsed={setIsFormCollapsed}
+    />
   );
 }
 
@@ -631,7 +503,7 @@ export default function FinanceThreePane() {
           {[
             { id: 'worksheet', label: 'Worksheet', count: accounts.length },
             { id: 'docs', label: 'Supporting Docs', count: docs.length },
-            { id: 'form', label: '1040 Draft', count: null },
+            { id: 'form', label: '1040 Return', count: null },
           ].map(t => (
             <button 
               key={t.id} 
@@ -643,6 +515,28 @@ export default function FinanceThreePane() {
               {t.label} {t.count !== null && <span className="text-[10px] ml-1 opacity-70">({t.count})</span>}
             </button>
           ))}
+        </div>
+
+        {/* FULL-WIDTH RIBBON — Spans across all 3 panes */}
+        <div className="w-full shrink-0 border-b border-white/10">
+          <TaxRibbon
+            activeYear={year}
+            years={[2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017]}
+            viewMode="three_pane"
+            onYearChange={(newYear) => {
+              if (newYear && newYear !== 'summary') {
+                setYear(parseInt(newYear, 10));
+              }
+            }}
+            onDocPreview={(fileUrl) => {
+              const fileName = fileUrl.split('/').pop();
+              const found = docs.find(d => d.name === fileName) || { name: fileName, hasFile: true, type: 'PDF' };
+              setSelectedDoc(found);
+            }}
+            onSave={() => {
+              console.log('Worksheet and documents saved.');
+            }}
+          />
         </div>
 
         {/* WORKFLOW PROGRESS BAR — always visible, hover for audit checklist */}
@@ -670,13 +564,13 @@ export default function FinanceThreePane() {
               <DocsPane />
             </div>
 
-            {/* Pane 3: WIP (DRAFT) 1040 Return */}
+            {/* Pane 3: Form 1040 Return (Accordion & PDF Preview) */}
             <div className={`h-full overflow-hidden transition-all duration-300 ${
               isFormCollapsed ? 'w-11 shrink-0' :
               isDocsCollapsed ? 'flex-[1.6] min-w-[320px]' :
               'flex-[1.2] min-w-[320px]'
             }`}>
-              <WIPFormPane />
+              <Form1040Pane />
             </div>
           </div>
 
@@ -684,7 +578,7 @@ export default function FinanceThreePane() {
           <div className="md:hidden flex-1 overflow-hidden">
             {activeTab === 'worksheet' && <WorksheetPane onSelectAndSwitch={setActiveTab} />}
             {activeTab === 'docs' && <DocsPane onSelectAndSwitch={setActiveTab} />}
-            {activeTab === 'form' && <WIPFormPane />}
+            {activeTab === 'form' && <Form1040Pane />}
           </div>
 
           {/* SLIDE-OUT CPA ANNOTATION & REVIEW PANEL */}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Save,
   Copy,
@@ -15,7 +15,19 @@ import {
   MessageSquare,
   CheckCircle2,
   XCircle,
-  Table as TableIcon
+  Upload,
+  Download,
+  Printer,
+  FileSpreadsheet,
+  FileText,
+  PanelLeftOpen,
+  PanelLeftClose,
+  PanelRightOpen,
+  PanelRightClose,
+  Maximize2,
+  Minimize2,
+  LayoutGrid,
+  ChevronDown
 } from 'lucide-react';
 import { updateTaxCell } from '../api/taxService';
 
@@ -31,9 +43,13 @@ export default function ExcelWorksheetGrid({
   onSelectAndSwitch,
   threads = {},
   openReviewPanel,
-  onSaveCell
+  onSaveCell,
+  isDocsCollapsed = false,
+  setIsDocsCollapsed,
+  isFormCollapsed = false,
+  setIsFormCollapsed
 }) {
-  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'insert' | 'data' | 'view'
+  const [activeTab, setActiveTab] = useState('home'); // 'file' | 'home' | 'insert' | 'data' | 'view'
   const [viewMode, setViewMode] = useState('focused'); // 'focused' (single year) | 'multi' (2017-2025)
   const [selectedCell, setSelectedCell] = useState({ rowId: 'w2_wages', colKey: year, address: 'B2' });
   const [formulaValue, setFormulaValue] = useState('');
@@ -44,6 +60,7 @@ export default function ExcelWorksheetGrid({
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [alignment, setAlignment] = useState('right');
+  const uploadInputRef = useRef(null);
 
   // Multi-year columns list
   const multiYears = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
@@ -180,6 +197,72 @@ export default function ExcelWorksheetGrid({
     }
   };
 
+  // Handle CSV/Excel Download
+  const handleDownloadExcel = () => {
+    const yearsToExport = viewMode === 'multi' ? multiYears : [year];
+    let csv = 'Account / Category,' + yearsToExport.map(y => `Tax Year ${y}`).join(',') + '\n';
+    accounts.forEach(acc => {
+      const rowVals = yearsToExport.map(y => {
+        const val = gridData[acc.name]?.[y];
+        return val !== undefined && val !== null ? val : 0;
+      });
+      csv += `"${acc.name.replace(/"/g, '""')}",` + rowVals.join(',') + '\n';
+    });
+    csv += 'Net Total,' + yearsToExport.map(y => calculateColumnTotal(y)).join(',') + '\n';
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `CloudBaud_Tax_Worksheet_${viewMode === 'multi' ? '2017-2025' : year}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // Handle PDF / Print
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleDownloadPdf = () => {
+    window.print();
+  };
+
+  // Handle Upload Spreadsheet
+  const handleUploadSpreadsheet = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const text = evt.target?.result;
+        if (typeof text === 'string') {
+          const lines = text.split(/\r?\n/);
+          let count = 0;
+          lines.forEach(line => {
+            const parts = line.split(',');
+            if (parts.length >= 2) {
+              const accName = parts[0].replace(/^"|"$/g, '').trim();
+              const num = parseFloat(parts[1]);
+              if (accName && !isNaN(num)) {
+                handleSaveEdit(accName, year, num);
+                count++;
+              }
+            }
+          });
+          alert(`Successfully imported ${count} entries from ${file.name} into Tax Year ${year}!`);
+        }
+      } catch (err) {
+        alert('Could not parse file: ' + err.message);
+      } finally {
+        if (uploadInputRef.current) uploadInputRef.current.value = '';
+      }
+    };
+    reader.readAsText(file);
+  };
+
   // Auto-Sum Column Totals
   const calculateColumnTotal = (colKey) => {
     let sum = 0;
@@ -192,14 +275,32 @@ export default function ExcelWorksheetGrid({
 
   return (
     <div className="flex flex-col h-full bg-[#090e18] text-white text-xs select-none overflow-hidden">
+      {/* Hidden File Input for Spreadsheet Upload */}
+      <input
+        ref={uploadInputRef}
+        type="file"
+        accept=".csv,.xlsx,.xls,.txt"
+        onChange={handleUploadSpreadsheet}
+        className="hidden"
+      />
+
       {/* ── EXCEL RIBBON TOOLBAR ── */}
       <div className="bg-[#121827] border-b border-white/15 shrink-0 flex flex-col">
         {/* Ribbon Tabs */}
         <div className="flex items-center gap-1 px-2 pt-1 border-b border-white/10 bg-[#0e1422] text-[11px]">
-          <span className="font-bold text-emerald-400 px-2 py-1 flex items-center gap-1 mr-2 text-xs">
-            <TableIcon className="size-3.5" />
-            <span>Excel Worksheet</span>
-          </span>
+          {/* File Menu Tab */}
+          <button
+            onClick={() => setActiveTab('file')}
+            className={`px-3 py-1.5 font-bold rounded-t flex items-center gap-1.5 transition ${
+              activeTab === 'file'
+                ? 'bg-emerald-700 text-white border-t-2 border-emerald-300 shadow-sm'
+                : 'bg-emerald-800/80 hover:bg-emerald-700 text-white/90'
+            }`}
+            title="File Menu (Upload, Download, Save As, Print)"
+          >
+            <FileSpreadsheet className="size-3.5" />
+            <span>File</span>
+          </button>
 
           {[
             { id: 'home', label: 'Home' },
@@ -223,6 +324,63 @@ export default function ExcelWorksheetGrid({
 
         {/* Ribbon Actions Toolbar */}
         <div className="p-1.5 px-3 flex items-center gap-2 overflow-x-auto min-h-[44px]">
+          {/* ── FILE MENU ── */}
+          {activeTab === 'file' && (
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Upload Button */}
+              <button
+                onClick={() => uploadInputRef.current?.click()}
+                className="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white font-semibold text-[11px] flex items-center gap-1.5 shadow-sm transition"
+                title="Upload spreadsheet (CSV/XLSX) to populate worksheet"
+              >
+                <Upload className="size-3.5" />
+                <span>Upload</span>
+              </button>
+
+              {/* Download Button */}
+              <button
+                onClick={handleDownloadExcel}
+                className="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-[11px] flex items-center gap-1.5 shadow-sm transition"
+                title="Download current worksheet data"
+              >
+                <Download className="size-3.5" />
+                <span>Download</span>
+              </button>
+
+              {/* Save As Dropdown / Group */}
+              <div className="flex items-center bg-white/5 rounded border border-white/10 p-0.5">
+                <span className="text-[10px] text-white/50 px-2 font-medium">Save As:</span>
+                <button
+                  onClick={handleDownloadExcel}
+                  className="px-2 py-0.5 rounded hover:bg-white/10 text-emerald-300 font-semibold text-[11px] flex items-center gap-1 transition"
+                  title="Save As Excel / CSV format"
+                >
+                  <FileSpreadsheet className="size-3 text-emerald-400" />
+                  <span>Excel (.xlsx)</span>
+                </button>
+                <button
+                  onClick={handleDownloadPdf}
+                  className="px-2 py-0.5 rounded hover:bg-white/10 text-purple-300 font-semibold text-[11px] flex items-center gap-1 transition"
+                  title="Save As PDF report"
+                >
+                  <FileText className="size-3 text-purple-400" />
+                  <span>PDF (.pdf)</span>
+                </button>
+              </div>
+
+              {/* Print Button */}
+              <button
+                onClick={handlePrint}
+                className="px-2.5 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white font-semibold text-[11px] flex items-center gap-1.5 shadow-sm transition"
+                title="Print worksheet or Save to PDF printer"
+              >
+                <Printer className="size-3.5" />
+                <span>Print</span>
+              </button>
+            </div>
+          )}
+
+          {/* ── HOME MENU ── */}
           {activeTab === 'home' && (
             <>
               {/* Clipboard */}
@@ -294,6 +452,7 @@ export default function ExcelWorksheetGrid({
             </>
           )}
 
+          {/* ── INSERT MENU ── */}
           {activeTab === 'insert' && (
             <div className="flex items-center gap-2">
               <button 
@@ -316,6 +475,7 @@ export default function ExcelWorksheetGrid({
             </div>
           )}
 
+          {/* ── DATA MENU ── */}
           {activeTab === 'data' && (
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1.5 bg-blue-950/60 border border-blue-500/30 px-2.5 py-1 rounded text-blue-200 text-[11px]">
@@ -325,25 +485,79 @@ export default function ExcelWorksheetGrid({
             </div>
           )}
 
+          {/* ── VIEW MENU ── */}
           {activeTab === 'view' && (
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] text-white/50">Grid Layout:</span>
-              <button
-                onClick={() => setViewMode('focused')}
-                className={`px-2.5 py-1 rounded text-[11px] font-semibold transition ${
-                  viewMode === 'focused' ? 'bg-blue-600 text-white' : 'bg-white/5 text-white/60 hover:text-white'
-                }`}
-              >
-                Focused ({year})
-              </button>
-              <button
-                onClick={() => setViewMode('multi')}
-                className={`px-2.5 py-1 rounded text-[11px] font-semibold transition ${
-                  viewMode === 'multi' ? 'bg-blue-600 text-white' : 'bg-white/5 text-white/60 hover:text-white'
-                }`}
-              >
-                Multi-Year (2017–2025)
-              </button>
+            <div className="flex items-center gap-3 flex-wrap">
+              {/* Grid Layout Toggle */}
+              <div className="flex items-center gap-1 pr-3 border-r border-white/10">
+                <span className="text-[10px] text-white/50 font-medium">Grid:</span>
+                <button
+                  onClick={() => setViewMode('focused')}
+                  className={`px-2 py-1 rounded text-[11px] font-semibold transition ${
+                    viewMode === 'focused' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white/5 text-white/60 hover:text-white'
+                  }`}
+                  title="Single Year Focused View"
+                >
+                  Single Year ({year})
+                </button>
+                <button
+                  onClick={() => setViewMode('multi')}
+                  className={`px-2 py-1 rounded text-[11px] font-semibold transition ${
+                    viewMode === 'multi' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white/5 text-white/60 hover:text-white'
+                  }`}
+                  title="Multi-Year Overview (2017-2025)"
+                >
+                  Overview (2017–2025)
+                </button>
+              </div>
+
+              {/* Panel Expand / Collapse Controls */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] text-white/50 font-medium">Panels:</span>
+
+                {/* Supporting Docs Panel Toggle */}
+                <button
+                  onClick={() => setIsDocsCollapsed?.(!isDocsCollapsed)}
+                  className={`px-2 py-1 rounded text-[11px] font-medium flex items-center gap-1 transition ${
+                    !isDocsCollapsed ? 'bg-emerald-600/30 text-emerald-300 border border-emerald-500/30' : 'bg-white/5 text-white/50 hover:text-white'
+                  }`}
+                  title={isDocsCollapsed ? 'Expand Supporting Docs Panel' : 'Collapse Supporting Docs Panel'}
+                >
+                  {isDocsCollapsed ? <PanelLeftOpen className="size-3 text-slate-400" /> : <PanelLeftClose className="size-3 text-emerald-400" />}
+                  <span>Docs: {isDocsCollapsed ? 'Collapsed' : 'Expanded'}</span>
+                </button>
+
+                {/* Form 1040 WIP Draft Toggle */}
+                <button
+                  onClick={() => setIsFormCollapsed?.(!isFormCollapsed)}
+                  className={`px-2 py-1 rounded text-[11px] font-medium flex items-center gap-1 transition ${
+                    !isFormCollapsed ? 'bg-purple-600/30 text-purple-300 border border-purple-500/30' : 'bg-white/5 text-white/50 hover:text-white'
+                  }`}
+                  title={isFormCollapsed ? 'Expand 1040 WIP Draft Panel' : 'Collapse 1040 WIP Draft Panel'}
+                >
+                  {isFormCollapsed ? <PanelRightOpen className="size-3 text-slate-400" /> : <PanelRightClose className="size-3 text-purple-400" />}
+                  <span>1040 WIP: {isFormCollapsed ? 'Collapsed' : 'Expanded'}</span>
+                </button>
+
+                {/* Focus Worksheet / Restore 3 Panes Toggle */}
+                <button
+                  onClick={() => {
+                    const bothCollapsed = isDocsCollapsed && isFormCollapsed;
+                    if (bothCollapsed) {
+                      setIsDocsCollapsed?.(false);
+                      setIsFormCollapsed?.(false);
+                    } else {
+                      setIsDocsCollapsed?.(true);
+                      setIsFormCollapsed?.(true);
+                    }
+                  }}
+                  className="px-2 py-1 rounded bg-white/5 hover:bg-white/15 text-white/80 hover:text-white text-[11px] font-medium flex items-center gap-1 transition"
+                  title={isDocsCollapsed && isFormCollapsed ? 'Restore 3-Pane Balanced Layout' : 'Focus Worksheet (Maximize)'}
+                >
+                  {isDocsCollapsed && isFormCollapsed ? <Minimize2 className="size-3 text-blue-400" /> : <Maximize2 className="size-3 text-amber-400" />}
+                  <span>{isDocsCollapsed && isFormCollapsed ? 'Restore Panes' : 'Focus Worksheet'}</span>
+                </button>
+              </div>
             </div>
           )}
         </div>
