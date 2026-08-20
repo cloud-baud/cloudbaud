@@ -15,6 +15,7 @@ import LoginPage from "./portal/pages/auth/LoginPage"
 import { AuthProvider } from '@/shared/contexts/AuthContext';
 import { ContentProvider } from '@/shared/contexts/ContentContext';
 import { ViewAsProvider } from './workspace/finance/ViewAsContext';
+import { FontSizeProvider } from '@/shared/contexts/FontSizeContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import AuthRedirector from './components/auth/AuthRedirector';
 import { Toaster } from './shared/ui/sonner';
@@ -24,12 +25,13 @@ function App() {
   return (
     <DynamicMsalProvider>
       <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-        <AuthProvider>
-          <ContentProvider>
-            <ViewAsProvider>
-              <Router>
-                <Toaster />
-                <AuthRedirector />
+        <FontSizeProvider>
+          <AuthProvider>
+            <ContentProvider>
+              <ViewAsProvider>
+                <Router>
+                  <Toaster />
+                  <AuthRedirector />
               <Routes>
                 <Route element={<MarketingLayout />}>
                   <Route path="/" element={<HomePage />} />
@@ -59,10 +61,11 @@ function App() {
                 </Route>
                 <Route path="*" element={<Navigate to="/collaboration" replace />} />
               </Routes>
-            </Router>
-            </ViewAsProvider>
-          </ContentProvider>
-        </AuthProvider>
+              </Router>
+              </ViewAsProvider>
+            </ContentProvider>
+          </AuthProvider>
+        </FontSizeProvider>
       </ThemeProvider>
     </DynamicMsalProvider>
   );

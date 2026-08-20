@@ -19,21 +19,21 @@ const mockSlides = [
 
 export default function PitchDeckPage() {
   return (
-    <div className="max-w-5xl mx-auto p-8 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div className="max-w-5xl mx-auto p-4 md:p-6 animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight mb-1 flex items-center gap-2">
-            <FileText className="size-6 text-primary" /> Pitch Deck (Series A)
+          <h1 className="text-xl font-bold tracking-tight mb-0.5 flex items-center gap-2">
+            <FileText className="size-5 text-primary" /> Pitch Deck (Series A)
           </h1>
-          <p className="text-muted-foreground">Collaborate, edit, and share your investor deck. All changes auto-save and are tracked by owner.</p>
+          <p className="text-xs text-muted-foreground">Collaborate, edit, and share your investor deck. All changes auto-save and are tracked by owner.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline"><Upload className="size-4 mr-2" /> Upload Slide</Button>
-          <Button variant="default"><Edit className="size-4 mr-2" /> New Slide</Button>
-          <Button variant="ghost"><Download className="size-4 mr-2" /> Download PDF</Button>
+          <Button variant="outline" size="sm"><Upload className="size-3.5 mr-1.5" /> Upload Slide</Button>
+          <Button variant="default" size="sm"><Edit className="size-3.5 mr-1.5" /> New Slide</Button>
+          <Button variant="ghost" size="sm"><Download className="size-3.5 mr-1.5" /> Download PDF</Button>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {mockSlides.map(slide => (
           <Card key={slide.id} className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between pb-2">

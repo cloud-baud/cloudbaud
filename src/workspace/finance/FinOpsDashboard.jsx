@@ -76,43 +76,43 @@ const FinOpsDashboard = () => {
                 {/* --- EXECUTIVE SUMMARY (KPIs) --- */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     <Card className="bg-card border-l-4 border-l-brand-blue shadow-sm">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Current Month Spend</CardTitle>
+                        <CardHeader className="pb-1.5 p-4">
+                            <CardTitle className="text-xs font-medium text-muted-foreground">Current Month Spend</CardTitle>
                         </CardHeader>
-                        <CardContent>
-                            <div className="text-3xl font-bold text-foreground">$42,350</div>
-                            <div className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
+                        <CardContent className="p-4 pt-0">
+                            <div className="text-xl font-bold tracking-tight text-foreground">$42,350</div>
+                            <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
                                 <span className="text-red-500 font-medium">+5%</span> vs last month
                             </div>
-                            <Progress value={78} className="h-1.5 mt-3 bg-secondary" indicatorclassname="bg-brand-blue" />
-                            <div className="text-xs text-muted-foreground mt-1 text-right">78% of Budget</div>
+                            <Progress value={78} className="h-1.5 mt-2 bg-secondary" indicatorclassname="bg-brand-blue" />
+                            <div className="text-[10px] text-muted-foreground mt-1 text-right">78% of Budget</div>
                         </CardContent>
                     </Card>
 
                     <Card className="bg-card border-l-4 border-l-amber-500 shadow-sm">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Forecasted EOM</CardTitle>
+                        <CardHeader className="pb-1.5 p-4">
+                            <CardTitle className="text-xs font-medium text-muted-foreground">Forecasted EOM</CardTitle>
                         </CardHeader>
-                        <CardContent>
-                            <div className="text-3xl font-bold text-foreground">$54,100</div>
-                            <div className="text-sm text-slate-500 mt-1 flex items-center gap-1">
+                        <CardContent className="p-4 pt-0">
+                            <div className="text-xl font-bold tracking-tight text-foreground">$54,100</div>
+                            <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
                                 <span className="text-green-500 font-medium">-2%</span> under budget
                             </div>
-                            <div className="mt-3 flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-md">
-                                <AlertTriangle className="w-4 h-4" />
+                            <div className="mt-2 flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-md">
+                                <AlertTriangle className="w-3.5 h-3.5" />
                                 <span>Risk: Production DB scaling</span>
                             </div>
                         </CardContent>
                     </Card>
 
                     <Card className="bg-card border-l-4 border-l-green-500 shadow-sm">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Savings Realized</CardTitle>
+                        <CardHeader className="pb-1.5 p-4">
+                            <CardTitle className="text-xs font-medium text-muted-foreground">Savings Realized</CardTitle>
                         </CardHeader>
-                        <CardContent>
-                            <div className="text-3xl font-bold text-foreground">$12,450</div>
-                            <div className="text-sm text-slate-500 mt-1">Total YTD Optimization</div>
-                            <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                        <CardContent className="p-4 pt-0">
+                            <div className="text-xl font-bold tracking-tight text-foreground">$12,450</div>
+                            <div className="text-xs text-slate-500 mt-0.5">Total YTD Optimization</div>
+                            <div className="mt-2 grid grid-cols-2 gap-1.5 text-[10px]">
                                 <div className="bg-green-50 dark:bg-green-900/20 p-1 rounded text-center text-green-700 dark:text-green-300">
                                     <span className="block font-bold">RIs</span> $8.2k
                                 </div>
@@ -124,14 +124,14 @@ const FinOpsDashboard = () => {
                     </Card>
 
                     <Card className="bg-card border-l-4 border-l-purple-500 shadow-sm">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Governance Score</CardTitle>
+                        <CardHeader className="pb-1.5 p-4">
+                            <CardTitle className="text-xs font-medium text-muted-foreground">Governance Score</CardTitle>
                         </CardHeader>
-                        <CardContent>
-                            <div className="text-3xl font-bold text-foreground">92/100</div>
-                            <div className="text-sm text-muted-foreground mt-1">Policy Compliance</div>
-                            <div className="w-full bg-secondary rounded-full h-2.5 mt-3">
-                                <div className="bg-purple-600 h-2.5 rounded-full" style={{ width: '92%' }}></div>
+                        <CardContent className="p-4 pt-0">
+                            <div className="text-xl font-bold tracking-tight text-foreground">92/100</div>
+                            <div className="text-xs text-muted-foreground mt-0.5">Policy Compliance</div>
+                            <div className="w-full bg-secondary rounded-full h-2 mt-2">
+                                <div className="bg-purple-600 h-2 rounded-full" style={{ width: '92%' }}></div>
                             </div>
                             <div className="text-xs text-slate-400 mt-1 flex justify-between">
                                 <span>Tagging: 98%</span>

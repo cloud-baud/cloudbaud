@@ -96,17 +96,17 @@ const AccessManagement = () => {
     }
 
     return (
-        <div className="p-6 max-w-4xl mx-auto space-y-6">
+        <div className="p-4 md:p-6 max-w-4xl mx-auto space-y-4">
             <div>
-                <h1 className="text-3xl font-bold text-white mb-2">Access Management</h1>
-                <p className="text-slate-400">Manage who can log in to the CloudBaud portal.</p>
+                <h1 className="text-xl font-bold text-white mb-0.5 tracking-tight">Access Management</h1>
+                <p className="text-xs text-slate-400">Manage who can log in to the CloudBaud portal.</p>
             </div>
 
             {/* Add New Rule */}
             <Card className="bg-slate-900 border-slate-800">
-                <CardHeader>
-                    <CardTitle className="text-xl text-white flex items-center gap-2">
-                        <UserPlus className="h-5 w-5 text-brand-blue" />
+                <CardHeader className="p-4 pb-2">
+                    <CardTitle className="text-sm text-white flex items-center gap-2">
+                        <UserPlus className="h-4 w-4 text-brand-blue" />
                         Grant Access
                     </CardTitle>
                 </CardHeader>

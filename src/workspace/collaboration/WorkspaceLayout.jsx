@@ -26,7 +26,9 @@ import {
     Rocket,
     Server,
     Eye,
-    Sparkles
+    Sparkles,
+    Type,
+    Sliders
 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
@@ -35,6 +37,8 @@ import { Separator } from '@radix-ui/react-separator';
 import { cn } from '@/shared/lib/utils';
 import CloudBaudLogo from '@/components/common/CloudBaudLogo';
 import { useAuth } from '@/shared/contexts/AuthContext';
+import { useFontSize, FONT_SIZE_OPTIONS } from '@/shared/contexts/FontSizeContext';
+import { DisplaySettingsDialog } from '@/shared/components/DisplaySettingsDialog';
 import { useViewAs } from '../finance/ViewAsContext';
 import {
     DropdownMenu,
@@ -122,6 +126,8 @@ const operationsApps = [
 const WorkspaceLayout = () => {
     const { user, signOut } = useAuth();
     const { viewAsId, activePersona, isViewingAs, setViewAs, clearViewAs, personas } = useViewAs();
+    const { fontSize, setFontSize } = useFontSize();
+    const [isDisplaySettingsOpen, setIsDisplaySettingsOpen] = useState(false);
     const [isChatOpen, setIsChatOpen] = useState(false); // State for chat panel
     const location = useLocation();
     const isInboxRoute = location.pathname === '/collaboration/inbox';
@@ -370,7 +376,7 @@ const WorkspaceLayout = () => {
                                 <ChevronRight className="rotate-90 text-slate-500 w-3.5 h-3.5 ml-0.5" />
                             </div>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-60">
+                        <DropdownMenuContent align="end" className="w-64">
                             <DropdownMenuLabel>
                                 {isViewingAs ? (
                                     <div className="flex flex-col">
@@ -401,13 +407,54 @@ const WorkspaceLayout = () => {
 
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem onClick={() => window.location.href = '/collaboration/settings'}>
-                                <Settings className="mr-2 h-4 w-4" />
-                                <span>Settings</span>
-                            </DropdownMenuItem>
+                            {/* Display Density & Font Size Selection */}
+                            <DropdownMenuLabel className="flex items-center gap-1.5 text-xs text-slate-400 font-normal">
+                                <Type className="size-3.5 text-brand-blue" />
+                                <span>Font Size & Density</span>
+                            </DropdownMenuLabel>
+                            {FONT_SIZE_OPTIONS.map((opt) => (
+                                <DropdownMenuItem
+                                    key={opt.id}
+                                    onClick={() => setFontSize(opt.id)}
+                                    className={cn(
+                                        "flex items-center justify-between cursor-pointer text-xs py-1.5",
+                                        fontSize === opt.id && "bg-brand-blue/10 text-brand-blue font-semibold"
+                                    )}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs">{opt.icon}</span>
+                                        <span>{opt.label}</span>
+                                        {opt.badge && (
+                                            <span className="text-[8px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                                {opt.badge}
+                                            </span>
+                                        )}
+                                    </div>
+                                    {fontSize === opt.id && <span className="text-brand-blue font-bold">✓</span>}
+                                </DropdownMenuItem>
+                            ))}
+
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={signOut} className="text-red-500 focus:text-red-500">
-                                <LogOut className="mr-2 h-4 w-4" />
+
+                            <DropdownMenuItem 
+                                onClick={() => setIsDisplaySettingsOpen(true)} 
+                                className="cursor-pointer text-xs py-2"
+                            >
+                                <Sliders className="mr-2 h-3.5 w-3.5 text-brand-blue" />
+                                <span className="font-medium text-slate-200">Display Settings...</span>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem 
+                                onClick={() => window.location.href = '/collaboration/settings'}
+                                className="cursor-pointer text-xs py-2 text-slate-400 hover:text-white"
+                            >
+                                <Settings className="mr-2 h-3.5 w-3.5" />
+                                <span>All Preferences</span>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={signOut} className="text-red-500 focus:text-red-500 cursor-pointer text-xs py-2">
+                                <LogOut className="mr-2 h-3.5 w-3.5" />
                                 <span>Sign Out</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -521,6 +568,12 @@ const WorkspaceLayout = () => {
                     </div>
                 </aside>
             </div>
+
+            {/* Display & Typography Settings Modal */}
+            <DisplaySettingsDialog 
+                open={isDisplaySettingsOpen} 
+                onOpenChange={setIsDisplaySettingsOpen} 
+            />
         </div>
     );
 };

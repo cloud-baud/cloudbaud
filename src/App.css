@@ -139,9 +139,21 @@
 }
 
 @layer base {
-  html {
-    font-size: 120%;
+  html,
+  html[data-font-size="compact"] {
+    font-size: 87.5%; /* 14px base - matches high density tax panels */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+
+  html[data-font-size="default"] {
+    font-size: 100%; /* 16px standard base */
+  }
+
+  html[data-font-size="large"] {
+    font-size: 115%; /* 18.4px comfortable base */
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
@@ -150,3 +162,4 @@
     @apply bg-background text-foreground bg-[image:var(--steel-gradient)] bg-fixed bg-no-repeat bg-cover;
   }
 }
+

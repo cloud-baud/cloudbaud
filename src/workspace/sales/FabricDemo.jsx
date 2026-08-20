@@ -198,11 +198,11 @@ generate_and_analyze()
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-2">
-                        <Zap className="text-yellow-400 w-8 h-8 fill-yellow-400/20" />
+                    <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        <Zap className="text-yellow-400 w-5 h-5 fill-yellow-400/20" />
                         Microsoft Fabric Analytics
                     </h1>
-                    <p className="text-muted-foreground mt-1">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                         Client-side <strong>Python (Pyodide)</strong> processing via WebAssembly. No server required.
                     </p>
                 </div>

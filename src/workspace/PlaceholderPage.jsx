@@ -15,15 +15,15 @@ const PlaceholderPage = () => {
         .replace(/\b\w/g, char => char.toUpperCase());
 
     return (
-        <div className="flex flex-col h-full space-y-6">
+        <div className="flex flex-col h-full space-y-4 p-4 md:p-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">{formattedTitle}</h1>
-                    <p className="text-muted-foreground mt-1">This module is currently under development.</p>
+                    <h1 className="text-xl font-bold tracking-tight">{formattedTitle}</h1>
+                    <p className="text-xs text-muted-foreground mt-0.5">This module is currently under development.</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" onClick={() => window.history.back()}>
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
+                    <Button variant="outline" size="sm" onClick={() => window.history.back()}>
+                        <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Go Back
                     </Button>
                 </div>
             </div>
