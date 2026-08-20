@@ -22,6 +22,8 @@ import { getChartOfAccounts, getTaxEntries, getMyDocuments } from './api/taxServ
 import AnnotationReviewPanel from './components/AnnotationReviewPanel';
 import TaxRibbon from './components/TaxRibbon';
 import Form1040ReturnPane from './components/Form1040ReturnPane';
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/shared/ui/resizable';
+import { EXTRACTED_SHEET_THREADS } from './data/extractedTaxSheetComments';
 
 const WorkbenchContext = createContext(null);
 const useWorkbench = () => useContext(WorkbenchContext);
@@ -93,6 +95,11 @@ const DEFAULT_SAMPLE_THREADS = {
       }
     ]
   }
+};
+
+const ALL_INITIAL_THREADS = {
+  ...EXTRACTED_SHEET_THREADS,
+  ...DEFAULT_SAMPLE_THREADS
 };
 
 import ExcelWorksheetGrid from './components/ExcelWorksheetGrid';
@@ -424,11 +431,20 @@ export default function FinanceThreePane() {
   const [threads, setThreads] = useState(() => {
     try {
       const saved = localStorage.getItem(`finance_tax_threads_${year}`);
-      return saved ? JSON.parse(saved) : DEFAULT_SAMPLE_THREADS;
+      return saved ? { ...ALL_INITIAL_THREADS, ...JSON.parse(saved) } : ALL_INITIAL_THREADS;
     } catch {
-      return DEFAULT_SAMPLE_THREADS;
+      return ALL_INITIAL_THREADS;
     }
   });
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(`finance_tax_threads_${year}`);
+      setThreads(saved ? { ...ALL_INITIAL_THREADS, ...JSON.parse(saved) } : ALL_INITIAL_THREADS);
+    } catch {
+      setThreads(ALL_INITIAL_THREADS);
+    }
+  }, [year]);
 
   // Active Review Drawer Target
   const [activeReviewTarget, setActiveReviewTarget] = useState(null);
@@ -481,7 +497,20 @@ export default function FinanceThreePane() {
     };
   }, [activeReviewTarget, threads, year]);
 
-  const [activeSheet, setActiveSheet] = useState('worksheet'); // 'worksheet' | 'checklist'
+  const [activeSheet, setActiveSheetState] = useState(() => {
+    try {
+      return localStorage.getItem('cloudbaud_active_tax_sheet') || 'googlesheet';
+    } catch {
+      return 'googlesheet';
+    }
+  });
+
+  const setActiveSheet = (sheet) => {
+    setActiveSheetState(sheet);
+    try {
+      localStorage.setItem('cloudbaud_active_tax_sheet', sheet);
+    } catch {}
+  };
 
   // Handle cross-pane transfers from Checklist to Named Cell
   const handleTransferValue = async ({ namedCell, targetAccount, amount, year: targetYear, docName, label }) => {
@@ -608,35 +637,57 @@ export default function FinanceThreePane() {
 
         {/* MAIN 3-PANE WORKBENCH */}
         <div className="flex-1 flex overflow-hidden relative">
-          {/* DESKTOP: 3 FLEXIBLE / COLLAPSIBLE COLUMNS */}
-          <div className="hidden md:flex flex-1 overflow-hidden">
-            {/* Pane 1: Worksheet (Expands dynamically when other panes collapse) */}
-            <div className={`h-full overflow-hidden transition-all duration-300 ${
-              isDocsCollapsed && isFormCollapsed ? 'flex-[3]' :
-              isDocsCollapsed || isFormCollapsed ? 'flex-[1.8]' :
-              'flex-[1.1] min-w-[280px]'
-            }`}>
+          {/* DESKTOP: 3 RESIZABLE & COLLAPSIBLE PANELS */}
+          <ResizablePanelGroup 
+            direction="horizontal" 
+            className="hidden md:flex flex-1 h-full overflow-hidden"
+            autoSaveId="cloudbaud_tax_three_pane_v3"
+          >
+            {/* Pane 1: Worksheet Grid */}
+            <ResizablePanel 
+              id="pane_worksheet"
+              order={1}
+              defaultSize={38} 
+              minSize={20}
+              className="h-full overflow-hidden"
+            >
               <WorksheetPane />
-            </div>
+            </ResizablePanel>
 
-            {/* Pane 2: Supporting Docs */}
-            <div className={`h-full overflow-hidden transition-all duration-300 ${
-              isDocsCollapsed ? 'w-11 shrink-0' :
-              isFormCollapsed ? 'flex-[1.5] min-w-[280px]' :
-              'flex-[0.9] min-w-[260px]'
-            }`}>
+            <ResizableHandle 
+              withHandle 
+              className="bg-white/10 hover:bg-brand-blue/60 transition-colors w-2 hover:w-2.5 cursor-col-resize z-20" 
+            />
+
+            {/* Pane 2: Supporting Docs & Checklist */}
+            <ResizablePanel 
+              id="pane_docs"
+              order={2}
+              defaultSize={32} 
+              minSize={isDocsCollapsed ? 3 : 15}
+              maxSize={isDocsCollapsed ? 3 : 60}
+              className="h-full overflow-hidden"
+            >
               <DocsPane />
-            </div>
+            </ResizablePanel>
+
+            <ResizableHandle 
+              withHandle 
+              className="bg-white/10 hover:bg-brand-blue/60 transition-colors w-2 hover:w-2.5 cursor-col-resize z-20" 
+            />
 
             {/* Pane 3: Form 1040 Return (Accordion & PDF Preview) */}
-            <div className={`h-full overflow-hidden transition-all duration-300 ${
-              isFormCollapsed ? 'w-11 shrink-0' :
-              isDocsCollapsed ? 'flex-[1.6] min-w-[320px]' :
-              'flex-[1.2] min-w-[320px]'
-            }`}>
+            <ResizablePanel 
+              id="pane_form1040"
+              order={3}
+              defaultSize={30} 
+              minSize={isFormCollapsed ? 3 : 15}
+              maxSize={isFormCollapsed ? 3 : 60}
+              className="h-full overflow-hidden"
+            >
               <Form1040Pane />
-            </div>
-          </div>
+            </ResizablePanel>
+          </ResizablePanelGroup>
 
           {/* MOBILE VIEW */}
           <div className="md:hidden flex-1 overflow-hidden">

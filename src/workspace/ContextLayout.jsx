@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Outlet, useLocation, Link } from 'react-router-dom';
 import { cn } from '@/shared/lib/utils';
 import {
@@ -160,6 +160,45 @@ const FinanceIframe = () => {
 const ContextLayout = () => {
     const location = useLocation();
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const containerRef = useRef(null);
+
+    // Resizable sidebar state with persistence
+    const [sidebarWidth, setSidebarWidth] = useState(() => {
+        const saved = localStorage.getItem('portal_context_sidebar_width');
+        return saved ? Math.max(160, Math.min(500, parseInt(saved, 10))) : 256;
+    });
+    const [isDragging, setIsDragging] = useState(false);
+
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            if (isDragging && containerRef.current) {
+                const rect = containerRef.current.getBoundingClientRect();
+                const newWidth = Math.max(160, Math.min(500, e.clientX - rect.left));
+                setSidebarWidth(newWidth);
+                localStorage.setItem('portal_context_sidebar_width', String(newWidth));
+            }
+        };
+
+        const handleMouseUp = () => {
+            if (isDragging) {
+                setIsDragging(false);
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            }
+        };
+
+        if (isDragging) {
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', handleMouseUp);
+        }
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isDragging]);
 
     // Detect active context from the URL
     let activeContext = null;
@@ -178,12 +217,20 @@ const ContextLayout = () => {
     const isFinance = activeContext === 'finance';
 
     return (
-        <div className="flex flex-1 h-full overflow-hidden">
+        <div ref={containerRef} className="flex flex-1 h-full overflow-hidden relative">
+            {/* Global Drag Overlay to prevent iframe mouse interception */}
+            {isDragging && (
+                <div className="fixed inset-0 z-50 cursor-col-resize select-none bg-transparent" />
+            )}
+
             {/* Middle Nav - Context Specific (Filters: Taxes, Years, Bookkeeping, Accounting...) */}
-            <div className={cn(
-                "flex-shrink-0 flex flex-col border-r border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-black/20 backdrop-blur-sm transition-all duration-300 ease-in-out relative",
-                isCollapsed ? "w-0 border-r-0 opacity-0 overflow-hidden" : "w-64 opacity-100 py-6 px-4"
-            )}>
+            <div 
+                className={cn(
+                    "flex-shrink-0 flex flex-col border-r border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-black/20 backdrop-blur-sm transition-[width] duration-150 ease-out relative",
+                    isCollapsed ? "w-0 border-r-0 opacity-0 overflow-hidden" : "opacity-100 py-6 px-4"
+                )}
+                style={{ width: isCollapsed ? 0 : sidebarWidth }}
+            >
                 <div className="mb-6 px-2 flex items-center justify-between">
                     <div className="overflow-hidden whitespace-nowrap">
                         <h2 className="text-lg font-bold flex items-center gap-2">
@@ -200,12 +247,29 @@ const ContextLayout = () => {
                     </button>
                 </div>
 
-                <nav className="space-y-1 min-w-[200px] flex-1">
+                <nav className="space-y-1 min-w-[150px] flex-1 overflow-y-auto">
                     {subNavItems.map((item) => (
                         <ContextLink key={item.label} {...item} />
                     ))}
                 </nav>
             </div>
+
+            {/* Middle Nav Resize Handle */}
+            {!isCollapsed && (
+                <div
+                    onMouseDown={(e) => {
+                        e.preventDefault();
+                        setIsDragging(true);
+                    }}
+                    className={cn(
+                        "w-2 hover:w-2.5 h-full cursor-col-resize z-40 transition-all flex items-center justify-center group shrink-0 select-none bg-border/40 hover:bg-brand-blue/50",
+                        isDragging && "bg-brand-blue w-2.5 shadow-md"
+                    )}
+                    title="Drag to resize context filter menu"
+                >
+                    <div className="w-1 h-10 rounded bg-slate-400 dark:bg-slate-500 group-hover:bg-white" />
+                </div>
+            )}
 
             {/* Main Section: Finance gets the clean 3-pane iframe; others get standard Outlet */}
             {isFinance ? (

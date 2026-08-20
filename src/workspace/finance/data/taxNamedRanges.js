@@ -171,6 +171,23 @@ export const SUMMARY_TAB_NAMED_ROWS = [
 
 export const SUMMARY_TAB_NAMED_RANGES = SUMMARY_TAB_NAMED_ROWS;
 
+// Google Sheet Canonical Column Mapping for Summary Tab
+export const GOOGLE_SHEET_YEAR_COLUMNS = {
+  2025: 'C',
+  2024: 'D',
+  2023: 'E',
+  2022: 'F',
+  2021: 'G',
+  2020: 'H',
+  2019: 'I',
+  2018: 'J',
+  2017: 'K'
+};
+
+export function getGoogleSheetColumn(year) {
+  return GOOGLE_SHEET_YEAR_COLUMNS[Number(year)] || 'F';
+}
+
 // Helper to construct a canonical Named Cell
 export function getNamedCell(rowPrefix, year) {
   return `${rowPrefix}_${year}`;

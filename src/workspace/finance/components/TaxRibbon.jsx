@@ -272,7 +272,7 @@ export default function TaxRibbon({
 
                     {/* Live Shared Google Sheet Link */}
                     <a
-                        href="https://docs.google.com/spreadsheets/d/1xiDL-_itpnVbIfufzP990O8CcyTz1h14/edit?usp=sharing&ouid=115232289970792282072&rtpof=true&sd=true"
+                        href="https://docs.google.com/spreadsheets/d/1QubZfLE5OC8RuhhljIBvj7dUeWN3UwefYxrtH0HSiGY/edit?usp=sharing"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="px-2.5 py-1 text-xs font-semibold bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/30 rounded flex items-center gap-1 transition"

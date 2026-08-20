@@ -16,11 +16,13 @@ import {
   Loader2,
   ListChecks,
   Files,
-  ExternalLink
+  ExternalLink,
+  RefreshCw
 } from 'lucide-react';
 import SpreadsheetPreview from './SpreadsheetPreview';
 import { uploadTaxDocument } from '../api/taxService';
 import TaxChecklist from './TaxChecklist';
+import { saveTaxDocumentBlob, resolveDocumentUrl } from '../utils/taxDocumentStorage';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ACCURATE TAX DOCUMENTS REGISTRY BY YEAR
@@ -97,16 +99,23 @@ export default function SupportingDocsViewerPane({
 }) {
   const [viewMode, setViewMode] = useState('checklist'); // 'checklist' | 'viewer'
   const [activeDocUrl, setActiveDocUrl] = useState(null);
+  const [isUrlLoading, setIsUrlLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadTargetDoc, setUploadTargetDoc] = useState(null);
   const [uploadSuccessMessage, setUploadSuccessMessage] = useState('');
   const fileInputRef = useRef(null);
+  const activeBlobUrlRef = useRef(null);
 
-  // Custom uploaded docs stored locally
+  // Custom uploaded docs stored locally (cleaned of dead blob URLs)
   const [customDocs, setCustomDocs] = useState(() => {
     try {
       const saved = localStorage.getItem(`cloudbaud_tax_custom_docs_${year}`);
-      return saved ? JSON.parse(saved) : [];
+      if (!saved) return [];
+      const parsed = JSON.parse(saved);
+      return parsed.map(d => {
+        const { localUrl, ...rest } = d;
+        return rest;
+      });
     } catch {
       return [];
     }
@@ -116,7 +125,15 @@ export default function SupportingDocsViewerPane({
   useEffect(() => {
     try {
       const saved = localStorage.getItem(`cloudbaud_tax_custom_docs_${year}`);
-      setCustomDocs(saved ? JSON.parse(saved) : []);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setCustomDocs(parsed.map(d => {
+          const { localUrl, ...rest } = d;
+          return rest;
+        }));
+      } else {
+        setCustomDocs([]);
+      }
     } catch {
       setCustomDocs([]);
     }
@@ -141,8 +158,9 @@ export default function SupportingDocsViewerPane({
       const isDocx = file.name.toLowerCase().endsWith('.docx') || file.name.toLowerCase().endsWith('.doc');
       const docType = isPdf ? 'PDF' : isXlsx ? 'XLSX' : isDocx ? 'DOCX' : 'DOC';
 
+      const docId = uploadTargetDoc?.id || `doc_custom_${Date.now()}`;
       const newDoc = {
-        id: uploadTargetDoc?.id || `doc_custom_${Date.now()}`,
+        id: docId,
         name: file.name,
         category: uploadTargetDoc?.category || selectedCat?.name || 'Supporting Document',
         payer: uploadTargetDoc?.payer || 'Uploaded Document',
@@ -152,11 +170,16 @@ export default function SupportingDocsViewerPane({
         status: 'verified',
         hasFile: true,
         pages: 1,
-        localUrl: localUrl
+        inIndexedDb: true
       };
 
+      // 1. Permanently persist file Blob into IndexedDB
+      await saveTaxDocumentBlob(year, docId, file);
+      await saveTaxDocumentBlob(year, file.name, file);
+
+      // 2. Persist metadata into localStorage (without dead blob strings)
       setCustomDocs(prev => {
-        const filtered = prev.filter(d => d.id !== newDoc.id);
+        const filtered = prev.filter(d => d.id !== newDoc.id && d.name !== newDoc.name);
         const next = [newDoc, ...filtered];
         try {
           localStorage.setItem(`cloudbaud_tax_custom_docs_${year}`, JSON.stringify(next));
@@ -166,16 +189,21 @@ export default function SupportingDocsViewerPane({
         return next;
       });
 
+      // 3. Optional remote sync
       try {
         await uploadTaxDocument(file, year, selectedCat?.id);
       } catch (cloudErr) {
-        console.warn('Cloud storage upload skipped, file cached locally:', cloudErr);
+        console.warn('Cloud storage upload skipped, file cached in IndexedDB:', cloudErr);
       }
 
+      if (activeBlobUrlRef.current && activeBlobUrlRef.current.startsWith('blob:')) {
+        try { URL.revokeObjectURL(activeBlobUrlRef.current); } catch {}
+      }
+      activeBlobUrlRef.current = localUrl;
       setSelectedDoc(newDoc);
       setActiveDocUrl(localUrl);
       setViewMode('viewer');
-      setUploadSuccessMessage(`Attached ${file.name}`);
+      setUploadSuccessMessage(`Attached & Saved ${file.name}`);
       setTimeout(() => setUploadSuccessMessage(''), 4500);
     } catch (err) {
       console.error('File upload error:', err);
@@ -193,25 +221,51 @@ export default function SupportingDocsViewerPane({
   const allAvailableDocs = useMemo(() => {
     const combined = [...customDocs];
     defaultDocs.forEach(d => {
-      if (!combined.some(c => c.id === d.id)) {
+      if (!combined.some(c => c.id === d.id || c.name === d.name)) {
         combined.push(d);
       }
     });
     return combined;
   }, [customDocs, defaultDocs]);
 
-  // Sync active doc URL when selectedDoc changes
+  // Sync and resolve active doc URL whenever selectedDoc or year changes
   useEffect(() => {
-    if (selectedDoc) {
-      const url = selectedDoc.localUrl || encodeURI(`/src/workspace/data/Documents - Taxes/${year}/${selectedDoc.name}`);
-      setActiveDocUrl(url);
+    let isCancelled = false;
+
+    async function syncUrl() {
+      if (!selectedDoc) {
+        setActiveDocUrl(null);
+        return;
+      }
+
+      setIsUrlLoading(true);
+      try {
+        const resolved = await resolveDocumentUrl(year, selectedDoc);
+        if (!isCancelled) {
+          if (activeBlobUrlRef.current && activeBlobUrlRef.current !== resolved && activeBlobUrlRef.current.startsWith('blob:')) {
+            try { URL.revokeObjectURL(activeBlobUrlRef.current); } catch {}
+          }
+          if (resolved && resolved.startsWith('blob:')) {
+            activeBlobUrlRef.current = resolved;
+          }
+          setActiveDocUrl(resolved);
+        }
+      } catch (err) {
+        console.warn('Error resolving document URL:', err);
+      } finally {
+        if (!isCancelled) setIsUrlLoading(false);
+      }
     }
+
+    syncUrl();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [selectedDoc, year]);
 
-  const handleOpenDoc = (doc) => {
+  const handleOpenDoc = async (doc) => {
     setSelectedDoc(doc);
-    const url = doc.localUrl || encodeURI(`/src/workspace/data/Documents - Taxes/${year}/${doc.name}`);
-    setActiveDocUrl(url);
     setViewMode('viewer');
   };
 
@@ -372,7 +426,12 @@ export default function SupportingDocsViewerPane({
 
             {/* Document Render (Native PDF Frame / Spreadsheet / Upload Prompt) */}
             <div className="flex-1 overflow-hidden p-2 flex flex-col items-center justify-center bg-[#03060d] relative min-h-0">
-              {!selectedDoc.hasFile && !selectedDoc.localUrl ? (
+              {isUrlLoading ? (
+                <div className="flex flex-col items-center justify-center gap-2 text-white/60">
+                  <Loader2 className="size-6 text-blue-400 animate-spin" />
+                  <span className="text-xs">Loading document preview...</span>
+                </div>
+              ) : !selectedDoc.hasFile && !activeDocUrl ? (
                 /* Missing Document Upload Prompt */
                 <div className="bg-[#0b101c] border border-amber-500/30 rounded-xl p-6 text-center max-w-[420px] text-white shadow-2xl m-auto">
                   <div className="size-12 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-3">
@@ -405,9 +464,10 @@ export default function SupportingDocsViewerPane({
               ) : selectedDoc.type === 'XLSX' || selectedDoc.name?.toLowerCase().endsWith('.xlsx') ? (
                 <SpreadsheetPreview url={activeDocUrl} name={selectedDoc.name} className="w-full h-full" />
               ) : (
-                /* Direct Native PDF Frame */
-                <div className="w-full h-full flex flex-col rounded-lg overflow-hidden border border-white/10 bg-slate-950 shadow-2xl">
+                /* Direct Native PDF / Document Frame */
+                <div className="w-full h-full flex flex-col rounded-lg overflow-hidden border border-white/10 bg-slate-950 shadow-2xl relative">
                   <iframe
+                    key={activeDocUrl}
                     src={activeDocUrl}
                     title={selectedDoc.name}
                     className="w-full h-full border-0 bg-slate-900 rounded-lg"
@@ -419,7 +479,7 @@ export default function SupportingDocsViewerPane({
             {/* Viewer Footer */}
             <div className="bg-[#0e1424] px-3 py-1.5 border-t border-white/10 flex items-center justify-between text-[11px] text-white/60 shrink-0">
               <span className="truncate">
-                Source: <b>{selectedDoc.hasFile ? (selectedDoc.localUrl ? 'Locally Uploaded File' : `/Documents - Taxes/${year}/${selectedDoc.name}`) : 'Not Uploaded Yet'}</b>
+                Source: <b>{selectedDoc.inIndexedDb || activeDocUrl?.startsWith('blob:') ? 'Locally Stored Document (Persistent)' : selectedDoc.hasFile ? `/Documents - Taxes/${year}/${selectedDoc.name}` : 'Not Uploaded Yet'}</b>
               </span>
               <span className="text-emerald-400 font-semibold flex items-center gap-1 shrink-0">
                 <CheckCircle2 className="size-3" />

@@ -138,6 +138,55 @@ const WorkspaceLayout = () => {
         return saved === 'true';
     });
 
+    // Resizable sidebar and chat panel states
+    const [sidebarWidth, setSidebarWidth] = useState(() => {
+        const saved = localStorage.getItem('portal_sidebar_width');
+        return saved ? Math.max(180, Math.min(500, parseInt(saved, 10))) : 280;
+    });
+
+    const [chatPanelWidth, setChatPanelWidth] = useState(() => {
+        const saved = localStorage.getItem('portal_chat_panel_width');
+        return saved ? Math.max(280, Math.min(750, parseInt(saved, 10))) : 400;
+    });
+
+    const [isDraggingLeft, setIsDraggingLeft] = useState(false);
+    const [isDraggingRight, setIsDraggingRight] = useState(false);
+
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            if (isDraggingLeft) {
+                const newWidth = Math.max(180, Math.min(500, e.clientX));
+                setSidebarWidth(newWidth);
+                localStorage.setItem('portal_sidebar_width', String(newWidth));
+            } else if (isDraggingRight) {
+                const newWidth = Math.max(280, Math.min(750, window.innerWidth - e.clientX));
+                setChatPanelWidth(newWidth);
+                localStorage.setItem('portal_chat_panel_width', String(newWidth));
+            }
+        };
+
+        const handleMouseUp = () => {
+            if (isDraggingLeft || isDraggingRight) {
+                setIsDraggingLeft(false);
+                setIsDraggingRight(false);
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            }
+        };
+
+        if (isDraggingLeft || isDraggingRight) {
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', handleMouseUp);
+        }
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isDraggingLeft, isDraggingRight]);
+
     const toggleSidebar = () => {
         const newState = !isSidebarCollapsed;
         setIsSidebarCollapsed(newState);
@@ -463,13 +512,18 @@ const WorkspaceLayout = () => {
             </header>
 
             {/* Main Content Area: Sidebar + Page */}
-            <div className="flex-1 flex overflow-hidden">
-                {/* Secondary Sidebar (Contextual) */}
+            <div className="flex-1 flex overflow-hidden relative">
+                {/* Global Drag Overlay to prevent iframe mouse interception */}
+                {(isDraggingLeft || isDraggingRight) && (
+                    <div className="fixed inset-0 z-50 cursor-col-resize select-none bg-transparent" />
+                )}
+
+                {/* Secondary Sidebar (Contextual) - Resizable & Collapsible */}
                 <aside
                     className={cn(
-                        "flex-shrink-0 flex flex-col pt-6 pb-4 pl-4 lg:pl-6 bg-transparent h-full transition-all duration-300 ease-in-out overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]",
-                        isSidebarCollapsed ? "w-[88px]" : "w-[280px]"
+                        "flex-shrink-0 flex flex-col pt-6 pb-4 pl-4 lg:pl-6 bg-transparent h-full transition-[width] duration-150 ease-out overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                     )}
+                    style={{ width: isSidebarCollapsed ? 88 : sidebarWidth }}
                 >
                     {/* Card 1: Navigation & Actions */}
                     <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden mb-4 mr-2 flex flex-col shrink-0">
@@ -541,6 +595,23 @@ const WorkspaceLayout = () => {
                     </div>
                 </aside>
 
+                {/* Left Sidebar Resize Handle */}
+                {!isSidebarCollapsed && (
+                    <div
+                        onMouseDown={(e) => {
+                            e.preventDefault();
+                            setIsDraggingLeft(true);
+                        }}
+                        className={cn(
+                            "w-2 hover:w-2.5 h-full cursor-col-resize z-40 transition-all flex items-center justify-center group shrink-0 select-none bg-border/40 hover:bg-brand-blue/50",
+                            isDraggingLeft ? "bg-brand-blue w-2.5 shadow-md" : ""
+                        )}
+                        title="Drag to resize sidebar"
+                    >
+                        <div className="w-1 h-10 rounded bg-slate-400 dark:bg-slate-500 group-hover:bg-white" />
+                    </div>
+                )}
+
                 {/* Page Content */}
                 <main className={cn(
                     "flex-1 flex flex-col overflow-auto relative",
@@ -551,12 +622,30 @@ const WorkspaceLayout = () => {
                     </div>
                 </main>
 
-                {/* Docked Persistent CloudBot Panel - Expand / Collapse at will */}
+                {/* Right Chat Panel Resize Handle */}
+                {isChatOpen && (
+                    <div
+                        onMouseDown={(e) => {
+                            e.preventDefault();
+                            setIsDraggingRight(true);
+                        }}
+                        className={cn(
+                            "w-2 hover:w-2.5 h-full cursor-col-resize z-40 transition-all flex items-center justify-center group shrink-0 select-none bg-border/40 hover:bg-brand-blue/50",
+                            isDraggingRight ? "bg-brand-blue w-2.5 shadow-md" : ""
+                        )}
+                        title="Drag to resize AI assistant panel"
+                    >
+                        <div className="w-1 h-10 rounded bg-slate-400 dark:bg-slate-500 group-hover:bg-white" />
+                    </div>
+                )}
+
+                {/* Docked Persistent CloudBot Panel - Resizable & Expandable */}
                 <aside
                     className={cn(
-                        "flex-shrink-0 flex flex-col bg-transparent h-full transition-all duration-300 ease-in-out overflow-hidden",
-                        isChatOpen ? "w-[400px] pt-6 pb-4 pr-4 lg:pr-6 opacity-100" : "w-0 p-0 m-0 border-0 opacity-0 pointer-events-none"
+                        "flex-shrink-0 flex flex-col bg-transparent h-full transition-[width] duration-150 ease-out overflow-hidden",
+                        isChatOpen ? "pt-6 pb-4 pr-4 lg:pr-6 opacity-100" : "w-0 p-0 m-0 border-0 opacity-0 pointer-events-none"
                     )}
+                    style={{ width: isChatOpen ? chatPanelWidth : 0 }}
                 >
                     <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden flex-1 flex flex-col relative ml-2">
                         <OllamaChatPanel 

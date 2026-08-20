@@ -27,17 +27,30 @@ import {
   Maximize2,
   Minimize2,
   LayoutGrid,
-  ChevronDown,
-  ListChecks,
   ExternalLink,
-  Table
+  Table,
+  Sparkles,
+  Search,
+  Filter,
+  X,
+  Send
 } from 'lucide-react';
 import { updateTaxCell } from '../api/taxService';
 import SpreadsheetPreview from './SpreadsheetPreview';
-import { SUMMARY_TAB_NAMED_RANGES, getNamedCell } from '../data/taxNamedRanges';
+import { SUMMARY_TAB_NAMED_ROWS, SUMMARY_TAB_NAMED_RANGES, GOOGLE_SHEET_YEAR_COLUMNS, getNamedCell } from '../data/taxNamedRanges';
+import { EXTRACTED_SHEET_THREADS } from '../data/extractedTaxSheetComments';
 
-export const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1xiDL-_itpnVbIfufzP990O8CcyTz1h14/edit?usp=sharing&ouid=115232289970792282072&rtpof=true&sd=true";
-export const GOOGLE_SHEET_EMBED_URL = "https://docs.google.com/spreadsheets/d/1xiDL-_itpnVbIfufzP990O8CcyTz1h14/edit?usp=sharing&widget=true&headers=false";
+export const DEFAULT_GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1QubZfLE5OC8RuhhljIBvj7dUeWN3UwefYxrtH0HSiGY/edit?usp=sharing";
+
+export function formatGoogleSheetEmbedUrl(rawUrl) {
+  if (!rawUrl) return '';
+  const cleanUrl = rawUrl.trim();
+  if (cleanUrl.includes('htmlembed') || cleanUrl.includes('pubhtml')) {
+    return cleanUrl;
+  }
+  const baseUrl = cleanUrl.split('?')[0].replace(/\/edit.*$/, '');
+  return `${baseUrl}/edit?usp=sharing`;
+}
 
 export default function ExcelWorksheetGrid({
   year = 2020,
@@ -59,11 +72,122 @@ export default function ExcelWorksheetGrid({
   activeSheet: controlledActiveSheet,
   onActiveSheetChange
 }) {
-  const [internalActiveSheet, setInternalActiveSheet] = useState('googlesheet');
+  const [googleSheetUrl, setGoogleSheetUrl] = useState(() => {
+    try {
+      const saved = localStorage.getItem('cloudbaud_google_sheet_url');
+      if (saved && !saved.includes('1xiDL-_itpnVbIfufzP990O8CcyTz1h14')) {
+        return saved;
+      }
+      return DEFAULT_GOOGLE_SHEET_URL;
+    } catch {
+      return DEFAULT_GOOGLE_SHEET_URL;
+    }
+  });
+  const [isEditingSheetUrl, setIsEditingSheetUrl] = useState(false);
+  const [sheetUrlInput, setSheetUrlInput] = useState(googleSheetUrl);
+
+  const handleSaveSheetUrl = (newUrl) => {
+    const trimmed = newUrl.trim();
+    if (trimmed) {
+      setGoogleSheetUrl(trimmed);
+      try {
+        localStorage.setItem('cloudbaud_google_sheet_url', trimmed);
+      } catch {}
+      setIsEditingSheetUrl(false);
+    }
+  };
+
+  const [internalActiveSheet, setInternalActiveSheet] = useState(() => {
+    try {
+      return localStorage.getItem('cloudbaud_active_tax_sheet') || 'googlesheet';
+    } catch {
+      return 'googlesheet';
+    }
+  });
   const activeSheet = controlledActiveSheet !== undefined ? controlledActiveSheet : internalActiveSheet;
-  const setActiveSheet = onActiveSheetChange || setInternalActiveSheet;
+  const setActiveSheet = (sheet) => {
+    if (onActiveSheetChange) {
+      onActiveSheetChange(sheet);
+    } else {
+      setInternalActiveSheet(sheet);
+    }
+    try {
+      localStorage.setItem('cloudbaud_active_tax_sheet', sheet);
+    } catch {}
+  };
+
+  // Google Sheet Comments Sidebar state
+  const [showCommentsSidebar, setShowCommentsSidebar] = useState(true);
+  const [commentFilterTab, setCommentFilterTab] = useState('all'); // 'all' | 'for_you'
+  const [commentSheetFilter, setCommentSheetFilter] = useState('all'); // 'all' | 'Summary' | 'CB' | 'OC' | 'CC' | 'Roberto'
+  const [commentSearchQuery, setCommentSearchQuery] = useState('');
+  const [newCommentText, setNewCommentText] = useState('');
+  const [newCommentCell, setNewCommentCell] = useState('Summary!E6');
+  const [sheetCommentsList, setSheetCommentsList] = useState(() => {
+    try {
+      const saved = localStorage.getItem('tax_sheet_custom_comments');
+      const custom = saved ? JSON.parse(saved) : [];
+      return [...custom, ...Object.values(EXTRACTED_SHEET_THREADS)];
+    } catch {
+      return Object.values(EXTRACTED_SHEET_THREADS);
+    }
+  });
+
+  const handleAddSheetComment = () => {
+    if (!newCommentText.trim()) return;
+    const newThread = {
+      id: `th_custom_${Date.now()}`,
+      targetType: 'worksheet_row',
+      targetId: newCommentCell,
+      targetTitle: `[${newCommentCell}] Comment`,
+      cellRef: newCommentCell.split('!')[1] || newCommentCell,
+      sheetName: newCommentCell.split('!')[0] || 'Summary',
+      year: year,
+      status: 'pending',
+      comments: [
+        {
+          id: `c_${Date.now()}`,
+          authorName: 'Jishnu Nath',
+          authorRole: 'Owner',
+          authorInitials: 'JN',
+          text: newCommentText.trim(),
+          createdAt: new Date().toISOString(),
+          decision: null
+        }
+      ]
+    };
+
+    const updated = [newThread, ...sheetCommentsList];
+    setSheetCommentsList(updated);
+    setNewCommentText('');
+    try {
+      const saved = localStorage.getItem('tax_sheet_custom_comments');
+      const existing = saved ? JSON.parse(saved) : [];
+      localStorage.setItem('tax_sheet_custom_comments', JSON.stringify([newThread, ...existing]));
+    } catch {}
+  };
+
+  // Filtered comments for the sidebar
+  const filteredComments = sheetCommentsList.filter(th => {
+    if (commentFilterTab === 'for_you') {
+      const hasDavid = th.comments?.some(c => (c.text || '').toLowerCase().includes('david') || (c.authorName || '').toLowerCase().includes('david'));
+      if (!hasDavid) return false;
+    }
+    if (commentSheetFilter !== 'all') {
+      const sName = (th.sheetName || '').toLowerCase();
+      if (!sName.includes(commentSheetFilter.toLowerCase())) return false;
+    }
+    if (commentSearchQuery.trim()) {
+      const q = commentSearchQuery.toLowerCase();
+      const matchText = th.comments?.some(c => (c.text || '').toLowerCase().includes(q) || (c.authorName || '').toLowerCase().includes(q));
+      const matchCell = (th.cellRef || '').toLowerCase().includes(q) || (th.sheetName || '').toLowerCase().includes(q);
+      if (!matchText && !matchCell) return false;
+    }
+    return true;
+  });
   const [activeTab, setActiveTab] = useState('home'); // 'file' | 'home' | 'insert' | 'data' | 'view'
   const [viewMode, setViewMode] = useState('focused'); // 'focused' (single year) | 'multi' (2017-2025)
+  const [gridData, setGridData] = useState({});
   const [selectedCell, setSelectedCell] = useState({ rowId: 'w2_wages', colKey: year, address: 'B2' });
   const [formulaValue, setFormulaValue] = useState('');
   const [editingCell, setEditingCell] = useState(null); // { rowId, colKey }
@@ -78,6 +202,32 @@ export default function ExcelWorksheetGrid({
   // Multi-year columns list
   const multiYears = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
   const columns = viewMode === 'multi' ? multiYears : [year];
+
+  // Helper to compute canonical Google Sheet cell coordinates
+  const getCellAddress = useCallback((rowIdx, colYear) => {
+    const colLetter = GOOGLE_SHEET_YEAR_COLUMNS[Number(colYear)] || 'F';
+    const rowNumber = rowIdx + 2; // row 1 is header
+    return `${colLetter}${rowNumber}`;
+  }, []);
+
+  // Transferred items from checklist
+  const [transferredItems, setTransferredItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`tax_transferred_cells_${year}`);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(`tax_transferred_cells_${year}`);
+      setTransferredItems(saved ? JSON.parse(saved) : {});
+    } catch {
+      setTransferredItems({});
+    }
+  }, [year]);
 
   // Cell status management (WIP, Ready for CPA Review, Question for CPA, Filed with CPA, Filed with IRS)
   const [cellStatuses, setCellStatuses] = useState(() => {
@@ -120,6 +270,10 @@ export default function ExcelWorksheetGrid({
       if (rowName && targetYear) {
         updateCellStatus(rowName, targetYear, status || 'ready_cpa');
         triggerCellFlash(rowName, targetYear);
+        try {
+          const saved = localStorage.getItem(`tax_transferred_cells_${targetYear}`);
+          if (saved) setTransferredItems(JSON.parse(saved));
+        } catch {}
       }
     };
     window.addEventListener('tax_cell_transferred', handleTransferEvent);
@@ -315,7 +469,7 @@ export default function ExcelWorksheetGrid({
           )}
 
           <a
-            href={GOOGLE_SHEET_URL}
+            href={googleSheetUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="px-2.5 py-1 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/30 rounded text-[11px] font-semibold flex items-center gap-1 transition"
@@ -329,13 +483,274 @@ export default function ExcelWorksheetGrid({
 
       {/* ── CONDITIONAL RENDER: LIVE GOOGLE SHEET vs CALCULATION GRID vs XLSX ── */}
       {activeSheet === 'googlesheet' ? (
-        <div className="flex-1 w-full h-full min-h-0 bg-white relative overflow-hidden flex flex-col">
-          <iframe
-            src={GOOGLE_SHEET_EMBED_URL}
-            title="Live Shared Tax Google Sheet - Jishnu & Deepika Nath (David Rumsey)"
-            className="w-full h-full border-0 flex-1"
-            allow="clipboard-read; clipboard-write; fullscreen"
-          />
+        <div className="flex-1 w-full h-full min-h-0 bg-slate-950 relative overflow-hidden flex flex-col">
+          {/* Google Sheet Live Header Bar */}
+          <div className="bg-[#0e1424] px-3 py-1.5 border-b border-white/10 flex items-center justify-between text-xs shrink-0 flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <span className="size-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="font-bold text-white text-xs">Live Google Sheet</span>
+              <span className="text-[10px] text-blue-300 font-mono bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-500/20">
+                Shared CPA Master
+              </span>
+              <span className="text-[10px] text-amber-300 font-mono bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/30 flex items-center gap-1">
+                <span className="size-1.5 rounded-full bg-amber-400"></span>
+                <span>Named Range Sync Active</span>
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowCommentsSidebar(!showCommentsSidebar)}
+                className={`text-[11px] px-2.5 py-0.5 rounded flex items-center gap-1.5 font-semibold transition border ${
+                  showCommentsSidebar
+                    ? 'bg-blue-600/30 text-blue-300 border-blue-400/60 shadow-[0_0_8px_rgba(59,130,246,0.3)]'
+                    : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-white/15'
+                }`}
+                title="Toggle Google Sheets Comments & Discussion Sidebar"
+              >
+                <MessageSquare className="size-3 text-blue-400" />
+                <span>Comments</span>
+                <span className="px-1 py-0.2 rounded bg-blue-500/20 text-[9px] font-mono text-blue-200">
+                  {filteredComments.length}
+                </span>
+              </button>
+              <button
+                onClick={() => setIsEditingSheetUrl(!isEditingSheetUrl)}
+                className="text-[11px] text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-white/15 px-2 py-0.5 rounded flex items-center gap-1 font-medium transition"
+                title="Update Google Sheet share URL"
+              >
+                <span>{isEditingSheetUrl ? 'Close URL Bar' : 'Change Sheet URL'}</span>
+              </button>
+              <button
+                onClick={() => setActiveSheet('worksheet')}
+                className="text-[11px] text-amber-300 hover:text-amber-200 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 px-2 py-0.5 rounded flex items-center gap-1 font-semibold transition"
+                title="View transferred cells highlighted with glowing border in Calculation Matrix"
+              >
+                <Table className="size-3" />
+                <span>Show Cell Highlights</span>
+              </button>
+              <a
+                href={googleSheetUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] text-blue-400 hover:text-blue-300 flex items-center gap-1 font-semibold"
+                title="Open live Google Spreadsheet in new tab"
+              >
+                <ExternalLink className="size-3" />
+                <span>Open in Google Sheets</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Quick URL Setup / Update Bar */}
+          {isEditingSheetUrl && (
+            <div className="bg-[#131b2e] border-b border-blue-500/30 px-3 py-2 flex items-center gap-2 text-xs shrink-0 flex-wrap animate-in fade-in slide-in-from-top-1">
+              <span className="text-white/70 font-medium shrink-0 text-[11px]">Google Sheet URL:</span>
+              <input
+                type="url"
+                value={sheetUrlInput}
+                onChange={(e) => setSheetUrlInput(e.target.value)}
+                placeholder="https://docs.google.com/spreadsheets/d/..."
+                className="flex-1 min-w-[280px] bg-slate-900 border border-white/20 rounded px-2 py-1 text-xs text-white font-mono placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-blue-400"
+              />
+              <button
+                onClick={() => handleSaveSheetUrl(sheetUrlInput)}
+                className="px-3 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-sm transition"
+              >
+                Connect Sheet
+              </button>
+            </div>
+          )}
+
+          {/* Transferred Named Cells Ribbon */}
+          {Object.keys(transferredItems).length > 0 && (
+            <div className="bg-[#10172a] border-b border-amber-500/30 px-3 py-2 flex items-center justify-between gap-2 text-xs shrink-0 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 border border-amber-400/80 text-amber-300 font-bold text-[10px]">
+                  <Sparkles className="size-3 text-amber-400" />
+                  <span>Transferred from Checklist ({year}):</span>
+                </span>
+                {Object.entries(transferredItems).filter(([k]) => !k.includes('_box') && !k.includes('_amount')).map(([key, item]) => {
+                  const namedRow = SUMMARY_TAB_NAMED_ROWS.find(r => r.prefix === item.namedCell?.replace(/_\d{4}$/, ''));
+                  const rowIdx = namedRow ? accounts.findIndex(a => a.name === namedRow.accountName) : -1;
+                  const cellCoord = rowIdx !== -1 ? getCellAddress(rowIdx, year) : 'Cell';
+
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => {
+                        setActiveSheet('worksheet');
+                        if (namedRow) {
+                          const rIdx = accounts.findIndex(a => a.name === namedRow.accountName);
+                          setSelectedCell({ rowName: namedRow.accountName, colKey: year, address: getCellAddress(rIdx !== -1 ? rIdx : 0, year) });
+                        }
+                      }}
+                      className="flex items-center gap-1.5 px-2 py-1 rounded bg-slate-900 border-2 border-amber-400/90 hover:border-amber-300 text-white text-[10px] font-mono transition hover:bg-slate-800 shadow-[0_0_8px_rgba(251,191,36,0.3)] cursor-pointer group"
+                      title="Click to view & highlight in Calculation Grid"
+                    >
+                      <span className="px-1 py-0.5 rounded bg-amber-500/30 text-amber-200 font-bold text-[9px] border border-amber-400/60">
+                        Summary!{cellCoord}
+                      </span>
+                      <span className="text-emerald-300 font-bold">{item.amount}</span>
+                      <span className="text-blue-300 font-semibold">[{item.namedCell}]</span>
+                      <span className="px-1 rounded bg-amber-500/20 text-[8px] text-amber-300 border border-amber-500/40 font-sans uppercase font-bold">
+                        Ready for CPA
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Main Layout: Google Sheet Embed + Google Sheets Comments Sidebar */}
+          <div className="flex-1 w-full h-full min-h-0 flex flex-row overflow-hidden bg-slate-950">
+            <iframe
+              src={formatGoogleSheetEmbedUrl(googleSheetUrl)}
+              title="Live Shared Tax Google Sheet - Jishnu & Deepika Nath (David Rumsey)"
+              className="flex-1 w-full h-full border-0 bg-white min-w-0"
+              allow="clipboard-read; clipboard-write; fullscreen"
+            />
+
+            {/* Live Google Sheets Comments Sidebar */}
+            {showCommentsSidebar && (
+              <div className="w-80 md:w-88 border-l border-white/15 bg-[#0e1424] flex flex-col h-full shrink-0 text-white animate-in slide-in-from-right-2 duration-150 shadow-2xl">
+                {/* Header */}
+                <div className="px-3 py-2.5 border-b border-white/10 flex items-center justify-between bg-[#080d18] shrink-0">
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="size-4 text-blue-400" />
+                    <h3 className="font-bold text-xs text-white uppercase tracking-wider">Comments</h3>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                      {filteredComments.length}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setShowCommentsSidebar(false)}
+                      className="p-1 rounded hover:bg-white/10 text-white/50 hover:text-white transition"
+                      title="Close Comments Sidebar"
+                    >
+                      <X className="size-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Tabs: All comments | For you */}
+                <div className="px-3 pt-2 pb-1 border-b border-white/10 flex items-center gap-3 text-xs bg-[#0a0f1c] shrink-0">
+                  <button
+                    onClick={() => setCommentFilterTab('all')}
+                    className={`pb-1.5 font-medium transition text-xs ${
+                      commentFilterTab === 'all'
+                        ? 'text-blue-400 font-bold border-b-2 border-blue-400'
+                        : 'text-white/60 hover:text-white'
+                    }`}
+                  >
+                    All comments
+                  </button>
+                  <button
+                    onClick={() => setCommentFilterTab('for_you')}
+                    className={`pb-1.5 font-medium transition text-xs ${
+                      commentFilterTab === 'for_you'
+                        ? 'text-blue-400 font-bold border-b-2 border-blue-400'
+                        : 'text-white/60 hover:text-white'
+                    }`}
+                  >
+                    For you (CPA David)
+                  </button>
+                </div>
+
+                {/* Filters: Search & Sheet Selector */}
+                <div className="p-2 border-b border-white/10 flex items-center gap-1.5 bg-[#090d18] text-xs shrink-0">
+                  <div className="relative flex-1">
+                    <Search className="size-3 text-white/40 absolute left-2 top-2" />
+                    <input
+                      type="text"
+                      value={commentSearchQuery}
+                      onChange={(e) => setCommentSearchQuery(e.target.value)}
+                      placeholder="Search comments..."
+                      className="w-full bg-slate-900 border border-white/10 rounded pl-7 pr-2 py-1 text-[11px] text-white placeholder:text-white/30 focus:outline-none focus:border-blue-400"
+                    />
+                  </div>
+                  <select
+                    value={commentSheetFilter}
+                    onChange={(e) => setCommentSheetFilter(e.target.value)}
+                    className="bg-slate-900 border border-white/10 rounded px-1.5 py-1 text-[11px] text-white/80 focus:outline-none cursor-pointer"
+                  >
+                    <option value="all">All sheets</option>
+                    <option value="Summary">Summary</option>
+                    <option value="CB">CloudBaud (CB)</option>
+                    <option value="OC">Olympic Court (OC)</option>
+                    <option value="CC">Cherry Crest (CC)</option>
+                    <option value="Roberto">Robertos</option>
+                  </select>
+                </div>
+
+                {/* Start Discussion / Add Comment Box */}
+                <div className="p-2.5 border-b border-white/10 bg-[#0d1322] shrink-0">
+                  <div className="flex items-center justify-between text-[10px] text-white/60 mb-1">
+                    <span className="font-semibold">Start a discussion</span>
+                    <input
+                      type="text"
+                      value={newCommentCell}
+                      onChange={(e) => setNewCommentCell(e.target.value)}
+                      placeholder="Cell e.g. Summary!E6"
+                      className="bg-slate-900 border border-white/15 rounded px-1.5 py-0.5 text-[10px] font-mono text-emerald-300 w-28 text-right outline-none focus:border-emerald-400"
+                    />
+                  </div>
+                  <div className="flex gap-1.5">
+                    <input
+                      type="text"
+                      value={newCommentText}
+                      onChange={(e) => setNewCommentText(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handleAddSheetComment(); }}
+                      placeholder="Add comment or @David..."
+                      className="flex-1 bg-slate-900 border border-white/15 rounded px-2 py-1 text-xs text-white placeholder:text-white/30 outline-none focus:ring-1 focus:ring-blue-400"
+                    />
+                    <button
+                      onClick={handleAddSheetComment}
+                      disabled={!newCommentText.trim()}
+                      className="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-xs font-semibold flex items-center gap-1 transition shadow-sm"
+                    >
+                      <Send className="size-3" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Comments List */}
+                <div className="flex-1 overflow-y-auto p-2 space-y-2 divide-y divide-white/5">
+                  {filteredComments.length === 0 ? (
+                    <div className="text-center py-8 text-white/40 text-xs">
+                      No comments found matching your filter.
+                    </div>
+                  ) : (
+                    filteredComments.map(th => (
+                      <div key={th.id} className="pt-2 first:pt-0 space-y-1.5 bg-slate-900/60 p-2.5 rounded-lg border border-white/5 hover:border-blue-500/40 transition">
+                        <div className="flex items-center justify-between text-[11px]">
+                          <div className="flex items-center gap-1.5">
+                            <span className="size-5 rounded-full bg-blue-600/30 border border-blue-400/50 text-blue-300 font-bold text-[9px] flex items-center justify-center">
+                              {th.comments[0]?.authorInitials || 'JN'}
+                            </span>
+                            <span className="font-semibold text-white text-xs">
+                              {th.comments[0]?.authorName || 'Jishnu Nath'}
+                            </span>
+                          </div>
+                          <span className="font-mono text-[10px] font-bold text-amber-300 bg-amber-950/80 border border-amber-400/40 px-1.5 py-0.5 rounded">
+                            {th.sheetName}!{th.cellRef}
+                          </span>
+                        </div>
+
+                        {th.comments.map(c => (
+                          <p key={c.id} className="text-xs text-white/80 leading-relaxed font-sans pl-6 whitespace-pre-wrap">
+                            {c.text}
+                          </p>
+                        ))}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       ) : activeSheet === 'xlsx_master' ? (
         <div className="flex-1 w-full h-full min-h-0 bg-[#03060c] overflow-hidden flex flex-col">
@@ -390,7 +805,7 @@ export default function ExcelWorksheetGrid({
                       className="bg-transparent text-[10px] font-semibold text-blue-300 outline-none cursor-pointer"
                     >
                       <option value="wip" className="bg-slate-900 text-amber-300">Work in Progress</option>
-                      <option value="ready_cpa" className="bg-slate-900 text-blue-300">Ready for CPA Review</option>
+                      <option value="ready_cpa" className="bg-slate-900 text-amber-400 font-bold">Ready for CPA Review</option>
                       <option value="cpa_question" className="bg-slate-900 text-purple-300">Question for CPA</option>
                       <option value="filed_cpa" className="bg-slate-900 text-cyan-300">Filed with CPA</option>
                       <option value="filed_irs" className="bg-slate-900 text-emerald-300">Filed with IRS</option>
@@ -417,8 +832,8 @@ export default function ExcelWorksheetGrid({
                   <th className="p-1.5 px-3 border-r border-white/10 min-w-[200px] font-semibold text-white">
                     A • Account / Category
                   </th>
-                  {columns.map((colYear, idx) => {
-                    const colLetter = String.fromCharCode(66 + idx);
+                  {columns.map((colYear) => {
+                    const colLetter = GOOGLE_SHEET_YEAR_COLUMNS[Number(colYear)] || 'F';
                     return (
                       <th
                         key={colYear}
@@ -468,6 +883,13 @@ export default function ExcelWorksheetGrid({
                         const isCellSelected = selectedCell?.rowName === acc.name && selectedCell?.colKey === colYear;
                         const numVal = typeof val === 'number' ? val : parseFloat(val);
                         const isNegative = !isNaN(numVal) && numVal < 0;
+                        const cellKey = `${acc.name}_${colYear}`;
+                        const cellStatus = cellStatuses[cellKey] || cellStatuses[`${acc.id}_${colYear}`];
+                        const isReadyForCpa = cellStatus === 'ready_cpa';
+                        const isFlashing = flashingCells[cellKey] || flashingCells[`${acc.id}_${colYear}`];
+                        const namedRow = SUMMARY_TAB_NAMED_RANGES.find(r => r.accountName === acc.name);
+                        const namedCell = namedRow ? getNamedCell(namedRow.prefix, colYear) : null;
+                        const cellCoord = getCellAddress(rowIdx, colYear);
 
                         return (
                           <td
@@ -477,12 +899,30 @@ export default function ExcelWorksheetGrid({
                               e.stopPropagation();
                               handleCellClick(acc, colYear, colIdx, rowIdx);
                             }}
-                            className={`p-1 px-2 border-r border-white/10 text-right font-mono text-xs select-none transition-all ${
+                            className={`p-1.5 px-2.5 border-r border-white/10 text-right font-mono text-xs select-none transition-all relative ${
                               isCellSelected
-                                ? 'bg-blue-600/30 ring-1 ring-blue-400 ring-inset font-bold text-white'
+                                ? 'bg-blue-600/40 ring-2 ring-blue-400 ring-inset font-bold text-white z-20'
+                                : isFlashing
+                                ? 'bg-amber-400/40 ring-2 ring-amber-300 ring-inset animate-pulse font-bold text-white z-20'
+                                : isReadyForCpa
+                                ? 'bg-amber-500/25 ring-2 ring-amber-400 border-2 border-amber-400 text-amber-100 font-bold shadow-[0_0_12px_rgba(251,191,36,0.4)] z-10'
                                 : ''
                             }`}
+                            title={isReadyForCpa ? `${acc.name} (${colYear}) [Summary!${cellCoord}] [${namedCell}] • Ready for CPA Review (Transferred from Source Document)` : undefined}
                           >
+                            {/* CPA Review Indicator Badge & Coordinate */}
+                            {isReadyForCpa && (
+                              <div className="absolute top-0.5 right-0.5 flex items-center gap-0.5">
+                                <span className="text-[8px] font-mono font-bold text-amber-200 bg-amber-950/90 border border-amber-400/70 px-1 rounded-sm shadow-sm">
+                                  {cellCoord}
+                                </span>
+                                <span
+                                  className="size-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,1)] animate-pulse"
+                                  title="Transferred • Ready for CPA Review"
+                                />
+                              </div>
+                            )}
+
                             {isEditing ? (
                               <input
                                 autoFocus
@@ -498,7 +938,7 @@ export default function ExcelWorksheetGrid({
                                 onClick={(e) => e.stopPropagation()}
                               />
                             ) : (
-                              <span className={`${isBold ? 'font-bold' : ''} ${isItalic ? 'italic' : ''} ${isNegative ? 'text-red-400' : 'text-emerald-300'}`}>
+                              <span className={`${isBold ? 'font-bold' : ''} ${isItalic ? 'italic' : ''} ${isNegative ? 'text-red-400' : isReadyForCpa ? 'text-amber-100 font-bold' : 'text-emerald-300'}`}>
                                 {val !== '' && !isNaN(numVal)
                                   ? `$${numVal.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
                                   : val || <span className="text-white/20 italic">-</span>}

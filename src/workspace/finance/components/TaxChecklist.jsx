@@ -411,11 +411,20 @@ export default function TaxChecklist({
         }
 
         // Record transfer status
+        const fieldKey = field?.key || targetField.key || 'primary';
+        const formattedAmount = targetField.formatted || `$${amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
         const updated = {
             ...transferredMap,
             [item.id]: {
                 namedCell: targetNamedCell,
-                amount: targetField.formatted || `$${amount.toLocaleString()}`,
+                amount: formattedAmount,
+                rawValue: amount,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            },
+            [`${item.id}_${fieldKey}`]: {
+                namedCell: targetNamedCell,
+                amount: formattedAmount,
+                rawValue: amount,
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }
         };
@@ -424,7 +433,7 @@ export default function TaxChecklist({
             localStorage.setItem(`tax_transferred_cells_${activeYear}`, JSON.stringify(updated));
         } catch {}
 
-        setTransferToast(`Transferred ${targetField.formatted || '$' + amount} ➔ [${targetNamedCell}]`);
+        setTransferToast(`Transferred ${formattedAmount} ➔ [${targetNamedCell}] • Ready for CPA Review`);
         setTimeout(() => setTransferToast(null), 4500);
     };
 
@@ -829,11 +838,24 @@ export default function TaxChecklist({
                                                                     <button
                                                                         type="button"
                                                                         onClick={(e) => handleTransfer(e, null, item, attachedDoc)}
-                                                                        className="px-2 py-0.5 rounded bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30 text-[10px] font-semibold flex items-center gap-1 transition"
-                                                                        title="Transfer parsed amount directly to worksheet named cell"
+                                                                        className={`px-2 py-0.5 rounded text-[10px] font-semibold flex items-center gap-1 transition ${
+                                                                            transferredMap[item.id]
+                                                                                ? 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40'
+                                                                                : 'bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30'
+                                                                        }`}
+                                                                        title={transferredMap[item.id] ? `Transferred to [${transferredMap[item.id]?.namedCell}] (Click to re-transfer)` : "Transfer parsed amount directly to worksheet named cell"}
                                                                     >
-                                                                        <ArrowRightCircle className="size-2.5 text-blue-400" />
-                                                                        <span>Transfer</span>
+                                                                        {transferredMap[item.id] ? (
+                                                                            <>
+                                                                                <Check className="size-2.5 text-emerald-400" />
+                                                                                <span>Transferred</span>
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <ArrowRightCircle className="size-2.5 text-blue-400" />
+                                                                                <span>Transfer</span>
+                                                                            </>
+                                                                        )}
                                                                     </button>
                                                                 </>
                                                             ) : (
@@ -893,6 +915,10 @@ export default function TaxChecklist({
                                                                         const currentVal = customFieldValues[fieldCustomKey] !== undefined 
                                                                             ? customFieldValues[fieldCustomKey] 
                                                                             : field.value;
+                                                                        const numCurrentVal = parseFloat(currentVal) || 0;
+                                                                        const transferredRecord = transferredMap[fieldCustomKey] || (field.isPrimary ? transferredMap[item.id] : null);
+                                                                        const isFieldTransferred = transferredRecord && transferredRecord.rawValue === numCurrentVal;
+                                                                        const isFieldModified = transferredRecord && transferredRecord.rawValue !== numCurrentVal;
 
                                                                         return (
                                                                             <div 
@@ -929,12 +955,32 @@ export default function TaxChecklist({
                                                                                     {field.targetNamedCell && (
                                                                                         <button
                                                                                             type="button"
-                                                                                            onClick={(e) => handleTransfer(e, { ...field, value: parseFloat(currentVal) || 0, formatted: `$${(parseFloat(currentVal) || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}` }, item, attachedDoc)}
-                                                                                            className="px-2 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white font-semibold text-[10px] flex items-center gap-1 transition shadow-sm"
-                                                                                            title={`Transfer $${currentVal} into ${field.targetNamedCell}`}
+                                                                                            onClick={(e) => handleTransfer(e, { ...field, key: field.key, value: numCurrentVal, formatted: `$${numCurrentVal.toLocaleString(undefined, { minimumFractionDigits: 2 })}` }, item, attachedDoc)}
+                                                                                            className={`px-2 py-1 rounded font-semibold text-[10px] flex items-center gap-1 transition shadow-sm ${
+                                                                                                isFieldTransferred
+                                                                                                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                                                                                                    : isFieldModified
+                                                                                                    ? 'bg-amber-600 hover:bg-amber-500 text-white animate-pulse'
+                                                                                                    : 'bg-blue-600 hover:bg-blue-500 text-white'
+                                                                                            }`}
+                                                                                            title={isFieldTransferred ? `Transferred $${numCurrentVal} into ${field.targetNamedCell}` : isFieldModified ? `Value changed — click to Update Transfer into ${field.targetNamedCell}` : `Transfer $${numCurrentVal} into ${field.targetNamedCell}`}
                                                                                         >
-                                                                                            <Send className="size-2.5" />
-                                                                                            <span>Transfer</span>
+                                                                                            {isFieldTransferred ? (
+                                                                                                <>
+                                                                                                    <Check className="size-2.5 text-white" />
+                                                                                                    <span>Transferred</span>
+                                                                                                </>
+                                                                                            ) : isFieldModified ? (
+                                                                                                <>
+                                                                                                    <Send className="size-2.5" />
+                                                                                                    <span>Update Transfer</span>
+                                                                                                </>
+                                                                                            ) : (
+                                                                                                <>
+                                                                                                    <Send className="size-2.5" />
+                                                                                                    <span>Transfer</span>
+                                                                                                </>
+                                                                                            )}
                                                                                         </button>
                                                                                     )}
                                                                                 </div>
