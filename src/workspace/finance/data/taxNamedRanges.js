@@ -172,25 +172,199 @@ export const SUMMARY_TAB_NAMED_ROWS = [
 export const SUMMARY_TAB_NAMED_RANGES = SUMMARY_TAB_NAMED_ROWS;
 
 // Google Sheet Canonical Column Mapping for Summary Tab
+// In the master tax sheets: Col D=2025, Col E=2024, Col F=2023, Col G=2022, Col H=2021, etc.
 export const GOOGLE_SHEET_YEAR_COLUMNS = {
-  2025: 'C',
-  2024: 'D',
-  2023: 'E',
-  2022: 'F',
-  2021: 'G',
-  2020: 'H',
-  2019: 'I',
-  2018: 'J',
-  2017: 'K'
+  2025: 'D',
+  2024: 'E',
+  2023: 'F',
+  2022: 'G',
+  2021: 'H',
+  2020: 'I',
+  2019: 'J',
+  2018: 'K',
+  2017: 'L'
 };
 
 export function getGoogleSheetColumn(year) {
-  return GOOGLE_SHEET_YEAR_COLUMNS[Number(year)] || 'F';
+  return GOOGLE_SHEET_YEAR_COLUMNS[Number(year)] || 'G';
 }
 
 // Helper to construct a canonical Named Cell
 export function getNamedCell(rowPrefix, year) {
   return `${rowPrefix}_${year}`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INTERACTIVE CROSS-PANEL CONNECTED TAX NODES (3-PANEL LINK REGISTRY)
+// ─────────────────────────────────────────────────────────────────────────────
+export const CONNECTED_TAX_NODES = {
+  w2_income: {
+    id: 'w2_income',
+    title: 'W-2 Wages (Box 1 Taxable)',
+    shortLabel: 'W-2 Income (G2 ↔ 2.1 ↔ Line 1a)',
+    accountName: 'W2 Wages',
+    excelRowIndex: 2,
+    cellCoord2022: 'G2',
+    yearCoords: {
+      2025: 'D2',
+      2024: 'E2',
+      2023: 'F2',
+      2022: 'G2',
+      2021: 'H2',
+      2020: 'I2',
+      2019: 'J2',
+      2018: 'K2',
+      2017: 'L2'
+    },
+    checklistId: 'w2_jishnu_deepika',
+    checklistNum: '2.1',
+    fieldKey: 'box1',
+    checklistSectionId: 'income',
+    form1040FormId: 'form_1040',
+    form1040LineLabel: 'Line 1a',
+    form1040FullLine: 'Line 1a — Total amount from Form(s) W-2, box 1',
+    docId: 'doc_2022_w2',
+    docName: 'Deepika W2 2022.pdf',
+    amount2022: 37995.76,
+    withholding2022: 4063.44,
+    description: 'Deepika W-2 Box 1 Taxable Wages ($37,995.76) from Bellevue School District 405 connects to Worksheet Cell G2 and 1040 Return Line 1a.'
+  },
+  w2_tax_withheld: {
+    id: 'w2_tax_withheld',
+    title: 'W-2 Fed Income Tax Withheld (Box 2)',
+    shortLabel: 'Fed Tax Withheld (G45 ↔ 2.1 Box 2 ↔ Line 25a)',
+    accountName: 'Taxes Withheld',
+    excelRowIndex: 45,
+    cellCoord2022: 'G45',
+    yearCoords: {
+      2025: 'D45',
+      2024: 'E45',
+      2023: 'F45',
+      2022: 'G45',
+      2021: 'H45',
+      2020: 'I45',
+      2019: 'J45',
+      2018: 'K45',
+      2017: 'L45'
+    },
+    checklistId: 'w2_jishnu_deepika',
+    checklistNum: '2.1 (Box 2)',
+    fieldKey: 'box2',
+    checklistSectionId: 'income',
+    form1040FormId: 'form_1040',
+    form1040LineLabel: 'Line 25a',
+    form1040FullLine: 'Line 25a — Federal income tax withheld from Form(s) W-2',
+    docId: 'doc_2022_w2',
+    docName: 'Deepika W2 2022.pdf',
+    amount2022: 4063.44,
+    description: 'Deepika W-2 Box 2 Federal Income Tax Withheld ($4,063.44) connects to Worksheet Cell G45 and Form 1040 Return Line 25a.'
+  },
+  cloudbaud_biz: {
+    id: 'cloudbaud_biz',
+    title: 'CloudBaud LLC Net Profit / P&L',
+    shortLabel: 'CloudBaud LLC (G4 ↔ 2.2 ↔ Sch C)',
+    accountName: 'CloudBaud LLC',
+    excelRowIndex: 4,
+    cellCoord2022: 'G4',
+    yearCoords: {
+      2025: 'D4',
+      2024: 'E4',
+      2023: 'F4',
+      2022: 'G4',
+      2021: 'H4',
+      2020: 'I4',
+      2019: 'J4',
+      2018: 'K4',
+      2017: 'L4'
+    },
+    checklistId: '1099_nec_misc',
+    checklistNum: '2.2',
+    checklistSectionId: 'income',
+    form1040FormId: 'schedule_c',
+    form1040LineLabel: 'Schedule C Line 1 / Line 31',
+    form1040FullLine: 'Line 1 — Gross receipts or sales (1099-NEC / Direct client revenue)',
+    amount2022: 365772.34,
+    description: 'CloudBaud LLC Consulting Gross Revenue and Schedule C Net Business Profit.'
+  },
+  mortgage_interest: {
+    id: 'mortgage_interest',
+    title: 'Mortgage Interest (Form 1098)',
+    shortLabel: 'Mortgage 1098 (G5 ↔ 4.1 ↔ Sch A 8a)',
+    accountName: 'Real Estate Interest Woodridge',
+    excelRowIndex: 5,
+    cellCoord2022: 'G5',
+    yearCoords: {
+      2025: 'D5',
+      2024: 'E5',
+      2023: 'F5',
+      2022: 'G5',
+      2021: 'H5',
+      2020: 'I5',
+      2019: 'J5',
+      2018: 'K5',
+      2017: 'L5'
+    },
+    checklistId: 'pr_1098_mortgage',
+    checklistNum: '4.1',
+    checklistSectionId: 'real_estate_residence',
+    form1040FormId: 'schedule_a',
+    form1040LineLabel: 'Schedule A Line 8a',
+    form1040FullLine: 'Line 8a — Home mortgage interest and points reported on Form 1098',
+    amount2022: 10516.14,
+    description: 'Form 1098 Woodridge residence mortgage interest deduction on Schedule A.'
+  },
+  real_estate_taxes: {
+    id: 'real_estate_taxes',
+    title: 'Property Taxes (King County Parcel)',
+    shortLabel: 'RE Taxes (G6 ↔ 4.2 ↔ Sch A 5b)',
+    accountName: 'Real Estate Taxes Woodridge',
+    excelRowIndex: 6,
+    cellCoord2022: 'G6',
+    yearCoords: {
+      2025: 'D6',
+      2024: 'E6',
+      2023: 'F6',
+      2022: 'G6',
+      2021: 'H6',
+      2020: 'I6',
+      2019: 'J6',
+      2018: 'K6',
+      2017: 'L6'
+    },
+    checklistId: 'pr_property_tax',
+    checklistNum: '4.2',
+    checklistSectionId: 'real_estate_residence',
+    form1040FormId: 'schedule_a',
+    form1040LineLabel: 'Schedule A Line 5b',
+    form1040FullLine: 'Line 5b — State and local real estate taxes (Woodridge / King County)',
+    amount2022: 7271.09,
+    description: 'King County property taxes for primary residence on Schedule A.'
+  }
+};
+
+/**
+ * Match a target element (account name, checklist item ID, or 1040 line) to a connected node
+ */
+export function findConnectedNode(query) {
+  if (!query) return null;
+  const q = String(query).toLowerCase();
+  
+  if (CONNECTED_TAX_NODES[query]) return CONNECTED_TAX_NODES[query];
+
+  return Object.values(CONNECTED_TAX_NODES).find(node => {
+    if (node.id === q) return true;
+    if (node.accountName && (node.accountName.toLowerCase() === q || q.includes(node.accountName.toLowerCase()))) return true;
+    if (node.checklistId && node.checklistId.toLowerCase() === q) return true;
+    if (node.checklistNum === q) return true;
+    if (node.form1040LineLabel && (node.form1040LineLabel.toLowerCase() === q || q.includes(node.form1040LineLabel.toLowerCase()))) return true;
+    if (q.includes('box 2') || q.includes('withheld') || q.includes('line 25a') || q.includes('25a') || q.includes('federal income tax')) {
+      if (node.id === 'w2_tax_withheld') return true;
+    }
+    if (q.includes('w2') || q.includes('w-2') || q.includes('line 1a') || q.includes('1a')) {
+      if (node.id === 'w2_income') return true;
+    }
+    return false;
+  }) || null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

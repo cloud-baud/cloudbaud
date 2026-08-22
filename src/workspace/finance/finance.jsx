@@ -107,18 +107,22 @@ const AppLayout = () => {
   );
 };
 
+import { FontSizeProvider } from '@/shared/contexts/FontSizeContext';
+
 const root = createRoot(document.getElementById('root'))
 root.render(
   <StrictMode>
     <HelmetProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/invite/:token" element={<InvitePage />} />
-          <Route path="/finance/invite/:token" element={<InvitePage />} />
-          <Route path="/finance/*" element={<AppLayout />} />
-          <Route path="/*" element={<AppLayout />} />
-        </Routes>
-      </BrowserRouter>
+      <FontSizeProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/invite/:token" element={<InvitePage />} />
+            <Route path="/finance/invite/:token" element={<InvitePage />} />
+            <Route path="/finance/*" element={<AppLayout />} />
+            <Route path="/*" element={<AppLayout />} />
+          </Routes>
+        </BrowserRouter>
+      </FontSizeProvider>
     </HelmetProvider>
   </StrictMode>
 )

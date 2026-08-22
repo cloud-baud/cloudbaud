@@ -6,23 +6,24 @@ export const FONT_SIZE_OPTIONS = [
     {
         id: 'compact',
         label: 'Compact',
-        sublabel: 'Tax Panel Standard (High Density)',
-        scale: '87.5%',
+        sublabel: 'Crisp Standard Density',
+        scale: '100%',
         icon: '⚡',
-        badge: 'Recommended'
+        badge: 'Standard'
     },
     {
         id: 'default',
-        label: 'Balanced',
-        sublabel: 'Standard Web Sizing',
-        scale: '100%',
+        label: 'Balanced (Medium)',
+        sublabel: 'Enhanced Readability',
+        scale: '112.5%',
         icon: '🔹',
+        badge: 'Recommended'
     },
     {
         id: 'large',
-        label: 'Comfortable',
+        label: 'Large (Comfortable)',
         sublabel: 'Enlarged Text & Spacing',
-        scale: '115%',
+        scale: '125%',
         icon: '🔍',
     }
 ];
@@ -37,7 +38,7 @@ export const FontSizeProvider = ({ children }) => {
                 return saved;
             }
         }
-        return 'compact'; // Default to compact to match tax panels
+        return 'default'; // Default to balanced/medium for clear visibility
     });
 
     const applyFontSize = (size) => {
@@ -53,12 +54,61 @@ export const FontSizeProvider = ({ children }) => {
         applyFontSize(fontSize);
     }, [fontSize]);
 
+    // Cross-window and iframe synchronization listeners
+    useEffect(() => {
+        const handleMessage = (event) => {
+            if (event.data?.type === 'FONT_SIZE_CHANGE' && event.data.fontSize) {
+                const nextSize = event.data.fontSize;
+                if (['compact', 'default', 'large'].includes(nextSize)) {
+                    setFontSizeState(nextSize);
+                    applyFontSize(nextSize);
+                }
+            }
+        };
+
+        const handleStorage = (event) => {
+            if (event.key === STORAGE_KEY && event.newValue) {
+                if (['compact', 'default', 'large'].includes(event.newValue)) {
+                    setFontSizeState(event.newValue);
+                    applyFontSize(event.newValue);
+                }
+            }
+        };
+
+        window.addEventListener('message', handleMessage);
+        window.addEventListener('storage', handleStorage);
+
+        return () => {
+            window.removeEventListener('message', handleMessage);
+            window.removeEventListener('storage', handleStorage);
+        };
+    }, []);
+
     const setFontSize = (size) => {
         if (!['compact', 'default', 'large'].includes(size)) return;
         setFontSizeState(size);
         if (typeof window !== 'undefined') {
             localStorage.setItem(STORAGE_KEY, size);
             window.dispatchEvent(new CustomEvent('cloudbaud-font-size-change', { detail: { fontSize: size } }));
+            
+            // Broadcast to parent if inside iframe
+            if (window.parent && window.parent !== window) {
+                try {
+                    window.parent.postMessage({ type: 'FONT_SIZE_CHANGE', fontSize: size }, '*');
+                } catch (e) {
+                    console.debug('Failed to postMessage to parent:', e);
+                }
+            }
+
+            // Broadcast to all child iframes
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                try {
+                    iframe.contentWindow?.postMessage({ type: 'FONT_SIZE_CHANGE', fontSize: size }, '*');
+                } catch (e) {
+                    console.debug('Failed to postMessage to iframe:', e);
+                }
+            });
         }
         applyFontSize(size);
     };

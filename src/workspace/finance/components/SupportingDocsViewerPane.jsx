@@ -17,12 +17,14 @@ import {
   ListChecks,
   Files,
   ExternalLink,
-  RefreshCw
+  RefreshCw,
+  Link2
 } from 'lucide-react';
 import SpreadsheetPreview from './SpreadsheetPreview';
 import { uploadTaxDocument } from '../api/taxService';
 import TaxChecklist from './TaxChecklist';
 import { saveTaxDocumentBlob, resolveDocumentUrl } from '../utils/taxDocumentStorage';
+import { CONNECTED_TAX_NODES } from '../data/taxNamedRanges';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ACCURATE TAX DOCUMENTS REGISTRY BY YEAR
@@ -95,7 +97,11 @@ export default function SupportingDocsViewerPane({
   isDocsCollapsed,
   setIsDocsCollapsed,
   onSelectAndSwitch,
-  onTransferValue
+  onTransferValue,
+  activeConnectedNode,
+  setActiveConnectedNode,
+  hoveredConnectedNode,
+  setHoveredConnectedNode
 }) {
   const [viewMode, setViewMode] = useState('checklist'); // 'checklist' | 'viewer'
   const [activeDocUrl, setActiveDocUrl] = useState(null);
@@ -424,6 +430,37 @@ export default function SupportingDocsViewerPane({
               </div>
             </div>
 
+            {/* 3-Panel Connected Source Badge for Open Document */}
+            {(() => {
+              const activeNode = CONNECTED_TAX_NODES[activeConnectedNode];
+              const isW2Doc = selectedDoc.name.toLowerCase().includes('w2') || selectedDoc.name.toLowerCase().includes('w-2') || selectedDoc.id === 'doc_2022_w2';
+              const isMatch = activeNode && (activeNode.docId === selectedDoc.id || activeNode.docName === selectedDoc.name || (activeNode.id === 'w2_income' && isW2Doc));
+
+              if (!isMatch || !activeNode) return null;
+              const cellCoord = activeNode.yearCoords[year] || activeNode.cellCoord2022;
+
+              return (
+                <div className="bg-cyan-950/90 border-b border-cyan-400/50 px-3 py-1.5 flex items-center justify-between gap-2 text-xs text-cyan-200 shrink-0 shadow-sm animate-in fade-in">
+                  <div className="flex items-center gap-1.5">
+                    <Link2 className="size-3.5 text-cyan-400 animate-pulse" />
+                    <span className="font-semibold text-white">3-Panel Live Trace:</span>
+                    <span className="font-mono text-amber-300 font-bold bg-black/40 px-1 rounded">
+                      Box 1 (${activeNode.amount2022.toLocaleString()})
+                    </span>
+                    <span>⟷</span>
+                    <span className="font-mono text-cyan-300 font-bold bg-black/40 px-1 rounded">
+                      Worksheet [{cellCoord}]
+                    </span>
+                    <span>⟷</span>
+                    <span className="font-mono text-purple-300 font-bold bg-black/40 px-1 rounded">
+                      1040 [{activeNode.form1040LineLabel}]
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-cyan-300/80 font-medium hidden sm:inline">Active Synchronized Field</span>
+                </div>
+              );
+            })()}
+
             {/* Document Render (Native PDF Frame / Spreadsheet / Upload Prompt) */}
             <div className="flex-1 overflow-hidden p-2 flex flex-col items-center justify-center bg-[#03060d] relative min-h-0">
               {isUrlLoading ? (
@@ -495,6 +532,10 @@ export default function SupportingDocsViewerPane({
             onViewDocument={handleOpenDoc}
             onTriggerUpload={(item) => triggerUpload({ id: item.id, name: `${item.label}.pdf`, category: item.label })}
             onTransferValue={onTransferValue}
+            activeConnectedNode={activeConnectedNode}
+            setActiveConnectedNode={setActiveConnectedNode}
+            hoveredConnectedNode={hoveredConnectedNode}
+            setHoveredConnectedNode={setHoveredConnectedNode}
           />
         )}
       </div>

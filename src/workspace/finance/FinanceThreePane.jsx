@@ -16,14 +16,18 @@ import {
   Maximize2,
   Minimize2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Link2,
+  Sparkles,
+  X
 } from 'lucide-react';
-import { getChartOfAccounts, getTaxEntries, getMyDocuments } from './api/taxService';
+import { getChartOfAccounts, getTaxEntries, getMyDocuments, updateTaxCell } from './api/taxService';
 import AnnotationReviewPanel from './components/AnnotationReviewPanel';
 import TaxRibbon from './components/TaxRibbon';
 import Form1040ReturnPane from './components/Form1040ReturnPane';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/shared/ui/resizable';
 import { EXTRACTED_SHEET_THREADS } from './data/extractedTaxSheetComments';
+import { CONNECTED_TAX_NODES, findConnectedNode } from './data/taxNamedRanges';
 
 const WorkbenchContext = createContext(null);
 const useWorkbench = () => useContext(WorkbenchContext);
@@ -125,7 +129,11 @@ function WorksheetPane({ onSelectAndSwitch }) {
     isFormCollapsed,
     setIsFormCollapsed,
     activeSheet,
-    setActiveSheet
+    setActiveSheet,
+    activeConnectedNode,
+    setActiveConnectedNode,
+    hoveredConnectedNode,
+    setHoveredConnectedNode
   } = useWorkbench();
 
   return (
@@ -148,6 +156,10 @@ function WorksheetPane({ onSelectAndSwitch }) {
         setIsFormCollapsed={setIsFormCollapsed}
         activeSheet={activeSheet}
         onActiveSheetChange={setActiveSheet}
+        activeConnectedNode={activeConnectedNode}
+        setActiveConnectedNode={setActiveConnectedNode}
+        hoveredConnectedNode={hoveredConnectedNode}
+        setHoveredConnectedNode={setHoveredConnectedNode}
       />
     </div>
   );
@@ -169,7 +181,11 @@ function DocsPane({ onSelectAndSwitch }) {
     year,
     isDocsCollapsed,
     setIsDocsCollapsed,
-    onTransferValue
+    onTransferValue,
+    activeConnectedNode,
+    setActiveConnectedNode,
+    hoveredConnectedNode,
+    setHoveredConnectedNode
   } = useWorkbench();
 
   return (
@@ -185,6 +201,10 @@ function DocsPane({ onSelectAndSwitch }) {
       setIsDocsCollapsed={setIsDocsCollapsed}
       onSelectAndSwitch={onSelectAndSwitch}
       onTransferValue={onTransferValue}
+      activeConnectedNode={activeConnectedNode}
+      setActiveConnectedNode={setActiveConnectedNode}
+      hoveredConnectedNode={hoveredConnectedNode}
+      setHoveredConnectedNode={setHoveredConnectedNode}
     />
   );
 }
@@ -203,7 +223,11 @@ function Form1040Pane() {
     openReviewPanel,
     year,
     isFormCollapsed,
-    setIsFormCollapsed
+    setIsFormCollapsed,
+    activeConnectedNode,
+    setActiveConnectedNode,
+    hoveredConnectedNode,
+    setHoveredConnectedNode
   } = useWorkbench();
 
   return (
@@ -218,6 +242,10 @@ function Form1040Pane() {
       openReviewPanel={openReviewPanel}
       isFormCollapsed={isFormCollapsed}
       setIsFormCollapsed={setIsFormCollapsed}
+      activeConnectedNode={activeConnectedNode}
+      setActiveConnectedNode={setActiveConnectedNode}
+      hoveredConnectedNode={hoveredConnectedNode}
+      setHoveredConnectedNode={setHoveredConnectedNode}
     />
   );
 }
@@ -225,6 +253,7 @@ function Form1040Pane() {
 const TAX_YEAR_ENTRIES_MAP = {
   2025: [
     { category_id: '1', amount: 0 },
+    { category_id: 'tax_withheld', amount: 0 },
     { category_id: '2', amount: 0 },
     { category_id: '3', amount: 0 },
     { category_id: '4', amount: 0 },
@@ -232,6 +261,7 @@ const TAX_YEAR_ENTRIES_MAP = {
   ],
   2024: [
     { category_id: '1', amount: 0 },
+    { category_id: 'tax_withheld', amount: 0 },
     { category_id: '2', amount: 0 },
     { category_id: '3', amount: 153952.00 },
     { category_id: '4', amount: 9200.00 },
@@ -239,6 +269,7 @@ const TAX_YEAR_ENTRIES_MAP = {
   ],
   2023: [
     { category_id: '1', amount: 59110.59 },
+    { category_id: 'tax_withheld', amount: 8005.09 },
     { category_id: '2', amount: 0 },
     { category_id: '3', amount: 38376.00 },
     { category_id: '4', amount: 8800.00 },
@@ -246,6 +277,7 @@ const TAX_YEAR_ENTRIES_MAP = {
   ],
   2022: [
     { category_id: '1', amount: 37995.76 },
+    { category_id: 'tax_withheld', amount: 4063.44 },
     { category_id: '2', amount: 0 },
     { category_id: '3', amount: 365772.34 },
     { category_id: '4', amount: 8600.00 },
@@ -253,6 +285,7 @@ const TAX_YEAR_ENTRIES_MAP = {
   ],
   2021: [
     { category_id: '1', amount: 49793.32 },
+    { category_id: 'tax_withheld', amount: 6200.00 },
     { category_id: '2', amount: 0 },
     { category_id: '3', amount: 67285.01 },
     { category_id: '4', amount: 8500.00 },
@@ -260,6 +293,7 @@ const TAX_YEAR_ENTRIES_MAP = {
   ],
   2020: [
     { category_id: '1', amount: 69549.66 },
+    { category_id: 'tax_withheld', amount: 10423.75 },
     { category_id: '2', amount: -44581.92 },
     { category_id: '3', amount: 365772.34 },
     { category_id: '4', amount: 8450.00 },
@@ -267,6 +301,7 @@ const TAX_YEAR_ENTRIES_MAP = {
   ],
   2019: [
     { category_id: '1', amount: 84444.89 },
+    { category_id: 'tax_withheld', amount: 9800.00 },
     { category_id: '2', amount: -12500.00 },
     { category_id: '3', amount: 79825.51 },
     { category_id: '4', amount: 7600.00 },
@@ -274,6 +309,7 @@ const TAX_YEAR_ENTRIES_MAP = {
   ],
   2018: [
     { category_id: '1', amount: 70399.57 },
+    { category_id: 'tax_withheld', amount: 8900.00 },
     { category_id: '2', amount: -8400.00 },
     { category_id: '3', amount: 485019.41 },
     { category_id: '4', amount: 6200.00 },
@@ -281,6 +317,7 @@ const TAX_YEAR_ENTRIES_MAP = {
   ],
   2017: [
     { category_id: '1', amount: 63132.46 },
+    { category_id: 'tax_withheld', amount: 7909.36 },
     { category_id: '2', amount: -44581.92 },
     { category_id: '3', amount: 334565.42 },
     { category_id: '4', amount: 5800.00 },
@@ -355,6 +392,7 @@ export default function FinanceThreePane() {
 
   const [accounts, setAccounts] = useState([
     { id: '1', name: 'W2 Wages', type: 'INCOME' },
+    { id: 'tax_withheld', name: 'Taxes Withheld', type: 'TAX_PAYMENT' },
     { id: '2', name: 'Comfort Foods', type: 'EXPENSE' },
     { id: '3', name: 'CloudBaud LLC', type: 'INCOME' },
     { id: '4', name: 'Home Office & Utilities', type: 'EXPENSE' },
@@ -370,6 +408,10 @@ export default function FinanceThreePane() {
   const [selectedCat, setSelectedCat] = useState(null);
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [selectedFormLine, setSelectedFormLine] = useState(null);
+  
+  // Interactive Cross-Panel Highlighting Node (Defaults to W-2 Income for 2022)
+  const [activeConnectedNode, setActiveConnectedNode] = useState('w2_income');
+  const [hoveredConnectedNode, setHoveredConnectedNode] = useState(null);
   
   // Persisted Active Tab
   const [activeTab, setActiveTabState] = useState(() => {
@@ -564,6 +606,13 @@ export default function FinanceThreePane() {
     setSelectedDoc,
     selectedFormLine,
     setSelectedFormLine,
+    activeConnectedNode,
+    setActiveConnectedNode,
+    hoveredConnectedNode,
+    setHoveredConnectedNode,
+    toggleConnectedNode: (nodeKey) => {
+      setActiveConnectedNode(prev => prev === nodeKey ? null : nodeKey);
+    },
     threads,
     openReviewPanel,
     isDocsCollapsed,
@@ -634,6 +683,74 @@ export default function FinanceThreePane() {
             setActiveTab('docs');
           }}
         />
+
+        {/* ── 3-PANEL INTERACTIVE CONNECTION BRIDGE BAR ── */}
+        <div className="bg-[#080d1a] border-b border-white/10 px-3 py-1 flex items-center justify-between gap-2 text-xs shrink-0 flex-wrap shadow-inner">
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-semibold text-[11px]">
+              <Link2 className="size-3.5 text-cyan-400 animate-pulse" />
+              <span>3-Panel Trace:</span>
+            </div>
+
+            {/* Quick Connection Node Selectors */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {Object.values(CONNECTED_TAX_NODES).map(node => {
+                const isActive = activeConnectedNode === node.id;
+                const cellCoord = node.yearCoords[year] || node.cellCoord2022;
+                return (
+                  <button
+                    key={node.id}
+                    onClick={() => setActiveConnectedNode(isActive ? null : node.id)}
+                    onMouseEnter={() => setHoveredConnectedNode(node.id)}
+                    onMouseLeave={() => setHoveredConnectedNode(null)}
+                    className={`px-2 py-0.5 rounded text-[11px] font-medium transition flex items-center gap-1.5 border shadow-sm ${
+                      isActive
+                        ? 'bg-cyan-500/25 border-cyan-400 text-cyan-100 font-bold ring-1 ring-cyan-400'
+                        : 'bg-slate-900/80 hover:bg-slate-800 text-white/70 hover:text-white border-white/10'
+                    }`}
+                    title={node.description}
+                  >
+                    <span className="font-mono text-[10px] text-amber-300 bg-amber-950/80 px-1 rounded border border-amber-400/30 font-bold">
+                      {cellCoord}
+                    </span>
+                    <span>{node.title.split('(')[0]}</span>
+                    {isActive && <span className="size-1.5 rounded-full bg-cyan-400 animate-ping" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Active Breadcrumb Flow Indicator */}
+          {activeConnectedNode && (() => {
+            const node = CONNECTED_TAX_NODES[activeConnectedNode];
+            if (!node) return null;
+            const cellCoord = node.yearCoords[year] || node.cellCoord2022;
+            const entryVal = entries.find(e => {
+              const acc = accounts.find(a => a.name === node.accountName);
+              return acc && e.category_id === acc.id;
+            })?.amount || node.amount2022;
+
+            return (
+              <div className="flex items-center gap-2 text-[11px]">
+                <div className="flex items-center gap-1.5 text-slate-200 bg-slate-950/90 border border-cyan-500/40 rounded px-2.5 py-0.5 font-mono shadow-sm">
+                  <span className="text-amber-300 font-bold">Worksheet [{cellCoord}: ${Number(entryVal).toLocaleString(undefined, { minimumFractionDigits: 2 })}]</span>
+                  <span className="text-cyan-400 font-bold">⟷</span>
+                  <span className="text-blue-300 font-semibold">Checklist [{node.checklistNum} W-2]</span>
+                  <span className="text-cyan-400 font-bold">⟷</span>
+                  <span className="text-purple-300 font-semibold">1040 [{node.form1040LineLabel}]</span>
+                </div>
+                <button
+                  onClick={() => setActiveConnectedNode(null)}
+                  className="text-white/40 hover:text-white text-[10px] underline"
+                  title="Clear active 3-panel highlight"
+                >
+                  Clear
+                </button>
+              </div>
+            );
+          })()}
+        </div>
 
         {/* MAIN 3-PANE WORKBENCH */}
         <div className="flex-1 flex overflow-hidden relative">

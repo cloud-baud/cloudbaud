@@ -4,10 +4,10 @@ import {
     HeartPulse, Users, Home, CreditCard, Globe, ExternalLink,
     AlertTriangle, CheckCircle2, RotateCcw, ChevronDown, ChevronRight,
     CheckSquare, Square, ShieldCheck, Calendar, Upload, Eye, FileSpreadsheet, Lock,
-    Sparkles, Cpu, Send, ArrowRight, Table, Check, Loader2, ArrowRightCircle
+    Sparkles, Cpu, Send, ArrowRight, Table, Check, Loader2, ArrowRightCircle, Link2
 } from 'lucide-react';
 import { useViewAs } from '../ViewAsContext';
-import { extractDocumentValues, getNamedCell, SUMMARY_TAB_NAMED_RANGES } from '../data/taxNamedRanges';
+import { extractDocumentValues, getNamedCell, SUMMARY_TAB_NAMED_RANGES, CONNECTED_TAX_NODES, findConnectedNode } from '../data/taxNamedRanges';
 
 const GDRIVE_URL = "https://drive.google.com/drive/folders/1bsHTGlWMp1j0fp_d2eDqiho1Ol0cMnzG?usp=sharing";
 
@@ -183,7 +183,11 @@ export default function TaxChecklist({
     onViewDocument,
     onTriggerUpload,
     onTransferValue,
-    availableDocs = [] 
+    availableDocs = [],
+    activeConnectedNode,
+    setActiveConnectedNode,
+    hoveredConnectedNode,
+    setHoveredConnectedNode
 }) {
     const activeYear = String(year);
     const { activePersona, isViewingAs } = useViewAs();
@@ -217,6 +221,19 @@ export default function TaxChecklist({
             return {};
         }
     });
+
+    // Auto-expand and scroll to section when active connected node changes
+    useEffect(() => {
+        if (activeConnectedNode) {
+            const node = CONNECTED_TAX_NODES[activeConnectedNode];
+            if (node?.checklistSectionId) {
+                setCollapsedSections(prev => ({
+                    ...prev,
+                    [node.checklistSectionId]: false
+                }));
+            }
+        }
+    }, [activeConnectedNode]);
 
     // Last active section the user worked in
     const [lastActiveSectionId, setLastActiveSectionId] = useState(() => {
@@ -749,13 +766,37 @@ export default function TaxChecklist({
                                     {section.items.map((item) => {
                                         const isChecked = !!currentYearChecked[item.id];
                                         const attachedDoc = getAttachedDoc(item);
+                                        const activeNode = CONNECTED_TAX_NODES[activeConnectedNode];
+                                        const hoveredNode = CONNECTED_TAX_NODES[hoveredConnectedNode];
+                                        const isItemConnected = activeNode && (activeNode.checklistId === item.id || (activeNode.id === 'w2_income' && (item.id === 'w2_jishnu_deepika' || item.num === '2.1')));
+                                        const isItemHoverConnected = hoveredNode && (hoveredNode.checklistId === item.id || (hoveredNode.id === 'w2_income' && (item.id === 'w2_jishnu_deepika' || item.num === '2.1')));
+                                        const isNodeHighlighted = isItemConnected || isItemHoverConnected;
+                                        const nodeForBadge = activeNode || hoveredNode;
 
                                         return (
                                             <div
                                                 key={item.id}
-                                                onClick={() => toggleAnnualItem(item.id, section.id)}
-                                                className={`flex items-start gap-2.5 p-2 rounded cursor-pointer transition ${
-                                                    isChecked
+                                                id={`checklist-item-${item.id}`}
+                                                onClick={() => {
+                                                    toggleAnnualItem(item.id, section.id);
+                                                    const matched = Object.values(CONNECTED_TAX_NODES).find(n => n.checklistId === item.id || (n.id === 'w2_income' && (item.id === 'w2_jishnu_deepika' || item.num === '2.1')));
+                                                    if (matched && setActiveConnectedNode) {
+                                                        setActiveConnectedNode(matched.id);
+                                                    }
+                                                }}
+                                                onMouseEnter={() => {
+                                                    const matched = Object.values(CONNECTED_TAX_NODES).find(n => n.checklistId === item.id || (n.id === 'w2_income' && (item.id === 'w2_jishnu_deepika' || item.num === '2.1')));
+                                                    if (matched && setHoveredConnectedNode) {
+                                                        setHoveredConnectedNode(matched.id);
+                                                    }
+                                                }}
+                                                onMouseLeave={() => {
+                                                    setHoveredConnectedNode?.(null);
+                                                }}
+                                                className={`flex items-start gap-2.5 p-2 rounded cursor-pointer transition relative ${
+                                                    isNodeHighlighted
+                                                        ? 'bg-cyan-950/40 ring-2 ring-cyan-400 border-2 border-cyan-400 text-white shadow-[0_0_20px_rgba(6,182,212,0.4)] z-10'
+                                                        : isChecked
                                                         ? 'bg-emerald-950/15 text-white'
                                                         : 'hover:bg-white/5 text-white'
                                                 }`}
@@ -781,9 +822,18 @@ export default function TaxChecklist({
                                                             <span className="font-mono text-blue-400 font-bold text-[11px]">
                                                                 [{item.num}]
                                                             </span>
-                                                            <span className="font-semibold text-xs text-white">
+                                                            <span className={`font-semibold text-xs ${isNodeHighlighted ? 'text-cyan-200 font-bold' : 'text-white'}`}>
                                                                 {item.label}
                                                             </span>
+
+                                                            {/* 3-Panel Connected Item Badge */}
+                                                            {isNodeHighlighted && nodeForBadge && (
+                                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] bg-cyan-500/20 text-cyan-200 border border-cyan-400/60 font-mono font-bold animate-in fade-in">
+                                                                    <Link2 className="size-2.5 text-cyan-300 animate-pulse" />
+                                                                    <span>Linked: Sheet [{nodeForBadge.yearCoords[activeYear] || nodeForBadge.cellCoord2022 || 'G2'}] ↔ 1040 {nodeForBadge.form1040LineLabel}</span>
+                                                                </span>
+                                                            )}
+
                                                             {item.isSensitive && isSecurityTrimmed && (
                                                                 <span className="inline-flex items-center gap-1 px-1 py-0.2 rounded text-[9px] bg-purple-500/20 text-purple-300 border border-purple-500/30 font-mono">
                                                                     <Lock className="size-2" />
@@ -799,7 +849,7 @@ export default function TaxChecklist({
                                                         </div>
 
                                                         {/* Attached File Actions: View Doc, Parse / Extract, Transfer */}
-                                                        <div className="flex items-center gap-1.5 shrink-0">
+                                                        <div className="flex items-center gap-2 shrink-0">
                                                             {attachedDoc ? (
                                                                 <>
                                                                     <button
@@ -810,27 +860,27 @@ export default function TaxChecklist({
                                                                             try { localStorage.setItem('tax_checklist_last_active_section', section.id); } catch {}
                                                                             onViewDocument?.(attachedDoc);
                                                                         }}
-                                                                        className="px-2 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold flex items-center gap-1 transition"
+                                                                        className="px-2.5 py-1 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
                                                                         title={`View ${attachedDoc.name}`}
                                                                     >
-                                                                        <Eye className="size-2.5" />
+                                                                        <Eye className="size-3.5" />
                                                                         <span>View Doc</span>
                                                                     </button>
 
                                                                     <button
                                                                         type="button"
                                                                         onClick={(e) => handleToggleExtract(e, item, attachedDoc)}
-                                                                        className={`px-2 py-0.5 rounded border text-[10px] font-semibold flex items-center gap-1 transition ${
+                                                                        className={`px-2.5 py-1 rounded border text-xs font-bold flex items-center gap-1.5 transition shadow-sm ${
                                                                             expandedExtracts[item.id]
-                                                                                ? 'bg-purple-600 text-white border-purple-400 shadow-sm'
-                                                                                : 'bg-purple-500/15 hover:bg-purple-500/30 text-purple-300 border-purple-500/30'
+                                                                                ? 'bg-purple-600 text-white border-purple-400 shadow-md'
+                                                                                : 'bg-purple-500/20 hover:bg-purple-500/35 text-purple-200 border-purple-500/40'
                                                                         }`}
                                                                         title="Extract and preview key tax values"
                                                                     >
                                                                         {extractingMap[item.id] ? (
-                                                                            <Loader2 className="size-2.5 animate-spin" />
+                                                                            <Loader2 className="size-3.5 animate-spin" />
                                                                         ) : (
-                                                                            <Sparkles className="size-2.5 text-purple-300" />
+                                                                            <Sparkles className="size-3.5 text-purple-300" />
                                                                         )}
                                                                         <span>{expandedExtracts[item.id] ? 'Hide Extract' : 'Parse'}</span>
                                                                     </button>
@@ -838,21 +888,21 @@ export default function TaxChecklist({
                                                                     <button
                                                                         type="button"
                                                                         onClick={(e) => handleTransfer(e, null, item, attachedDoc)}
-                                                                        className={`px-2 py-0.5 rounded text-[10px] font-semibold flex items-center gap-1 transition ${
+                                                                        className={`px-2.5 py-1 rounded text-xs font-bold flex items-center gap-1.5 transition shadow-sm ${
                                                                             transferredMap[item.id]
-                                                                                ? 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40'
-                                                                                : 'bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30'
+                                                                                ? 'bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/80 shadow-md'
+                                                                                : 'bg-blue-600 hover:bg-blue-500 text-white border border-blue-400/80'
                                                                         }`}
                                                                         title={transferredMap[item.id] ? `Transferred to [${transferredMap[item.id]?.namedCell}] (Click to re-transfer)` : "Transfer parsed amount directly to worksheet named cell"}
                                                                     >
                                                                         {transferredMap[item.id] ? (
                                                                             <>
-                                                                                <Check className="size-2.5 text-emerald-400" />
+                                                                                <Check className="size-3.5 text-white" />
                                                                                 <span>Transferred</span>
                                                                             </>
                                                                         ) : (
                                                                             <>
-                                                                                <ArrowRightCircle className="size-2.5 text-blue-400" />
+                                                                                <ArrowRightCircle className="size-3.5 text-white" />
                                                                                 <span>Transfer</span>
                                                                             </>
                                                                         )}
@@ -867,26 +917,26 @@ export default function TaxChecklist({
                                                                         try { localStorage.setItem('tax_checklist_last_active_section', section.id); } catch {}
                                                                         onTriggerUpload?.(item);
                                                                     }}
-                                                                    className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-white/60 hover:text-white border border-white/10 text-[10px] flex items-center gap-1 transition"
+                                                                    className="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white border border-white/20 text-xs font-semibold flex items-center gap-1.5 transition"
                                                                     title="Attach document"
                                                                 >
-                                                                    <Upload className="size-2.5 text-blue-400" />
+                                                                    <Upload className="size-3.5 text-blue-400" />
                                                                     <span>Attach</span>
                                                                 </button>
                                                             )}
                                                         </div>
                                                     </div>
 
-                                                    <p className="text-[11px] text-white/50 leading-relaxed">
+                                                    <p className="text-xs text-slate-200 leading-relaxed font-normal">
                                                         {item.subtext}
                                                     </p>
 
                                                     {/* Transferred Badge if already applied */}
                                                     {transferredMap[item.id] && (
-                                                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] font-mono mt-1">
-                                                            <CheckCircle2 className="size-3 text-emerald-400 shrink-0" />
-                                                            <span>Transferred {transferredMap[item.id].amount} ➔ <b>[{transferredMap[item.id].namedCell}]</b></span>
-                                                            <span className="text-white/40 text-[9px]">({transferredMap[item.id].timestamp})</span>
+                                                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 text-xs font-mono font-medium mt-1">
+                                                            <CheckCircle2 className="size-3.5 text-emerald-400 shrink-0" />
+                                                            <span>Transferred {transferredMap[item.id].amount} ➔ <b className="text-white">[{transferredMap[item.id].namedCell}]</b></span>
+                                                            <span className="text-slate-400 text-[10px]">({transferredMap[item.id].timestamp})</span>
                                                         </div>
                                                     )}
 
@@ -895,21 +945,21 @@ export default function TaxChecklist({
                                                         const extraction = extractDocumentValues(item, attachedDoc, activeYear);
                                                         return (
                                                             <div 
-                                                                className="mt-2 p-2.5 rounded-lg border border-purple-500/30 bg-[#120d24] text-white space-y-2 animate-in fade-in slide-in-from-top-1 shadow-lg"
+                                                                className="mt-2 p-3 rounded-lg border border-purple-500/40 bg-[#120d24] text-white space-y-2.5 animate-in fade-in slide-in-from-top-1 shadow-xl"
                                                                 onClick={(e) => e.stopPropagation()}
                                                             >
-                                                                <div className="flex items-center justify-between border-b border-purple-500/20 pb-1.5 text-[11px] flex-wrap gap-1">
-                                                                    <div className="flex items-center gap-1.5 text-purple-300 font-semibold">
-                                                                        <Cpu className="size-3.5 text-purple-400 shrink-0" />
+                                                                <div className="flex items-center justify-between border-b border-purple-500/30 pb-2 text-xs flex-wrap gap-1">
+                                                                    <div className="flex items-center gap-1.5 text-purple-300 font-bold">
+                                                                        <Cpu className="size-4 text-purple-400 shrink-0" />
                                                                         <span>Extracted {extraction.formType}</span>
-                                                                        <span className="text-white/40 font-mono text-[10px]">({extraction.year})</span>
+                                                                        <span className="text-purple-200 font-mono text-xs">({extraction.year})</span>
                                                                     </div>
-                                                                    <span className="text-white/60 text-[10px] truncate max-w-[200px]" title={extraction.employer}>
+                                                                    <span className="text-slate-300 text-xs font-medium truncate max-w-[220px]" title={extraction.employer}>
                                                                         {extraction.employer}
                                                                     </span>
                                                                 </div>
 
-                                                                <div className="space-y-1.5">
+                                                                <div className="space-y-2">
                                                                     {extraction.fields.map((field) => {
                                                                         const fieldCustomKey = `${item.id}_${field.key}`;
                                                                         const currentVal = customFieldValues[fieldCustomKey] !== undefined 
@@ -920,15 +970,54 @@ export default function TaxChecklist({
                                                                         const isFieldTransferred = transferredRecord && transferredRecord.rawValue === numCurrentVal;
                                                                         const isFieldModified = transferredRecord && transferredRecord.rawValue !== numCurrentVal;
 
+                                                                        const isBox2 = field.key === 'box2' || field.label.toLowerCase().includes('withheld') || field.label.toLowerCase().includes('federal');
+                                                                        const isBox1 = field.key === 'box1' || field.isPrimary;
+                                                                        const isFieldActive = (isBox2 && activeConnectedNode === 'w2_tax_withheld') || (isBox1 && activeConnectedNode === 'w2_income');
+                                                                        const isFieldHovered = (isBox2 && hoveredConnectedNode === 'w2_tax_withheld') || (isBox1 && hoveredConnectedNode === 'w2_income');
+                                                                        const isFieldHighlighted = isFieldActive || isFieldHovered;
+                                                                        const activeNodeForField = isBox2 ? CONNECTED_TAX_NODES['w2_tax_withheld'] : isBox1 ? CONNECTED_TAX_NODES['w2_income'] : null;
+
                                                                         return (
                                                                             <div 
-                                                                                key={field.key} 
-                                                                                className="flex items-center justify-between gap-2 p-1.5 rounded bg-black/40 border border-white/5 text-[11px] hover:border-purple-500/30 transition"
+                                                                                key={field.key}
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    if (isBox2 && setActiveConnectedNode) {
+                                                                                        setActiveConnectedNode(activeConnectedNode === 'w2_tax_withheld' ? null : 'w2_tax_withheld');
+                                                                                    } else if (isBox1 && setActiveConnectedNode) {
+                                                                                        setActiveConnectedNode(activeConnectedNode === 'w2_income' ? null : 'w2_income');
+                                                                                    }
+                                                                                }}
+                                                                                onMouseEnter={() => {
+                                                                                    if (isBox2 && setHoveredConnectedNode) {
+                                                                                        setHoveredConnectedNode('w2_tax_withheld');
+                                                                                    } else if (isBox1 && setHoveredConnectedNode) {
+                                                                                        setHoveredConnectedNode('w2_income');
+                                                                                    }
+                                                                                }}
+                                                                                onMouseLeave={() => {
+                                                                                    setHoveredConnectedNode?.(null);
+                                                                                }}
+                                                                                className={`flex items-center justify-between gap-2 p-2.5 rounded transition cursor-pointer relative ${
+                                                                                    isFieldHighlighted
+                                                                                        ? 'bg-cyan-950/70 border-2 border-cyan-400 ring-2 ring-cyan-400/60 text-white shadow-[0_0_18px_rgba(6,182,212,0.45)] z-10'
+                                                                                        : 'bg-black/50 border border-white/10 text-xs hover:border-purple-500/40'
+                                                                                }`}
                                                                             >
                                                                                 <div className="space-y-0.5 flex-1 min-w-0">
-                                                                                    <div className="text-white/70 font-medium text-[10px] truncate">{field.label}</div>
-                                                                                    <div className="flex items-center gap-1.5">
-                                                                                        <span className="text-emerald-400 font-mono text-xs">$</span>
+                                                                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                                                                        <div className={`font-semibold text-xs truncate ${isFieldHighlighted ? 'text-cyan-200 font-bold' : 'text-slate-200'}`}>
+                                                                                            {field.label}
+                                                                                        </div>
+                                                                                        {isFieldHighlighted && activeNodeForField && (
+                                                                                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] bg-cyan-500/25 text-cyan-200 border border-cyan-400/60 font-mono font-bold animate-in fade-in">
+                                                                                                <Link2 className="size-2.5 text-cyan-300 animate-pulse" />
+                                                                                                <span>Linked: Sheet [{activeNodeForField.yearCoords[activeYear] || activeNodeForField.cellCoord2022}] ↔ 1040 {activeNodeForField.form1040LineLabel}</span>
+                                                                                            </span>
+                                                                                        )}
+                                                                                    </div>
+                                                                                    <div className="flex items-center gap-1.5 mt-0.5">
+                                                                                        <span className="text-emerald-400 font-mono text-sm font-bold">$</span>
                                                                                         <input
                                                                                             type="number"
                                                                                             step="0.01"
@@ -941,14 +1030,14 @@ export default function TaxChecklist({
                                                                                                     [fieldCustomKey]: nextVal
                                                                                                 }));
                                                                                             }}
-                                                                                            className="bg-slate-900 border border-white/15 focus:border-purple-400 focus:ring-1 focus:ring-purple-400 rounded px-1.5 py-0.5 text-xs font-mono font-bold text-emerald-300 w-28 outline-none"
+                                                                                            className="bg-slate-900 border border-white/20 focus:border-purple-400 focus:ring-1 focus:ring-purple-400 rounded px-2 py-1 text-sm font-mono font-bold text-emerald-300 w-32 outline-none"
                                                                                         />
                                                                                     </div>
                                                                                 </div>
 
-                                                                                <div className="flex items-center gap-1.5 shrink-0">
+                                                                                <div className="flex items-center gap-2 shrink-0">
                                                                                     {field.targetNamedCell && (
-                                                                                        <span className="px-1.5 py-0.5 rounded bg-blue-500/15 border border-blue-500/25 text-[9px] font-mono text-blue-300" title={`Named Cell target: ${field.targetNamedCell}`}>
+                                                                                        <span className="px-2 py-1 rounded bg-blue-500/20 border border-blue-500/40 text-[11px] font-mono font-bold text-blue-200" title={`Named Cell target: ${field.targetNamedCell}`}>
                                                                                             [{field.targetNamedCell}]
                                                                                         </span>
                                                                                     )}
@@ -956,7 +1045,7 @@ export default function TaxChecklist({
                                                                                         <button
                                                                                             type="button"
                                                                                             onClick={(e) => handleTransfer(e, { ...field, key: field.key, value: numCurrentVal, formatted: `$${numCurrentVal.toLocaleString(undefined, { minimumFractionDigits: 2 })}` }, item, attachedDoc)}
-                                                                                            className={`px-2 py-1 rounded font-semibold text-[10px] flex items-center gap-1 transition shadow-sm ${
+                                                                                            className={`px-3 py-1 rounded font-bold text-xs flex items-center gap-1.5 transition shadow-sm ${
                                                                                                 isFieldTransferred
                                                                                                     ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
                                                                                                     : isFieldModified
@@ -967,17 +1056,17 @@ export default function TaxChecklist({
                                                                                         >
                                                                                             {isFieldTransferred ? (
                                                                                                 <>
-                                                                                                    <Check className="size-2.5 text-white" />
+                                                                                                    <Check className="size-3.5 text-white" />
                                                                                                     <span>Transferred</span>
                                                                                                 </>
                                                                                             ) : isFieldModified ? (
                                                                                                 <>
-                                                                                                    <Send className="size-2.5" />
+                                                                                                    <Send className="size-3.5" />
                                                                                                     <span>Update Transfer</span>
                                                                                                 </>
                                                                                             ) : (
                                                                                                 <>
-                                                                                                    <Send className="size-2.5" />
+                                                                                                    <Send className="size-3.5" />
                                                                                                     <span>Transfer</span>
                                                                                                 </>
                                                                                             )}

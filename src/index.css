@@ -23,3 +23,20 @@ html {
     overflow-x: hidden;
     width: 100vw;
 }
+
+@layer base {
+  html,
+  html[data-font-size="compact"] {
+    font-size: 100%; /* 16px crisp standard */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html[data-font-size="default"] {
+    font-size: 112.5%; /* 18px enhanced readability */
+  }
+
+  html[data-font-size="large"] {
+    font-size: 125%; /* 20px comfortable & large */
+  }
+}

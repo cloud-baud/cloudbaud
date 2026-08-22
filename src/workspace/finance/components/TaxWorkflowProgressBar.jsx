@@ -157,18 +157,20 @@ export default function TaxWorkflowProgressBar({ year = 2020, onYearChange, onOp
   return (
     <div className="relative shrink-0 bg-[#0c1220] border-b border-white/10" ref={flyoutRef}>
       {/* ── BAR ── */}
-      <div className="flex items-stretch min-h-[52px] px-3 gap-0 overflow-x-auto">
+      <div className="flex items-stretch min-h-[58px] px-3 gap-1 overflow-x-auto bg-[#0a101d]">
 
         {/* Left label & Year Selector */}
-        <div className="flex items-center gap-2 pr-4 border-r border-white/10 shrink-0 mr-1">
-          <CalendarClock className="size-4 text-blue-400 shrink-0" />
+        <div className="flex items-center gap-2.5 pr-4 border-r border-white/15 shrink-0 mr-1">
+          <div className="p-1.5 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30">
+            <CalendarClock className="size-4.5 text-blue-400 shrink-0" />
+          </div>
           <div className="leading-tight">
-            <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-bold text-white whitespace-nowrap">Tax Return</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-white whitespace-nowrap">Tax Return</span>
               <select
                 value={year}
                 onChange={(e) => onYearChange?.(Number(e.target.value))}
-                className="bg-[#182238] border border-white/20 rounded px-1.5 py-0.5 text-[11px] font-bold text-emerald-400 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+                className="bg-[#152238] border border-blue-500/40 rounded-md px-2 py-0.5 text-xs font-bold text-emerald-300 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer shadow-sm"
                 title="Switch Tax Year"
               >
                 {[2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017].map(y => (
@@ -176,7 +178,7 @@ export default function TaxWorkflowProgressBar({ year = 2020, onYearChange, onOp
                 ))}
               </select>
             </div>
-            <div className="text-[10px] text-white/40 whitespace-nowrap">{overallPct}% complete</div>
+            <div className="text-[11px] font-semibold text-blue-300 whitespace-nowrap mt-0.5">{overallPct}% complete</div>
           </div>
         </div>
 
@@ -197,31 +199,42 @@ export default function TaxWorkflowProgressBar({ year = 2020, onYearChange, onOp
                 setShowPeopleDropdown(false);
                 setOpenStageId(isOpen ? null : stage.id);
               }}
-              className={`relative flex items-center gap-1.5 px-3 py-2 shrink-0 transition border-r border-white/5 last:border-r-0 group
+              className={`relative flex items-center gap-2 px-3.5 py-2 shrink-0 transition rounded-lg my-1 select-none border group
                 ${isPast
-                  ? 'text-emerald-400 hover:bg-emerald-500/5'
+                  ? 'text-emerald-200 bg-emerald-950/40 border-emerald-500/40 hover:bg-emerald-900/40 hover:border-emerald-400'
                   : isDue
-                  ? 'text-white bg-blue-600/10 hover:bg-blue-600/20 border-l-2 border-blue-500'
-                  : 'text-white/40 hover:bg-white/5 hover:text-white/70'}
+                  ? 'text-white bg-blue-600/30 border-blue-400 shadow-[0_0_12px_rgba(59,130,246,0.35)] ring-1 ring-blue-400/50'
+                  : 'text-slate-200 bg-slate-900/60 border-white/10 hover:bg-slate-800 hover:text-white hover:border-white/25'}
               `}
               title={`${stage.label} — Due: ${stage.deadline} — Owner: ${stage.owner}`}
             >
+              {/* Step number badge */}
+              <span className={`size-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 border ${
+                isPast
+                  ? 'bg-emerald-500 text-slate-950 border-emerald-300 font-extrabold'
+                  : isDue
+                  ? 'bg-blue-500 text-white border-blue-300 animate-pulse font-extrabold'
+                  : 'bg-slate-800 text-slate-300 border-white/20'
+              }`}>
+                {isPast ? '✓' : (i + 1)}
+              </span>
+
               {/* Status icon */}
               {isPast ? (
-                <CheckCircle2 className="size-3.5 text-emerald-400 shrink-0" />
+                <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
               ) : isDue ? (
-                <Clock className="size-3.5 text-blue-400 animate-pulse shrink-0" />
+                <Clock className="size-4 text-blue-300 animate-pulse shrink-0" />
               ) : (
-                <Icon className="size-3.5 shrink-0" />
+                <Icon className="size-4 text-slate-300 shrink-0" />
               )}
 
               {/* Label + deadline */}
               <div className="text-left leading-tight">
-                <div className={`text-[11px] font-semibold whitespace-nowrap ${isDue ? 'text-white' : ''}`}>
+                <div className={`text-xs font-bold whitespace-nowrap ${isDue ? 'text-white' : isPast ? 'text-emerald-100' : 'text-slate-100'}`}>
                   {stage.shortLabel}
                 </div>
-                <div className={`text-[9px] whitespace-nowrap ${
-                  isDue ? 'text-blue-300' : isPast ? 'text-emerald-500/70' : 'text-white/25'
+                <div className={`text-[11px] font-medium whitespace-nowrap ${
+                  isDue ? 'text-blue-200 font-semibold' : isPast ? 'text-emerald-400' : 'text-slate-300'
                 }`}>
                   {isDue ? `Due ${stage.deadline}` : isPast ? `✓ ${stage.deadline}` : stage.deadline}
                 </div>
@@ -229,20 +242,13 @@ export default function TaxWorkflowProgressBar({ year = 2020, onYearChange, onOp
 
               {/* Mini checklist progress badge (active stage only) */}
               {isDue && (
-                <span className="ml-1 text-[9px] bg-blue-500/20 border border-blue-500/30 text-blue-300 px-1 rounded font-mono">
+                <span className="ml-1 text-[10px] bg-blue-500/30 border border-blue-400/60 text-blue-200 px-1.5 py-0.5 rounded font-mono font-bold">
                   {checkDone}/{checkTotal}
                 </span>
               )}
 
               {/* Chevron hint */}
-              <ChevronDown className={`size-3 ml-0.5 shrink-0 opacity-40 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-
-              {/* Connector line between steps */}
-              {i < STAGES.length - 1 && (
-                <div className={`absolute right-0 top-1/2 -translate-y-1/2 w-px h-4 ${
-                  isPast ? 'bg-emerald-500/40' : 'bg-white/10'
-                }`} />
-              )}
+              <ChevronDown className={`size-3.5 ml-0.5 shrink-0 opacity-60 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
             </button>
           );
         })}
@@ -337,10 +343,10 @@ export default function TaxWorkflowProgressBar({ year = 2020, onYearChange, onOp
         </div>
       </div>
 
-      {/* ── THIN PROGRESS FILL LINE ── */}
-      <div className="h-[2px] bg-white/5 w-full">
+      {/* ── HIGH VISIBILITY PROGRESS FILL LINE ── */}
+      <div className="h-1.5 bg-slate-950/80 border-t border-b border-white/15 w-full overflow-hidden relative">
         <div
-          className="h-full bg-gradient-to-r from-blue-500 to-emerald-400 transition-all duration-700"
+          className="h-full bg-gradient-to-r from-blue-500 via-indigo-400 to-emerald-400 shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-700 rounded-r"
           style={{ width: `${overallPct}%` }}
         />
       </div>

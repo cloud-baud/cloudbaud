@@ -37,8 +37,9 @@ import {
 } from 'lucide-react';
 import { updateTaxCell } from '../api/taxService';
 import SpreadsheetPreview from './SpreadsheetPreview';
-import { SUMMARY_TAB_NAMED_ROWS, SUMMARY_TAB_NAMED_RANGES, GOOGLE_SHEET_YEAR_COLUMNS, getNamedCell } from '../data/taxNamedRanges';
+import { SUMMARY_TAB_NAMED_ROWS, SUMMARY_TAB_NAMED_RANGES, GOOGLE_SHEET_YEAR_COLUMNS, getNamedCell, CONNECTED_TAX_NODES, findConnectedNode } from '../data/taxNamedRanges';
 import { EXTRACTED_SHEET_THREADS } from '../data/extractedTaxSheetComments';
+import { Link2 } from 'lucide-react';
 
 export const DEFAULT_GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1QubZfLE5OC8RuhhljIBvj7dUeWN3UwefYxrtH0HSiGY/edit?usp=sharing";
 
@@ -53,7 +54,7 @@ export function formatGoogleSheetEmbedUrl(rawUrl) {
 }
 
 export default function ExcelWorksheetGrid({
-  year = 2020,
+  year = 2022,
   onYearChange,
   accounts = [],
   entries = [],
@@ -70,7 +71,11 @@ export default function ExcelWorksheetGrid({
   isFormCollapsed = false,
   setIsFormCollapsed,
   activeSheet: controlledActiveSheet,
-  onActiveSheetChange
+  onActiveSheetChange,
+  activeConnectedNode,
+  setActiveConnectedNode,
+  hoveredConnectedNode,
+  setHoveredConnectedNode
 }) {
   const [googleSheetUrl, setGoogleSheetUrl] = useState(() => {
     try {
@@ -116,8 +121,8 @@ export default function ExcelWorksheetGrid({
     } catch {}
   };
 
-  // Google Sheet Comments Sidebar state
-  const [showCommentsSidebar, setShowCommentsSidebar] = useState(true);
+  // Google Sheet Comments Sidebar state (optional overlay, false by default since Google Sheet has native comments)
+  const [showCommentsSidebar, setShowCommentsSidebar] = useState(false);
   const [commentFilterTab, setCommentFilterTab] = useState('all'); // 'all' | 'for_you'
   const [commentSheetFilter, setCommentSheetFilter] = useState('all'); // 'all' | 'Summary' | 'CB' | 'OC' | 'CC' | 'Roberto'
   const [commentSearchQuery, setCommentSearchQuery] = useState('');
@@ -766,9 +771,10 @@ export default function ExcelWorksheetGrid({
           {(() => {
             const selectedNamedRow = SUMMARY_TAB_NAMED_RANGES.find(r => r.accountName === (selectedCell?.rowName || selectedCell?.rowId));
             const activeNamedCell = selectedNamedRow ? getNamedCell(selectedNamedRow.prefix, selectedCell?.colKey || year) : null;
+            const activeNode = CONNECTED_TAX_NODES[activeConnectedNode];
 
             return (
-              <div className="bg-[#0b101c] border-b border-white/10 px-3 py-1.5 flex items-center gap-2 shrink-0">
+              <div className="bg-[#0b101c] border-b border-white/10 px-3 py-1.5 flex items-center gap-2 shrink-0 flex-wrap">
                 {/* Name / Cell Coordinate & Named Range Box */}
                 <div 
                   className="bg-slate-900 border border-white/15 rounded px-2 py-1 text-center font-mono font-bold text-emerald-400 text-xs shadow-inner flex items-center gap-1.5 shrink-0" 
@@ -782,6 +788,14 @@ export default function ExcelWorksheetGrid({
                   )}
                 </div>
 
+                {/* 3-Panel Connected Indicator in Formula Bar */}
+                {activeNode && (
+                  <div className="flex items-center gap-1.5 bg-cyan-950/90 border border-cyan-400/60 rounded px-2 py-0.5 text-[10px] text-cyan-200 font-mono shadow-sm shrink-0">
+                    <Link2 className="size-3 text-cyan-300 animate-pulse" />
+                    <span>Connected: [{activeNode.yearCoords[selectedCell?.colKey || year] || activeNode.cellCoord2022}] ↔ Checklist {activeNode.checklistNum} ↔ 1040 {activeNode.form1040LineLabel}</span>
+                  </div>
+                )}
+
                 <div className="text-white/40 font-mono font-bold italic select-none text-xs">
                   fx
                 </div>
@@ -792,7 +806,7 @@ export default function ExcelWorksheetGrid({
                   value={formulaValue}
                   onChange={handleFormulaBarChange}
                   placeholder="Enter formula or value (e.g. 69549.66 or =SUM(B2:B5))..."
-                  className="flex-1 bg-slate-900/90 border border-white/15 rounded px-2.5 py-1 text-xs text-white font-mono placeholder:text-white/25 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="flex-1 bg-slate-900/90 border border-white/15 rounded px-2.5 py-1 text-xs text-white font-mono placeholder:text-white/25 focus:outline-none focus:ring-1 focus:ring-blue-500 min-w-[160px]"
                 />
 
                 {/* Cell Status Selector */}
@@ -833,7 +847,7 @@ export default function ExcelWorksheetGrid({
                     A • Account / Category
                   </th>
                   {columns.map((colYear) => {
-                    const colLetter = GOOGLE_SHEET_YEAR_COLUMNS[Number(colYear)] || 'F';
+                    const colLetter = GOOGLE_SHEET_YEAR_COLUMNS[Number(colYear)] || 'G';
                     return (
                       <th
                         key={colYear}
@@ -858,22 +872,45 @@ export default function ExcelWorksheetGrid({
                   const thread = threads[threadId];
                   const commentCount = thread?.comments?.length || 0;
                   const status = thread?.status || 'pending';
+                  const activeNode = CONNECTED_TAX_NODES[activeConnectedNode];
+                  const hoveredNode = CONNECTED_TAX_NODES[hoveredConnectedNode];
+                  const isRowConnected = (activeNode && activeNode.accountName === acc.name) || (hoveredNode && hoveredNode.accountName === acc.name);
 
                   return (
                     <tr
                       key={acc.id}
                       className={`hover:bg-blue-600/10 transition-colors group ${
-                        selectedCat?.id === acc.id ? 'bg-blue-950/20' : ''
+                        isRowConnected ? 'bg-cyan-950/25' : selectedCat?.id === acc.id ? 'bg-blue-950/20' : ''
                       }`}
                     >
                       {/* Row Index Number */}
-                      <td className="p-1 text-center text-white/30 text-[10px] bg-[#070c17] select-none border-r border-white/10">
+                      <td className={`p-1 text-center text-[10px] select-none border-r border-white/10 ${
+                        isRowConnected ? 'bg-cyan-950/50 text-cyan-300 font-bold' : 'bg-[#070c17] text-white/30'
+                      }`}>
                         {rowIdx + 2}
                       </td>
 
                       {/* Account Label (Column A) */}
-                      <td className="p-1 px-3 border-r border-white/10 font-medium truncate font-sans text-xs">
-                        {acc.name}
+                      <td 
+                        onClick={() => {
+                          const matched = Object.values(CONNECTED_TAX_NODES).find(n => n.accountName === acc.name);
+                          if (matched && setActiveConnectedNode) {
+                            setActiveConnectedNode(activeConnectedNode === matched.id ? null : matched.id);
+                          }
+                        }}
+                        className={`p-1 px-3 border-r border-white/10 font-medium truncate font-sans text-xs cursor-pointer transition ${
+                          isRowConnected ? 'text-cyan-200 font-bold bg-cyan-950/30' : ''
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-1">
+                          <span>{acc.name}</span>
+                          {isRowConnected && activeNode && (
+                            <span className="text-[9px] text-cyan-300 font-mono bg-cyan-500/15 border border-cyan-400/30 px-1 rounded flex items-center gap-1 shrink-0">
+                              <Link2 className="size-2 text-cyan-400" />
+                              <span>{activeNode.form1040LineLabel}</span>
+                            </span>
+                          )}
+                        </div>
                       </td>
 
                       {/* Values (Column B, C, D...) */}
@@ -891,6 +928,12 @@ export default function ExcelWorksheetGrid({
                         const namedCell = namedRow ? getNamedCell(namedRow.prefix, colYear) : null;
                         const cellCoord = getCellAddress(rowIdx, colYear);
 
+                        // 3-Panel Cross-Connected Cell Highlighting
+                        const isNodeCell = activeNode && (activeNode.accountName === acc.name) && (Number(colYear) === Number(year) || (Number(colYear) === 2022 && (activeNode.id === 'w2_income' || activeNode.id === 'w2_tax_withheld')));
+                        const isHoverNodeCell = hoveredNode && (hoveredNode.accountName === acc.name) && (Number(colYear) === Number(year) || (Number(colYear) === 2022 && (hoveredNode.id === 'w2_income' || hoveredNode.id === 'w2_tax_withheld')));
+                        const isConnectedHighlighted = isNodeCell || isHoverNodeCell;
+                        const activeOrHoverNode = activeNode || hoveredNode;
+
                         return (
                           <td
                             key={colYear}
@@ -898,9 +941,24 @@ export default function ExcelWorksheetGrid({
                             onClick={(e) => {
                               e.stopPropagation();
                               handleCellClick(acc, colYear, colIdx, rowIdx);
+                              const matched = Object.values(CONNECTED_TAX_NODES).find(n => n.accountName === acc.name);
+                              if (matched && setActiveConnectedNode) {
+                                setActiveConnectedNode(matched.id);
+                              }
+                            }}
+                            onMouseEnter={() => {
+                              const matched = Object.values(CONNECTED_TAX_NODES).find(n => n.accountName === acc.name);
+                              if (matched && setHoveredConnectedNode) {
+                                setHoveredConnectedNode(matched.id);
+                              }
+                            }}
+                            onMouseLeave={() => {
+                              setHoveredConnectedNode?.(null);
                             }}
                             className={`p-1.5 px-2.5 border-r border-white/10 text-right font-mono text-xs select-none transition-all relative ${
-                              isCellSelected
+                              isConnectedHighlighted
+                                ? 'bg-cyan-500/25 ring-2 ring-cyan-400 border-2 border-cyan-400 text-cyan-100 font-bold shadow-[0_0_20px_rgba(6,182,212,0.6)] z-20'
+                                : isCellSelected
                                 ? 'bg-blue-600/40 ring-2 ring-blue-400 ring-inset font-bold text-white z-20'
                                 : isFlashing
                                 ? 'bg-amber-400/40 ring-2 ring-amber-300 ring-inset animate-pulse font-bold text-white z-20'
@@ -908,13 +966,27 @@ export default function ExcelWorksheetGrid({
                                 ? 'bg-amber-500/25 ring-2 ring-amber-400 border-2 border-amber-400 text-amber-100 font-bold shadow-[0_0_12px_rgba(251,191,36,0.4)] z-10'
                                 : ''
                             }`}
-                            title={isReadyForCpa ? `${acc.name} (${colYear}) [Summary!${cellCoord}] [${namedCell}] • Ready for CPA Review (Transferred from Source Document)` : undefined}
+                            title={
+                              isConnectedHighlighted 
+                                ? `[${cellCoord}] Connected across 3 Panels: Worksheet ${cellCoord} ↔ Checklist ${activeOrHoverNode?.checklistNum || '2.1'} W-2 ↔ Form 1040 ${activeOrHoverNode?.form1040LineLabel || 'Line 1a'}`
+                                : isReadyForCpa 
+                                ? `${acc.name} (${colYear}) [Summary!${cellCoord}] [${namedCell}] • Ready for CPA Review` 
+                                : undefined
+                            }
                           >
+                            {/* 3-Panel Connected Floating Badge on Cell */}
+                            {isConnectedHighlighted && (
+                              <div className="absolute -top-3 right-1 z-30 flex items-center gap-1 bg-cyan-950 border border-cyan-400 text-cyan-200 px-1.5 py-0.5 rounded shadow-2xl text-[9px] font-mono animate-in fade-in zoom-in-95 pointer-events-none">
+                                <Link2 className="size-2 text-cyan-300 animate-pulse" />
+                                <span className="font-bold">{activeOrHoverNode?.yearCoords?.[colYear] || activeOrHoverNode?.cellCoord2022 || cellCoord} ↔ 1040 {activeOrHoverNode?.form1040LineLabel || 'Line 1a'}</span>
+                              </div>
+                            )}
+
                             {/* CPA Review Indicator Badge & Coordinate */}
-                            {isReadyForCpa && (
+                            {isReadyForCpa && !isConnectedHighlighted && (
                               <div className="absolute top-0.5 right-0.5 flex items-center gap-0.5">
                                 <span className="text-[8px] font-mono font-bold text-amber-200 bg-amber-950/90 border border-amber-400/70 px-1 rounded-sm shadow-sm">
-                                  {cellCoord}
+                                   {cellCoord}
                                 </span>
                                 <span
                                   className="size-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,1)] animate-pulse"
@@ -938,7 +1010,7 @@ export default function ExcelWorksheetGrid({
                                 onClick={(e) => e.stopPropagation()}
                               />
                             ) : (
-                              <span className={`${isBold ? 'font-bold' : ''} ${isItalic ? 'italic' : ''} ${isNegative ? 'text-red-400' : isReadyForCpa ? 'text-amber-100 font-bold' : 'text-emerald-300'}`}>
+                              <span className={`${isBold ? 'font-bold' : ''} ${isItalic ? 'italic' : ''} ${isNegative ? 'text-red-400' : isConnectedHighlighted ? 'text-cyan-100 font-bold' : isReadyForCpa ? 'text-amber-100 font-bold' : 'text-emerald-300'}`}>
                                 {val !== '' && !isNaN(numVal)
                                   ? `$${numVal.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
                                   : val || <span className="text-white/20 italic">-</span>}

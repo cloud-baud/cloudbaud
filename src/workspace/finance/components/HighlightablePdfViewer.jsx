@@ -60,12 +60,23 @@ const HighlightablePdfViewer = forwardRef(({ url, searchTerm, className, onState
 
         const loadPdf = async () => {
             try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`File not found on server (${response.status})`);
+                let loadingTask;
+                const encodedUrl = encodeURI(url);
+
+                if (url.startsWith('blob:') || url.startsWith('data:')) {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`Failed to fetch file (${response.status})`);
+                    const data = await response.arrayBuffer();
+                    loadingTask = pdfjsLib.getDocument({ data });
+                } else {
+                    // Try direct URL fetching via pdfjs
+                    loadingTask = pdfjsLib.getDocument({
+                        url: encodedUrl,
+                        cMapUrl: 'https://unpkg.com/pdfjs-dist/cmaps/',
+                        cMapPacked: true,
+                    });
                 }
-                const data = await response.arrayBuffer();
-                const loadingTask = pdfjsLib.getDocument({ data });
+
                 const pdf = await loadingTask.promise;
 
                 if (cancelled) return;
@@ -79,10 +90,24 @@ const HighlightablePdfViewer = forwardRef(({ url, searchTerm, className, onState
 
                 setLoading(false);
             } catch (err) {
-                console.error('[HighlightablePdfViewer] Load failed:', err);
-                if (!cancelled) {
-                    setError(err.message || 'Failed to render PDF');
+                console.warn('[HighlightablePdfViewer] Canvas load warning, attempting arrayBuffer fetch:', err);
+                try {
+                    const resp = await fetch(encodeURI(url));
+                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                    const arrayBuffer = await resp.arrayBuffer();
+                    const task = pdfjsLib.getDocument({ data: arrayBuffer });
+                    const pdf = await task.promise;
+                    if (cancelled) return;
+                    pdfDocRef.current = pdf;
+                    setNumPages(pdf.numPages);
+                    setCurrentPage(1);
                     setLoading(false);
+                } catch (fallbackErr) {
+                    console.error('[HighlightablePdfViewer] All PDF render attempts failed:', fallbackErr);
+                    if (!cancelled) {
+                        setError(fallbackErr.message || 'PDF Preview Unavailable');
+                        setLoading(false);
+                    }
                 }
             }
         };
@@ -231,24 +256,26 @@ const HighlightablePdfViewer = forwardRef(({ url, searchTerm, className, onState
     return (
         <div ref={containerRef} className={cn("overflow-auto flex justify-center items-start p-4 bg-transparent min-h-[300px] w-full", className)}>
             {error ? (
-                <div className="flex flex-col items-center justify-center p-6 text-center bg-[#0d1527] rounded-xl border border-white/10 max-w-sm m-auto shadow-2xl">
-                    <div className="p-3 rounded-full bg-amber-500/10 text-amber-400 mb-3">
-                        <AlertCircle className="size-8" />
-                    </div>
-                    <h4 className="text-sm font-bold text-white mb-1">Document Preview Unavailable</h4>
-                    <p className="text-[11px] text-white/50 mb-4 leading-relaxed">
-                        {error}. The file may be pending upload or located in your Google Drive folder.
-                    </p>
-                    <div className="flex items-center gap-2">
+                <div className="w-full h-full flex flex-col items-center gap-2">
+                    <div className="w-full flex items-center justify-between px-3 py-1.5 bg-[#12192c] border border-white/10 rounded-t text-xs">
+                        <span className="text-amber-300 font-medium flex items-center gap-1.5">
+                            <AlertCircle className="size-3.5" />
+                            <span>Rendering via browser native PDF viewer</span>
+                        </span>
                         <a
                             href={url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-semibold shadow-sm transition"
+                            className="px-2.5 py-0.5 bg-blue-600 hover:bg-blue-500 text-white rounded text-[11px] font-semibold transition"
                         >
-                            Open Directly
+                            Open in New Tab
                         </a>
                     </div>
+                    <iframe
+                        src={encodeURI(url)}
+                        title="PDF Viewer Fallback"
+                        className="w-full h-[650px] rounded-b border border-white/10 bg-white"
+                    />
                 </div>
             ) : loading ? (
                 <div className="flex items-center justify-center h-full min-h-[200px] text-slate-400 text-sm">

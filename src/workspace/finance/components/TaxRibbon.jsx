@@ -230,10 +230,10 @@ export default function TaxRibbon({
                         <button
                             key={tab.id}
                             onClick={() => setActiveRibbonTab(tab.id)}
-                            className={`px-3 py-1.5 font-medium rounded-t transition ${
+                            className={`px-3.5 py-1.5 rounded-t transition text-xs font-semibold ${
                                 activeRibbonTab === tab.id
-                                    ? 'bg-[#141e33] text-white border-t-2 border-blue-400 font-semibold shadow-sm'
-                                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                                    ? 'bg-[#141e33] text-white border-t-2 border-blue-400 font-bold shadow-sm'
+                                    : 'text-slate-300 hover:text-white hover:bg-white/10'
                             }`}
                         >
                             {tab.label}

@@ -8,9 +8,19 @@ import {
   Send, 
   CornerDownRight, 
   X, 
-  Bot
+  Bot,
+  RefreshCw,
+  ExternalLink,
+  Key
 } from 'lucide-react';
 import { useViewAs } from '../ViewAsContext';
+import {
+  createGoogleDriveComment,
+  replyGoogleDriveComment,
+  setGoogleDriveCommentStatus,
+  getStoredGoogleToken,
+  setStoredGoogleToken
+} from '../services/googleCommentsSyncService';
 
 /**
  * Intelligent simulation / AI assistant tax knowledge responses for CloudBot
@@ -38,7 +48,8 @@ export default function AnnotationReviewPanel({
   year = 2020,
   thread,
   onSaveThread,
-  onClose
+  onClose,
+  targetCellAddress = 'Summary!E2'
 }) {
   const { activePersona, isViewingAs } = useViewAs();
   const [commentText, setCommentText] = useState('');
@@ -46,11 +57,26 @@ export default function AnnotationReviewPanel({
   const [botResponse, setBotResponse] = useState('');
   const [isBotLoading, setIsBotLoading] = useState(false);
   const [showBotPrompt, setShowBotPrompt] = useState(false);
+  const [alsoSyncToGoogle, setAlsoSyncToGoogle] = useState(true);
+  const [isGoogleSyncing, setIsGoogleSyncing] = useState(false);
+  const [googleToken, setGoogleToken] = useState(() => getStoredGoogleToken());
+  const [isTokenModalOpen, setIsTokenModalOpen] = useState(false);
+  const [tokenInput, setTokenInput] = useState(googleToken || '');
+  const [syncFeedback, setSyncFeedback] = useState(null);
 
   const comments = thread?.comments || [];
   const status = thread?.status || 'pending';
+  const isGoogleSynced = thread?.isGoogleSync || comments.some(c => c.isGoogleSync);
 
-  const handleAddComment = (decision = null) => {
+  const handleSaveToken = () => {
+    setStoredGoogleToken(tokenInput);
+    setGoogleToken(tokenInput ? tokenInput.trim() : null);
+    setIsTokenModalOpen(false);
+    setSyncFeedback('Google Token saved. Live 2-way sync active.');
+    setTimeout(() => setSyncFeedback(null), 4000);
+  };
+
+  const handleAddComment = async (decision = null) => {
     if (!commentText.trim() && !decision) return;
 
     const newComment = {
@@ -60,7 +86,8 @@ export default function AnnotationReviewPanel({
       authorInitials: isViewingAs ? activePersona.initials : 'ME',
       text: commentText.trim() || (decision === 'accepted' ? 'Marked as Approved & Accepted.' : decision === 'rejected' ? 'Marked as Rejected / Needs Correction.' : 'Updated status.'),
       decision: decision,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      isGoogleSync: alsoSyncToGoogle && !!googleToken
     };
 
     const newStatus = decision ? decision : status;
@@ -78,6 +105,31 @@ export default function AnnotationReviewPanel({
 
     onSaveThread(updatedThread);
     setCommentText('');
+
+    // Outbound Live Sync to Google Drive
+    if (alsoSyncToGoogle && googleToken) {
+      setIsGoogleSyncing(true);
+      try {
+        if (thread?.googleCommentId) {
+          await replyGoogleDriveComment('1QubZfLE5OC8RuhhljIBvj7dUeWN3UwefYxrtH0HSiGY', thread.googleCommentId, newComment.text, googleToken);
+        } else {
+          await createGoogleDriveComment('1QubZfLE5OC8RuhhljIBvj7dUeWN3UwefYxrtH0HSiGY', newComment.text, targetCellAddress, googleToken);
+        }
+        if (decision === 'accepted') {
+          if (thread?.googleCommentId) {
+            await setGoogleDriveCommentStatus('1QubZfLE5OC8RuhhljIBvj7dUeWN3UwefYxrtH0HSiGY', thread.googleCommentId, true, googleToken);
+          }
+        }
+        setSyncFeedback('✓ Synced note directly to Google Sheet!');
+        setTimeout(() => setSyncFeedback(null), 3000);
+      } catch (err) {
+        console.warn('Google Sync outbound error:', err);
+        setSyncFeedback(`Sync notice: ${err.message}`);
+        setTimeout(() => setSyncFeedback(null), 4000);
+      } finally {
+        setIsGoogleSyncing(false);
+      }
+    }
   };
 
   const handleAskBot = () => {
@@ -133,6 +185,42 @@ export default function AnnotationReviewPanel({
           )}
         </div>
       </div>
+
+      {/* Google Sheets Live 2-Way Sync Status Bar */}
+      <div className="bg-[#0b1220] border-b border-white/10 px-3 py-1.5 flex items-center justify-between text-[11px] shrink-0">
+        <div className="flex items-center gap-1.5">
+          <span className={`size-2 rounded-full ${googleToken ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
+          <span className="text-white/80 font-medium">Google Sheet Sync:</span>
+          <span className={`font-mono text-[10px] px-1.5 py-0.5 rounded border ${
+            googleToken 
+              ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 font-semibold' 
+              : 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+          }`}>
+            {googleToken ? 'Connected (2-Way)' : 'Auth Required'}
+          </span>
+          {isGoogleSynced && (
+            <span className="text-[9px] bg-blue-500/20 text-blue-300 border border-blue-500/30 px-1 rounded font-mono">
+              Live Anchored
+            </span>
+          )}
+        </div>
+
+        <button
+          onClick={() => setIsTokenModalOpen(true)}
+          className="text-[10px] text-blue-400 hover:text-blue-300 flex items-center gap-1 font-medium bg-slate-900 border border-white/15 px-2 py-0.5 rounded hover:bg-slate-800 transition"
+          title="Configure Google OAuth / Drive API Access Token"
+        >
+          <Key className="size-3 text-amber-400" />
+          <span>{googleToken ? 'Update Token' : 'Connect Google'}</span>
+        </button>
+      </div>
+
+      {syncFeedback && (
+        <div className="bg-emerald-950/80 border-b border-emerald-500/40 px-3 py-1.5 text-xs text-emerald-300 flex items-center gap-1.5 animate-in fade-in">
+          <CheckCircle2 className="size-3.5 text-emerald-400 shrink-0" />
+          <span>{syncFeedback}</span>
+        </div>
+      )}
 
       {/* Bot Assistant Quick Bar */}
       <div className="bg-blue-950/40 border-b border-blue-500/20 px-3 py-2 flex items-center justify-between shrink-0">
@@ -216,9 +304,16 @@ export default function AnnotationReviewPanel({
                   <span className="font-bold text-white text-[11px]">{c.authorName}</span>
                   <span className="text-[10px] text-white/40">({c.authorRole})</span>
                 </div>
-                <span className="text-[10px] text-white/40">
-                  {c.createdAt ? new Date(c.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  {c.isGoogleSync && (
+                    <span className="text-[9px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono">
+                      Google Sync
+                    </span>
+                  )}
+                  <span className="text-[10px] text-white/40">
+                    {c.createdAt ? new Date(c.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                  </span>
+                </div>
               </div>
 
               <div className="text-white/90 whitespace-pre-wrap pl-6 leading-relaxed">
@@ -243,7 +338,15 @@ export default function AnnotationReviewPanel({
             <CornerDownRight className="size-3 text-blue-400" />
             Responding as <b>{isViewingAs ? activePersona.name : 'Me (Owner)'}</b>
           </span>
-          <span className="text-[10px] text-white/40">Reviewer Decision Flow</span>
+          <label className="flex items-center gap-1.5 text-[10px] text-white/70 cursor-pointer hover:text-white">
+            <input
+              type="checkbox"
+              checked={alsoSyncToGoogle}
+              onChange={(e) => setAlsoSyncToGoogle(e.target.checked)}
+              className="rounded bg-slate-900 border-white/20 text-blue-500 focus:ring-0"
+            />
+            <span>Sync to Google Sheet ({targetCellAddress})</span>
+          </label>
         </div>
 
         <textarea
@@ -278,14 +381,80 @@ export default function AnnotationReviewPanel({
           {/* Standard Comment Submit */}
           <button
             onClick={() => handleAddComment(null)}
-            disabled={!commentText.trim()}
+            disabled={!commentText.trim() || isGoogleSyncing}
             className="flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white font-semibold text-[11px] transition shadow-sm"
           >
-            <Send className="size-3" />
-            <span>Comment</span>
+            {isGoogleSyncing ? <RefreshCw className="size-3 animate-spin" /> : <Send className="size-3" />}
+            <span>{isGoogleSyncing ? 'Syncing...' : 'Comment'}</span>
           </button>
         </div>
       </div>
+
+      {/* Google OAuth Access Token Modal */}
+      {isTokenModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
+          <div className="bg-[#0f172a] border border-white/20 rounded-xl max-w-md w-full p-5 space-y-4 shadow-2xl animate-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <Key className="size-4 text-amber-400" />
+                <h4 className="font-bold text-white text-sm">Google Drive 2-Way Sync Setup</h4>
+              </div>
+              <button
+                onClick={() => setIsTokenModalOpen(false)}
+                className="p-1 rounded hover:bg-white/10 text-white/60 hover:text-white"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-white/70 leading-relaxed">
+              Connect your Google OAuth Access Token to enable live 2-way comments between CloudBaud and your shared tax spreadsheet (<b>1QubZfLE5OC8RuhhljIBvj7dUeWN3UwefYxrtH0HSiGY</b>).
+            </p>
+
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-semibold text-white/80">Google OAuth Bearer Token / API Token:</label>
+              <input
+                type="password"
+                value={tokenInput}
+                onChange={(e) => setTokenInput(e.target.value)}
+                placeholder="ya29.a0AfH6SM..."
+                className="w-full bg-slate-900 border border-white/20 rounded px-3 py-2 text-xs text-white font-mono placeholder:text-white/30 focus:outline-none focus:border-blue-400"
+              />
+              <p className="text-[10px] text-white/40">
+                Scopes required: <code className="text-blue-300">drive.file</code>, <code className="text-blue-300">spreadsheets</code>
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-white/10">
+              <button
+                onClick={() => {
+                  setStoredGoogleToken(null);
+                  setGoogleToken(null);
+                  setTokenInput('');
+                  setIsTokenModalOpen(false);
+                }}
+                className="text-xs text-red-400 hover:text-red-300"
+              >
+                Disconnect
+              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setIsTokenModalOpen(false)}
+                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded text-xs text-white/80"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveToken}
+                  className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 rounded text-xs font-semibold text-white shadow-sm"
+                >
+                  Save & Connect
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

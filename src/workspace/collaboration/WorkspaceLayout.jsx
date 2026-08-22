@@ -200,14 +200,19 @@ const WorkspaceLayout = () => {
             const parsed = saved ? JSON.parse(saved) : null;
             // Fallback if null or empty array to ensure nav doesn't disappear
             if (parsed && Array.isArray(parsed) && parsed.length > 0) {
-                return parsed;
+                return parsed.map(item => {
+                    if (item.href?.includes('/team') || item.label === 'Team' || item.label === 'Teams') {
+                        return { ...item, label: 'Teams', href: '/collaboration/teams', icon: item.icon || 'Users' };
+                    }
+                    return item;
+                });
             }
         } catch (e) {
             console.error("Failed to parse nav", e);
         }
         return [
             { id: '2', label: 'Documents', href: '/collaboration/sites/consulting/docs', icon: 'FileText' },
-            { id: '3', label: 'Team', href: '/collaboration/sites/consulting/team', icon: 'Users' }
+            { id: '3', label: 'Teams', href: '/collaboration/teams', icon: 'Users' }
         ];
     });
 

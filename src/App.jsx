@@ -20,6 +20,8 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import AuthRedirector from './components/auth/AuthRedirector';
 import { Toaster } from './shared/ui/sonner';
 
+import TeamsAuthorizationDashboard from './workspace/teams/TeamsAuthorizationDashboard';
+
 function App() {
   const isFinanceHost = typeof window !== 'undefined' && window.location.hostname.includes('finance');
   return (
@@ -44,6 +46,10 @@ function App() {
                   {/* Main HQ: /collaboration/* */}
                   <Route path="/collaboration" element={<WorkspaceLayout />}>
                     <Route index element={<PortalDashboard />} />
+                    <Route path="teams" element={<TeamsAuthorizationDashboard />} />
+                    <Route path="teams/*" element={<TeamsAuthorizationDashboard />} />
+                    <Route path="sites/consulting/team" element={<Navigate to="/collaboration/teams" replace />} />
+                    <Route path="sites/consulting/teams" element={<Navigate to="/collaboration/teams" replace />} />
                     <Route element={<ContextLayout />}>
                       {/* Finance on main domain still works, but if on finance subdomain, redirect to root */}
                       <Route path="finance/*" element={isFinanceHost ? <Navigate to="/" replace /> : <FinanceApp />} />
@@ -51,10 +57,17 @@ function App() {
                   </Route>
                   <Route path="/workspace" element={<WorkspaceLayout />}>
                     <Route index element={<PortalDashboard />} />
+                    <Route path="teams" element={<TeamsAuthorizationDashboard />} />
+                    <Route path="teams/*" element={<TeamsAuthorizationDashboard />} />
+                    <Route path="sites/consulting/team" element={<Navigate to="/workspace/teams" replace />} />
+                    <Route path="sites/consulting/teams" element={<Navigate to="/workspace/teams" replace />} />
                     <Route element={<ContextLayout />}>
                       <Route path="finance/*" element={<FinanceApp />} />
                     </Route>
                   </Route>
+                  {/* Direct / Teams shortcut */}
+                  <Route path="/teams" element={<Navigate to="/collaboration/teams" replace />} />
+                  <Route path="/teams/*" element={<Navigate to="/collaboration/teams" replace />} />
                   {/* Finance subdomain clean routes - when built as main app accidentally, handle */}
                   <Route path="/finance/*" element={<FinanceApp />} />
                   <Route path="/*" element={<FinanceApp />} />
