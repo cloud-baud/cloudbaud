@@ -1851,13 +1851,13 @@ const SettingsPage = () => {
     }
 
     return (
-        <div className="p-8 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500 bg-white dark:bg-neutral-900 min-h-screen">
+        <div className="p-3 sm:p-6 lg:p-8 max-w-[1600px] mx-auto space-y-5 sm:space-y-8 animate-in fade-in duration-500 bg-white dark:bg-neutral-900 min-h-screen pb-24">
             {/* Hub Breadcrumb Header */}
-            <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="mb-4 sm:mb-8 flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground mb-1 flex-wrap">
                         <span className="font-semibold text-brand-blue">CloudBaud Hub</span>
-                        <ChevronRight className="size-4" />
+                        <ChevronRight className="size-3 sm:size-4" />
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <button className="flex items-center gap-1 hover:text-foreground transition-colors font-medium">
@@ -1874,18 +1874,53 @@ const SettingsPage = () => {
                                 ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
-                        <ChevronRight className="size-4" />
+                        <ChevronRight className="size-3 sm:size-4" />
                         <span>Site Settings</span>
                     </div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
                         {currentCollection.name} Settings
                     </h1>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-                {/* Sidebar */}
-                <div className="md:col-span-3 space-y-6">
+            {/* Mobile Horizontal Pill / Tab Bar */}
+            <div className="md:hidden flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-2 border-b border-border/80 text-xs shrink-0">
+                {[
+                    { id: 'profile', label: 'Profile', icon: User },
+                    { id: 'general', label: 'Info', icon: Globe },
+                    { id: 'permissions', label: 'Permissions', icon: Lock },
+                    { id: 'appearance', label: 'Look & Feel', icon: PaintBucket },
+                    { id: 'navigation', label: 'Navigation', icon: LayoutGrid },
+                    { id: 'hub', label: 'Hub', icon: Layers },
+                    { id: 'integrations', label: 'Integrations', icon: Puzzle },
+                    { id: 'content', label: 'Content Control', icon: LayoutGrid },
+                    ...(hasHubAdminAccess(user) ? [{ id: 'hub-admin', label: 'Admin', icon: Shield, admin: true }] : [])
+                ].map(tab => {
+                    const TabIcon = tab.icon;
+                    const isActive = activeTab === tab.id;
+                    return (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={cn(
+                                "flex items-center gap-1.5 px-3 py-2 rounded-lg font-medium whitespace-nowrap transition-all shrink-0 border",
+                                isActive
+                                    ? "bg-brand-blue text-white border-brand-blue shadow-sm font-semibold"
+                                    : tab.admin
+                                        ? "bg-red-500/10 border-red-500/30 text-red-400"
+                                        : "bg-secondary/40 border-border text-muted-foreground hover:text-foreground"
+                            )}
+                        >
+                            <TabIcon className="size-3.5" />
+                            <span>{tab.label}</span>
+                        </button>
+                    );
+                })}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8">
+                {/* Desktop Sidebar (Hidden on Mobile) */}
+                <div className="hidden md:block md:col-span-3 space-y-6">
                     <div>
                         <h3 className="mb-3 px-4 text-sm font-semibold text-primary">
                             My Personal Settings
@@ -1985,7 +2020,7 @@ const SettingsPage = () => {
                     </div>
                 </div>
 
-                <div className="md:col-span-9">
+                <div className="md:col-span-9 w-full min-w-0">
                     {renderContent()}
                 </div>
             </div>
@@ -2016,25 +2051,25 @@ const SettingsPage = () => {
 
             {/* Sticky Action Bar - Shows when there are unsaved changes */}
             {hasUnsavedChanges && (
-                <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shadow-lg z-40 animate-in slide-in-from-bottom duration-300">
-                    <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="h-2 w-2 bg-amber-500 rounded-full animate-pulse"></div>
-                            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shadow-xl z-40 animate-in slide-in-from-bottom duration-300 pb-safe">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div className="flex items-center gap-2.5">
+                            <div className="h-2 w-2 bg-amber-500 rounded-full animate-pulse shrink-0"></div>
+                            <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300">
                                 You have unsaved changes
                             </span>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
                             <Button 
                                 variant="outline" 
                                 onClick={handleDiscardChanges}
-                                className="min-w-[120px]"
+                                className="flex-1 sm:flex-none text-xs sm:text-sm h-9 px-3 min-w-[100px]"
                             >
-                                Discard Changes
+                                Discard
                             </Button>
                             <Button 
                                 onClick={handleSaveAllChanges}
-                                className="min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white"
+                                className="flex-1 sm:flex-none text-xs sm:text-sm h-9 px-4 min-w-[120px] bg-blue-600 hover:bg-blue-700 text-white"
                             >
                                 Save All Changes
                             </Button>

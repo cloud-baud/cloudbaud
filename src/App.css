@@ -160,6 +160,28 @@
 
   body {
     @apply bg-background text-foreground bg-[image:var(--steel-gradient)] bg-fixed bg-no-repeat bg-cover;
+    touch-action: manipulation;
   }
 }
+
+/* Mobile & Touch Utility Classes */
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .touch-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 1rem);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 1rem);
+  }
+}
+
 

@@ -138,6 +138,18 @@ export default function ExcelWorksheetGrid({
     }
   });
 
+  // Listen to TaxRibbon commands for Comments and URL Editing
+  useEffect(() => {
+    const handleToggleComments = () => setShowCommentsSidebar(prev => !prev);
+    const handleEditUrl = () => setIsEditingSheetUrl(prev => !prev);
+    window.addEventListener('tax_ribbon_toggle_comments', handleToggleComments);
+    window.addEventListener('tax_ribbon_edit_sheet_url', handleEditUrl);
+    return () => {
+      window.removeEventListener('tax_ribbon_toggle_comments', handleToggleComments);
+      window.removeEventListener('tax_ribbon_edit_sheet_url', handleEditUrl);
+    };
+  }, []);
+
   const handleAddSheetComment = () => {
     if (!newCommentText.trim()) return;
     const newThread = {
@@ -423,129 +435,9 @@ export default function ExcelWorksheetGrid({
         className="hidden"
       />
 
-      {/* ── WORKSHEET VIEW SWITCHER (LIVE GOOGLE SHEET vs GRID vs MASTER XLSX) ── */}
-      <div className="bg-[#0b1120] border-b border-white/10 px-3 py-1.5 flex items-center justify-between gap-2 shrink-0 flex-wrap">
-        <div className="flex items-center gap-1 bg-[#060a14] p-0.5 rounded-lg border border-white/10 text-xs">
-          <button
-            onClick={() => setActiveSheet('googlesheet')}
-            className={`px-3 py-1 rounded font-semibold flex items-center gap-1.5 transition ${
-              activeSheet === 'googlesheet'
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-white/60 hover:text-white hover:bg-white/5'
-            }`}
-            title="Live Connected Google Sheet shared with David Rumsey (CPA)"
-          >
-            <span className="size-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Live Google Sheet</span>
-          </button>
-
-          <button
-            onClick={() => setActiveSheet('worksheet')}
-            className={`px-3 py-1 rounded font-semibold flex items-center gap-1.5 transition ${
-              activeSheet === 'worksheet'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-white/60 hover:text-white hover:bg-white/5'
-            }`}
-            title="High-density interactive calculation grid linked to Form 1040"
-          >
-            <Table className="size-3.5" />
-            <span>Calculation Grid</span>
-          </button>
-
-          <button
-            onClick={() => setActiveSheet('xlsx_master')}
-            className={`px-3 py-1 rounded font-semibold flex items-center gap-1.5 transition ${
-              activeSheet === 'xlsx_master'
-                ? 'bg-purple-600 text-white shadow-sm'
-                : 'text-white/60 hover:text-white hover:bg-white/5'
-            }`}
-            title="Preview Consolidated Tax Items Excel workbook"
-          >
-            <FileSpreadsheet className="size-3.5" />
-            <span>Consolidated XLSX</span>
-          </button>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {activeSheet === 'googlesheet' && (
-            <span className="text-[10px] text-emerald-300 font-mono bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 hidden md:inline-block">
-              ✓ Connected to David Rumsey's Shared Sheet
-            </span>
-          )}
-
-          <a
-            href={googleSheetUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-2.5 py-1 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/30 rounded text-[11px] font-semibold flex items-center gap-1 transition"
-            title="Open Google Sheet in a new tab"
-          >
-            <ExternalLink className="size-3" />
-            <span className="hidden sm:inline">Google Sheets</span>
-          </a>
-        </div>
-      </div>
-
       {/* ── CONDITIONAL RENDER: LIVE GOOGLE SHEET vs CALCULATION GRID vs XLSX ── */}
       {activeSheet === 'googlesheet' ? (
         <div className="flex-1 w-full h-full min-h-0 bg-slate-950 relative overflow-hidden flex flex-col">
-          {/* Google Sheet Live Header Bar */}
-          <div className="bg-[#0e1424] px-3 py-1.5 border-b border-white/10 flex items-center justify-between text-xs shrink-0 flex-wrap gap-2">
-            <div className="flex items-center gap-2">
-              <span className="size-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span className="font-bold text-white text-xs">Live Google Sheet</span>
-              <span className="text-[10px] text-blue-300 font-mono bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-500/20">
-                Shared CPA Master
-              </span>
-              <span className="text-[10px] text-amber-300 font-mono bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/30 flex items-center gap-1">
-                <span className="size-1.5 rounded-full bg-amber-400"></span>
-                <span>Named Range Sync Active</span>
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowCommentsSidebar(!showCommentsSidebar)}
-                className={`text-[11px] px-2.5 py-0.5 rounded flex items-center gap-1.5 font-semibold transition border ${
-                  showCommentsSidebar
-                    ? 'bg-blue-600/30 text-blue-300 border-blue-400/60 shadow-[0_0_8px_rgba(59,130,246,0.3)]'
-                    : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-white/15'
-                }`}
-                title="Toggle Google Sheets Comments & Discussion Sidebar"
-              >
-                <MessageSquare className="size-3 text-blue-400" />
-                <span>Comments</span>
-                <span className="px-1 py-0.2 rounded bg-blue-500/20 text-[9px] font-mono text-blue-200">
-                  {filteredComments.length}
-                </span>
-              </button>
-              <button
-                onClick={() => setIsEditingSheetUrl(!isEditingSheetUrl)}
-                className="text-[11px] text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-white/15 px-2 py-0.5 rounded flex items-center gap-1 font-medium transition"
-                title="Update Google Sheet share URL"
-              >
-                <span>{isEditingSheetUrl ? 'Close URL Bar' : 'Change Sheet URL'}</span>
-              </button>
-              <button
-                onClick={() => setActiveSheet('worksheet')}
-                className="text-[11px] text-amber-300 hover:text-amber-200 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 px-2 py-0.5 rounded flex items-center gap-1 font-semibold transition"
-                title="View transferred cells highlighted with glowing border in Calculation Matrix"
-              >
-                <Table className="size-3" />
-                <span>Show Cell Highlights</span>
-              </button>
-              <a
-                href={googleSheetUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[11px] text-blue-400 hover:text-blue-300 flex items-center gap-1 font-semibold"
-                title="Open live Google Spreadsheet in new tab"
-              >
-                <ExternalLink className="size-3" />
-                <span>Open in Google Sheets</span>
-              </a>
-            </div>
-          </div>
 
           {/* Quick URL Setup / Update Bar */}
           {isEditingSheetUrl && (

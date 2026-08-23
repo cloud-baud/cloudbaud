@@ -248,33 +248,33 @@ export const TeamsAuthorizationDashboard = () => {
     const rulesCount = accessRules.length;
 
     return (
-        <div className="flex flex-col h-full bg-background text-foreground overflow-y-auto">
+        <div className="flex flex-col h-full bg-background text-foreground overflow-y-auto w-full">
             {/* Header & Sub-Navigation */}
-            <div className="border-b border-border bg-card/60 backdrop-blur sticky top-0 z-20 px-6 py-4">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div className="border-b border-border bg-card/60 backdrop-blur sticky top-0 z-20 px-3 sm:px-6 py-3 sm:py-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                     {/* Module Title */}
-                    <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-brand-blue/10 border border-brand-blue/30 text-brand-blue shadow-sm">
-                            <Shield className="size-6" />
+                    <div className="flex items-center gap-2.5 sm:gap-3">
+                        <div className="p-2 sm:p-2.5 rounded-xl bg-brand-blue/10 border border-brand-blue/30 text-brand-blue shadow-sm shrink-0">
+                            <Shield className="size-5 sm:size-6" />
                         </div>
                         <div>
                             <div className="flex items-center gap-2">
-                                <h1 className="text-xl font-bold tracking-tight">Teams & Authorization</h1>
-                                <Badge variant="outline" className="text-[10px] bg-brand-blue/10 text-brand-blue border-brand-blue/30 px-1.5 py-0.5">
-                                    RBAC v2.4
+                                <h1 className="text-lg sm:text-xl font-bold tracking-tight">Teams & Access</h1>
+                                <Badge variant="outline" className="text-[10px] bg-brand-blue/10 text-brand-blue border-brand-blue/30 px-1.5 py-0.2">
+                                    RBAC
                                 </Badge>
                             </div>
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                                Role-based access control, multi-tenant permissions matrix, domain allowlists, and audit logs.
+                            <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-1 sm:line-clamp-none">
+                                Role-based access control, permissions matrix, and domain security.
                             </p>
                         </div>
                     </div>
 
                     {/* Global Actions */}
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-2">
                         <Button
                             onClick={() => setIsInviteModalOpen(true)}
-                            className="bg-brand-blue hover:bg-brand-blue/90 text-white font-medium text-xs h-9 gap-1.5 shadow-sm shadow-brand-blue/20"
+                            className="bg-brand-blue hover:bg-brand-blue/90 text-white font-medium text-xs h-8 sm:h-9 px-3 gap-1.5 shadow-sm shadow-brand-blue/20 w-full sm:w-auto justify-center"
                         >
                             <UserPlus className="size-3.5" />
                             <span>Invite Member</span>
@@ -283,10 +283,10 @@ export const TeamsAuthorizationDashboard = () => {
                 </div>
 
                 {/* Tabs Navigation */}
-                <div className="flex items-center gap-2 mt-5 border-b border-border/40 pb-0 overflow-x-auto no-scrollbar">
+                <div className="flex items-center gap-1.5 sm:gap-2 mt-3 sm:mt-5 border-b border-border/40 pb-0 overflow-x-auto no-scrollbar whitespace-nowrap">
                     <TabButton
                         id="members"
-                        label="Member Roster"
+                        label="Members"
                         badge={totalMembersCount}
                         icon={Users}
                         active={activeTab === 'members'}
@@ -294,7 +294,7 @@ export const TeamsAuthorizationDashboard = () => {
                     />
                     <TabButton
                         id="roles"
-                        label="Roles & Permissions Matrix"
+                        label="Roles & Matrix"
                         badge={SYSTEM_ROLES.length}
                         icon={Key}
                         active={activeTab === 'roles'}
@@ -302,7 +302,7 @@ export const TeamsAuthorizationDashboard = () => {
                     />
                     <TabButton
                         id="domains"
-                        label="Domain & Email Access"
+                        label="Domain Access"
                         badge={rulesCount}
                         icon={Globe}
                         active={activeTab === 'domains'}
@@ -310,7 +310,7 @@ export const TeamsAuthorizationDashboard = () => {
                     />
                     <TabButton
                         id="invitations"
-                        label="Invitations & Tokens"
+                        label="Invitations"
                         badge={pendingInvitesCount}
                         icon={Mail}
                         active={activeTab === 'invitations'}
@@ -318,7 +318,7 @@ export const TeamsAuthorizationDashboard = () => {
                     />
                     <TabButton
                         id="audit"
-                        label="Security & Audit Logs"
+                        label="Audit Logs"
                         icon={Activity}
                         active={activeTab === 'audit'}
                         onClick={() => setActiveTab('audit')}
@@ -327,9 +327,9 @@ export const TeamsAuthorizationDashboard = () => {
             </div>
 
             {/* Main Content Area */}
-            <div className="p-6 space-y-6 flex-1">
+            <div className="p-3 sm:p-6 space-y-4 sm:space-y-6 flex-1 w-full">
                 {/* Top Metrics Cards */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
                     <StatCard
                         label="Active Members"
                         value={`${activeMembersCount} / ${totalMembersCount}`}

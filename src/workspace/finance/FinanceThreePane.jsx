@@ -671,85 +671,13 @@ export default function FinanceThreePane() {
             setIsDocsCollapsed={setIsDocsCollapsed}
             isFormCollapsed={isFormCollapsed}
             setIsFormCollapsed={setIsFormCollapsed}
+            activeConnectedNode={activeConnectedNode}
+            setActiveConnectedNode={setActiveConnectedNode}
+            hoveredConnectedNode={hoveredConnectedNode}
+            setHoveredConnectedNode={setHoveredConnectedNode}
+            entries={entries}
+            accounts={accounts}
           />
-        </div>
-
-        {/* WORKFLOW PROGRESS BAR — always visible, hover for audit checklist */}
-        <TaxWorkflowProgressBar
-          year={year}
-          onYearChange={setYear}
-          onOpenDocCollection={() => {
-            setIsDocsCollapsed(false);
-            setActiveTab('docs');
-          }}
-        />
-
-        {/* ── 3-PANEL INTERACTIVE CONNECTION BRIDGE BAR ── */}
-        <div className="bg-[#080d1a] border-b border-white/10 px-3 py-1 flex items-center justify-between gap-2 text-xs shrink-0 flex-wrap shadow-inner">
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-semibold text-[11px]">
-              <Link2 className="size-3.5 text-cyan-400 animate-pulse" />
-              <span>3-Panel Trace:</span>
-            </div>
-
-            {/* Quick Connection Node Selectors */}
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {Object.values(CONNECTED_TAX_NODES).map(node => {
-                const isActive = activeConnectedNode === node.id;
-                const cellCoord = node.yearCoords[year] || node.cellCoord2022;
-                return (
-                  <button
-                    key={node.id}
-                    onClick={() => setActiveConnectedNode(isActive ? null : node.id)}
-                    onMouseEnter={() => setHoveredConnectedNode(node.id)}
-                    onMouseLeave={() => setHoveredConnectedNode(null)}
-                    className={`px-2 py-0.5 rounded text-[11px] font-medium transition flex items-center gap-1.5 border shadow-sm ${
-                      isActive
-                        ? 'bg-cyan-500/25 border-cyan-400 text-cyan-100 font-bold ring-1 ring-cyan-400'
-                        : 'bg-slate-900/80 hover:bg-slate-800 text-white/70 hover:text-white border-white/10'
-                    }`}
-                    title={node.description}
-                  >
-                    <span className="font-mono text-[10px] text-amber-300 bg-amber-950/80 px-1 rounded border border-amber-400/30 font-bold">
-                      {cellCoord}
-                    </span>
-                    <span>{node.title.split('(')[0]}</span>
-                    {isActive && <span className="size-1.5 rounded-full bg-cyan-400 animate-ping" />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Active Breadcrumb Flow Indicator */}
-          {activeConnectedNode && (() => {
-            const node = CONNECTED_TAX_NODES[activeConnectedNode];
-            if (!node) return null;
-            const cellCoord = node.yearCoords[year] || node.cellCoord2022;
-            const entryVal = entries.find(e => {
-              const acc = accounts.find(a => a.name === node.accountName);
-              return acc && e.category_id === acc.id;
-            })?.amount || node.amount2022;
-
-            return (
-              <div className="flex items-center gap-2 text-[11px]">
-                <div className="flex items-center gap-1.5 text-slate-200 bg-slate-950/90 border border-cyan-500/40 rounded px-2.5 py-0.5 font-mono shadow-sm">
-                  <span className="text-amber-300 font-bold">Worksheet [{cellCoord}: ${Number(entryVal).toLocaleString(undefined, { minimumFractionDigits: 2 })}]</span>
-                  <span className="text-cyan-400 font-bold">⟷</span>
-                  <span className="text-blue-300 font-semibold">Checklist [{node.checklistNum} W-2]</span>
-                  <span className="text-cyan-400 font-bold">⟷</span>
-                  <span className="text-purple-300 font-semibold">1040 [{node.form1040LineLabel}]</span>
-                </div>
-                <button
-                  onClick={() => setActiveConnectedNode(null)}
-                  className="text-white/40 hover:text-white text-[10px] underline"
-                  title="Clear active 3-panel highlight"
-                >
-                  Clear
-                </button>
-              </div>
-            );
-          })()}
         </div>
 
         {/* MAIN 3-PANE WORKBENCH */}

@@ -7,7 +7,7 @@ import {
     FileText, ChevronLeft, FileSpreadsheet, ListChecks,
     PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
     ExternalLink, CheckCircle2, AlertCircle, ShieldCheck,
-    Globe, Car, Home, Sliders, RotateCcw
+    Globe, Car, Home, Sliders, RotateCcw, Link2, MessageSquare, Table, Sparkles
 } from 'lucide-react';
 import { Ribbon, RibbonButton, RibbonSeparator, RibbonGroup } from 'synolic.core';
 import TaxAssumptionsModal from './TaxAssumptionsModal';
@@ -17,6 +17,7 @@ import {
     saveTaxAssumptions,
     getAssumptionsForYear
 } from '../data/taxAssumptions';
+import { CONNECTED_TAX_NODES } from '../data/taxNamedRanges';
 
 const DOC_BASE = '/src/workspace/data/Documents - Taxes';
 const GDRIVE_URL = "https://drive.google.com/drive/folders/1bsHTGlWMp1j0fp_d2eDqiho1Ol0cMnzG?usp=sharing";
@@ -113,7 +114,14 @@ export default function TaxRibbon({
     isDocsCollapsed = false,
     setIsDocsCollapsed,
     isFormCollapsed = false,
-    setIsFormCollapsed
+    setIsFormCollapsed,
+    activeConnectedNode,
+    setActiveConnectedNode,
+    hoveredConnectedNode,
+    setHoveredConnectedNode,
+    entries = [],
+    accounts = [],
+    googleSheetUrl = "https://docs.google.com/spreadsheets/d/1QubZfLE5OC8RuhhljIBvj7dUeWN3UwefYxrtH0HSiGY/edit?usp=sharing"
 }) {
     const [activeRibbonTab, setActiveRibbonTab] = useState('home');
     const [isAssumptionsModalOpen, setIsAssumptionsModalOpen] = useState(false);
@@ -203,13 +211,13 @@ export default function TaxRibbon({
                 }}
             />
 
-            {/* Top Bar: Office-style Tabs + Global Year & Sheet Switcher */}
-            <div className="flex items-center justify-between px-3 pt-1.5 border-b border-white/10 bg-[#090d18] text-xs">
+            {/* Top Bar: Office-style Tabs + Sheet Switcher + Global Year Switcher */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between px-2 sm:px-3 pt-1.5 border-b border-white/10 bg-[#090d18] text-xs gap-1.5">
                 {/* Ribbon Tabs */}
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 overflow-x-auto no-scrollbar whitespace-nowrap">
                     <button
                         onClick={() => setActiveRibbonTab('file')}
-                        className={`px-3.5 py-1.5 font-bold rounded-t flex items-center gap-1.5 transition ${
+                        className={`px-3 py-1 sm:px-3.5 sm:py-1.5 font-bold rounded-t flex items-center gap-1.5 transition text-xs shrink-0 ${
                             activeRibbonTab === 'file'
                                 ? 'bg-emerald-700 text-white border-t-2 border-emerald-300 shadow-sm'
                                 : 'bg-emerald-800/80 hover:bg-emerald-700 text-white/90'
@@ -223,14 +231,14 @@ export default function TaxRibbon({
                     {[
                         { id: 'home', label: 'Home / Worksheet' },
                         { id: 'assumptions', label: '⚙️ Assumptions & FX' },
-                        { id: 'docs', label: 'Checklist Panel (65 Docs)' },
+                        { id: 'docs', label: 'Checklist (65 Docs)' },
                         { id: 'form1040', label: 'Form 1040 Return' },
                         { id: 'view', label: 'View & Panes' },
                     ].map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveRibbonTab(tab.id)}
-                            className={`px-3.5 py-1.5 rounded-t transition text-xs font-semibold ${
+                            className={`px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-t transition text-xs font-semibold shrink-0 ${
                                 activeRibbonTab === tab.id
                                     ? 'bg-[#141e33] text-white border-t-2 border-blue-400 font-bold shadow-sm'
                                     : 'text-slate-300 hover:text-white hover:bg-white/10'
@@ -241,12 +249,55 @@ export default function TaxRibbon({
                     ))}
                 </div>
 
-                {/* Right Side: Assumptions Indicator Pill + Quick Links + Filing Year Selector */}
-                <div className="flex items-center gap-2 pb-1">
+                {/* Right Side: Worksheet View Mode Selector + Assumptions Pill + Year Selector */}
+                <div className="flex items-center gap-1.5 sm:gap-2 pb-1 overflow-x-auto no-scrollbar justify-between sm:justify-end shrink-0">
+                    {/* Integrated Sheet Mode Switcher */}
+                    <div className="flex items-center gap-0.5 bg-[#060a14] p-0.5 rounded-lg border border-white/15 text-xs shrink-0">
+                        <button
+                            onClick={() => onActiveSheetChange?.('googlesheet')}
+                            className={`px-2 py-0.5 rounded font-semibold flex items-center gap-1 transition text-[11px] ${
+                                activeSheet === 'googlesheet'
+                                    ? 'bg-emerald-600 text-white shadow-sm'
+                                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                            }`}
+                            title="Live Connected Google Sheet shared with David Rumsey (CPA)"
+                        >
+                            <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span className="hidden sm:inline">Live Google Sheet</span>
+                            <span className="sm:hidden">Sheet</span>
+                        </button>
+                        <button
+                            onClick={() => onActiveSheetChange?.('worksheet')}
+                            className={`px-2 py-0.5 rounded font-semibold flex items-center gap-1 transition text-[11px] ${
+                                activeSheet === 'worksheet'
+                                    ? 'bg-blue-600 text-white shadow-sm'
+                                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                            }`}
+                            title="High-density interactive calculation grid linked to Form 1040"
+                        >
+                            <Table className="size-3" />
+                            <span className="hidden sm:inline">Calculation Grid</span>
+                            <span className="sm:hidden">Grid</span>
+                        </button>
+                        <button
+                            onClick={() => onActiveSheetChange?.('xlsx_master')}
+                            className={`px-2 py-0.5 rounded font-semibold flex items-center gap-1 transition text-[11px] ${
+                                activeSheet === 'xlsx_master'
+                                    ? 'bg-purple-600 text-white shadow-sm'
+                                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                            }`}
+                            title="Preview Consolidated Tax Items Excel workbook"
+                        >
+                            <FileSpreadsheet className="size-3" />
+                            <span className="hidden sm:inline">Consolidated XLSX</span>
+                            <span className="sm:hidden">XLSX</span>
+                        </button>
+                    </div>
+
                     {/* Live Tax Assumptions Quick Pill Bar */}
                     <button
                         onClick={() => setIsAssumptionsModalOpen(true)}
-                        className="hidden lg:flex items-center gap-2 px-2.5 py-1 bg-[#10192e] hover:bg-[#16223e] border border-blue-500/30 rounded text-[11px] font-mono transition shadow-sm"
+                        className="hidden xl:flex items-center gap-2 px-2 py-0.5 bg-[#10192e] hover:bg-[#16223e] border border-blue-500/30 rounded text-[11px] font-mono transition shadow-sm shrink-0"
                         title="Click to view & edit full 9-Year Tax Assumptions Matrix (2017–2025)"
                     >
                         <span className="text-blue-300 font-semibold flex items-center gap-1">
@@ -258,45 +309,11 @@ export default function TaxRibbon({
                             <span>🇮🇳</span>
                             <span>{activeYearAssumptions.inrToUsd}</span>
                         </span>
-                        <span className="text-white/20">|</span>
-                        <span className="text-emerald-300 font-semibold flex items-center gap-1">
-                            <span>🚗</span>
-                            <span>${activeYearAssumptions.mileageRate}</span>
-                        </span>
-                        <span className="text-white/20">|</span>
-                        <span className="text-cyan-300 font-semibold flex items-center gap-1">
-                            <span>🏠</span>
-                            <span>{activeYearAssumptions.homeUsePercent}%</span>
-                        </span>
                     </button>
 
-                    {/* Live Shared Google Sheet Link */}
-                    <a
-                        href="https://docs.google.com/spreadsheets/d/1QubZfLE5OC8RuhhljIBvj7dUeWN3UwefYxrtH0HSiGY/edit?usp=sharing"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-2.5 py-1 text-xs font-semibold bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/30 rounded flex items-center gap-1 transition"
-                        title="Open Live Shared Tax Google Sheet (David Rumsey)"
-                    >
-                        <span className="size-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span className="hidden sm:inline">Google Sheet</span>
-                    </a>
-
-                    {/* Google Drive Link */}
-                    <a
-                        href={GDRIVE_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-2.5 py-1 text-xs font-semibold bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 rounded flex items-center gap-1 transition"
-                        title="Open Shared Google Drive Tax Folder"
-                    >
-                        <ExternalLink className="size-3" />
-                        <span className="hidden sm:inline">Google Drive</span>
-                    </a>
-
                     {/* Tax Year Picker Dropdown */}
-                    <div className="flex items-center gap-1.5 bg-[#060a14] px-2.5 py-1 rounded border border-white/15">
-                        <span className="text-[10px] text-white/50 font-semibold uppercase">Filing Year:</span>
+                    <div className="flex items-center gap-1 bg-[#060a14] px-2 py-0.5 rounded border border-white/15 shrink-0">
+                        <span className="text-[10px] text-white/50 font-semibold uppercase hidden sm:inline">Year:</span>
                         <select
                             value={activeYear}
                             onChange={(e) => onYearChange?.(parseInt(e.target.value, 10))}
@@ -304,7 +321,7 @@ export default function TaxRibbon({
                         >
                             {years.map(y => (
                                 <option key={y} value={y} className="bg-[#0b101c] text-white">
-                                    Tax Year {y}
+                                    {y}
                                 </option>
                             ))}
                         </select>
@@ -313,13 +330,13 @@ export default function TaxRibbon({
             </div>
 
             {/* Lower Ribbon Content Bar */}
-            <div className="px-3 py-2 bg-[#121b2d] flex items-center justify-between gap-4 overflow-x-auto min-h-[52px]">
+            <div className="px-2 sm:px-3 py-1.5 bg-[#121b2d] flex items-center justify-start sm:justify-between gap-2 sm:gap-4 overflow-x-auto no-scrollbar min-h-[44px] whitespace-nowrap">
                 {/* ── FILE TAB ── */}
                 {activeRibbonTab === 'file' && (
                     <div className="flex items-center gap-3">
                         <button
                             onClick={onSave}
-                            className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-xs font-semibold flex items-center gap-1.5 shadow-sm transition"
+                            className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-xs font-semibold flex items-center gap-1.5 shadow-sm transition"
                             title="Save all changes to Worksheet and Document cache"
                         >
                             <Save className="size-3.5" />
@@ -328,18 +345,18 @@ export default function TaxRibbon({
 
                         <button
                             onClick={onUpload}
-                            className="px-2.5 py-1.5 bg-white/10 hover:bg-white/15 text-white rounded text-xs font-medium flex items-center gap-1.5 transition border border-white/10"
+                            className="px-2.5 py-1 bg-white/10 hover:bg-white/15 text-white rounded text-xs font-medium flex items-center gap-1.5 transition border border-white/10"
                             title="Upload Supporting Document or Spreadsheet"
                         >
                             <Upload className="size-3.5 text-blue-400" />
                             <span>Upload File</span>
                         </button>
 
-                        <div className="h-6 w-px bg-white/10" />
+                        <div className="h-5 w-px bg-white/10" />
 
                         <button
                             onClick={() => window.print()}
-                            className="px-2.5 py-1.5 bg-white/5 hover:bg-white/10 text-white/80 rounded text-xs font-medium flex items-center gap-1.5 transition"
+                            className="px-2.5 py-1 bg-white/5 hover:bg-white/10 text-white/80 rounded text-xs font-medium flex items-center gap-1.5 transition"
                             title="Print active worksheet or return"
                         >
                             <Printer className="size-3.5 text-slate-400" />
@@ -350,7 +367,7 @@ export default function TaxRibbon({
                             href={GDRIVE_URL}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-2.5 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 rounded text-xs font-medium flex items-center gap-1.5 transition"
+                            className="px-2.5 py-1 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 rounded text-xs font-medium flex items-center gap-1.5 transition"
                         >
                             <ExternalLink className="size-3.5" />
                             <span>Google Drive Tax Folder</span>
@@ -360,56 +377,156 @@ export default function TaxRibbon({
 
                 {/* ── HOME / WORKSHEET TAB ── */}
                 {activeRibbonTab === 'home' && (
-                    <div className="flex items-center gap-3 flex-wrap">
-                        {/* Font / Text Styling */}
-                        <div className="flex items-center gap-1 bg-[#090e18] p-1 rounded border border-white/10">
-                            <button
-                                className="p-1 rounded hover:bg-white/10 text-white/70 hover:text-white"
-                                title="Bold"
-                            >
-                                <Bold className="size-3.5" />
-                            </button>
-                            <button
-                                className="p-1 rounded hover:bg-white/10 text-white/70 hover:text-white"
-                                title="Italic"
-                            >
-                                <Italic className="size-3.5" />
-                            </button>
-                            <div className="h-4 w-px bg-white/10 mx-0.5" />
-                            <button
-                                className="p-1 rounded hover:bg-white/10 text-white/70 hover:text-white"
-                                title="Align Left"
-                            >
-                                <AlignLeft className="size-3.5" />
-                            </button>
-                            <button
-                                className="p-1 rounded hover:bg-white/10 text-white/70 hover:text-white"
-                                title="Align Center"
-                            >
-                                <AlignCenter className="size-3.5" />
-                            </button>
-                            <button
-                                className="p-1 rounded hover:bg-white/10 text-white/70 hover:text-white"
-                                title="Align Right"
-                            >
-                                <AlignRight className="size-3.5" />
-                            </button>
+                    <div className="flex items-center justify-between gap-3 w-full overflow-x-auto no-scrollbar">
+                        {/* Section 1: Live Google Sheet Controls or Standard Worksheet Controls */}
+                        <div className="flex items-center gap-2 shrink-0">
+                            {activeSheet === 'googlesheet' ? (
+                                <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1.5 bg-[#080e1a] px-2 py-1 rounded border border-emerald-500/30">
+                                        <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                        <span className="text-[10px] text-emerald-300 font-mono font-semibold">Shared CPA Master</span>
+                                        <span className="text-white/20">|</span>
+                                        <span className="text-[10px] text-amber-300 font-mono flex items-center gap-1">
+                                            <span className="size-1 rounded-full bg-amber-400"></span>
+                                            <span>Range Sync</span>
+                                        </span>
+                                    </div>
+
+                                    <button
+                                        onClick={() => window.dispatchEvent(new CustomEvent('tax_ribbon_toggle_comments'))}
+                                        className="text-[11px] px-2 py-1 rounded flex items-center gap-1.5 font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/15 shadow-sm transition"
+                                        title="Toggle Google Sheets Comments & Discussion Sidebar"
+                                    >
+                                        <MessageSquare className="size-3 text-blue-400" />
+                                        <span>Comments</span>
+                                        <span className="px-1 py-0.2 rounded bg-blue-500/30 text-[9px] font-mono text-blue-200">146</span>
+                                    </button>
+
+                                    <button
+                                        onClick={() => window.dispatchEvent(new CustomEvent('tax_ribbon_edit_sheet_url'))}
+                                        className="text-[11px] text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-white/15 px-2 py-1 rounded flex items-center gap-1 font-medium transition"
+                                        title="Update Google Sheet URL"
+                                    >
+                                        <span>Change URL</span>
+                                    </button>
+
+                                    <button
+                                        onClick={() => onActiveSheetChange?.('worksheet')}
+                                        className="text-[11px] text-amber-300 hover:text-amber-200 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 px-2 py-1 rounded flex items-center gap-1 font-semibold transition"
+                                        title="View cell highlights in calculation matrix"
+                                    >
+                                        <Table className="size-3" />
+                                        <span>Show Highlights</span>
+                                    </button>
+
+                                    <a
+                                        href={googleSheetUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-[11px] px-2 py-1 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/30 rounded flex items-center gap-1 font-semibold transition"
+                                        title="Open live Google Spreadsheet in new tab"
+                                    >
+                                        <ExternalLink className="size-3" />
+                                        <span>Open Sheet</span>
+                                    </a>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2">
+                                    {/* Font / Text Styling */}
+                                    <div className="flex items-center gap-1 bg-[#090e18] p-0.5 rounded border border-white/10">
+                                        <button className="p-1 rounded hover:bg-white/10 text-white/70 hover:text-white" title="Bold">
+                                            <Bold className="size-3.5" />
+                                        </button>
+                                        <button className="p-1 rounded hover:bg-white/10 text-white/70 hover:text-white" title="Italic">
+                                            <Italic className="size-3.5" />
+                                        </button>
+                                        <div className="h-3.5 w-px bg-white/10 mx-0.5" />
+                                        <button className="p-1 rounded hover:bg-white/10 text-white/70 hover:text-white" title="Align Left">
+                                            <AlignLeft className="size-3.5" />
+                                        </button>
+                                        <button className="p-1 rounded hover:bg-white/10 text-white/70 hover:text-white" title="Align Center">
+                                            <AlignCenter className="size-3.5" />
+                                        </button>
+                                        <button className="p-1 rounded hover:bg-white/10 text-white/70 hover:text-white" title="Align Right">
+                                            <AlignRight className="size-3.5" />
+                                        </button>
+                                    </div>
+
+                                    <div className="flex items-center gap-1 bg-[#090e18] px-2 py-1 rounded border border-white/10">
+                                        <Lock className="size-3.5 text-amber-400" />
+                                        <span className="text-[11px] text-white/70 font-medium">Protect</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
-                        {/* Lock / Protect */}
-                        <div className="flex items-center gap-1 bg-[#090e18] px-2 py-1 rounded border border-white/10">
-                            <Lock className="size-3.5 text-amber-400" />
-                            <span className="text-[11px] text-white/70 font-medium">Protect Worksheet</span>
-                        </div>
+                        <div className="h-5 w-px bg-white/15 hidden md:block" />
 
-                        <div className="h-6 w-px bg-white/10" />
+                        {/* Section 2: Integrated 3-Panel Trace Nodes & Breadcrumb */}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                            <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-semibold text-[11px] shrink-0">
+                                <Link2 className="size-3.5 text-cyan-400 animate-pulse" />
+                                <span className="hidden sm:inline">3-Panel Trace:</span>
+                                <span className="sm:hidden">Trace:</span>
+                            </div>
 
-                        {/* Active Year Summary Pill */}
-                        <div className="flex items-center gap-2 text-xs">
-                            <span className="text-white/50">Active Tax Year:</span>
-                            <span className="font-bold text-white px-2 py-0.5 rounded bg-blue-600/30 border border-blue-500/40 text-blue-200">
-                                {activeYear} Form 1040
-                            </span>
+                            {/* Quick Connection Node Selectors */}
+                            <div className="flex items-center gap-1 shrink-0">
+                                {Object.values(CONNECTED_TAX_NODES).map(node => {
+                                    const isActive = activeConnectedNode === node.id;
+                                    const cellCoord = node.yearCoords[activeYear] || node.cellCoord2022;
+                                    return (
+                                        <button
+                                            key={node.id}
+                                            onClick={() => setActiveConnectedNode?.(isActive ? null : node.id)}
+                                            onMouseEnter={() => setHoveredConnectedNode?.(node.id)}
+                                            onMouseLeave={() => setHoveredConnectedNode?.(null)}
+                                            className={`px-1.5 py-0.5 rounded text-[10px] font-medium transition flex items-center gap-1 border shadow-sm ${
+                                                isActive
+                                                    ? 'bg-cyan-500/30 border-cyan-400 text-cyan-100 font-bold ring-1 ring-cyan-400'
+                                                    : 'bg-slate-900/80 hover:bg-slate-800 text-white/70 hover:text-white border-white/10'
+                                            }`}
+                                            title={node.description}
+                                        >
+                                            <span className="font-mono text-[9px] text-amber-300 bg-amber-950/80 px-1 rounded border border-amber-400/30 font-bold">
+                                                {cellCoord}
+                                            </span>
+                                            <span className="truncate max-w-[90px]">{node.title.split('(')[0]}</span>
+                                            {isActive && <span className="size-1 rounded-full bg-cyan-400 animate-ping" />}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Active Breadcrumb Flow Indicator */}
+                            {activeConnectedNode && (() => {
+                                const node = CONNECTED_TAX_NODES[activeConnectedNode];
+                                if (!node) return null;
+                                const cellCoord = node.yearCoords[activeYear] || node.cellCoord2022;
+                                const entryVal = entries.find(e => {
+                                    const acc = accounts.find(a => a.name === node.accountName);
+                                    return acc && e.category_id === acc.id;
+                                })?.amount || node.amount2022;
+
+                                return (
+                                    <div className="flex items-center gap-1.5 text-[10px] shrink-0">
+                                        <div className="flex items-center gap-1 text-slate-200 bg-slate-950/90 border border-cyan-500/40 rounded px-2 py-0.5 font-mono shadow-sm">
+                                            <span className="text-amber-300 font-bold">[{cellCoord}: ${Number(entryVal).toLocaleString(undefined, { minimumFractionDigits: 2 })}]</span>
+                                            <span className="text-cyan-400 font-bold">⟷</span>
+                                            <span className="text-blue-300 font-semibold">Checklist [{node.checklistNum}]</span>
+                                            <span className="text-cyan-400 font-bold">⟷</span>
+                                            <span className="text-purple-300 font-semibold">1040 [{node.form1040LineLabel}]</span>
+                                        </div>
+                                        <button
+                                            onClick={() => setActiveConnectedNode?.(null)}
+                                            className="text-white/40 hover:text-white text-[10px] underline"
+                                            title="Clear active 3-panel highlight"
+                                        >
+                                            Clear
+                                        </button>
+                                    </div>
+                                );
+                            })()}
                         </div>
                     </div>
                 )}

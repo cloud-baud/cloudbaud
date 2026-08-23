@@ -762,7 +762,7 @@ Return ONLY the JSON object, no markdown, no explanation.`;
     if (showSettings) {
         return (
             <div className={variant === 'overlay'
-                ? "fixed top-16 right-0 bottom-0 w-[400px] bg-background border-l border-border shadow-2xl z-40 flex flex-col animate-in slide-in-from-right duration-300"
+                ? "fixed top-16 right-0 bottom-0 w-full sm:w-[400px] bg-background border-l border-border shadow-2xl z-40 flex flex-col animate-in slide-in-from-right duration-300"
                 : "h-full flex flex-col bg-background"
             }>
                 <AiControlPlane
@@ -778,7 +778,7 @@ Return ONLY the JSON object, no markdown, no explanation.`;
     }
 
     const containerClasses = variant === 'overlay'
-        ? "fixed top-16 right-0 bottom-0 w-[400px] bg-background border-l border-border shadow-2xl z-40 flex flex-col animate-in slide-in-from-right duration-300"
+        ? "fixed top-16 right-0 bottom-0 w-full sm:w-[400px] bg-background border-l border-border shadow-2xl z-40 flex flex-col animate-in slide-in-from-right duration-300"
         : "h-full flex flex-col bg-background";
 
     return (

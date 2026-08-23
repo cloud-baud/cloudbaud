@@ -113,16 +113,16 @@ const PortalDashboard = () => {
     ];
 
     return (
-        <div className="flex flex-col gap-5 p-4 md:p-6 max-w-7xl mx-auto w-full animate-in fade-in duration-500">
+        <div className="flex flex-col gap-4 sm:gap-5 p-3 sm:p-4 md:p-6 max-w-7xl mx-auto w-full animate-in fade-in duration-500">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                    <h1 className="text-xl font-bold tracking-tight mb-0.5">
+                    <h1 className="text-lg sm:text-xl font-bold tracking-tight mb-0.5">
                         {greeting}, <span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
                             {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
                         </span>
                     </h1>
-                    <p className="text-xs text-muted-foreground">Here's what's happening in your workspace today.</p>
+                    <p className="text-[11px] sm:text-xs text-muted-foreground">Here's what's happening in your workspace today.</p>
                 </div>
                 
                 <div className="flex items-center gap-2">
@@ -141,7 +141,7 @@ const PortalDashboard = () => {
             </div>
 
             {/* Stats Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
                 <StatCard label="Active Deadlines" value="3" trend="Critical" icon={Clock} trendUp={false} />
                 <StatCard label="Open RFPs" value="$1.2M" trend="Pipeline" icon={Grid} trendUp={true} />
                 <StatCard label="Speaking Gigs" value="2" trend="Upcoming" icon={Users} trendUp={true} />
