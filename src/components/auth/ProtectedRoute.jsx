@@ -16,12 +16,16 @@ const ProtectedRoute = () => {
     }
 
     const isDev = import.meta.env.DEV;
+    // NEW: Check if user explicitly signed out
+    // Why: In DEV, `!user && !isDev` was false, so it let you in with no user after Sign Out.
+    // We now also block if signed-out flag exists, forcing /login even in DEV.
+    const hasSignedOut = localStorage.getItem('cb_has_signed_out') === '1';
 
-    if (!user && !isDev) {
+    if (!user && (!isDev || hasSignedOut)) {
         return <Navigate to="/login" replace />;
     }
 
-    // Intercept if MFA is active but user session is unverified (AAL1 instead of AAL2)
+    // MFA check unchanged
     if (aal && aal.currentLevel === 'aal1' && aal.nextLevel === 'aal2') {
         return <MfaChallengeScreen />;
     }
@@ -30,5 +34,3 @@ const ProtectedRoute = () => {
 };
 
 export default ProtectedRoute;
-
-

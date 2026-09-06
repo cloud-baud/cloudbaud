@@ -12,7 +12,7 @@ import FabricDemo from './workspace/sales/FabricDemo';
 import AuthConfirmPage from "./portal/pages/auth/AuthConfirmPage"
 import HomePage from './portal/pages/HomePage';
 import LoginPage from "./portal/pages/auth/LoginPage"
-import { AuthProvider } from '@/shared/contexts/AuthContext';
+import { AuthProvider, useAuth } from '@/shared/contexts/AuthContext';
 import { ContentProvider } from '@/shared/contexts/ContentContext';
 import { ViewAsProvider } from './workspace/finance/ViewAsContext';
 import { FontSizeProvider } from '@/shared/contexts/FontSizeContext';
@@ -21,6 +21,14 @@ import AuthRedirector from './components/auth/AuthRedirector';
 import { Toaster } from './shared/ui/sonner';
 
 import TeamsAuthorizationDashboard from './workspace/teams/TeamsAuthorizationDashboard';
+
+// NEW: Logged-in landing = /collaboration
+function RootRedirect() {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (user) return <Navigate to="/collaboration" replace />;
+  return <HomePage />;
+}
 
 function App() {
   const isFinanceHost = typeof window !== 'undefined' && window.location.hostname.includes('finance');
@@ -36,7 +44,8 @@ function App() {
                   <AuthRedirector />
               <Routes>
                 <Route element={<MarketingLayout />}>
-                  <Route path="/" element={<HomePage />} />
+                  {/* CHANGED: / now redirects to /collaboration when logged in */}
+                  <Route path="/" element={<RootRedirect />} />
                   <Route path="/login" element={<LoginPage />} /> 
                   <Route path="/auth/confirm" element={<AuthConfirmPage />} />
                   <Route path="/fabric-demo" element={<FabricDemo />} />
@@ -55,20 +64,13 @@ function App() {
                       <Route path="finance/*" element={isFinanceHost ? <Navigate to="/" replace /> : <FinanceApp />} />
                     </Route>
                   </Route>
-                  <Route path="/workspace" element={<WorkspaceLayout />}>
-                    <Route index element={<PortalDashboard />} />
-                    <Route path="teams" element={<TeamsAuthorizationDashboard />} />
-                    <Route path="teams/*" element={<TeamsAuthorizationDashboard />} />
-                    <Route path="sites/consulting/team" element={<Navigate to="/workspace/teams" replace />} />
-                    <Route path="sites/consulting/teams" element={<Navigate to="/workspace/teams" replace />} />
-                    <Route element={<ContextLayout />}>
-                      <Route path="finance/*" element={<FinanceApp />} />
-                    </Route>
-                  </Route>
+                  {/* Legacy /workspace -> redirect to /collaboration to keep URL clean */}
+                  <Route path="/workspace" element={<Navigate to="/collaboration" replace />} />
+                  <Route path="/workspace/*" element={<Navigate to="/collaboration" replace />} />
                   {/* Direct / Teams shortcut */}
                   <Route path="/teams" element={<Navigate to="/collaboration/teams" replace />} />
                   <Route path="/teams/*" element={<Navigate to="/collaboration/teams" replace />} />
-                  {/* Finance subdomain clean routes - when built as main app accidentally, handle */}
+                  {/* Finance subdomain clean routes */}
                   <Route path="/finance/*" element={<FinanceApp />} />
                   <Route path="/*" element={<FinanceApp />} />
                 </Route>
