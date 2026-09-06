@@ -19,7 +19,7 @@ import { useViewAs } from './finance/ViewAsContext';
 const getBasePath = (pathname) => {
   if (pathname.includes('/collaboration')) return '/collaboration';
   if (pathname.includes('/workspace')) return '/workspace';
-  return '/workspace'; // default fallback
+  return '/collaboration'; // default fallback
 };
 
 /**

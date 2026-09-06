@@ -50,7 +50,7 @@ const WorkspaceChat = ({ className, workspaceId: propWorkspaceId }) => {
             }
 
             // Try to resolve from route path
-            const routePath = `/workspace/${propWorkspaceId}`;
+            const routePath = `/collaboration/${propWorkspaceId}`;
             const ws = await resolveWorkspaceFromRoute(routePath);
             if (ws) {
                 setResolvedWs(ws);
