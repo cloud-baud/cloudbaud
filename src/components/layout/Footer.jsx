@@ -1,170 +1,55 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { useTheme } from 'next-themes';
-import { Globe, ChevronDown, Smartphone, Linkedin, Github } from 'lucide-react';
+import { Globe, ChevronDown, Linkedin, Github } from 'lucide-react';
 
 const Footer = () => {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   const footerSections = [
-    {
-      title: 'Platforms',
-      links: [
-        { label: 'Cloud Infrastructure', to: '/platforms/cloud' },
-        { label: 'Edge Computing', to: '/platforms/edge' },
-        { label: 'Hybrid Mesh', to: '/platforms/hybrid' },
-        { label: 'Serverless SDK', to: '/platforms/serverless' },
-        { label: 'Data Fabric', to: '/platforms/data' },
-      ],
-    },
-    {
-      title: 'Topics & Engineering',
-      links: [
-        { label: 'AI Engineering Services', to: '/ai-engineering' },
-        { label: 'System Architecture', to: '/engineering/architecture' },
-        { label: 'DevOps & CI/CD', to: '/engineering/devops' },
-        { label: 'Cybersecurity', to: '/engineering/security' },
-        { label: 'Performance', to: '/engineering/performance' },
-        { label: 'Scalability', to: '/engineering/scalability' },
-        { label: 'Microservices', to: '/engineering/microservices' },
-      ],
-    },
-    {
-      title: 'Resources',
-      links: [
-        { label: 'Documentation', to: '/docs' },
-        { label: 'Whitepapers', to: '/whitepapers' },
-        { label: 'Case Studies', to: '/case-studies' },
-        { label: 'API Reference', to: '/api' },
-        { label: 'Community', to: '/community' },
-        { label: 'Events', to: '/events' },
-      ],
-    },
-    {
-      title: 'Support',
-      links: [
-        { label: 'Help Center', to: '/support' },
-        { label: 'Contact Us', to: '/contact' },
-        { label: 'System Status', to: '/status' },
-        { label: 'Professional Services', to: '/services' },
-      ],
-    },
-    {
-      title: 'Account',
-      links: [
-        { label: 'CloudBaud Console', to: '/console' },
-        { label: 'Billing', to: '/billing' },
-        { label: 'Developer ID', to: '/dev-id' },
-      ],
-    },
-    {
-      title: 'Company',
-      links: [
-        { label: 'About Us', to: '/about' },
-        { label: 'Portfolio', to: '/portfolio' },
-        { label: 'Careers', to: '/careers' },
-        { label: 'Newsroom', to: '/news' },
-        { label: 'Ethics', to: '/ethics' },
-      ],
-    },
+    { title: 'Platforms', links: [ { label: 'Cloud Infrastructure', to: '/platforms/cloud' }, { label: 'Edge Computing', to: '/platforms/edge' }, { label: 'Hybrid Mesh', to: '/platforms/hybrid' }, { label: 'Serverless SDK', to: '/platforms/serverless' }, { label: 'Data Fabric', to: '/platforms/data' }, ] },
+    { title: 'Topics & Engineering', links: [ { label: 'AI Engineering Services', to: '/ai-engineering' }, { label: 'System Architecture', to: '/engineering/architecture' }, { label: 'DevOps & CI/CD', to: '/engineering/devops' }, { label: 'Cybersecurity', to: '/engineering/security' }, { label: 'Performance', to: '/engineering/performance' }, { label: 'Scalability', to: '/engineering/scalability' }, { label: 'Microservices', to: '/engineering/microservices' }, ] },
+    { title: 'Resources', links: [ { label: 'Documentation', to: '/docs' }, { label: 'Whitepapers', to: '/whitepapers' }, { label: 'Case Studies', to: '/case-studies' }, { label: 'API Reference', to: '/api' }, { label: 'Community', to: '/community' }, { label: 'Events', to: '/events' }, ] },
+    { title: 'Support', links: [ { label: 'Help Center', to: '/support' }, { label: 'Contact Us', to: '/contact' }, { label: 'System Status', to: '/status' }, { label: 'Professional Services', to: '/services' }, ] },
+    { title: 'Account', links: [ { label: 'CloudBaud Console', to: '/console' }, { label: 'Billing', to: '/billing' }, { label: 'Developer ID', to: '/dev-id' }, ] },
+    { title: 'Company', links: [ { label: 'About Us', to: '/about' }, { label: 'Portfolio', to: '/portfolio' }, { label: 'Careers', to: '/careers' }, { label: 'Newsroom', to: '/news' }, { label: 'Ethics', to: '/ethics' }, ] },
   ];
 
-  if (!mounted) return null;
-
   return (
-    <footer className="bg-[#f5f5f7] dark:bg-[#010816] text-[#1d1d1f] dark:text-[#f5f5f7] border-t border-slate-200 dark:border-slate-800 transition-colors pt-12 pb-8 px-4 font-sans tracking-tight">
-      <div className="max-w-[1024px] mx-auto">
-        {/* Navigation Grid */}
+    <footer className="w-full bg-[#0a0a0a] border-t border-[#222] pt-12 pb-8 px-4 font-sans">
+      <div className="mx-auto max-w-7xl">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-12">
           {footerSections.map((section) => (
             <div key={section.title} className="flex flex-col space-y-3">
-              <h3 className="text-[12px] font-semibold text-[#6e6e73] dark:text-[#86868b] leading-[1.3] mb-1">
-                {section.title}
-              </h3>
+              <h3 className="text-[12px] font-semibold text-[#86868b] leading-[1.3] mb-1">{section.title}</h3>
               <ul className="space-y-2">
                 {section.links.map((link) => (
                   <li key={link.label}>
-                    <Link
-                      to={link.to}
-                      className="text-[12px] text-[#424245] dark:text-[#d2d2d7] hover:underline leading-[1.33]"
-                    >
-                      {link.label}
-                    </Link>
+                    <Link to={link.to} className="text-[12px] text-[#a1a1a6] hover:text-white hover:underline leading-[1.33]">{link.label}</Link>
                   </li>
                 ))}
               </ul>
             </div>
           ))}
         </div>
-
-        {/* Call to action & Theme row */}
-        <div className="border-b border-slate-200 dark:border-slate-800 pb-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-
-
-          {/* Theme Segmented Control */}
-          <div className="flex bg-[#e8e8ed] dark:bg-[#1d1d1f] rounded-full p-[2px] w-fit shadow-inner">
-            {['light', 'dark', 'system'].map((t) => (
-              <button
-                key={t}
-                onClick={() => setTheme(t)}
-                className={`px-4 py-1 text-[11px] font-medium rounded-full transition-all ${(t === 'system' ? theme === 'system' : theme === t)
-                  ? 'bg-white dark:bg-slate-700 text-[#1d1d1f] dark:text-white shadow-sm'
-                  : 'text-[#6e6e73] dark:text-[#86868b] hover:text-[#1d1d1f] dark:hover:text-white'
-                  }`}
-              >
-                {t.charAt(0).toUpperCase() + t.slice(1)}
-              </button>
-            ))}
+        <div className="border-b border-[#222] pb-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="text-[11px] text-[#86868b]">Built for scale, engineered for compliance.</div>
+          <div className="flex items-center gap-4">
+            <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="text-[#86868b] hover:text-white"><Linkedin className="w-4 h-4" /></a>
+            <a href="https://github.com" target="_blank" rel="noreferrer" className="text-[#86868b] hover:text-white"><Github className="w-4 h-4" /></a>
           </div>
         </div>
-
-        {/* Legal & Local Footer */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pt-1">
-          <div className="flex flex-wrap items-center gap-y-2 text-[12px] text-[#6e6e73] dark:text-[#86868b]">
+          <div className="flex flex-wrap items-center gap-y-2 text-[12px] text-[#86868b]">
             <span className="mr-4">Copyright © 2026 CloudBaud Inc. All rights reserved.</span>
-            <div className="flex divide-x divide-slate-300 dark:divide-slate-700">
+            <div className="flex divide-x divide-[#333]">
               <Link to="/privacy-policy" className="px-2 first:pl-0 hover:underline">Privacy Policy</Link>
               <Link to="/terms-and-conditions" className="px-2 hover:underline">Terms of Use</Link>
             </div>
           </div>
-
-          <div className="flex items-center gap-4">
-            {/* Social Links for Passive Growth Strategy */}
-            <div className="flex items-center gap-4 mr-4 border-r border-slate-300 dark:border-slate-700 pr-4">
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-[#6e6e73] dark:text-[#86868b] hover:text-[#0077b5] transition-colors" aria-label="LinkedIn">
-                <Linkedin className="w-4 h-4" />
-              </a>
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-[#6e6e73] dark:text-[#86868b] hover:text-black dark:hover:text-white transition-colors" aria-label="GitHub">
-                <Github className="w-4 h-4" />
-              </a>
-            </div>
-
-            <div className="flex items-center space-x-1 text-[12px] text-[#424245] dark:text-[#d2d2d7] hover:underline cursor-pointer group">
-              <span className="font-medium">United States</span>
-              <Globe className="w-3 h-3 text-[#6e6e73]" />
-              <ChevronDown className="w-3 h-3 text-[#6e6e73] group-hover:block hidden" />
-            </div>
+          <div className="flex items-center space-x-1 text-[12px] text-[#a1a1a6] cursor-pointer">
+            <span className="font-medium">United States</span><Globe className="w-3 h-3" /><ChevronDown className="w-3 h-3" />
           </div>
-        </div>
-        
-        {/* Build Info */}
-        <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/50 flex justify-center opacity-60 hover:opacity-100 transition-opacity">
-           <p className="text-[10px] font-mono text-slate-400 dark:text-slate-600 flex items-center gap-2">
-              <span>v{"0.0.2"}</span>
-              <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
-              <span>{new Date((new Date().toISOString())).toLocaleString()}</span>
-              <span className="w-1 h-1 rounded-full bg-emerald-500/50" title="System Operational" />
-           </p>
         </div>
       </div>
     </footer>
   );
 };
-
 export default Footer;
-

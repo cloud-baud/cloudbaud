@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import './App.css';
 import { ThemeProvider } from 'next-themes';
 import DynamicMsalProvider from './components/auth/DynamicMsalProvider';
-import MarketingLayout from './portal/layout/MarketingLayout';
+import DefaultLayout from './components/layout/DefaultLayout';
 import WorkspaceLayout from './workspace/collaboration/WorkspaceLayout';
 import ContextLayout from './workspace/ContextLayout';
 import PortalDashboard from './workspace/collaboration/WorkspaceDashboard';
@@ -43,7 +43,7 @@ function App() {
                   <Toaster />
                   <AuthRedirector />
               <Routes>
-                <Route element={<MarketingLayout />}>
+               <Route element={<DefaultLayout />}>
                   {/* CHANGED: / now redirects to /collaboration when logged in */}
                   <Route path="/" element={<RootRedirect />} />
                   <Route path="/login" element={<LoginPage />} /> 
